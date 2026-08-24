@@ -1,0 +1,141 @@
+# Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
+# SPDX-License-Identifier: Apache-2.0
+
+# Construction des binaires publiés, sur un tag.
+#
+# Une seule machine ne produit pas toutes les cibles, contrairement aux autres
+# projets : Ebitengine ne se compile en croisé que vers Windows et WebAssembly,
+# Linux et macOS exigent du natif. D'où la matrice multi-runners.
+#
+# Trois choses ne peuvent pas se faire cible par cible et vont dans le job de
+# rassemblement : SHA256SUMS calculé en un seul endroit sur toutes les archives,
+# l'attestation de provenance, et la création de la version.
+
+name: Publication
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version à construire, pour un essai à blanc"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  binaires:
+    name: ${{ matrix.os }}/${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows, arch: amd64, cgo: 0, runner: ubuntu-latest, ext: .exe }
+          - { os: js, arch: wasm, cgo: 0, runner: ubuntu-latest, ext: .wasm }
+          - { os: linux, arch: amd64, cgo: 1, runner: ubuntu-latest, ext: "" }
+          - { os: linux, arch: arm64, cgo: 1, runner: ubuntu-24.04-arm, ext: "" }
+          - { os: darwin, arch: arm64, cgo: 1, runner: macos-latest, ext: "" }
+          # macos-15-intel est la dernière image x86_64 des runners, annoncée
+          # jusqu'en août 2027. Cette ligne a une date de péremption connue.
+          - { os: darwin, arch: amd64, cgo: 1, runner: macos-15-intel, ext: "" }
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Version
+        id: version
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "valeur=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "valeur=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      # -trimpath toujours : les chemins absolus de la machine de build n'ont
+      # rien à faire dans un artefact public.
+      - name: Construction
+        shell: bash
+        env:
+          CGO_ENABLED: ${{ matrix.cgo }}
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: |
+          mkdir -p paquet
+          go build -trimpath \
+            -ldflags "-s -w -X main.version=${{ steps.version.outputs.valeur }}" \
+            -o "paquet/filature${{ matrix.ext }}" ./cmd/filature
+
+      # LICENSE et NOTICE vont dans l'archive et non à côté : Apache 2.0 les
+      # exige à la redistribution, et personne ne télécharge un asset séparé.
+      #
+      # Rien d'autre : le contenu livré est embarqué dans le binaire, qui se
+      # suffit donc à lui-même.
+      - name: Archive
+        shell: bash
+        run: |
+          cp LICENSE NOTICE paquet/
+          nom="filature_${{ steps.version.outputs.valeur }}_${{ matrix.os }}_${{ matrix.arch }}"
+          mkdir -p dist
+          cd paquet
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            zip -r "../dist/$nom.zip" .
+          else
+            tar czf "../dist/$nom.tar.gz" .
+          fi
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: archive-${{ matrix.os }}-${{ matrix.arch }}
+          path: dist/*
+          if-no-files-found: error
+
+  rassemblement:
+    name: Sommes, attestation et version
+    needs: binaires
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      # L'attestation lie chaque archive au commit et à la chaîne qui l'a
+      # produite. C'est le seul contrepoids crédible à des binaires non signés.
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: recu
+          merge-multiple: true
+
+      # Les sommes portent sur les archives et non sur les binaires : c'est
+      # l'archive que la personne télécharge, donc ce qu'elle peut vérifier.
+      - name: SHA256SUMS
+        run: |
+          cd recu
+          sha256sum * > SHA256SUMS
+          cat SHA256SUMS
+
+      - uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: "recu/*.zip,recu/*.tar.gz"
+
+      # En brouillon : les notes de release se relisent avant d'être publiées,
+      # et c'est là que s'annonce un version_formes ou un version_effets qui
+      # change — l'événement le plus coûteux du projet.
+      - name: Version en brouillon
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "${GITHUB_REF_NAME}" \
+            --draft \
+            --notes "À relire avant publication." \
+            recu/*
