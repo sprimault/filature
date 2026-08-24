@@ -1,0 +1,65 @@
+# Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
+# SPDX-License-Identifier: Apache-2.0
+
+# Langue de repli. Toute clé affichée par le jeu existe ici : une traduction
+# incomplète retombe sur ce fichier, qui n'a donc pas le droit d'avoir de trou.
+#
+# Les clés sont des identifiants, pas du texte : elles ne se traduisent pas et
+# ne se renomment pas sans périmer toutes les traductions publiées.
+
+[libelle]
+
+# Menus et navigation
+menu_nouvelle_partie = "Nouvelle partie"
+menu_reprendre = "Reprendre"
+menu_rejoindre = "Rejoindre une partie"
+menu_heberger = "Héberger"
+menu_preferences = "Préférences"
+menu_quitter = "Quitter"
+menu_retour = "Retour"
+
+# Préférences
+pref_langue = "Langue"
+pref_affichage = "Affichage"
+pref_plein_ecran = "Plein écran"
+pref_greffons = "Greffons"
+pref_fleches_ecran = "Les flèches suivent l'écran"
+pref_fleches_plateau = "Les flèches suivent le plateau"
+
+# Camps et pions
+camp_fugitif = "Fugitif"
+camp_inspecteurs = "Inspecteurs"
+pion_guetteur = "Guetteur"
+pion_coureur = "Coureur"
+pion_traqueur = "Traqueur"
+pion_barreur = "Barreur"
+pion_chef = "Chef"
+
+# Termes du plateau
+terme_resistance = "Résistance"
+terme_trace = "Trace"
+terme_zone = "Zone d'extraction"
+terme_scene = "Scène"
+terme_barrage = "Barrage"
+terme_tour = "Tour"
+
+# Dépenses du fugitif
+depense_double_deplacement = "Double déplacement"
+depense_silence = "Silence"
+depense_effacement = "Effacement"
+depense_meurtre = "Meurtre"
+depense_changer_zone = "Changer de zone"
+
+# Déroulement
+phase_placement = "Placement"
+phase_inspecteurs = "Aux inspecteurs"
+phase_fugitif = "Au fugitif"
+action_passer = "Passer"
+action_fin_de_phase = "Rendre la main"
+action_annuler = "Revenir en arrière"
+
+# Fin de partie
+fin_extraction = "Le fugitif s'est extrait"
+fin_resistance_epuisee = "Le fugitif est à bout"
+fin_fugitif_bloque = "Le fugitif est pris"
+fin_temps_ecoule = "Le temps est écoulé"
