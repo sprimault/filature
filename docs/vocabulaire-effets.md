@@ -2,6 +2,11 @@
 
 Version du vocabulaire : **1**
 
+Un greffon qui déclare une capacité, une dépense ou un mode porte
+`version_effets` dans son manifeste. C'est le quatrième numéro de contrat du
+projet, indépendant des trois autres : le vocabulaire peut changer sans que le
+contrat de formes ni celui des bots bougent, et l'inverse est vrai aussi.
+
 Une capacité, une dépense de résistance, un mode de jeu se décrit par
 composition de primitives, jamais par du code. C'est le contrat central du
 projet : il rend le modding accessible sans bac à sable, sans faille, sans
@@ -163,13 +168,51 @@ capacité d'inspecteur ne cible pas `fugitif` pour lui rendre de la résistance.
 | `fin_de_tour` | Automatique, à la résolution |
 | `contact` | Quand le fugitif est adjacent à un inspecteur |
 | `revelation` | Au tour d'une révélation périodique |
+| `etranglement` | Au tour où une zone se ferme — **réservé aux modes** |
 
 Une capacité `passive = true` n'a pas de déclenchement : elle s'applique en
 permanence, tant que le pion est en jeu.
 
 ---
 
-## 6. Comment s'exprime un niveau de difficulté
+## 6. Modes
+
+Un mode est une règle de partie que le jeu déclenche, sans qu'un joueur la
+choisisse. C'est la troisième forme déclarative, à côté des capacités et des
+dépenses, et elle se lit de la même façon : un nom, un déclenchement, des
+effets.
+
+```toml
+[mode.etranglement]
+nom = "Étranglement"
+declenchement = "etranglement"
+
+  [[mode.etranglement.effet]]
+  type = "differer"
+  duree = 2
+  annonce = true
+
+    [[mode.etranglement.effet.puis]]
+    type = "fermer_zone"
+    cible = "zone"
+```
+
+**La cadence n'est pas dans le mode.** À partir de quel tour l'étranglement
+commence et tous les combien il se répète sont des `Parametres`, réglés dans
+l'interface et enregistrés avec la partie. Le mode dit *ce qui se passe*, le
+paramètre dit *quand* : les écrire tous deux ici donnerait deux sources de
+vérité pour un même réglage, et un préréglage de difficulté cesserait d'agir.
+
+La `duree` du `differer` ci-dessus est le préavis, pas la période. Les deux
+valent 2 dans la règle standard, et ce n'est qu'une coïncidence de chiffres.
+
+`etranglement` n'est ouvert qu'à un mode. Une capacité ne lit pas les
+paramètres de cadence, elle n'aurait donc aucun moyen de savoir quand se
+déclencher.
+
+---
+
+## 7. Comment s'exprime un niveau de difficulté
 
 Trois axes indépendants. **Les garder séparés est ce qui rend l'équilibrage
 mesurable** : si « difficile » veut dire à la fois une IA plus forte et des
@@ -194,7 +237,7 @@ jamais par accident.
 
 ---
 
-## 7. Ce qui n'est pas dans le vocabulaire, et pourquoi
+## 8. Ce qui n'est pas dans le vocabulaire, et pourquoi
 
 **Rien qui force un adversaire à jouer un coup.** Un effet modifie ce qui est
 possible, jamais ce qui est choisi. La convergence des inspecteurs sur une scène
@@ -214,11 +257,13 @@ un contrat distinct avec sa propre version.
 
 ---
 
-## 8. Validation
+## 9. Validation
 
 Contrôles appliqués au chargement, greffon local compris :
 
-- type de primitive connu, version du vocabulaire prise en charge ;
+- type de primitive connu, `version_effets` prise en charge ;
+- `duree` d'un `differer` supérieure à zéro, et `annonce` comme `puis` refusés
+  sur toute autre primitive ;
 - `cible` compatible avec le `camp` déclaré ;
 - champs obligatoires présents pour le type ;
 - `duree` et `rayon` positifs, `valeur` dans les bornes du type ;

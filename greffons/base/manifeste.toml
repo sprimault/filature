@@ -4,6 +4,7 @@
 
 nom = "base"
 version = "0.1.0"
+version_effets = 1
 regles = true
 licence = "Apache-2.0"
 description = "Capacités et dépenses de la règle standard"

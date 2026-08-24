@@ -12,28 +12,47 @@
   "properties": {
     "nom": {
       "type": "string",
-      "pattern": "^[a-z][a-z0-9-]{1,31}$"
+      "pattern": "^[a-z][a-z0-9-]{1,31}$",
+      "description": "Identifiant du greffon, qui est aussi son nom de dossier."
     },
     "version": {
-      "type": "string"
+      "type": "string",
+      "description": "Version declaree par l'auteur, sans valeur de preuve."
+    },
+    "version_effets": {
+      "type": "integer",
+      "enum": [
+        1
+      ],
+      "description": "Version du vocabulaire d'effets visee. Obligatoire des qu'une capacite, une depense ou un mode est declare."
     },
     "description": {
-      "type": "string"
+      "type": "string",
+      "description": "Une phrase, affichee dans l'ecran des greffons."
     },
     "regles": {
       "type": "boolean",
       "default": false,
-      "description": "Vrai si le greffon modifie les règles. Ces greffons doivent être identiques des deux côtés d'une partie en réseau ; les greffons purement visuels en sont dispensés."
+      "description": "Vrai si le greffon modifie les regles. Ceux-la doivent etre identiques des deux cotes en reseau."
     },
     "wasm": {
       "type": "string",
-      "description": "Chemin relatif d'un module WebAssembly, pour un générateur de plateau ou une IA. Le bac à sable ne donne accès ni à l'horloge, ni à l'entropie système, ni au disque, ni au réseau."
+      "description": "Chemin relatif d'un module WebAssembly, pour un generateur de plateau ou une IA."
     },
     "capacite": {
-      "$ref": "#/$defs/tableCapacites"
+      "$ref": "#/$defs/tableCapacites",
+      "description": "Capacites apportees, indexees par identifiant."
     },
     "depense": {
-      "$ref": "#/$defs/tableCapacites"
+      "$ref": "#/$defs/tableCapacites",
+      "description": "Depenses de resistance apportees, meme format qu'une capacite."
+    },
+    "mode": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/mode"
+      },
+      "description": "Regles de partie declenchees par le jeu et non par un joueur."
     },
     "licence": {
       "enum": [
@@ -44,9 +63,37 @@
         "CC-BY-SA-4.0",
         "BSD-3-Clause"
       ],
-      "description": "Identifiant SPDX. Liste courte et fermee : un champ libre laisserait passer « a voir » et rendrait les entrees du catalogue inexploitables. Obligatoire pour un greffon publie, facultatif hors catalogue."
+      "description": "Identifiant SPDX. Obligatoire pour un greffon publie, facultatif hors catalogue."
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "anyOf": [
+          {
+            "required": [
+              "capacite"
+            ]
+          },
+          {
+            "required": [
+              "depense"
+            ]
+          },
+          {
+            "required": [
+              "mode"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "required": [
+          "version_effets"
+        ]
+      }
+    }
+  ],
   "$defs": {
     "tableCapacites": {
       "type": "object",
@@ -63,24 +110,29 @@
       "additionalProperties": false,
       "properties": {
         "nom": {
-          "type": "string"
+          "type": "string",
+          "description": "Libelle affiche au joueur ; l'identifiant est la cle de la table."
         },
         "camp": {
           "enum": [
             "fugitif",
             "inspecteurs"
-          ]
+          ],
+          "description": "Camp qui peut la declencher. Une cible incompatible avec lui est refusee au chargement."
         },
         "usages": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Nombre de declenchements par partie ; absent vaut illimite."
         },
         "cout": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Points de resistance preleves au declenchement."
         },
         "passive": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Vrai pour une capacite permanente, qui n'a alors pas de declenchement."
         },
         "declenchement": {
           "enum": [
@@ -89,14 +141,50 @@
             "fin_de_tour",
             "contact",
             "revelation"
-          ]
+          ],
+          "description": "Moment ou la capacite entre en jeu."
         },
         "effet": {
           "type": "array",
           "minItems": 1,
           "items": {
             "$ref": "#/$defs/effet"
-          }
+          },
+          "description": "Les primitives appliquees, dans l'ordre."
+        }
+      }
+    },
+    "mode": {
+      "type": "object",
+      "required": [
+        "nom",
+        "declenchement",
+        "effet"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "nom": {
+          "type": "string",
+          "description": "Libelle affiche aux deux joueurs quand le mode agit."
+        },
+        "declenchement": {
+          "enum": [
+            "phase_inspecteurs",
+            "phase_fugitif",
+            "fin_de_tour",
+            "contact",
+            "revelation",
+            "etranglement"
+          ],
+          "description": "Moment ou le mode agit. etranglement n'est ouvert qu'a un mode."
+        },
+        "effet": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/effet"
+          },
+          "description": "Ce que le mode applique a chaque declenchement ; la cadence vient des parametres de la partie."
         }
       }
     },
@@ -126,7 +214,8 @@
             "teleporter",
             "differer",
             "fin_partie"
-          ]
+          ],
+          "description": "La primitive appliquee. Liste fermee, decrite dans docs/vocabulaire-effets.md."
         },
         "cible": {
           "enum": [
@@ -136,28 +225,32 @@
             "fugitif",
             "case",
             "zone"
-          ]
+          ],
+          "description": "Ce sur quoi l'effet porte."
         },
         "valeur": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Amplitude, dans l'unite de la primitive. Le negatif est legal."
         },
         "duree": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Nombre de tours pendant lesquels l'effet tient ; zero vaut le tour courant."
         },
         "rayon": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Portee en cases, distance de Tchebychev."
         },
         "annonce": {
           "type": "boolean",
-          "description": "Pour differer seulement. Si vrai, l'effet en attente figure dans la Vue des deux camps — c'est tout son interet : un mur qui apparait sans prevenir transformerait un plan raisonne en coup de de."
+          "description": "Pour differer seulement : l'effet en attente figure alors dans la vue des deux camps."
         },
         "puis": {
           "type": "array",
           "minItems": 1,
           "maxItems": 8,
-          "description": "Pour differer seulement. Un differer imbrique est refuse : deux durees s'additionnent, donc l'imbrication n'ajoute rien et permettrait des chaines qu'aucune annulation ne saurait derouler.",
+          "description": "Pour differer seulement : les effets appliques a l'echeance.",
           "items": {
             "allOf": [
               {
@@ -168,7 +261,8 @@
               "type": {
                 "not": {
                   "const": "differer"
-                }
+                },
+                "description": "Toute primitive sauf differer."
               }
             }
           }
@@ -190,7 +284,19 @@
             "required": [
               "duree",
               "puis"
-            ]
+            ],
+            "properties": {
+              "duree": {
+                "minimum": 1,
+                "description": "Nombre de tours de preavis, au moins un."
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "annonce": false,
+              "puis": false
+            }
           }
         }
       ]

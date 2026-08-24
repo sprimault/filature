@@ -5,18 +5,25 @@ package noyau
 
 import "errors"
 
-// Declenchement dit quand une capacité peut être jouée.
+// VersionEffets est la version du vocabulaire que ce binaire sait appliquer.
+//
+// Un greffon écrit contre une version inconnue est refusé plutôt qu'appliqué de
+// travers. Sans ce numéro, un manifeste employant une primitive apparue plus
+// tard échouerait sur un message de champ inconnu.
+const VersionEffets = 1
+
+// Declenchement dit quand une capacité ou un mode entre en jeu.
 type Declenchement string
 
-// Les cinq moments où une capacité peut se déclencher. SurFinDeTour,
-// SurContact et SurRevelation n'ont aucun usage dans le contenu livré : ils
-// existent pour les greffons de règles.
+// Les six moments de déclenchement. SurContact et SurRevelation n'ont aucun
+// usage dans le contenu livré : ils existent pour les greffons de règles.
 const (
 	SurPhaseInspecteurs Declenchement = "phase_inspecteurs"
 	SurPhaseFugitif     Declenchement = "phase_fugitif"
 	SurFinDeTour        Declenchement = "fin_de_tour"
 	SurContact          Declenchement = "contact"
 	SurRevelation       Declenchement = "revelation"
+	SurEtranglement     Declenchement = "etranglement"
 )
 
 // Capacite est une entrée déclarative, chargée depuis un manifeste. Les cinq
@@ -33,11 +40,26 @@ type Capacite struct {
 	Effets        []Effet       `toml:"effet" json:"effets"`
 }
 
+// Mode est une règle de partie déclarée en effets, que le noyau déclenche sans
+// qu'un joueur la choisisse.
+//
+// L'étranglement en est un. La cadence — à partir de quel tour, tous les
+// combien — reste dans Parametres, où l'interface l'expose : le mode dit ce qui
+// se passe, le paramètre dit quand. Les inscrire tous deux ici donnerait deux
+// sources de vérité pour un même réglage.
+type Mode struct {
+	Cle           string        `toml:"-" json:"cle"`
+	Nom           string        `toml:"nom" json:"nom"`
+	Declenchement Declenchement `toml:"declenchement" json:"declenchement"`
+	Effets        []Effet       `toml:"effet" json:"effets"`
+}
+
 // Registre rassemble tout ce que les greffons ont apporté, plus le contenu de
 // base. Le noyau ne connaît que le registre, jamais un greffon en particulier.
 type Registre struct {
 	Capacites map[string]Capacite
 	Depenses  map[Depense]Capacite
+	Modes     map[string]Mode
 
 	// Generateurs et Cerveaux sont les deux points d'extension qui ne se
 	// décrivent pas en données : un générateur de plateau et une IA. Ils
