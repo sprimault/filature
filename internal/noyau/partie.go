@@ -92,6 +92,11 @@ type Partie struct {
 	PionsDeplaces int   `json:"pions_deplaces"`
 	ZonesFermees  []int `json:"zones_fermees"`
 
+	// EffetsEnAttente est la file des differer posés, résolue en fin de tour
+	// avant le test de fin de partie. Elle se sérialise avec le reste : une
+	// reprise qui la perdrait escamoterait un barrage déjà annoncé.
+	EffetsEnAttente []EffetEnAttente `json:"effets_en_attente"`
+
 	Journal    []Coup    `json:"journal"`
 	Extensions *Registre `json:"-"`
 	alea       *Alea

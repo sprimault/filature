@@ -18,7 +18,7 @@ clause du zéro.
 ## 1 — Noyau
 
 `internal/noyau` : état, coups légaux, application et annulation, contacts,
-arbitrage, vocabulaire d'effets, registre.
+arbitrage, vocabulaire d'effets et file des différés, registre.
 
 Livré quand une partie complète se joue de bout en bout depuis des appels Go,
 sans interface, avec les cas limites de `docs/regles.md` §14 couverts par des

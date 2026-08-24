@@ -44,6 +44,11 @@ type Vue struct {
 	SilencePaye     bool       `json:"silence_paye"`
 	ZonesAnnoncees  []int      `json:"zones_annoncees"`
 
+	// EffetsAnnonces ne porte que les differer déclarés avec annonce, et les
+	// porte à l'identique pour les deux camps. Un differer sans annonce reste
+	// invisible jusqu'à sa résolution, sinon le champ le trahirait.
+	EffetsAnnonces []EffetEnAttente `json:"effets_annonces"`
+
 	Resultat *Resultat `json:"resultat,omitempty"`
 }
 

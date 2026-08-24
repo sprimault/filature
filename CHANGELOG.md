@@ -23,3 +23,4 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
 - Squelette du projet, contrats de formes et de bot.
 - Vocabulaire d'effets documenté, avec les primitives `differer` et
   `ouvrir_case`.
+- File des effets différés dans l'état, et les différés annoncés dans la vue.

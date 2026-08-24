@@ -94,10 +94,10 @@ type EffetEnAttente struct {
 // à la Partie entière : un greffon ne doit pas pouvoir lire la zone scellée du
 // fugitif ni écrire dans le journal.
 type Contexte struct {
-	Acteur Acteur
-	Pion   int
-	Case   Position
-	Zone   int
+	Acteur Acteur   `json:"acteur"`
+	Pion   int      `json:"pion"`
+	Case   Position `json:"case"`
+	Zone   int      `json:"zone"`
 }
 
 // Appliquer1Effet exécute un effet et renvoie de quoi le défaire.
