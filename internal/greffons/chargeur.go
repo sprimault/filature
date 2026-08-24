@@ -13,16 +13,24 @@ package greffons
 
 import (
 	"errors"
+	"io/fs"
 
 	"github.com/sprimault/filature/internal/noyau"
 )
 
-// Charger lit un dossier de greffons et construit le registre.
+// Charger construit le registre depuis le contenu livré puis le dossier de
+// greffons du joueur.
 //
-// L'ordre de chargement est alphabétique, donc déterministe. Un manifeste
-// invalide fait échouer le chargement entier plutôt que d'être ignoré : un
-// greffon à moitié actif est pire qu'un greffon absent.
-func Charger(racine string, base *noyau.Registre) (*noyau.Registre, error) {
+// Les deux sources sont lues par le même code, et c'est le seul point qui
+// compte : le contenu livré vient d'un système de fichiers embarqué dans le
+// binaire, les greffons tiers du disque, mais rien dans le chargement ne les
+// distingue. Un raccourci pour le contenu livré laisserait ce chemin non testé
+// jusqu'au jour où quelqu'un installe son premier greffon.
+//
+// L'ordre de chargement est alphabétique au sein de chaque source, donc
+// déterministe. Un manifeste invalide fait échouer le chargement entier plutôt
+// que d'être ignoré : un greffon à moitié actif est pire qu'un greffon absent.
+func Charger(livres fs.FS, racine string, base *noyau.Registre) (*noyau.Registre, error) {
 	return nil, errors.New("à implémenter : étape 8")
 }
 
