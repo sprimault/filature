@@ -61,10 +61,13 @@ jobs:
       - name: Détecteur de course
         run: make race
 
+      # Version épinglée, la même que GOLANGCI_VERSION dans le Makefile. Avec
+      # « latest », le poste de développement prend du retard dès qu'une version
+      # sort, et le lint échoue ici sur du code que personne n'a touché.
       - name: Lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: latest
+          version: v2.13.1
 
   securite:
     name: Sécurité
