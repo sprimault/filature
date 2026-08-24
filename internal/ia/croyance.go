@@ -25,16 +25,26 @@ type Croyance struct {
 
 // NouvelleCroyance part de la connaissance initiale : le fugitif est quelque
 // part dans le noyau central.
-func NouvelleCroyance(v noyau.Vue) *Croyance { return nil }
+func NouvelleCroyance(v noyau.Vue) *Croyance {
+	// à implémenter : étape 9
+	return nil
+}
 
 // Propager étale la masse d'un tour de déplacement.
-func (c *Croyance) Propager(v noyau.Vue) {}
+func (c *Croyance) Propager(v noyau.Vue) {
+	// à implémenter : étape 9
+}
 
 // Observer annule la masse des cases vues et vides, et réinjecte autour des
 // traces découvertes, pondérée par leur ancienneté.
-func (c *Croyance) Observer(v noyau.Vue) {}
+func (c *Croyance) Observer(v noyau.Vue) {
+	// à implémenter : étape 9
+}
 
 // Barycentre sert d'heuristique de convergence. Il n'a de sens que si la masse
 // est concentrée : sur une distribution bimodale, il désigne un point où le
 // fugitif n'est justement pas.
-func (c *Croyance) Barycentre() noyau.Position { return noyau.Position{} }
+func (c *Croyance) Barycentre() noyau.Position {
+	// à implémenter : étape 9
+	return noyau.Position{}
+}

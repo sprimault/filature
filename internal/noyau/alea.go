@@ -17,12 +17,18 @@ type Alea struct {
 // évitent qu'ajouter un tirage dans la génération décale tous les tirages de
 // l'IA.
 func NouvelAlea(graine int64, flux string) *Alea {
+	// à implémenter : étape 1
 	return nil
 }
 
 // Entier renvoie une valeur dans [0, n[.
-func (a *Alea) Entier(n int) int { return 0 }
+func (a *Alea) Entier(n int) int {
+	// à implémenter : étape 1
+	return 0
+}
 
 // Melanger permute une tranche sur place. À préférer systématiquement à un
 // parcours de map, dont l'ordre n'est pas déterministe en Go.
-func Melanger[T any](a *Alea, s []T) {}
+func Melanger[T any](a *Alea, s []T) {
+	// à implémenter : étape 1
+}

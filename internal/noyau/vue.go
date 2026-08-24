@@ -58,5 +58,6 @@ type Vue struct {
 // copié ici, jamais par recopie de structure. Une omission fait fuiter, un
 // oubli ne fait qu'afficher moins.
 func (p *Partie) VuePour(a Acteur) Vue {
+	// à implémenter : étape 2
 	return Vue{}
 }

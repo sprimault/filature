@@ -42,7 +42,13 @@ func Ouvrir(ctx context.Context, wasm []byte, alea *noyau.Alea) (*BacASable, err
 }
 
 // Cerveau adapte un module invité à la signature d'IA du noyau.
-func (b *BacASable) Cerveau() noyau.FabriqueCerveau { return nil }
+func (b *BacASable) Cerveau() noyau.FabriqueCerveau {
+	// à implémenter : étape 13
+	return nil
+}
 
 // Generateur adapte un module invité à la signature de génération de plateau.
-func (b *BacASable) Generateur() noyau.FabriquePlateau { return nil }
+func (b *BacASable) Generateur() noyau.FabriquePlateau {
+	// à implémenter : étape 13
+	return nil
+}

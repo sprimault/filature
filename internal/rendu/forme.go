@@ -188,6 +188,7 @@ const AmplitudeGrainSol = 5
 // Ce n'est pas une primitive du contrat et aucun greffon n'a à en tenir compte :
 // tous en bénéficient, y compris ceux qui ne changent que la palette.
 func GrainSol(graine int64, colonne, ligne int) int {
+	// à implémenter : étape 7
 	return 0
 }
 
@@ -201,5 +202,6 @@ func VersEcran(colonne, ligne int) (x, y int) {
 // L'arrondi doit tomber sur la case que l'utilisateur croit viser, y compris
 // près des arêtes du losange où le calcul naïf se trompe d'une case.
 func VersPlateau(x, y int) (colonne, ligne int) {
+	// à implémenter : étape 7
 	return 0, 0
 }

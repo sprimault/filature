@@ -14,6 +14,7 @@ package noyau
 // Guetteur comprise — et tronquée à la lecture. Recalculer à chaque
 // changement de portée coûterait plus cher que stocker.
 func precalculerVision(b *PlateauBorne, porteeMax int) map[Position][]Position {
+	// à implémenter : étape 4
 	return nil
 }
 
@@ -23,6 +24,7 @@ func precalculerVision(b *PlateauBorne, porteeMax int) map[Position][]Position {
 // Les diagonales appliquent la même règle d'angle que les déplacements : un
 // regard ne se faufile pas entre deux bâtiments en équerre.
 func ligneDeVue(b *PlateauBorne, depart Position, d Direction, portee int) []Position {
+	// à implémenter : étape 4
 	return nil
 }
 
@@ -37,5 +39,6 @@ func ligneDeVue(b *PlateauBorne, depart Position, d Direction, portee int) []Pos
 // ici, en tronquant la ligne à la première case occupée. Les précalculer
 // ensemble supposerait de tout recalculer à chaque déplacement.
 func EstVisible(b Plateau, depuis, cible Position, portee int, occupees map[Position]bool) bool {
+	// à implémenter : étape 4
 	return false
 }

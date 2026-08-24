@@ -24,6 +24,7 @@ const (
 // Resultat teste les conditions de fin. Le second retour distingue « partie en
 // cours » de « match nul », qui n'existe pas ici.
 func (p *Partie) Resultat() (Resultat, bool) {
+	// à implémenter : étape 1
 	return Resultat{}, false
 }
 
@@ -31,6 +32,7 @@ func (p *Partie) Resultat() (Resultat, bool) {
 // inspecteur est neutralisée : le compte ne démarre pas et s'interrompt s'il
 // était engagé.
 func (p *Partie) extractionEnCours() bool {
+	// à implémenter : étape 1
 	return false
 }
 
@@ -41,5 +43,6 @@ func (p *Partie) extractionEnCours() bool {
 // de greffons/base, qui porte le préavis et la fermeture. Un greffon qui
 // remplace ce mode change ce qui se passe, jamais quand.
 func (p *Partie) zonesAFermer() (maintenant, annoncees []int) {
+	// à implémenter : étape 1
 	return nil, nil
 }

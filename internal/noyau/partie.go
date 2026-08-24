@@ -114,6 +114,7 @@ func Nouvelle(graine int64, p Parametres, r *Registre) (*Partie, error) {
 // surligner les cases, l'IA pour explorer, le serveur pour valider ce qui
 // arrive du réseau. Aucun de ces trois ne réimplémente la règle.
 func (p *Partie) CoupsLegaux(a Acteur) []Coup {
+	// à implémenter : étape 1
 	return nil
 }
 
@@ -138,11 +139,13 @@ func (p *Partie) Annuler() error {
 // étranglement et test de fin. L'ordre est un contrat : le décompte des
 // contacts a lieu après le déplacement du fugitif, pas avant.
 func (p *Partie) resoudreFinDeTour() {
+	// à implémenter : étape 1
 }
 
 // contacts compte les inspecteurs orthogonalement adjacents au fugitif. Les
 // diagonales ne comptent pas, et le total est plafonné : être encerclé doit
 // faire très mal sans être instantanément fatal.
 func (p *Partie) contacts() int {
+	// à implémenter : étape 1
 	return 0
 }
