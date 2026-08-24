@@ -18,11 +18,13 @@ enregistrer.
 
 ```
 greffons/
-  base/                 le contenu livré, au même format qu'un greffon tiers
+  base/                 le contenu livré, français compris
+  anglais/              l'anglais, livré au même format
   mes-vehicules/
     manifeste.toml      obligatoire
     formes.toml         facultatif
     palette.toml        facultatif
+    langue.toml         facultatif
 ```
 
 `manifeste.toml` est le seul fichier obligatoire. Les autres n'existent que si
@@ -85,6 +87,7 @@ proprement.
 | `depense` | ce que le fugitif peut acheter avec sa résistance |
 | `mode` | ce que le jeu déclenche de lui-même |
 | `bot` | un adversaire en processus séparé |
+| `langue` | un dictionnaire de libellés |
 
 Les trois premiers sont des tables indexées par identifiant. La clé est
 l'identifiant, le champ `nom` est le libellé affiché :
@@ -170,7 +173,75 @@ formes attendus sont dans [`contrat-formes.md`](contrat-formes.md).
 
 ---
 
-## 6. Bots
+## 6. Langues
+
+Les libellés de l'interface ne sont jamais dans le code : ils viennent d'un
+dictionnaire, et un greffon de langue en fournit un.
+
+```
+mes-traductions/
+  manifeste.toml
+  langue.toml
+```
+
+```toml
+# manifeste.toml
+nom = "filature-de"
+version = "1.0.0"
+licence = "CC0-1.0"
+description = "Filature en allemand"
+
+[langue]
+code = "de"
+nom = "Deutsch"
+```
+
+`code` est une étiquette BCP 47 — `de`, `pt-BR`, `zh-Hans`. `nom` est le nom de
+la langue **dans cette langue**, parce que c'est lui qui s'affiche dans le
+sélecteur : quelqu'un qui cherche sa langue y cherche « Deutsch », pas
+« allemand ».
+
+```toml
+# langue.toml
+[libelle]
+menu_nouvelle_partie = "Neues Spiel"
+camp_fugitif = "Flüchtiger"
+```
+
+**Une langue par greffon.** Un traducteur publie et met à jour la sienne sans
+toucher à celles des autres, et deux greffons qui fournissent le même code sont
+un conflit signalé, comme partout ailleurs.
+
+### Où le poser pour qu'il soit reconnu
+
+Dans le dossier des greffons, qui est `greffons/` à côté de l'exécutable, ou
+celui que désigne `--greffons` :
+
+```
+filature.exe
+greffons/
+  base/              le contenu livré, français compris
+  anglais/           l'anglais, livré aussi
+  mes-traductions/   le vôtre, ici
+```
+
+Rien à enregistrer, rien à recompiler : le dossier est lu au démarrage, et la
+langue apparaît dans le sélecteur des préférences. Un greffon qui ne se montre
+pas est un greffon dont le manifeste a été refusé — le journal dit lequel et
+pourquoi.
+
+### Ce qui n'a pas de version
+
+Un dictionnaire n'en porte pas, contrairement aux formes, aux effets et au
+protocole de bot. **Aucune incompatibilité n'est possible** : une clé absente
+retombe sur le français, une clé inconnue est ignorée. Une traduction en retard
+n'est pas cassée, elle est partielle — et l'écran des greffons dit à quel point.
+
+Le français fait exception en ceci qu'il est la langue de repli : il vit dans
+`greffons/base` et couvre toutes les clés par construction, puisque c'est lui
+que le reste complète.
+
+## 7. Bots
 
 Un bot ne modifie pas les règles, il joue avec. Il se déclare dans une table
 `[bot]` et vit dans un processus séparé.
@@ -194,7 +265,7 @@ Les messages échangés sont dans [`protocole-bot.md`](protocole-bot.md).
 
 ---
 
-## 7. Ce qui se passe au chargement
+## 8. Ce qui se passe au chargement
 
 1. Lecture des manifestes, dans l'ordre alphabétique des dossiers.
 2. Validation de chacun contre
@@ -215,7 +286,7 @@ point un greffon veut la liste, pas un aller-retour par erreur.
 
 ---
 
-## 8. Ce qui est refusé
+## 9. Ce qui est refusé
 
 - `regles = false` accompagné d'une capacité, d'une dépense, d'un mode ou d'un
   module exécutable ;

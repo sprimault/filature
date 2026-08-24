@@ -59,6 +59,10 @@
       "$ref": "#/$defs/bot",
       "description": "Adversaire en processus separe, qui remplace l'IA du jeu."
     },
+    "langue": {
+      "$ref": "#/$defs/langue",
+      "description": "Dictionnaire de libelles, dans langue.toml a cote du manifeste."
+    },
     "licence": {
       "enum": [
         "MIT",
@@ -218,6 +222,25 @@
             "$ref": "#/$defs/effet"
           },
           "description": "Ce que le mode applique a chaque declenchement ; la cadence vient des parametres de la partie."
+        }
+      }
+    },
+    "langue": {
+      "type": "object",
+      "required": [
+        "code",
+        "nom"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,8})*$",
+          "description": "Etiquette BCP 47 : de, pt-BR, zh-Hans. Deux greffons qui declarent le meme code sont un conflit."
+        },
+        "nom": {
+          "type": "string",
+          "description": "Nom de la langue dans cette langue, tel qu'il s'affiche dans le selecteur."
         }
       }
     },

@@ -29,3 +29,4 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
 - Étranglement exprimé en effets dans `greffons/base`, plus codé en dur.
 - Documentation du format d'un greffon, et table `bot` au schéma de manifeste.
 - Application et annulation des dix-sept primitives d'effets.
+- Greffons de langue, avec le français en repli et l'anglais livré.

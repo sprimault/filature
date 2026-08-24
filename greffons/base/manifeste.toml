@@ -12,6 +12,13 @@ regles = true
 licence = "Apache-2.0"
 description = "Capacités et dépenses de la règle standard"
 
+# Le français est la langue de repli : un libellé absent d'une traduction est
+# affiché depuis ici. Il vit donc dans le contenu de base plutôt que dans un
+# greffon à part, où son absence rendrait l'interface muette.
+[langue]
+code = "fr"
+nom = "Français"
+
 # ---------------------------------------------------------------------------
 # Capacités des inspecteurs : une par pion, une seule fois par partie.
 # ---------------------------------------------------------------------------
