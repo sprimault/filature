@@ -34,9 +34,12 @@ func (p *Partie) extractionEnCours() bool {
 	return false
 }
 
-// zonesAFermer renvoie les zones que l'étranglement ferme à ce tour, et celles
-// annoncées pour dans deux tours. L'ordre vient de la graine : les deux camps
-// voient venir la fermeture, personne ne la subit par surprise.
+// zonesAFermer renvoie les zones que l'étranglement vise à ce tour. L'ordre
+// vient de la graine.
+//
+// Elle ne ferme rien : elle donne la cadence et la cible au mode etranglement
+// de greffons/base, qui porte le préavis et la fermeture. Un greffon qui
+// remplace ce mode change ce qui se passe, jamais quand.
 func (p *Partie) zonesAFermer() (maintenant, annoncees []int) {
 	return nil, nil
 }

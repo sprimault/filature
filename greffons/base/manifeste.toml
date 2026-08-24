@@ -126,3 +126,29 @@ declenchement = "phase_fugitif"
   [[depense.meurtre.effet]]
   type = "reveler_position"
   cible = "fugitif"
+
+# ---------------------------------------------------------------------------
+# Modes : ce que le jeu déclenche de lui-même, sans qu'un joueur le choisisse.
+# ---------------------------------------------------------------------------
+
+# La fermeture progressive des zones d'extraction. Le préavis de deux tours est
+# ici parce qu'il fait partie de la mécanique : les deux camps voient venir la
+# fermeture, personne ne la subit par surprise.
+#
+# À partir de quel tour l'étranglement commence et tous les combien il se répète
+# restent des paramètres de partie, réglables dans l'interface. Les inscrire ici
+# donnerait deux sources de vérité, et un préréglage de difficulté n'aurait plus
+# prise dessus.
+
+[mode.etranglement]
+nom = "Étranglement"
+declenchement = "etranglement"
+
+  [[mode.etranglement.effet]]
+  type = "differer"
+  duree = 2
+  annonce = true
+
+    [[mode.etranglement.effet.puis]]
+    type = "fermer_zone"
+    cible = "zone"
