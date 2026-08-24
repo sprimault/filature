@@ -57,7 +57,13 @@ binaries:
 clean:
 	rm -rf $(SORTIE) dist
 
+# La version de golangci-lint est épinglée et partagée avec le workflow, qui la
+# reprend telle quelle. Avec @latest des deux côtés, le poste prend du retard
+# dès qu'une version sort : le lint passe en local et échoue en intégration
+# continue, sur du code que personne n'a touché. Les deux se changent ensemble.
+GOLANGCI_VERSION ?= v2.13.1
+
 tools:
-	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_VERSION)
 	go install golang.org/x/vuln/cmd/govulncheck@latest
 	go install github.com/securego/gosec/v2/cmd/gosec@latest

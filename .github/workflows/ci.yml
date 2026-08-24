@@ -1,0 +1,122 @@
+# Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
+# SPDX-License-Identifier: Apache-2.0
+
+# Vérification de chaque poussée et de chaque PR.
+#
+# Les cibles appelées sont celles du Makefile, jamais des commandes go réécrites
+# ici : deux définitions finiraient par diverger, et c'est celle du workflow
+# qu'on ne peut pas essayer avant de pousser.
+
+name: Vérification
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  # govulncheck interroge sa base d'avis en direct : un job vert le matin peut
+  # être rouge l'après-midi sur exactement le même code. Une exécution
+  # quotidienne le dit sans attendre la prochaine contribution.
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  controles:
+    name: Contrôles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          # La version vient de go.mod : la répéter ici créerait un second
+          # endroit à mettre à jour, et personne ne penserait aux deux.
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Format
+        run: |
+          restants=$(gofmt -l .)
+          if [ -n "$restants" ]; then
+            echo "fichiers non formatés :"
+            echo "$restants"
+            exit 1
+          fi
+
+      - name: Construction
+        run: make build
+
+      - name: Tests
+        run: make test
+
+      # Le détecteur de course exige cgo, donc un compilateur C. Il est présent
+      # sur les runners Ubuntu, ce qui n'est pas le cas partout.
+      - name: Détecteur de course
+        run: make race
+
+      # Version épinglée, la même que GOLANGCI_VERSION dans le Makefile. Avec
+      # « latest », le poste de développement prend du retard dès qu'une version
+      # sort, et le lint échoue ici sur du code que personne n'a touché.
+      - name: Lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.13.1
+
+  securite:
+    name: Sécurité
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Vulnérabilités connues
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          make vulncheck
+
+      - name: Analyse statique de sécurité
+        run: |
+          go install github.com/securego/gosec/v2/cmd/gosec@latest
+          make sec
+
+  # Ce que le poste de développement ne peut pas vérifier : que le code se
+  # construit encore pour les six cibles publiées. Sans ce job, une rupture de
+  # compilation sur macOS ou arm64 n'apparaîtrait qu'au moment de publier.
+  cibles:
+    name: Compilation ${{ matrix.os }}/${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows, arch: amd64, cgo: 0, runner: ubuntu-latest }
+          - { os: js, arch: wasm, cgo: 0, runner: ubuntu-latest }
+          - { os: linux, arch: amd64, cgo: 1, runner: ubuntu-latest }
+          - { os: linux, arch: arm64, cgo: 1, runner: ubuntu-24.04-arm }
+          - { os: darwin, arch: arm64, cgo: 1, runner: macos-latest }
+          - { os: darwin, arch: amd64, cgo: 1, runner: macos-15-intel }
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Construction
+        env:
+          CGO_ENABLED: ${{ matrix.cgo }}
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: go build -trimpath ./cmd/filature
