@@ -17,6 +17,12 @@ seule, et elle ne ment pas.
 Un mineur de version marque une étape franchie. Voir `CHANGELOG.md` pour la
 clause du zéro.
 
+**Les numéros ordonnent les dépendances, pas le calendrier.** Une étape peut
+s'attaquer avant celle qui la précède si rien ne l'en empêche. Ils ne se
+renumérotent jamais : ce sont eux que portent les marqueurs du code, et les
+décaler périmerait quarante-cinq lignes d'un coup. Une étape qui apparaît
+s'ajoute donc à la fin, quelle que soit sa place logique.
+
 ---
 
 ## 1 — Noyau
@@ -76,8 +82,27 @@ Toujours pas de pixel à l'écran — le contrat se teste sur des fichiers.
 Projection, tri en profondeur, caméra, clic, grain du sol, occlusion. Plus la
 vue de débogage 2D, écrite en premier et gardée en permanence.
 
-Puis le clavier : table `touche -> direction logique`, isolée dans un module,
-avec le réglage « les flèches suivent l'écran / suivent le plateau ».
+**La fenêtre s'adapte, elle n'impose pas.** Redimensionnement libre, plein
+écran, et mise à l'échelle selon le facteur du moniteur — sur un écran très
+dense, une interface en pixels fixes devient illisible, et c'est le genre de
+défaut qu'on ne voit pas sur sa propre machine.
+
+**Les cinq inspecteurs portent leur numéro.** Chaud contre froid sépare les
+deux camps même en niveaux de gris, mais cinq bleus nuancés ne se distinguent
+pas — et savoir lequel est le Barreur change ce qu'on joue. Le chiffre est
+tracé par le moteur, pas déclaré : cinq silhouettes différentes coûteraient
+cinq formes à maintenir et brouilleraient le fait qu'un inspecteur doit d'abord
+se lire comme un inspecteur.
+
+Deux moyens de jeu, complets l'un comme l'autre :
+
+- **la souris**, qui doit suffire à tout ce qui se joue. Un jeu de plateau se
+  manipule en désignant des cases ; exiger le clavier pour une action serait
+  une régression par rapport au support qu'on imite ;
+- **le clavier**, table `touche -> direction logique` isolée dans un module,
+  avec le réglage « les flèches suivent l'écran / suivent le plateau » — en
+  isométrique le nord logique part vers le haut-droite, et les deux attentes
+  existent chez de vrais joueurs.
 
 ## 8 — Persistance et greffons
 
@@ -123,6 +148,11 @@ reconnexion par jeton.
 Placée tard sans risque : le protocole ne construit rien de neuf, l'hôte fait
 déjà autorité et `VuePour` est en place depuis l'étape 2.
 
+**Le retour en arrière s'arrête ici.** `Annuler` existe pour l'IA et se prête à
+un bouton en solo, où l'adversaire est une machine. En réseau deux joueurs
+s'affrontent, et défaire un coup reviendrait à rejouer celui d'en face après
+l'avoir vu.
+
 ## 13 — Greffons exécutables
 
 Bac à sable wazero, générateurs de plateau et IA tierces. Hôtes sans horloge,
@@ -139,6 +169,21 @@ en brouillon. La matrice et ses contraintes sont dans
 [`docs/construction.md`](docs/construction.md) — c'est l'étape la plus
 particulière du projet, puisque le moteur ne se compile en croisé que vers
 Windows et WebAssembly.
+
+## 15 — Interface hors-jeu
+
+Menus, écran de préférences, `Échap` pour l'ouvrir, et la persistance des
+réglages. Plus le chargement des langues et le sélecteur qui va avec.
+
+Les libellés ne sont jamais dans le code : ils viennent d'un dictionnaire, et un
+greffon de langue en fournit un. Le format se pose à l'étape 8 avec les autres
+contrats de greffon ; c'est ici qu'il est consommé.
+
+Numérotée en dernier sans être la dernière à faire : rien de tout cela ne
+dépend du réseau ni des greffons exécutables, et un écran de réglages sera
+utile bien avant. C'est aussi ici que se tranche `ebitenui` contre des widgets
+écrits à la main — la question se règle en écrivant le premier écran, pas
+avant.
 
 ---
 
