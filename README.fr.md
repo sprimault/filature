@@ -57,6 +57,8 @@ Hors catalogue, rien n'est restreint. C'est ta machine.
 - [`docs/architecture.md`](docs/architecture.md) — le noyau, la vue filtrée, le
   déterminisme
 - [`docs/regles.md`](docs/regles.md) — les règles complètes et leurs chiffres
+- [`docs/vocabulaire-effets.md`](docs/vocabulaire-effets.md) — les primitives
+  dont se composent capacités, dépenses et modes de jeu
 - [`docs/construction.md`](docs/construction.md) — matrice de compilation,
   empaquetage, signature
 - [`schemas/`](schemas/) — les contrats publics, versionnés à part

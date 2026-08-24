@@ -54,6 +54,8 @@ Outside the catalogue, nothing is restricted. Your machine, your rules.
 - [`docs/architecture.md`](docs/architecture.md) — the core, the filtered view,
   determinism
 - [`docs/regles.md`](docs/regles.md) — the full rules and their numbers
+- [`docs/vocabulaire-effets.md`](docs/vocabulaire-effets.md) — the primitives
+  abilities, costs and game modes are composed from (French)
 - [`docs/construction.md`](docs/construction.md) — build matrix, packaging,
   signing
 - [`schemas/`](schemas/) — the public contracts, versioned separately

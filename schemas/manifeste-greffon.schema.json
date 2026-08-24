@@ -113,6 +113,7 @@
             "modifier_portee",
             "modifier_mobilite",
             "bloquer_case",
+            "ouvrir_case",
             "reveler_traces",
             "reveler_position",
             "annuler_revelation",
@@ -123,6 +124,7 @@
             "fermer_zone",
             "ouvrir_zone",
             "teleporter",
+            "differer",
             "fin_partie"
           ]
         },
@@ -146,8 +148,52 @@
         "rayon": {
           "type": "integer",
           "minimum": 0
+        },
+        "annonce": {
+          "type": "boolean",
+          "description": "Pour differer seulement. Si vrai, l'effet en attente figure dans la Vue des deux camps — c'est tout son interet : un mur qui apparait sans prevenir transformerait un plan raisonne en coup de de."
+        },
+        "puis": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "description": "Pour differer seulement. Un differer imbrique est refuse : deux durees s'additionnent, donc l'imbrication n'ajoute rien et permettrait des chaines qu'aucune annulation ne saurait derouler.",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/effet"
+              }
+            ],
+            "properties": {
+              "type": {
+                "not": {
+                  "const": "differer"
+                }
+              }
+            }
+          }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "differer"
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "then": {
+            "required": [
+              "duree",
+              "puis"
+            ]
+          }
+        }
+      ]
     }
   }
 }

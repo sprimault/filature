@@ -21,3 +21,5 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
 
 ### Ajouté
 - Squelette du projet, contrats de formes et de bot.
+- Vocabulaire d'effets documenté, avec les primitives `differer` et
+  `ouvrir_case`.

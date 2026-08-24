@@ -18,14 +18,15 @@ import "errors"
 // public et ne peut plus être retirée sans casser les greffons existants.
 type TypeEffet string
 
-// Le vocabulaire livré. EffetTeleporter ne sert à aucune capacité de base — la
-// téléportation a été retirée des règles — et reste offert aux greffons qui
-// voudraient la rétablir.
+// Le vocabulaire livré, décrit en entier dans docs/vocabulaire-effets.md.
+// EffetTeleporter ne sert à aucune capacité de base — la téléportation a été
+// retirée des règles — et reste offert aux greffons qui voudraient la rétablir.
 const (
 	EffetDeplacer          TypeEffet = "deplacer"
 	EffetModifierPortee    TypeEffet = "modifier_portee"
 	EffetModifierMobilite  TypeEffet = "modifier_mobilite"
 	EffetBloquerCase       TypeEffet = "bloquer_case"
+	EffetOuvrirCase        TypeEffet = "ouvrir_case"
 	EffetRevelerTraces     TypeEffet = "reveler_traces"
 	EffetRevelerPosition   TypeEffet = "reveler_position"
 	EffetAnnulerRevelation TypeEffet = "annuler_revelation"
@@ -36,6 +37,7 @@ const (
 	EffetFermerZone        TypeEffet = "fermer_zone"
 	EffetOuvrirZone        TypeEffet = "ouvrir_zone"
 	EffetTeleporter        TypeEffet = "teleporter"
+	EffetDifferer          TypeEffet = "differer"
 	EffetFinPartie         TypeEffet = "fin_partie"
 )
 
@@ -62,6 +64,30 @@ type Effet struct {
 	Valeur int       `toml:"valeur" json:"valeur,omitempty"`
 	Duree  int       `toml:"duree" json:"duree,omitempty"`
 	Rayon  int       `toml:"rayon" json:"rayon,omitempty"`
+
+	// Annonce et Puis n'ont de sens que pour EffetDifferer.
+	//
+	// Un effet différé annoncé figure dans la Vue des deux camps, et c'est
+	// tout son intérêt : un mur qui apparaît sans prévenir transformerait un
+	// plan raisonné en coup de dé et rendrait la carte de croyance inutile.
+	//
+	// Un differer imbriqué dans un differer est refusé au chargement : deux
+	// durées s'additionnent, donc ça n'ajoute rien, et ça permettrait des
+	// chaînes qu'aucune annulation ne saurait dérouler.
+	Annonce bool    `toml:"annonce" json:"annonce,omitempty"`
+	Puis    []Effet `toml:"puis" json:"puis,omitempty"`
+}
+
+// EffetEnAttente est une entrée de la file des effets différés.
+//
+// Résolue en fin de tour, avant le test de fin de partie. L'annulation défait
+// la mise en file, pas l'effet : annuler le tour où le differer a été posé le
+// retire de la file.
+type EffetEnAttente struct {
+	Effets   []Effet  `json:"effets"`
+	Tour     int      `json:"tour"`
+	Annonce  bool     `json:"annonce"`
+	Contexte Contexte `json:"contexte"`
 }
 
 // Contexte est ce dont un effet dispose pour s'appliquer. Il ne donne pas accès
