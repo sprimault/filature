@@ -1,3 +1,6 @@
+# Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
+# SPDX-License-Identifier: Apache-2.0
+
 # Formes livrées avec le jeu, écrites dans le même format qu'un greffon tiers.
 #
 # C'est le test du vocabulaire : si l'une d'elles ne s'exprime pas avec les

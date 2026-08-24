@@ -1,3 +1,6 @@
+# Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
+# SPDX-License-Identifier: Apache-2.0
+
 # Contenu livré avec le jeu. Ce fichier n'a aucun statut particulier : il est
 # chargé par le même code qu'un greffon tiers, ce qui garantit que le chemin de
 # chargement est exercé à chaque partie plutôt qu'une fois de temps en temps.
