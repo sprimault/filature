@@ -176,10 +176,13 @@ automatiquement la palette active. Un greffon de palette seule est le mod le
 moins cher qui existe — un fichier de quinze lignes, aucun éditeur, aucune
 géométrie.
 
+`version_formes` est à la racine du fichier, hors de la table `[palette]` : il
+qualifie le fichier, pas la palette.
+
 ```toml
-[palette]
 version_formes = 1
 
+[palette]
 rue = "#d8d2c4"
 batiment = "#3a3f4a"
 zone_ouverte = "#7fa86b"

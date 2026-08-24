@@ -57,6 +57,8 @@ Hors catalogue, rien n'est restreint. C'est ta machine.
 - [`docs/architecture.md`](docs/architecture.md) — le noyau, la vue filtrée, le
   déterminisme
 - [`docs/regles.md`](docs/regles.md) — les règles complètes et leurs chiffres
+- [`docs/greffons.md`](docs/greffons.md) — le format d'un greffon, fichier par
+  fichier et champ par champ
 - [`docs/vocabulaire-effets.md`](docs/vocabulaire-effets.md) — les primitives
   dont se composent capacités, dépenses et modes de jeu
 - [`docs/construction.md`](docs/construction.md) — matrice de compilation,

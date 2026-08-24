@@ -76,7 +76,8 @@ exprime pas, il manque une primitive, ce qui est une décision de contrat public
 — pas un cas particulier à coder dans le noyau.
 
 La référence complète du vocabulaire est
-[`vocabulaire-effets.md`](vocabulaire-effets.md).
+[`vocabulaire-effets.md`](vocabulaire-effets.md), et le format des fichiers qui
+le portent est dans [`greffons.md`](greffons.md).
 
 Un greffon ne touche jamais `*Partie`. Il produit des `Effet` ou des `Coup`, le
 noyau les applique. C'est ce qui fait qu'il ne peut pas lire la zone scellée du

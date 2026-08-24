@@ -54,6 +54,10 @@
       },
       "description": "Regles de partie declenchees par le jeu et non par un joueur."
     },
+    "bot": {
+      "$ref": "#/$defs/bot",
+      "description": "Adversaire en processus separe, qui remplace l'IA du jeu."
+    },
     "licence": {
       "enum": [
         "MIT",
@@ -91,6 +95,34 @@
         "required": [
           "version_effets"
         ]
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "bot"
+        ]
+      },
+      "then": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "capacite"
+              ]
+            },
+            {
+              "required": [
+                "depense"
+              ]
+            },
+            {
+              "required": [
+                "mode"
+              ]
+            }
+          ]
+        }
       }
     }
   ],
@@ -185,6 +217,39 @@
             "$ref": "#/$defs/effet"
           },
           "description": "Ce que le mode applique a chaque declenchement ; la cadence vient des parametres de la partie."
+        }
+      }
+    },
+    "bot": {
+      "type": "object",
+      "required": [
+        "camp",
+        "commande"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "camp": {
+          "enum": [
+            "fugitif",
+            "inspecteurs"
+          ],
+          "description": "Camp que le bot pilote."
+        },
+        "commande": {
+          "type": "string",
+          "description": "Executable, cherche dans le dossier du greffon puis dans le PATH. Aucun interpreteur n'est fourni."
+        },
+        "arguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Arguments passes au lancement."
+        },
+        "deterministe": {
+          "type": "boolean",
+          "default": false,
+          "description": "Vrai si deux parties sur la meme graine donnent les memes coups. Verifie au catalogue."
         }
       }
     },

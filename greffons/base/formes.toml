@@ -38,6 +38,9 @@ role = "pion"
   couleur = "fugitif_principal"
   contour = "fugitif_detail"
 
+# Une seule forme pour les cinq pions, que le moteur teinte par numéro. Les
+# surcharges inspecteur_1 à inspecteur_5 existent pour qui veut distinguer les
+# capacités ; les livrer d'office rendrait le plateau plus difficile à lire.
 [forme.inspecteur]
 role = "pion"
 
@@ -53,6 +56,9 @@ role = "pion"
   couleur = "inspecteur_principal"
   contour = "inspecteur_detail"
 
+# Un trait discret, et volontairement à demi transparent : une trace est une
+# piste à interpréter, pas une position. La confondre du coin de l'œil avec un
+# pion fausserait la lecture du plateau.
 [forme.trace]
 role = "marqueur"
 
@@ -64,6 +70,8 @@ role = "marqueur"
   couleur = "trace"
   opacite = 60
 
+# Un losange plein, aux dimensions de la case : un barrage bloque la vue comme
+# un bâtiment, et doit se lire comme un obstacle et non comme une décoration.
 [forme.barrage]
 role = "marqueur"
 
