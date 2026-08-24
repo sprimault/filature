@@ -40,6 +40,16 @@ est conservée, la partie ne se termine plus sur un seul coup.
 adjacent, évalué une seule fois par tour, à la fin du tour complet, plafonné à
 trois. Être encerclé doit faire très mal sans être instantanément fatal.
 
+**Trois pions par tour, pas cinq.** L'énoncé initial laissait les inspecteurs
+déplacer tous leurs pions. Le quota est ce qui fait de leur phase une décision :
+arbitrer entre garder les zones et resserrer le filet, au lieu d'avancer tout le
+monde et de regarder. L'objection — cinq déplacements contre un serait écrasant
+— est plus faible qu'elle n'en a l'air, puisque les inspecteurs ignorent où
+viser : leur problème est l'information, pas la vitesse.
+
+C'est un paramètre et non une constante. Trois par défaut, mesuré à l'étape 11,
+et le premier chiffre à corriger si l'équilibrage penche.
+
 **Placement.** Le fugitif est placé aléatoirement dans le noyau central (rayon 5).
 Les inspecteurs se placent ensuite librement sur n'importe quelle case claire,
 sans connaître sa position exacte — seulement la zone. Le premier vrai choix de
@@ -92,7 +102,8 @@ Les six zones sont visibles des deux joueurs dès le début.
 
 **Phase inspecteurs**
 
-- Jusqu'à 3 pions déplacés, d'une case, en orthogonal uniquement.
+- Jusqu'à 3 pions **parmi les 5** déplacés, d'une case, en orthogonal uniquement.
+  Le joueur choisit lesquels : c'est là qu'est sa décision de tour.
 - Un pion qui repère le fugitif pendant la phase gagne un déplacement
   supplémentaire immédiat, hors quota.
 - Une capacité peut être déclenchée, une seule par tour, une seule fois par pion
@@ -103,6 +114,16 @@ Les six zones sont visibles des deux joueurs dès le début.
 - Un déplacement d'une case, dans les 8 directions.
 - Ou une dépense de résistance (voir §7), qui peut se cumuler avec le déplacement.
 - Le fugitif peut passer son tour.
+
+**Le quota compte les actions, pas les résultats.** Un pion qui se déplace puis
+revient sur sa case a consommé son déplacement, sinon un joueur sonderait le
+terrain gratuitement.
+
+**Plusieurs inspecteurs peuvent tenir la même case**, et n'y gagnent rien : une
+ligne de vue s'arrête au premier d'entre eux, et le contact plafonne à trois
+quel que soit leur nombre. **Le fugitif, lui, ne peut pas entrer sur une case
+occupée.** Il y serait à l'abri de tout, puisque le contact exige l'adjacence et
+qu'une case partagée n'est pas adjacente à elle-même.
 
 **Une phase se termine quand son camp rend la main.** Les inspecteurs ne sont
 pas tenus de déplacer trois pions, le fugitif n'est pas tenu de bouger, et
@@ -226,7 +247,7 @@ d'équilibrage.
 | Durée | 40 tours | Environ le côté du plateau |
 | Résistance | 10 | |
 | Inspecteurs | 5 | |
-| Pions déplaçables par tour | 3 | **Premier levier à ajuster** |
+| Pions déplaçables par tour | 3 sur 5 | **Premier levier à ajuster** |
 | Période de révélation | 4 tours | |
 | Zones d'extraction | 6 | Doit rester supérieur au nombre d'inspecteurs |
 | Durée d'une trace | 6 tours | |
