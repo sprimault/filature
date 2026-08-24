@@ -1,0 +1,34 @@
+# Normalisation des fins de ligne. Indispensable quand le dépôt est alimenté
+# depuis Windows et consommé sous Linux : sans ça, un script shell ou un test
+# comparant des octets casse de façon incompréhensible.
+* text=auto eol=lf
+
+# Doivent rester en LF quoi qu'il arrive
+*.sh text eol=lf
+*.go text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.sql text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+Makefile text eol=lf
+
+# Spécifiques Windows
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binaire, jamais converti
+*.png binary
+*.jpg binary
+*.zip binary
+*.gz binary
+*.exe binary
+*.wasm binary
+
+# Les plateaux de référence sont comparés octet pour octet par les tests de
+# génération : aucune conversion, jamais. C'est ce qui garantit qu'une graine
+# donnée produit toujours le même plateau, sur les trois systèmes.
+tests/**/*.plateau.json -text
+tests/**/*.journal.json -text

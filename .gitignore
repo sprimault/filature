@@ -1,0 +1,18 @@
+# Binaires
+/filature
+*.exe
+/dist/
+/build/
+
+# Go
+*.test
+*.out
+
+# Bases de parties
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
+# Répertoire de travail local
+/.tmp/
+/makefile.local

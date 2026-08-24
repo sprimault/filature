@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sprimault/filature/schemas/manifeste-greffon.schema.json",
+  "title": "Manifeste de greffon Filature",
+  "description": "Contrat public. Versionné indépendamment du jeu : un greffon écrit contre la version 1 doit continuer à charger.",
+  "type": "object",
+  "required": [
+    "nom",
+    "version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "nom": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,31}$"
+    },
+    "version": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "regles": {
+      "type": "boolean",
+      "default": false,
+      "description": "Vrai si le greffon modifie les règles. Ces greffons doivent être identiques des deux côtés d'une partie en réseau ; les greffons purement visuels en sont dispensés."
+    },
+    "wasm": {
+      "type": "string",
+      "description": "Chemin relatif d'un module WebAssembly, pour un générateur de plateau ou une IA. Le bac à sable ne donne accès ni à l'horloge, ni à l'entropie système, ni au disque, ni au réseau."
+    },
+    "capacite": {
+      "$ref": "#/$defs/tableCapacites"
+    },
+    "depense": {
+      "$ref": "#/$defs/tableCapacites"
+    },
+    "licence": {
+      "enum": [
+        "MIT",
+        "Apache-2.0",
+        "CC0-1.0",
+        "CC-BY-4.0",
+        "CC-BY-SA-4.0",
+        "BSD-3-Clause"
+      ],
+      "description": "Identifiant SPDX. Liste courte et fermee : un champ libre laisserait passer « a voir » et rendrait les entrees du catalogue inexploitables. Obligatoire pour un greffon publie, facultatif hors catalogue."
+    }
+  },
+  "$defs": {
+    "tableCapacites": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/capacite"
+      }
+    },
+    "capacite": {
+      "type": "object",
+      "required": [
+        "nom",
+        "camp"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "nom": {
+          "type": "string"
+        },
+        "camp": {
+          "enum": [
+            "fugitif",
+            "inspecteurs"
+          ]
+        },
+        "usages": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cout": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passive": {
+          "type": "boolean"
+        },
+        "declenchement": {
+          "enum": [
+            "phase_inspecteurs",
+            "phase_fugitif",
+            "fin_de_tour",
+            "contact",
+            "revelation"
+          ]
+        },
+        "effet": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/effet"
+          }
+        }
+      }
+    },
+    "effet": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "deplacer",
+            "modifier_portee",
+            "modifier_mobilite",
+            "bloquer_case",
+            "reveler_traces",
+            "reveler_position",
+            "annuler_revelation",
+            "partager_vue",
+            "couter_resistance",
+            "rendre_resistance",
+            "effacer_traces",
+            "fermer_zone",
+            "ouvrir_zone",
+            "teleporter",
+            "fin_partie"
+          ]
+        },
+        "cible": {
+          "enum": [
+            "pion_courant",
+            "tous_pions",
+            "autre_pion",
+            "fugitif",
+            "case",
+            "zone"
+          ]
+        },
+        "valeur": {
+          "type": "integer"
+        },
+        "duree": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rayon": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

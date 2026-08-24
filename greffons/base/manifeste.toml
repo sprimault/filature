@@ -1,0 +1,127 @@
+# Contenu livré avec le jeu. Ce fichier n'a aucun statut particulier : il est
+# chargé par le même code qu'un greffon tiers, ce qui garantit que le chemin de
+# chargement est exercé à chaque partie plutôt qu'une fois de temps en temps.
+
+nom = "base"
+version = "0.1.0"
+regles = true
+licence = "Apache-2.0"
+description = "Capacités et dépenses de la règle standard"
+
+# ---------------------------------------------------------------------------
+# Capacités des inspecteurs : une par pion, une seule fois par partie.
+# ---------------------------------------------------------------------------
+
+[capacite.guetteur]
+nom = "Guetteur"
+camp = "inspecteurs"
+usages = 1
+declenchement = "phase_inspecteurs"
+
+  [[capacite.guetteur.effet]]
+  type = "modifier_portee"
+  cible = "pion_courant"
+  valeur = 8
+  duree = 1
+
+[capacite.coureur]
+nom = "Coureur"
+camp = "inspecteurs"
+usages = 1
+declenchement = "phase_inspecteurs"
+
+  [[capacite.coureur.effet]]
+  type = "modifier_mobilite"
+  cible = "pion_courant"
+  valeur = 1
+  duree = 1
+
+[capacite.traqueur]
+nom = "Traqueur"
+camp = "inspecteurs"
+usages = 1
+passive = true
+
+  [[capacite.traqueur.effet]]
+  type = "reveler_traces"
+  cible = "pion_courant"
+  rayon = 2
+
+[capacite.barreur]
+nom = "Barreur"
+camp = "inspecteurs"
+usages = 1
+declenchement = "phase_inspecteurs"
+
+  [[capacite.barreur.effet]]
+  type = "bloquer_case"
+  cible = "case"
+  duree = 3
+
+[capacite.chef]
+nom = "Chef"
+camp = "inspecteurs"
+usages = 1
+declenchement = "phase_inspecteurs"
+
+  [[capacite.chef.effet]]
+  type = "partager_vue"
+  cible = "autre_pion"
+  duree = 2
+
+# ---------------------------------------------------------------------------
+# Dépenses de résistance du fugitif. Même format que les capacités : c'est le
+# coût qui change de sens, pas la structure.
+# ---------------------------------------------------------------------------
+
+[depense.double_deplacement]
+nom = "Double déplacement"
+camp = "fugitif"
+cout = 2
+declenchement = "phase_fugitif"
+
+  [[depense.double_deplacement.effet]]
+  type = "modifier_mobilite"
+  cible = "fugitif"
+  valeur = 1
+  duree = 1
+
+[depense.silence]
+nom = "Silence"
+camp = "fugitif"
+cout = 3
+declenchement = "phase_fugitif"
+
+  [[depense.silence.effet]]
+  type = "annuler_revelation"
+  cible = "fugitif"
+
+[depense.effacement]
+nom = "Effacement"
+camp = "fugitif"
+cout = 1
+declenchement = "phase_fugitif"
+
+  [[depense.effacement.effet]]
+  type = "effacer_traces"
+  cible = "fugitif"
+  duree = 3
+
+# Le meurtre s'exprime avec les primitives existantes : révéler la position, et
+# payer. C'est le test du vocabulaire qui passe — la mécanique la plus riche du
+# jeu n'a demandé aucune primitive nouvelle.
+#
+# La convergence des inspecteurs n'est pas un effet : rien ne les oblige à se
+# rendre sur la scène. C'est justement ce qui fait du meurtre un pari et non un
+# automatisme.
+
+[depense.meurtre]
+nom = "Meurtre"
+camp = "fugitif"
+cout = 3
+usages = 2
+declenchement = "phase_fugitif"
+
+  [[depense.meurtre.effet]]
+  type = "reveler_position"
+  cible = "fugitif"

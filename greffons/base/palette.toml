@@ -1,0 +1,17 @@
+# Palette livrée. Les noms de CouleursObligatoires doivent tous y figurer : une
+# forme tierce s'appuie dessus sans savoir quelle palette sera active.
+
+version_formes = 1
+
+[palette]
+rue = "#d8d2c4"
+batiment = "#3a3f4a"
+zone_ouverte = "#7fa86b"
+zone_fermee = "#6b4a4a"
+fugitif_principal = "#c85a3c"
+fugitif_detail = "#8a3a26"
+inspecteur_principal = "#2f5f8f"
+inspecteur_detail = "#1c3d5c"
+trace = "#a89c84"
+barrage = "#8a7a4a"
+scene = "#9b2c2c"

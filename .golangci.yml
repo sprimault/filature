@@ -1,0 +1,36 @@
+version: "2"
+
+# misspell n'est pas dans la liste : ses dictionnaires sont anglais et il n'en
+# existe pas de français. Sur ce dépôt il ne signale que des mots corrects —
+# « connexion », « déplacements », `Enveloppe` — et le bruit finit par faire
+# ignorer la sortie entière.
+linters:
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - revive
+    - gocritic
+
+  settings:
+    revive:
+      rules:
+        - name: exported
+          disabled: false
+
+  exclusions:
+    rules:
+      # Les corps sont encore des stubs : unused remonte les champs et les
+      # fonctions que personne n'appelle. Retirer un chemin de cette liste dès
+      # que son étape est écrite — 1 pour noyau, 6 pour rendu, 8 pour greffons,
+      # 9 et 10 pour ia.
+      - linters:
+          - unused
+        path: internal/(noyau|rendu|greffons|ia)/
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
