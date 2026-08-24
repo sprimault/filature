@@ -104,6 +104,14 @@ Les six zones sont visibles des deux joueurs dès le début.
 - Ou une dépense de résistance (voir §7), qui peut se cumuler avec le déplacement.
 - Le fugitif peut passer son tour.
 
+**Une phase se termine quand son camp rend la main.** Les inspecteurs ne sont
+pas tenus de déplacer trois pions, le fugitif n'est pas tenu de bouger, et
+aucun des deux n'est mis dehors parce qu'il a épuisé son quota — un joueur qui
+garde un déplacement en réserve fait un choix, pas une erreur.
+
+**Le tour n'est résolu qu'une fois les deux phases jouées.** Rien de ce qui
+suit n'a lieu entre elles.
+
 **Résolution de fin de tour**
 
 1. Calcul de la visibilité. Si le fugitif est dans une ligne de vue, son pion
