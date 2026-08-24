@@ -76,6 +76,15 @@ perdrait.
 exige à la redistribution, et personne ne télécharge un fichier séparé pour
 accompagner un binaire.
 
+**L'archive ne contient rien d'autre que le binaire et ces deux fichiers.** Le
+contenu livré — règles, formes, palette, français et anglais — est embarqué dans
+l'exécutable par `//go:embed` : un binaire déplacé continue de fonctionner, et
+personne ne casse ses règles en éditant un fichier qu'il n'a pas écrit.
+
+Ce contenu reste accessible à qui veut s'en inspirer : `filature exemples
+<dossier>` l'écrit sur le disque, sans jamais écraser un fichier existant. C'est
+par là que passe un traducteur qui recopie l'anglais pour en faire sa langue.
+
 Le nom de l'archive porte version, système et architecture ; le binaire qu'elle
 contient s'appelle `filature` tout court — une fois extrait, on sait sur quelle
 machine on est.

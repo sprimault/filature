@@ -10,7 +10,7 @@ internal/rendu/   projection isométrique, contrat de formes
 internal/stockage/ SQLite : journal, instantanés, poids d'IA
 internal/serveur/ WebSocket, hébergement et jonction
 internal/greffons/ chargement des manifestes, bac à sable WebAssembly
-greffons/base/    le contenu livré, au même format qu'un greffon tiers
+greffons/         le contenu livré, embarqué dans le binaire par go:embed
 schemas/          les contrats publics, versionnés à part
 ```
 

@@ -30,3 +30,5 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
 - Documentation du format d'un greffon, et table `bot` au schéma de manifeste.
 - Application et annulation des dix-sept primitives d'effets.
 - Greffons de langue, avec le français en repli et l'anglais livré.
+- Contenu livré embarqué dans le binaire, et `filature exemples` pour l'en
+  ressortir.

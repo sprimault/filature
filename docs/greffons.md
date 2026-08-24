@@ -17,9 +17,8 @@ Un greffon est un dossier posé dans `greffons/`. Rien à compiler, rien à
 enregistrer.
 
 ```
+filature                l'exécutable, qui se suffit à lui-même
 greffons/
-  base/                 le contenu livré, français compris
-  anglais/              l'anglais, livré au même format
   mes-vehicules/
     manifeste.toml      obligatoire
     formes.toml         facultatif
@@ -27,13 +26,22 @@ greffons/
     langue.toml         facultatif
 ```
 
+**Le contenu livré n'est pas dans ce dossier** : règles, formes, palette,
+français et anglais sont embarqués dans l'exécutable, qui fonctionne donc sans
+aucun fichier à côté.
+
+Pour le lire ou le recopier, `filature exemples <dossier>` l'écrit sur le
+disque. C'est le chemin d'un traducteur qui part de l'anglais, ou de quiconque
+veut voir comment une capacité est déclarée avant d'écrire la sienne. La
+commande n'écrase jamais un fichier existant.
+
 `manifeste.toml` est le seul fichier obligatoire. Les autres n'existent que si
 le greffon les remplit.
 
-**Le contenu livré passe par le même chemin que le vôtre.** `greffons/base` n'a
-aucun statut particulier : il est lu par le code qui lira le vôtre. C'est ce qui
-garantit que ce chemin est exercé à chaque partie, plutôt qu'une fois de temps
-en temps.
+**Le contenu livré passe par le même chemin que le vôtre.** Il vient d'un
+système de fichiers embarqué au lieu du disque, et c'est la seule différence :
+le code qui le lit est celui qui lira le vôtre. C'est ce qui garantit que ce
+chemin est exercé à chaque partie, plutôt qu'une fois de temps en temps.
 
 ---
 
@@ -220,8 +228,6 @@ celui que désigne `--greffons` :
 ```
 filature.exe
 greffons/
-  base/              le contenu livré, français compris
-  anglais/           l'anglais, livré aussi
   mes-traductions/   le vôtre, ici
 ```
 
@@ -230,6 +236,9 @@ langue apparaît dans le sélecteur des préférences. Un greffon qui ne se mont
 pas est un greffon dont le manifeste a été refusé — le journal dit lequel et
 pourquoi.
 
+Le français et l'anglais ne sont pas là : ils sont dans l'exécutable. Pour
+partir de l'anglais, `filature exemples <dossier>` l'en ressort.
+
 ### Ce qui n'a pas de version
 
 Un dictionnaire n'en porte pas, contrairement aux formes, aux effets et au
@@ -237,9 +246,9 @@ protocole de bot. **Aucune incompatibilité n'est possible** : une clé absente
 retombe sur le français, une clé inconnue est ignorée. Une traduction en retard
 n'est pas cassée, elle est partielle — et l'écran des greffons dit à quel point.
 
-Le français fait exception en ceci qu'il est la langue de repli : il vit dans
-`greffons/base` et couvre toutes les clés par construction, puisque c'est lui
-que le reste complète.
+Le français fait exception en ceci qu'il est la langue de repli : il est livré
+avec les règles, dans le greffon `base`, et couvre toutes les clés par
+construction puisque c'est lui que le reste complète.
 
 ## 7. Bots
 
