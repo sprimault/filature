@@ -12,18 +12,27 @@ type Resultat struct {
 	Tour      int    `json:"tour"`
 }
 
-// Les quatre motifs de fin. Ils partent dans le journal et dans le message
-// `fin` du protocole de bot : les renommer périmerait les parties enregistrées.
+// Les motifs de fin. Ils partent dans le journal et dans le message `fin` du
+// protocole de bot : les renommer périmerait les parties enregistrées.
+//
+// MotifGreffon est le seul que le jeu de base ne produit jamais : il vient d'un
+// effet fin_partie, dont le noyau ignore la condition.
 const (
 	MotifExtraction  = "extraction"
 	MotifResistance  = "resistance_epuisee"
 	MotifBlocage     = "fugitif_bloque"
 	MotifTempsEcoule = "temps_ecoule"
+	MotifGreffon     = "greffon"
 )
 
 // Resultat teste les conditions de fin. Le second retour distingue « partie en
 // cours » de « match nul », qui n'existe pas ici.
 func (p *Partie) Resultat() (Resultat, bool) {
+	// Une fin forcée par un greffon l'emporte sur tout : le noyau ne connaît
+	// pas sa condition, il ne peut donc pas l'arbitrer contre les siennes.
+	if p.FinForcee != nil {
+		return *p.FinForcee, true
+	}
 	// à implémenter : étape 1
 	return Resultat{}, false
 }

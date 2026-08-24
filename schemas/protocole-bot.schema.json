@@ -61,7 +61,8 @@
         "type": { "const": "fin" },
         "vainqueur": { "enum": ["fugitif", "inspecteurs"] },
         "motif": {
-          "enum": ["extraction", "resistance_epuisee", "fugitif_bloque", "temps_ecoule"]
+          "type": "string",
+          "description": "Le jeu de base en produit quatre : extraction, resistance_epuisee, fugitif_bloque, temps_ecoule. Un greffon de regles peut en produire d'autres, d'ou l'absence de liste fermee ; les greffons actifs sont annonces dans bonjour."
         },
         "tour": { "type": "integer" }
       }
