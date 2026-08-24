@@ -16,6 +16,8 @@ import (
 // version est injectée à la compilation par -ldflags.
 var version = "dev"
 
+// main lit les drapeaux et fixe le code de sortie. Tout ce qui peut échouer est
+// dans executer.
 func main() {
 	heberger := flag.Bool("heberger", false, "héberger une partie en réseau")
 	rejoindre := flag.String("rejoindre", "", "adresse d'une partie à rejoindre")
@@ -34,6 +36,7 @@ func main() {
 	}
 }
 
+// executer assemble les dépendances et lance la boucle de jeu.
 func executer(heberger bool, rejoindre, greffons, partie string) error {
 	return fmt.Errorf("à implémenter : étape 5")
 }

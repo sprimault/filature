@@ -112,6 +112,7 @@ const (
 	PlanVertical Plan = "vertical"
 )
 
+// gabarits borne ce que chaque rôle a le droit d'occuper.
 var gabarits = map[Role]Gabarit{
 	RolePion:     {PlanVertical, -24, 24, 0, 40, 24, 0},
 	RoleMarqueur: {PlanSol, -24, 24, -12, 12, 8, 0},

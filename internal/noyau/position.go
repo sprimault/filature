@@ -39,6 +39,7 @@ var (
 	Diagonales   = [4]Direction{NordEst, SudEst, SudOuest, NordOuest}
 )
 
+// deplacements donne le vecteur de chaque direction, indexé par Direction.
 var deplacements = [8]Position{
 	{0, -1}, {1, 0}, {0, 1}, {-1, 0},
 	{1, -1}, {1, 1}, {-1, 1}, {-1, -1},
