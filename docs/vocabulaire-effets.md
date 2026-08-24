@@ -59,10 +59,16 @@ ajouter une, vérifier que la composition des existantes ne suffit pas.
 |---|---|---|
 | `modifier_portee` | `cible`, `valeur`, `duree` | Modifie la portée de vue |
 | `reveler_position` | `cible` | Rend une position publique ce tour |
+| `marquer_scene` | `cible` | Inscrit un lieu, durablement et pour les deux camps |
 | `annuler_revelation` | `cible` | Neutralise la prochaine révélation périodique |
 | `partager_vue` | `cible`, `duree` | Un pion voit ce que voit un autre |
 | `reveler_traces` | `cible`, `rayon` | Découvre les traces dans le rayon |
 | `effacer_traces` | `cible`, `duree` | Supprime les traces plus récentes que `duree` tours |
+
+`reveler_position` et `marquer_scene` sont volontairement distincts, et le
+meurtre les compose : le premier ne vaut qu'un tour, le second reste sur le
+plateau. Les fondre en un seul interdirait de révéler sans laisser de marque, ce
+dont toute mécanique de repérage a besoin.
 
 ### Terrain
 
@@ -76,6 +82,11 @@ ajouter une, vérifier que la composition des existantes ne suffit pas.
 Un barrage bloque la vue comme un bâtiment. Sans ça, la capacité ne serait
 qu'un mur de déplacement, sans effet sur l'information — ce qui, dans ce jeu,
 revient à n'avoir aucun effet.
+
+**Un barrage l'emporte sur un percement.** Une case visée par `ouvrir_case`
+puis par `bloquer_case` est fermée, et elle l'est aussi dans l'ordre inverse :
+sans priorité déclarée, le résultat dépendrait de l'ordre d'application et deux
+rejeux du même journal pourraient diverger.
 
 ### Ressource
 
@@ -156,6 +167,10 @@ L'annulation défait la mise en file, pas l'effet : annuler le tour où le
 
 Une cible incompatible avec le camp déclarant est refusée au chargement : une
 capacité d'inspecteur ne cible pas `fugitif` pour lui rendre de la résistance.
+
+`autre_pion` est la seule cible qui en désigne deux : celui qui déclenche et
+celui qui subit. Le Chef, qui voit à travers un coéquipier, en est le seul usage
+livré.
 
 ---
 

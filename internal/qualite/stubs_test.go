@@ -20,6 +20,10 @@ import (
 // feuille de route. Une fonction dont la signature ne renvoie pas d'erreur ne
 // peut pas porter le marqueur dans un errors.New, et échappait donc au grep :
 // le compteur a annoncé 25 stubs pour 46.
+//
+// Les fichiers de test sont hors du contrôle, contrairement au contrôle de
+// documentation : un double d'essai qui renvoie une valeur nulle est la norme
+// et non un travail en attente, et aucune étape ne se mesure à eux.
 func TestStubsMarques(t *testing.T) {
 	fset := token.NewFileSet()
 	var manques []string
@@ -34,7 +38,7 @@ func TestStubsMarques(t *testing.T) {
 			}
 			return nil
 		}
-		if !strings.HasSuffix(e.Name(), ".go") {
+		if !strings.HasSuffix(e.Name(), ".go") || strings.HasSuffix(e.Name(), "_test.go") {
 			return nil
 		}
 
@@ -64,9 +68,9 @@ func TestStubsMarques(t *testing.T) {
 // corpsTrivial dit si un corps ne fait rien : vide, ou un unique return de
 // valeurs nulles.
 //
-// Une fonction implémentée qui se réduirait à « return nil » serait signalée à
-// tort. Le cas ne s'est pas présenté ; s'il se présente, l'exception se déclare
-// ici plutôt qu'en désarmant le test.
+// Une fonction de production qui se réduirait à « return nil » serait signalée
+// à tort. Le cas ne s'est pas présenté ; s'il se présente, l'exception se
+// déclare ici plutôt qu'en désarmant le test.
 func corpsTrivial(b *ast.BlockStmt) bool {
 	switch len(b.List) {
 	case 0:

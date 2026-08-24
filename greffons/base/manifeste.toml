@@ -111,9 +111,9 @@ declenchement = "phase_fugitif"
   cible = "fugitif"
   duree = 3
 
-# Le meurtre s'exprime avec les primitives existantes : révéler la position, et
-# payer. C'est le test du vocabulaire qui passe — la mécanique la plus riche du
-# jeu n'a demandé aucune primitive nouvelle.
+# Le meurtre se compose : révéler la position, marquer la scène, et payer. Les
+# deux premiers restent distincts parce qu'ils ne durent pas pareil — la
+# révélation vaut un tour, la scène reste sur le plateau.
 #
 # La convergence des inspecteurs n'est pas un effet : rien ne les oblige à se
 # rendre sur la scène. C'est justement ce qui fait du meurtre un pari et non un
@@ -128,6 +128,10 @@ declenchement = "phase_fugitif"
 
   [[depense.meurtre.effet]]
   type = "reveler_position"
+  cible = "fugitif"
+
+  [[depense.meurtre.effet]]
+  type = "marquer_scene"
   cible = "fugitif"
 
 # ---------------------------------------------------------------------------

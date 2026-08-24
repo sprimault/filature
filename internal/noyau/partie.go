@@ -61,14 +61,16 @@ type Scene struct {
 }
 
 // Inspecteur porte un pion et sa capacité, utilisable une fois par partie.
+//
+// Aucun bonus n'est stocké ici : portée, mobilité et rayon de détection se
+// lisent par PorteeDe, MobiliteDe et RayonTracesDe, qui agrègent les effets en
+// cours. Un entier figé dans le pion serait un cache que rien ne réconcilie, et
+// un greffon qui invente une capacité à durée n'aurait pas de champ où la
+// ranger.
 type Inspecteur struct {
 	Position         Position `json:"position"`
 	Capacite         string   `json:"capacite"`
 	CapaciteUtilisee bool     `json:"capacite_utilisee"`
-	// Bonus dure le temps d'un tour et vient des effets d'un greffon plutôt
-	// que d'un cas particulier codé en dur.
-	BonusPortee      int `json:"bonus_portee"`
-	BonusDeplacement int `json:"bonus_deplacement"`
 }
 
 // Partie porte l'intégralité de l'état.
@@ -85,9 +87,14 @@ type Partie struct {
 	Fugitif     Fugitif      `json:"fugitif"`
 	Inspecteurs []Inspecteur `json:"inspecteurs"`
 
-	Traces   map[Position]Trace `json:"traces"`
-	Barrages map[Position]int   `json:"barrages"`
-	Scenes   []Scene            `json:"scenes"`
+	Traces map[Position]Trace `json:"traces"`
+	Scenes []Scene            `json:"scenes"`
+
+	// Barrages et Ouvertures sont les deux altérations du terrain, en tours
+	// d'expiration. Le plateau est en lecture seule — c'est la condition du
+	// plateau infini — donc ce qui le modifie vit ici, par-dessus.
+	Barrages   map[Position]int `json:"barrages"`
+	Ouvertures map[Position]int `json:"ouvertures"`
 
 	PionsDeplaces int   `json:"pions_deplaces"`
 	ZonesFermees  []int `json:"zones_fermees"`
@@ -96,6 +103,13 @@ type Partie struct {
 	// avant le test de fin de partie. Elle se sérialise avec le reste : une
 	// reprise qui la perdrait escamoterait un barrage déjà annoncé.
 	EffetsEnAttente []EffetEnAttente `json:"effets_en_attente"`
+
+	// EffetsActifs porte ce qui modifie temporairement un pion ou le fugitif.
+	EffetsActifs []EffetActif `json:"effets_actifs"`
+
+	// FinForcee est le seul moyen qu'un greffon termine une partie sans que le
+	// noyau connaisse sa condition de victoire. Resultat la consulte d'abord.
+	FinForcee *Resultat `json:"fin_forcee,omitempty"`
 
 	Journal    []Coup    `json:"journal"`
 	Extensions *Registre `json:"-"`
@@ -106,6 +120,22 @@ type Partie struct {
 // généré ici, donc la graine renvoyée peut différer de celle demandée.
 func Nouvelle(graine int64, p Parametres, r *Registre) (*Partie, error) {
 	return nil, errors.New("à implémenter : étape 1")
+}
+
+// EstPraticable dit si une case peut être occupée et traversée du regard.
+//
+// Trois couches, dans cet ordre : le terrain, les percements d'un ouvrir_case,
+// les barrages. Un barrage l'emporte sur tout — sans quoi rouvrir une case déjà
+// barrée dépendrait de l'ordre d'application, et le rejeu du journal cesserait
+// d'être reproductible.
+func (p *Partie) EstPraticable(pos Position) bool {
+	if _, barre := p.Barrages[pos]; barre {
+		return false
+	}
+	if _, ouverte := p.Ouvertures[pos]; ouverte {
+		return true
+	}
+	return p.Plateau.EstRue(pos)
 }
 
 // CoupsLegaux énumère ce que l'acteur peut jouer dans la phase courante.

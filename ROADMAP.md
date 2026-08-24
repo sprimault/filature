@@ -4,8 +4,12 @@ Les numéros font foi : ce sont eux que portent les
 `errors.New("à implémenter : étape N")` du code.
 
 ```
-grep -rn "à implémenter" internal cmd | wc -l
+grep -rn "à implémenter : étape" internal cmd --include="*.go" --exclude="*_test.go" | wc -l
 ```
+
+Le motif complet et l'exclusion des tests ne sont pas de la coquetterie : le
+contrôle qui vérifie que tout stub porte son marqueur cite lui-même la chaîne,
+et se comptait donc dans le total.
 
 C'est la mesure d'avancement la plus honnête du projet. Elle descend toute
 seule, et elle ne ment pas.

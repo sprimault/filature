@@ -91,6 +91,12 @@ règles ajoutant une dépense est utilisable par un bot qui l'ignore.
 {"type":"fin","vainqueur":"fugitif","motif":"extraction","tour":34}
 ```
 
+Le jeu de base produit quatre motifs : `extraction`, `resistance_epuisee`,
+`fugitif_bloque`, `temps_ecoule`. **La liste n'est pas fermée** — un greffon de
+règles qui invente une condition de victoire produit son propre motif, et un bot
+qui ne le connaît pas l'a appris dans `bonjour`, qui annonce les greffons
+actifs. Traiter le champ comme une chaîne, jamais comme une énumération.
+
 ---
 
 ## 4. Messages du bot

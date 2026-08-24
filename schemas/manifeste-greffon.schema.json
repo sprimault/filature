@@ -270,6 +270,7 @@
             "ouvrir_case",
             "reveler_traces",
             "reveler_position",
+            "marquer_scene",
             "annuler_revelation",
             "partager_vue",
             "couter_resistance",
