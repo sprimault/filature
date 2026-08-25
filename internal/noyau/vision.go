@@ -8,7 +8,12 @@ package noyau
 //
 // C'est ce qui rend l'IA utilisable : tester « le fugitif est-il vu » devient
 // une lecture de table au lieu de huit parcours. Sur un plateau de 41 cases de
-// côté, quelques mégaoctets et une fraction de seconde à la génération.
+// côté, de l'ordre du mégaoctet et demi — environ sept cent cinquante rues,
+// huit directions, seize cases de portée avec le bonus du Guetteur.
+//
+// C'est ce coût qui borne CoteMax, et lui seul : un plateau plus vaste demande
+// une autre implémentation de Plateau, qui calcule à la demande au lieu de tout
+// tenir en mémoire.
 //
 // La table est calculée pour la portée maximale atteignable — capacité du
 // Guetteur comprise — et tronquée à la lecture. Recalculer à chaque

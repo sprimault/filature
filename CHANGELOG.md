@@ -30,6 +30,32 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+### Ajouté
+- Génération de plateau : trame irrégulière, cours percées, impasses et six
+  zones d'extraction réparties sur le pourtour. Une graine donnée produit
+  toujours le même plateau, vérifié sur Windows et Linux.
+- Trois préréglages de partie — Quartier, Faubourg et Ville — là où seule la
+  Ville existait. La portée de vue et la durée suivent la taille du plateau.
+
+### Corrigé
+- Les bornes des paramètres avaient des valeurs sans nom ni justification, et
+  les refus ne disaient ni la valeur reçue ni ce qui était attendu. Le nombre de
+  pions déplaçables n'était pas contrôlé.
+
+***
+
+### Added
+- Board generation: irregular street grid, punched courtyards, dead ends and six
+  extraction zones spread around the perimeter. A given seed always produces the
+  same board, verified on Windows and Linux.
+- Three game presets — District, Outskirts and City — where only the City
+  existed. Sight range and duration follow the board size.
+
+### Fixed
+- Parameter bounds were unnamed magic numbers, and rejections stated neither the
+  value received nor what was expected. The number of movable pieces was not
+  checked at all.
+
 ## [0.2.0] — 2026-08-25 — La vue filtrée
 
 Étape 2 de la feuille de route. Les quatre invariants de l'architecture sont
