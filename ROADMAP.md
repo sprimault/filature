@@ -120,6 +120,22 @@ Deux moyens de jeu, complets l'un comme l'autre :
 Ensemble parce qu'une sauvegarde porte le manifeste des greffons actifs : une
 partie ne se recharge pas sans eux.
 
+Avec `filature valide <chemin>`, qui charge un greffon par **le même code que
+le jeu** et liste ses manquements en une fois. Deux validateurs finiraient par
+diverger, et c'est alors la partie qui tranche — au pire moment.
+
+**Chaque manquement dit où il est** : fichier, ligne quand elle est connue, et
+chemin complet de la clé fautive, avec ce qui était attendu. Une erreur qu'on
+doit chercher coûte plus cher que celle qu'on lit.
+
+Elle existe pour deux raisons. Un greffon invalide fait échouer le chargement
+entier, ce qui est juste en jeu et détestable en développement : le jeu ne
+démarre plus, et il faut deviner lequel des fichiers pèche. Et surtout, un
+greffon validé chez son auteur se charge chez n'importe qui — c'est la
+condition pour installer le travail d'un inconnu sans crainte. Un code de sortie
+suffit à en faire la brique du workflow que `docs/protocole-bot.md` §8 promet
+aux auteurs.
+
 Livré quand le test central passe : partie jouée, journal, rejeu, état
 identique octet pour octet.
 
@@ -186,6 +202,10 @@ réglages. Plus le chargement des langues et le sélecteur qui va avec.
 Les libellés ne sont jamais dans le code : ils viennent d'un dictionnaire, et un
 greffon de langue en fournit un. Le format se pose à l'étape 8 avec les autres
 contrats de greffon ; c'est ici qu'il est consommé.
+
+**L'écran des greffons montre les refusés autant que les actifs**, chacun avec
+sa raison. Un greffon absent de la liste sans explication laisse son auteur
+deviner, et le journal n'est pas un endroit où il pensera à regarder.
 
 Numérotée en dernier sans être la dernière à faire : rien de tout cela ne
 dépend du réseau ni des greffons exécutables, et un écran de réglages sera
