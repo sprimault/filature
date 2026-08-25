@@ -25,8 +25,31 @@ Début de projet. Les règles sont figées, le moteur n'est pas écrit.
 Télécharger un binaire depuis la page des versions, extraire, lancer. Aucun
 runtime, aucune dépendance système.
 
+**L'archive ne contient que l'exécutable**, avec la licence. Les règles, les
+formes et les libellés sont dedans : rien à installer à côté, et déplacer le
+fichier ne casse rien.
+
 Le binaire Windows n'est pas signé : SmartScreen affichera un avertissement au
 premier lancement.
+
+### Les commandes
+
+Deux commandes se lancent depuis un terminal, pas en double-cliquant — leur
+sortie est du texte, et une fenêtre ouverte par l'explorateur se referme avant
+qu'on ait pu lire quoi que ce soit.
+
+```
+filature version              le numéro de la version installée
+filature exemples <dossier>   écrit les greffons livrés, pour servir de modèle
+```
+
+`exemples` ne peut pas écrire dans le dossier des greffons actifs, et le refuse
+en le disant : ce qu'il en sort est déjà dans le binaire, l'y remettre le
+déclarerait deux fois. Ce sont des modèles à recopier sous un autre nom.
+
+Le jeu cherche ses greffons dans un dossier `greffons` **à côté de
+l'exécutable**, et non dans le répertoire courant — un raccourci fonctionne donc
+comme un lancement direct. `--greffons` pointe ailleurs si besoin.
 
 ## Étendre le jeu
 

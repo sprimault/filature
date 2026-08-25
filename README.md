@@ -24,7 +24,29 @@ Early. The rules are settled, the engine is not written yet.
 Download a binary from the releases page, extract, run. No runtime, no system
 dependency.
 
+**The archive holds the executable and the licence, nothing else.** Rules,
+shapes and labels are inside it: nothing to install alongside, and moving the
+file breaks nothing.
+
 The Windows binary is not signed: SmartScreen will warn on first launch.
+
+### Commands
+
+Two commands belong in a terminal, not a double-click — their output is text,
+and a window opened from the file explorer closes before anything can be read.
+
+```
+filature version              the installed version number
+filature exemples <folder>    writes the shipped plugins, as templates
+```
+
+`exemples` refuses to write into the active plugin folder, and says so: what it
+writes out is already inside the binary, and putting it back there would declare
+it twice. These are templates to copy under another name.
+
+The game looks for plugins in a `greffons` folder **next to the executable**,
+not in the current directory — so a shortcut behaves like a direct launch. Use
+`--greffons` to point elsewhere.
 
 ## Extending
 

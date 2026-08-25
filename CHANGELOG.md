@@ -20,6 +20,20 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
 
 ## [Non publié]
 
+## [0.1.1] — 2026-08-25
+
+### Corrigé
+- Le dossier des greffons est cherché à côté de l'exécutable et non dans le
+  répertoire courant. Lancé par un raccourci, le jeu ignorait les greffons
+  installés sans rien dire.
+- `filature exemples` refuse d'écrire dans le dossier des greffons actifs. Le
+  contenu livré y aurait été déclaré deux fois — une fois depuis le binaire, une
+  fois depuis le disque — et deux greffons qui définissent la même clé sont un
+  conflit.
+
+### Ajouté
+- Le README décrit les deux commandes du binaire et l'emplacement des greffons.
+
 ## [0.1.0] — 2026-08-25
 
 Étape 1 de la feuille de route : le noyau. Une partie complète se joue depuis
