@@ -97,12 +97,10 @@ type (
 	FabriqueCerveau func(v Vue, a *Alea) (Coup, error)
 )
 
-// RegistreBase charge les capacités et dépenses livrées avec le jeu. Une partie
-// sans aucun greffon tiers utilise déjà ce chemin de code : il n'y a pas de
-// voie rapide qui court-circuiterait le registre et resterait donc non testée.
-func RegistreBase() (*Registre, error) {
-	return nil, errors.New("à implémenter : étape 1")
-}
+// Le registre se construit dans internal/greffons, jamais ici : le remplir
+// demande de lire des manifestes, et ce paquet n'a aucune dépendance disque.
+// C'est ce qui en fait une feuille du graphe de dépendances, et ce qui garantit
+// qu'aucune règle n'attend un fichier pour s'appliquer.
 
 // Fusionner ajoute un greffon au registre. Une clé déjà prise est un conflit,
 // pas un écrasement silencieux : deux greffons qui redéfinissent la même

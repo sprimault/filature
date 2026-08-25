@@ -30,6 +30,11 @@ s'ajoute donc à la fin, quelle que soit sa place logique.
 `internal/noyau` : état, coups légaux, application et annulation, contacts,
 arbitrage, vocabulaire d'effets et file des différés, registre.
 
+Le registre est posé ici, mais rempli à l'étape 8 : lire un manifeste donnerait
+au noyau une dépendance disque, et il n'en a aucune. De même, le plateau lui est
+remis plutôt que fabriqué — la génération est l'étape 3, et une partie se monte
+sans elle sur un plateau d'essai.
+
 Livré quand une partie complète se joue de bout en bout depuis des appels Go,
 sans interface, avec les cas limites de `docs/regles.md` §14 couverts par des
 tests.
