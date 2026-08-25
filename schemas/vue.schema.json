@@ -1,0 +1,405 @@
+{
+  "$comment": "Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>. SPDX-License-Identifier: Apache-2.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sprimault/filature/schemas/vue.schema.json",
+  "title": "Vue Filature",
+  "description": "Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis noyau.Vue : ne pas modifier a la main.",
+  "$ref": "#/$defs/Vue",
+  "$defs": {
+    "Contexte": {
+      "type": "object",
+      "properties": {
+        "acteur": {
+          "type": "string"
+        },
+        "autre_pion": {
+          "type": "integer"
+        },
+        "case": {
+          "$ref": "#/$defs/Position"
+        },
+        "pion": {
+          "type": "integer"
+        },
+        "zone": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "acteur",
+        "autre_pion",
+        "case",
+        "pion",
+        "zone"
+      ]
+    },
+    "Coup": {
+      "type": "object",
+      "properties": {
+        "acteur": {
+          "type": "string"
+        },
+        "arrivee": {
+          "$ref": "#/$defs/Position"
+        },
+        "capacite": {
+          "type": "string"
+        },
+        "depart": {
+          "$ref": "#/$defs/Position"
+        },
+        "depense": {
+          "type": "string"
+        },
+        "pion": {
+          "type": "integer"
+        },
+        "tour": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string"
+        },
+        "zone": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "acteur",
+        "tour",
+        "type"
+      ]
+    },
+    "Effet": {
+      "type": "object",
+      "properties": {
+        "annonce": {
+          "type": "boolean"
+        },
+        "cible": {
+          "type": "string"
+        },
+        "duree": {
+          "type": "integer"
+        },
+        "puis": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Effet"
+          }
+        },
+        "rayon": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string"
+        },
+        "valeur": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "EffetEnAttente": {
+      "type": "object",
+      "properties": {
+        "annonce": {
+          "type": "boolean"
+        },
+        "contexte": {
+          "$ref": "#/$defs/Contexte"
+        },
+        "effets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Effet"
+          }
+        },
+        "tour": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "annonce",
+        "contexte",
+        "effets",
+        "tour"
+      ]
+    },
+    "Inspecteur": {
+      "type": "object",
+      "properties": {
+        "capacite": {
+          "type": "string"
+        },
+        "capacite_utilisee": {
+          "type": "boolean"
+        },
+        "deplacements_faits": {
+          "type": "integer"
+        },
+        "position": {
+          "$ref": "#/$defs/Position"
+        }
+      },
+      "required": [
+        "capacite",
+        "capacite_utilisee",
+        "deplacements_faits",
+        "position"
+      ]
+    },
+    "Parametres": {
+      "type": "object",
+      "properties": {
+        "cote": {
+          "type": "integer"
+        },
+        "debut_etranglement": {
+          "type": "integer"
+        },
+        "duree_trace": {
+          "type": "integer"
+        },
+        "inspecteurs": {
+          "type": "integer"
+        },
+        "periode_etranglement": {
+          "type": "integer"
+        },
+        "periode_revelation": {
+          "type": "integer"
+        },
+        "pions_par_tour": {
+          "type": "integer"
+        },
+        "portee": {
+          "type": "integer"
+        },
+        "resistance": {
+          "type": "integer"
+        },
+        "tours": {
+          "type": "integer"
+        },
+        "zones": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "cote",
+        "debut_etranglement",
+        "duree_trace",
+        "inspecteurs",
+        "periode_etranglement",
+        "periode_revelation",
+        "pions_par_tour",
+        "portee",
+        "resistance",
+        "tours",
+        "zones"
+      ]
+    },
+    "Position": {
+      "type": "object",
+      "properties": {
+        "Colonne": {
+          "type": "integer"
+        },
+        "Ligne": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "Colonne",
+        "Ligne"
+      ]
+    },
+    "Resultat": {
+      "type": "object",
+      "properties": {
+        "motif": {
+          "type": "string"
+        },
+        "tour": {
+          "type": "integer"
+        },
+        "vainqueur": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "motif",
+        "tour",
+        "vainqueur"
+      ]
+    },
+    "Scene": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "$ref": "#/$defs/Position"
+        },
+        "tour": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "position",
+        "tour"
+      ]
+    },
+    "Trace": {
+      "type": "object",
+      "properties": {
+        "direction": {
+          "type": "integer"
+        },
+        "tour": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "direction",
+        "tour"
+      ]
+    },
+    "Vue": {
+      "type": "object",
+      "properties": {
+        "acteur": {
+          "type": "string"
+        },
+        "barrages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Position"
+          }
+        },
+        "cases_visibles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Position"
+          }
+        },
+        "coups_legaux": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Coup"
+          }
+        },
+        "effets_annonces": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EffetEnAttente"
+          }
+        },
+        "inspecteurs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Inspecteur"
+          }
+        },
+        "parametres": {
+          "$ref": "#/$defs/Parametres"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "position_fugitif": {
+          "$ref": "#/$defs/Position"
+        },
+        "prochaine_revelation": {
+          "type": "integer"
+        },
+        "resistance": {
+          "type": "integer"
+        },
+        "resultat": {
+          "$ref": "#/$defs/Resultat"
+        },
+        "rues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Position"
+          }
+        },
+        "scenes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Scene"
+          }
+        },
+        "silence_paye": {
+          "type": "boolean"
+        },
+        "tour": {
+          "type": "integer"
+        },
+        "traces_connues": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Trace"
+          }
+        },
+        "zone_scellee": {
+          "type": "integer"
+        },
+        "zones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Zone"
+          }
+        },
+        "zones_annoncees": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        }
+      },
+      "required": [
+        "acteur",
+        "barrages",
+        "cases_visibles",
+        "coups_legaux",
+        "effets_annonces",
+        "inspecteurs",
+        "parametres",
+        "phase",
+        "prochaine_revelation",
+        "rues",
+        "scenes",
+        "silence_paye",
+        "tour",
+        "traces_connues",
+        "zones",
+        "zones_annoncees"
+      ]
+    },
+    "Zone": {
+      "type": "object",
+      "properties": {
+        "Cases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Position"
+          }
+        },
+        "Fermee": {
+          "type": "boolean"
+        },
+        "Numero": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "Cases",
+        "Fermee",
+        "Numero"
+      ]
+    }
+  }
+}

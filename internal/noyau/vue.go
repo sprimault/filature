@@ -81,19 +81,19 @@ func (p *Partie) VuePour(a Acteur) Vue {
 		Tour:            p.Tour,
 		Phase:           p.Phase,
 		Parametres:      p.Parametres,
-		Rues:            p.ruesConnues(),
-		Zones:           p.zonesVues(),
-		Barrages:        p.barrages(),
-		Inspecteurs:     append([]Inspecteur(nil), p.Inspecteurs...),
+		Rues:            liste(p.ruesConnues()),
+		Zones:           liste(p.zonesVues()),
+		Barrages:        liste(p.barrages()),
+		Inspecteurs:     liste(append([]Inspecteur(nil), p.Inspecteurs...)),
 		TracesConnues:   p.tracesPour(a),
-		Scenes:          append([]Scene(nil), p.Scenes...),
-		CasesVisibles:   p.casesVisiblesPour(a),
-		CoupsLegaux:     p.CoupsLegaux(a),
+		Scenes:          liste(append([]Scene(nil), p.Scenes...)),
+		CasesVisibles:   liste(p.casesVisiblesPour(a)),
+		CoupsLegaux:     liste(p.CoupsLegaux(a)),
 		ProchaineReveal: p.prochaineRevelation(),
 		SilencePaye:     p.Fugitif.SilenceAchete,
-		EffetsAnnonces:  p.effetsAnnonces(),
+		EffetsAnnonces:  liste(p.effetsAnnonces()),
 	}
-	v.ZonesAnnoncees = zonesAnnoncees(v.EffetsAnnonces)
+	v.ZonesAnnoncees = liste(zonesAnnoncees(v.EffetsAnnonces))
 
 	// Le fugitif voit tout de lui-même. Les inspecteurs ne voient sa position
 	// que s'il est repéré ou révélé, et sa zone jamais.
@@ -113,6 +113,19 @@ func (p *Partie) VuePour(a Acteur) Vue {
 		v.Resultat = &r
 	}
 	return v
+}
+
+// liste garantit une tranche non nulle.
+//
+// Une tranche vide se sérialise en null, pas en tableau vide : un bot devrait
+// alors traiter les deux formes pour chacune des neuf listes de la vue, et
+// celui qui ne le ferait que pour certaines tomberait sur les autres. Le
+// contrat promet un tableau, il en rend un.
+func liste[T any](s []T) []T {
+	if s == nil {
+		return []T{}
+	}
+	return s
 }
 
 // ruesConnues rend la portion de plateau que le client peut afficher.
