@@ -40,3 +40,4 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
   périodique, effets différés et étranglement.
 - Arbitrage : extraction sur deux tours, zone neutralisée par un inspecteur ou
   par sa fermeture, et les trois victoires des inspecteurs.
+- Mise en place d'une partie, plateau reçu et non fabriqué.

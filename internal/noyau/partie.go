@@ -5,6 +5,7 @@ package noyau
 
 import (
 	"errors"
+	"fmt"
 	"sort"
 )
 
@@ -143,10 +144,67 @@ type Partie struct {
 	alea       *Alea
 }
 
-// Nouvelle prépare une partie au premier coup de placement. Le plateau est
-// généré ici, donc la graine renvoyée peut différer de celle demandée.
-func Nouvelle(graine int64, p Parametres, r *Registre) (*Partie, error) {
-	return nil, errors.New("à implémenter : étape 1")
+// La distance minimale entre le noyau central et les zones d'extraction reste
+// ouverte : elle dépend du taux de rues que la génération obtiendra, donc de
+// l'étape 3. Ce rayon la borne par le haut en attendant.
+
+// RayonNoyauCentral borne la zone où le fugitif est tiré au sort.
+//
+// Assez large pour que les inspecteurs ne puissent pas la couvrir, assez
+// resserrée pour qu'aucune sortie ne soit à portée immédiate : il doit avoir à
+// traverser, sinon les six points d'extraction ne servent à rien.
+const RayonNoyauCentral = 5
+
+// Nouvelle prépare une partie au premier coup de placement.
+//
+// Le plateau est reçu, pas fabriqué. Le noyau applique des règles à un terrain,
+// il ne le produit pas — c'est aussi ce qui rend une partie montable sur un
+// plateau d'essai sans passer par la génération, et ce qui laissera la
+// génération par tuiles se substituer sans qu'une règle bouge.
+//
+// La position du fugitif est tirée au sort, comme le veut la mise en place : il
+// choisit sa zone d'extraction, jamais sa case de départ.
+func Nouvelle(plateau Plateau, graine int64, p Parametres, r *Registre) (*Partie, error) {
+	if plateau == nil {
+		return nil, errors.New("plateau manquant")
+	}
+	if r == nil {
+		return nil, errors.New("registre manquant")
+	}
+	if err := p.Valider(); err != nil {
+		return nil, fmt.Errorf("parametres: %w", err)
+	}
+
+	depart, err := departDuFugitif(plateau, graine, p)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Partie{
+		Graine:     graine,
+		Parametres: p,
+		Plateau:    plateau,
+		Phase:      PhasePlacementFugitif,
+		Fugitif: Fugitif{
+			Position:    depart,
+			Resistance:  p.Resistance,
+			ZoneScellee: -1,
+		},
+		Extensions: r,
+	}, nil
+}
+
+// departDuFugitif tire sa case dans le noyau central.
+//
+// Le flux nommé isole ce tirage : ajouter un dé ailleurs ne doit pas déplacer
+// le fugitif d'une partie qu'on rejoue.
+func departDuFugitif(plateau Plateau, graine int64, p Parametres) (Position, error) {
+	milieu := p.Cote / 2
+	cases := plateau.CasesDans(Position{Colonne: milieu, Ligne: milieu}, RayonNoyauCentral)
+	if len(cases) == 0 {
+		return Position{}, errors.New("aucune rue au centre du plateau")
+	}
+	return cases[NouvelAlea(graine, "placement").Entier(len(cases))], nil
 }
 
 // EstPraticable dit si une case peut être occupée et traversée du regard.
