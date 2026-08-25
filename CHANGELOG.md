@@ -35,3 +35,4 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
 - Énumération des coups légaux, et la dépense de changement de zone qui
   manquait au contenu livré.
 - Application et annulation d'un coup, avec l'enchaînement des phases.
+- Générateur déterministe à flux nommés, seul aléatoire du jeu.
