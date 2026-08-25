@@ -21,9 +21,19 @@ const (
 
 	// CoteZone est le bloc d'une zone d'extraction, et RuesParZone le nombre
 	// de cases praticables qu'il doit contenir pour qu'on puisse s'y tenir.
-	CoteZone           = 3
-	RuesParZone        = 5
+	CoteZone    = 3
+	RuesParZone = 5
+
+	// LongueurImpasseMax borne un couloir borgne, SurfaceParImpasse en donne
+	// le nombre : une par carré de huit cases de côté.
+	//
+	// Une surface et non le côté du plateau. Un nombre proportionnel au côté
+	// rendrait la Ville deux fois moins piégeuse qu'un Quartier sans que
+	// personne ne l'ait décidé, alors que le fugitif n'y circule pas en ligne
+	// droite : il tourne, revient, se terre, et ce qu'il croise dépend de
+	// l'aire qu'il couvre.
 	LongueurImpasseMax = 3
+	SurfaceParImpasse  = 64
 
 	// tentativesMax borne la recherche d'un plateau valide. Un jeu de
 	// paramètres qui échoue autant de fois de suite ne produira pas de plateau
@@ -139,30 +149,95 @@ func (b *PlateauBorne) toucheUneRue(p Position) bool {
 	return false
 }
 
-// creuserImpasses ouvre des couloirs sans issue depuis une avenue.
+// creuserImpasses ouvre des couloirs sans issue depuis une rue.
 //
 // Sans bords à exploiter, ce sont elles qui permettent le piégeage : un fugitif
 // engagé dans une impasse n'en ressort que par où il est entré. Le Barreur y
 // gagne sa raison d'être.
+//
+// Les départs sont énumérés puis mélangés, et non tirés case par case. Une case
+// bâtie qui ne touche qu'une seule rue est rare — une centaine sur les quatre
+// cent quarante et une d'un Quartier — et la tirer au hasard échouait assez
+// souvent pour que l'étape entière n'ait aucun effet mesurable.
 func (b *PlateauBorne) creuserImpasses(a *Alea) {
-	impasses := b.cote / 3
-	for i := 0; i < impasses; i++ {
-		depart := Position{Colonne: a.Entier(b.cote), Ligne: a.Entier(b.cote)}
-		if !b.EstRue(depart) {
+	departs := b.amorces()
+	Melanger(a, departs)
+
+	restantes := b.cote * b.cote / SurfaceParImpasse
+	for _, d := range departs {
+		if restantes == 0 {
+			return
+		}
+		// Un couloir déjà creusé a pu ouvrir une voisine de cette amorce, qui
+		// déboucherait maintenant.
+		if !b.creusable(d.tete, d.acces) {
 			continue
 		}
+		b.prolonger(d, 1+a.Entier(LongueurImpasseMax))
+		restantes--
+	}
+}
 
-		direction := Orthogonales[a.Entier(len(Orthogonales))]
-		longueur := 1 + a.Entier(LongueurImpasseMax)
-		for pas := 0; pas < longueur; pas++ {
-			depart = depart.Avance(direction)
-			if depart.Colonne < 0 || depart.Ligne < 0 ||
-				depart.Colonne >= b.cote || depart.Ligne >= b.cote {
-				break
+// amorce est le départ d'un couloir borgne : une case bâtie qui ne touche
+// qu'une seule rue, et cette rue.
+type amorce struct {
+	tete  Position
+	acces Position
+}
+
+// amorces énumère les départs possibles, ligne par ligne puis colonne par
+// colonne.
+//
+// L'ordre du parcours est ce qui rend le mélange reproductible : deux rejeux de
+// la même graine doivent mélanger la même liste.
+func (b *PlateauBorne) amorces() []amorce {
+	var liste []amorce
+	for ligne := 0; ligne < b.cote; ligne++ {
+		for colonne := 0; colonne < b.cote; colonne++ {
+			p := Position{Colonne: colonne, Ligne: ligne}
+			for _, d := range Orthogonales {
+				if v := p.Avance(d); b.EstRue(v) && b.creusable(p, v) {
+					liste = append(liste, amorce{tete: p, acces: v})
+					break
+				}
 			}
-			b.ouvrir(depart)
 		}
 	}
+	return liste
+}
+
+// prolonger creuse tout droit depuis une amorce, et s'arrête dès que la case
+// suivante déboucherait.
+func (b *PlateauBorne) prolonger(d amorce, longueur int) {
+	// Le second retour ne peut pas être faux : une amorce et son accès sont
+	// voisins orthogonaux par construction.
+	direction, _ := DirectionVers(d.acces, d.tete)
+
+	b.ouvrir(d.tete)
+	precedente, tete := d.tete, d.tete.Avance(direction)
+
+	for pas := 1; pas < longueur && b.creusable(tete, precedente); pas++ {
+		b.ouvrir(tete)
+		precedente, tete = tete, tete.Avance(direction)
+	}
+}
+
+// creusable dit si une case peut prolonger un couloir borgne arrivant de
+// precedente.
+//
+// Le refus qui compte est le dernier : une case voisine d'une rue autre que
+// celle d'où l'on vient débouche, et un couloir qui débouche n'est plus une
+// impasse.
+func (b *PlateauBorne) creusable(p, precedente Position) bool {
+	if !b.dedans(p) || b.EstRue(p) {
+		return false
+	}
+	for _, d := range Orthogonales {
+		if v := p.Avance(d); v != precedente && b.EstRue(v) {
+			return false
+		}
+	}
+	return true
 }
 
 // poserZones place les points d'extraction en périphérie, régulièrement

@@ -207,10 +207,15 @@ func (b *PlateauBorne) zoneAtteignable(z Zone, atteintes map[Position]bool) bool
 // EstRue dit si une case est praticable. Hors plateau vaut bâtiment, ce qui
 // évite un test de bornes à chaque appelant.
 func (b *PlateauBorne) EstRue(p Position) bool {
-	if p.Colonne < 0 || p.Ligne < 0 || p.Colonne >= b.cote || p.Ligne >= b.cote {
-		return false
-	}
-	return b.rues[p.Ligne*b.cote+p.Colonne]
+	return b.dedans(p) && b.rues[p.Ligne*b.cote+p.Colonne]
+}
+
+// dedans dit si une position tombe sur le plateau.
+//
+// Les parcours de voisinage sortent des bords en permanence : c'est ce test qui
+// leur évite d'avoir à s'en soucier.
+func (b *PlateauBorne) dedans(p Position) bool {
+	return p.Colonne >= 0 && p.Ligne >= 0 && p.Colonne < b.cote && p.Ligne < b.cote
 }
 
 // CasesDans énumère les rues autour d'un centre, ligne par ligne puis colonne

@@ -43,6 +43,10 @@ publié, et explique les conventions du dépôt à qui y contribue.
   pions déplaçables n'était pas contrôlé.
 - Le README annonçait un moteur non écrit alors qu'une partie complète se joue
   depuis des appels Go.
+- Le creusement des impasses n'en produisait aucune : les couloirs rejoignaient
+  l'avenue suivante au lieu de rester borgnes, et le piégeage sur lequel repose
+  le Barreur n'existait pas. Leur nombre suit désormais la surface du plateau et
+  non son côté, qui rendait une Ville deux fois moins piégeuse qu'un Quartier.
 
 ***
 
@@ -59,6 +63,10 @@ publié, et explique les conventions du dépôt à qui y contribue.
   checked at all.
 - The README claimed the engine was not written yet, when a full game already
   plays out from Go calls.
+- Dead-end carving produced none: corridors reached the next avenue instead of
+  staying blind, and the trapping the Blocker relies on did not exist. Their
+  count now follows the board's area rather than its side, which made a City
+  half as trap-ridden as a District.
 
 ## [0.2.0] — 2026-08-25 — La vue filtrée
 
