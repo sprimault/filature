@@ -331,7 +331,7 @@
         "rayon": {
           "type": "integer",
           "minimum": 0,
-          "description": "Portee en cases, distance de Tchebychev."
+          "description": "Portee en cases, distance de Manhattan : un rayon de 1 couvre la case et ses quatre voisines orthogonales, pas les diagonales."
         },
         "annonce": {
           "type": "boolean",

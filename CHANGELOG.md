@@ -25,6 +25,11 @@ facultatif ; sans lui, la version se nomme par son tag.
 
 ## [Non publié]
 
+### Ajouté
+- Vue filtrée : chaque camp ne reçoit que ce qu'il a le droit de savoir. La
+  position du fugitif, sa zone scellée, sa résistance et les traces hors de
+  portée ne franchissent pas la projection.
+
 ## [0.1.1] — 2026-08-25 — Correctifs du binaire
 
 ### Corrigé
