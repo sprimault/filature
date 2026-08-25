@@ -31,6 +31,7 @@ const (
 	DepenseDoubleDeplacement Depense = "double_deplacement"
 	DepenseSilence           Depense = "silence"
 	DepenseEffacement        Depense = "effacement"
+	DepenseChangerZone       Depense = "changer_zone"
 	DepenseMeurtre           Depense = "meurtre"
 )
 

@@ -37,6 +37,7 @@ const (
 	EffetEffacerTraces     TypeEffet = "effacer_traces"
 	EffetFermerZone        TypeEffet = "fermer_zone"
 	EffetOuvrirZone        TypeEffet = "ouvrir_zone"
+	EffetScellerZone       TypeEffet = "sceller_zone"
 	EffetTeleporter        TypeEffet = "teleporter"
 	EffetDifferer          TypeEffet = "differer"
 	EffetFinPartie         TypeEffet = "fin_partie"
@@ -196,6 +197,14 @@ func (p *Partie) Appliquer1Effet(e Effet, ctx Contexte) (annulation func(), err 
 
 	case EffetOuvrirZone:
 		return p.basculerZone(ctx.Zone, false), nil
+
+	// Écrire la zone scellée ne la fait pas fuiter : un greffon la remplace
+	// sans jamais pouvoir la lire, et VuePour continue de la retenir côté
+	// inspecteurs.
+	case EffetScellerZone:
+		precedente := p.Fugitif.ZoneScellee
+		p.Fugitif.ZoneScellee = ctx.Zone
+		return func() { p.Fugitif.ZoneScellee = precedente }, nil
 
 	case EffetDifferer:
 		return p.mettreEnAttente(e, ctx), nil

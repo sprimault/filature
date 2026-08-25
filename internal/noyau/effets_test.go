@@ -28,6 +28,19 @@ func (b plateauNu) Graine() int64 { return 1 }
 // Vision n'est pas exercée ici, la table de vision relevant de l'étape 4.
 func (b plateauNu) Vision(p Position, portee int) []Position { return nil }
 
+// CasesDans énumère les cases du carré, dans l'ordre du plateau borné.
+func (b plateauNu) CasesDans(centre Position, rayon int) []Position {
+	var cases []Position
+	for ligne := centre.Ligne - rayon; ligne <= centre.Ligne+rayon; ligne++ {
+		for colonne := centre.Colonne - rayon; colonne <= centre.Colonne+rayon; colonne++ {
+			if p := (Position{Colonne: colonne, Ligne: ligne}); b.EstRue(p) {
+				cases = append(cases, p)
+			}
+		}
+	}
+	return cases
+}
+
 // partieDEssai monte une partie au tour 5, avec trois inspecteurs et un
 // fugitif, de quoi appliquer n'importe quelle primitive.
 func partieDEssai() *Partie {
@@ -228,6 +241,16 @@ func tousLesCas() []casEffet {
 			verifie: func(t *testing.T, p *Partie) {
 				if !reflect.DeepEqual(p.ZonesFermees, []int{3}) {
 					t.Errorf("zones fermées %v, attendu [3]", p.ZonesFermees)
+				}
+			},
+		},
+		{
+			nom:   "sceller_zone",
+			effet: Effet{Type: EffetScellerZone, Cible: CibleZone},
+			ctx:   Contexte{Acteur: CampFugitif, Zone: 4},
+			verifie: func(t *testing.T, p *Partie) {
+				if p.Fugitif.ZoneScellee != 4 {
+					t.Errorf("zone scellée %d, attendu 4", p.Fugitif.ZoneScellee)
 				}
 			},
 		},

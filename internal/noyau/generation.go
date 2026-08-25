@@ -92,6 +92,21 @@ func (b *PlateauBorne) EstRue(p Position) bool {
 	return b.rues[p.Ligne*b.cote+p.Colonne]
 }
 
+// CasesDans énumère les rues autour d'un centre, ligne par ligne puis colonne
+// par colonne. L'ordre est un contrat : il détermine celui des coups légaux, et
+// donc ce qu'un rejeu doit retrouver.
+func (b *PlateauBorne) CasesDans(centre Position, rayon int) []Position {
+	var cases []Position
+	for ligne := centre.Ligne - rayon; ligne <= centre.Ligne+rayon; ligne++ {
+		for colonne := centre.Colonne - rayon; colonne <= centre.Colonne+rayon; colonne++ {
+			if p := (Position{Colonne: colonne, Ligne: ligne}); b.EstRue(p) {
+				cases = append(cases, p)
+			}
+		}
+	}
+	return cases
+}
+
 // Zones renvoie les zones d'extraction, connues des deux camps dès le début.
 func (b *PlateauBorne) Zones() []Zone { return b.zones }
 

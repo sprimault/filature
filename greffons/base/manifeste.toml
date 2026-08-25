@@ -118,6 +118,20 @@ declenchement = "phase_fugitif"
   cible = "fugitif"
   duree = 3
 
+# Le fugitif ne change pas de zone par confort : l'étranglement peut fermer la
+# sienne et l'y contraindre, et deux points sont alors une amende sur un plan
+# qu'il n'a pas choisi d'abandonner.
+
+[depense.changer_zone]
+nom = "Changement de zone"
+camp = "fugitif"
+cout = 2
+declenchement = "phase_fugitif"
+
+  [[depense.changer_zone.effet]]
+  type = "sceller_zone"
+  cible = "zone"
+
 # Le meurtre se compose : révéler la position, marquer la scène, et payer. Les
 # deux premiers restent distincts parce qu'ils ne durent pas pareil — la
 # révélation vaut un tour, la scène reste sur le plateau.

@@ -16,6 +16,15 @@ type Plateau interface {
 	// Vision renvoie les cases visibles depuis p, table calculée à la
 	// génération. Renvoie nil si p n'est pas une rue.
 	Vision(p Position, portee int) []Position
+
+	// CasesDans énumère les rues à portée du centre, en distance de
+	// Tchebychev, dans un ordre stable.
+	//
+	// Bornée par construction, et c'est ce qui la distingue d'un parcours
+	// global : un plateau qui génère ses tuiles à la demande y répond aussi
+	// bien qu'un plateau clos. C'est par elle que passent le placement des
+	// inspecteurs et le tirage du fugitif dans le noyau central.
+	CasesDans(centre Position, rayon int) []Position
 }
 
 // Zone est un point d'extraction : un bloc dont au moins cinq cases sont des
