@@ -293,6 +293,63 @@ func TestValidationRejette(t *testing.T) {
 	})
 }
 
+// culsDeSac compte les rues qui n'ont qu'une seule voisine praticable.
+//
+// C'est la seule mesure d'une impasse qui ait un sens ici : creuserImpasses
+// ouvre des couloirs, mais un couloir qui rejoint une rue existante n'en est
+// pas une, et rien ne distingue les deux au moment du tirage.
+func culsDeSac(b *PlateauBorne) int {
+	n := 0
+	for ligne := 0; ligne < b.cote; ligne++ {
+		for colonne := 0; colonne < b.cote; colonne++ {
+			c := Position{Colonne: colonne, Ligne: ligne}
+			if !b.EstRue(c) {
+				continue
+			}
+			voisines := 0
+			for _, d := range Orthogonales {
+				if b.EstRue(c.Avance(d)) {
+					voisines++
+				}
+			}
+			if voisines == 1 {
+				n++
+			}
+		}
+	}
+	return n
+}
+
+// TestPlateauPorteDesImpasses garde la quatrième étape de la génération, seule
+// à n'avoir aucun critère dans valider.
+//
+// docs/regles.md §3 leur donne un rôle nommé : sans bords à exploiter, ce sont
+// elles qui permettent le piégeage, et le Barreur y gagne sa raison d'être. Un
+// plateau qui n'en aurait pas resterait connexe, praticable et accepté par la
+// validation — la capacité deviendrait décorative sans que rien ne le dise.
+//
+// Le seuil est un plancher, pas une cible : combien il en faut ne se saura
+// qu'en jouant. Il est placé sous le minimum mesuré et au-dessus de ce que les
+// seules cours percées produisent, ce qui est tout ce qu'on lui demande — une
+// version de creuserImpasses sans effet échoue ici sur les trois préréglages.
+func TestPlateauPorteDesImpasses(t *testing.T) {
+	for _, pre := range Prereglages() {
+		t.Run(pre.Cle, func(t *testing.T) {
+			plancher := pre.Parametres.Cote / 4
+
+			for graine := int64(1); graine <= 60; graine++ {
+				b, _, err := Generer(graine, pre.Parametres)
+				if err != nil {
+					t.Fatalf("graine %d : %v", graine, err)
+				}
+				if n := culsDeSac(b); n < plancher {
+					t.Fatalf("graine %d : %d impasses, attendu au moins %d", graine, n, plancher)
+				}
+			}
+		})
+	}
+}
+
 // TestPlateauGenereMonteUnePartie relie les deux moitiés de la mise en place :
 // un plateau tiré au sort, et le noyau qui doit y placer le fugitif.
 //

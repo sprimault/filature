@@ -75,8 +75,9 @@ Génération déterministe depuis une graine :
 1. Trame de rues orthogonales à intervalle irrégulier (3 à 6 cases).
 2. Remplissage des îlots en bâtiments.
 3. Perçage aléatoire de passages et de cours, pour casser la régularité.
-4. Creusement de quelques impasses — sans bords, ce sont elles qui permettent le
-   piégeage.
+4. Creusement d'impasses, une par carré de huit cases de côté — sans bords, ce
+   sont elles qui permettent le piégeage. Un couloir fait trois cases au plus et
+   ne débouche jamais.
 5. Placement des six zones d'extraction, en périphérie, réparties angulairement.
 6. **Validation** : toutes les cases claires forment une seule composante
    connexe, chaque zone est atteignable, le taux de rues tombe entre 35 % et 50 %.
