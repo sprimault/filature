@@ -2,6 +2,9 @@
 
 English: [README.md](README.md)
 
+![CI](https://github.com/sprimault/filature/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/badge/license-Apache%202.0-blue)
+
 Un jeu de plateau au tour par tour, à déplacement caché. Un fugitif contre cinq
 inspecteurs, sur une ville de rues et de bâtiments.
 

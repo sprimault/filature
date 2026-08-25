@@ -2,6 +2,9 @@
 
 Français : [README.fr.md](README.fr.md)
 
+![CI](https://github.com/sprimault/filature/actions/workflows/ci.yml/badge.svg)
+![License](https://img.shields.io/badge/license-Apache%202.0-blue)
+
 A turn-based board game of hidden movement. One fugitive against five
 inspectors, on a city of streets and buildings.
 
