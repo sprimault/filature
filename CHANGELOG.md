@@ -25,10 +25,31 @@ facultatif ; sans lui, la version se nomme par son tag.
 
 ## [Non publié]
 
+## [0.2.0] — 2026-08-25 — La vue filtrée
+
+Étape 2 de la feuille de route. Les quatre invariants de l'architecture sont
+désormais posés et gardés par des tests.
+
+**Le binaire ne joue toujours pas** : la boucle de jeu est l'étape 5.
+
+`schemas/vue.schema.json` paraît pour la première fois. Un bot peut s'écrire
+contre lui — c'est exactement ce que le jeu enverra, puisque le schéma est
+généré depuis la structure et qu'un test échoue s'ils divergent.
+
 ### Ajouté
 - Vue filtrée : chaque camp ne reçoit que ce qu'il a le droit de savoir. La
   position du fugitif, sa zone scellée, sa résistance et les traces hors de
   portée ne franchissent pas la projection.
+- `schemas/vue.schema.json`, généré depuis `noyau.Vue` et non écrit à la main.
+- La validation d'un greffon avant installation est prévue pour l'étape 8 :
+  `filature valide <chemin>`, avec le fichier, la ligne et le chemin de clé de
+  chaque manquement.
+
+### Corrigé
+- Les listes de la vue rendaient `null` au lieu d'un tableau vide, ce qui
+  obligeait un bot à traiter deux formes pour la même absence.
+- Les traces se découvrent en distance de Manhattan, comme la règle l'énonce, et
+  non de Tchebychev qui aurait ouvert les quatre diagonales.
 
 ## [0.1.1] — 2026-08-25 — Correctifs du binaire
 
