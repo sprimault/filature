@@ -242,8 +242,8 @@ d'équilibrage.
 
 | Paramètre | v1 | Note |
 |---|---|---|
-| Taille du plateau | 41×41 | Préréglages 21, 31, 41 |
-| Portée de vue | 8 | Lier à la taille : environ un cinquième du côté |
+| Taille du plateau | 41×41 | Préréglages Quartier 21, Faubourg 31, Ville 41 |
+| Portée de vue | 8 | Un cinquième du côté, jamais moins de 3 |
 | Durée | 40 tours | Environ le côté du plateau |
 | Résistance | 10 | |
 | Inspecteurs | 5 | |
@@ -257,8 +257,6 @@ d'équilibrage.
 
 Suspicion à vérifier en simulation : trois déplacements contre un reste peut-être
 trop favorable aux inspecteurs. C'est là qu'il faudra corriger en premier.
-
----
 
 ---
 

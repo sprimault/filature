@@ -14,7 +14,7 @@ have to guess.
 
 ## Status
 
-Early. The rules are settled, the engine is not written yet.
+**The binary does not play yet**: the game loop is step 5, rendering step 7.
 
 - [`docs/regles.md`](docs/regles.md) — the full specification (French)
 - [`ROADMAP.md`](ROADMAP.md) — the steps, and what is out of scope for v1
