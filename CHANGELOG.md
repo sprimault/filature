@@ -28,7 +28,16 @@ de version sont ce que lit un auteur de greffon étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
-## [Non publié]
+## [0.3.0] — 2026-08-25 — Le plateau
+
+Étape 3 de la feuille de route. Le plateau se fabrique au lieu d'être fourni :
+une graine donne une ville, et la même graine la redonne à l'identique sur
+Windows, Linux et macOS.
+
+**Le binaire ne joue toujours pas** : la boucle de jeu est l'étape 5.
+
+Rien à reprendre pour un auteur de greffon : `version_formes`, `protocole` et
+`version_effets` sont inchangés.
 
 ### Ajouté
 - Génération de plateau : trame irrégulière, cours percées, impasses et six
@@ -49,6 +58,14 @@ publié, et explique les conventions du dépôt à qui y contribue.
   non son côté, qui rendait une Ville deux fois moins piégeuse qu'un Quartier.
 
 ***
+
+Step 3 of the roadmap. The board is now built rather than supplied: a seed gives
+a city, and the same seed gives it back identically on Windows, Linux and macOS.
+
+**The binary still does not play**: the game loop is step 5.
+
+Nothing for plugin authors to update: `version_formes`, `protocole` and
+`version_effets` are unchanged.
 
 ### Added
 - Board generation: irregular street grid, punched courtyards, dead ends and six
