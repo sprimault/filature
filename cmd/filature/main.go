@@ -14,6 +14,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/sprimault/filature/greffons"
 )
@@ -26,7 +27,7 @@ var version = "dev"
 func main() {
 	heberger := flag.Bool("heberger", false, "héberger une partie en réseau")
 	rejoindre := flag.String("rejoindre", "", "adresse d'une partie à rejoindre")
-	greffons := flag.String("greffons", "greffons", "dossier des greffons")
+	dossierGreffons := flag.String("greffons", greffonsParDefaut(), "dossier des greffons")
 	partie := flag.String("partie", "", "nom d'une partie enregistrée à reprendre")
 	flag.Parse()
 
@@ -35,17 +36,55 @@ func main() {
 		fmt.Println("filature", version)
 		return
 	case "exemples":
-		if err := extraire(flag.Arg(1)); err != nil {
+		if err := extraire(flag.Arg(1), *dossierGreffons); err != nil {
 			fmt.Fprintln(os.Stderr, "filature:", err)
 			os.Exit(1)
 		}
 		return
 	}
 
-	if err := executer(*heberger, *rejoindre, *greffons, *partie); err != nil {
+	if err := executer(*heberger, *rejoindre, *dossierGreffons, *partie); err != nil {
 		fmt.Fprintln(os.Stderr, "filature:", err)
 		os.Exit(1)
 	}
+}
+
+// memeDossier compare deux chemins après résolution.
+//
+// La comparaison est insensible à la casse : Windows l'est, et « Greffons »
+// y désigne le même dossier que « greffons ». Se tromper dans ce sens fait
+// refuser une extraction légitime, ce qui se voit et se corrige ; l'inverse
+// laisserait passer celle qui casse le chargement.
+func memeDossier(a, b string) bool {
+	absA, err := filepath.Abs(a)
+	if err != nil {
+		return false
+	}
+	absB, err := filepath.Abs(b)
+	if err != nil {
+		return false
+	}
+	return strings.EqualFold(filepath.Clean(absA), filepath.Clean(absB))
+}
+
+// greffonsParDefaut situe le dossier des greffons à côté de l'exécutable.
+//
+// Et non dans le répertoire courant : un raccourci sur le bureau, un lancement
+// depuis ailleurs, et le jeu chercherait dans un dossier qui n'est pas le sien
+// sans que rien ne le signale — les greffons installés seraient simplement
+// ignorés.
+//
+// Le repli sur un chemin relatif ne couvre qu'un cas où le système refuse de
+// dire où est le binaire, ce qui n'arrive pas sur les cibles publiées.
+func greffonsParDefaut() string {
+	exe, err := os.Executable()
+	if err != nil {
+		return "greffons"
+	}
+	if resolu, err := filepath.EvalSymlinks(exe); err == nil {
+		exe = resolu
+	}
+	return filepath.Join(filepath.Dir(exe), "greffons")
 }
 
 // executer assemble les dépendances et lance la boucle de jeu.
@@ -63,9 +102,17 @@ func executer(heberger bool, rejoindre, greffons, partie string) error {
 // Un fichier existant n'est jamais écrasé. Quelqu'un qui relance la commande
 // sur un dossier où il a déjà travaillé perdrait son travail, et il n'y a pas
 // de bonne raison de lui offrir ça.
-func extraire(dossier string) error {
+//
+// Le dossier des greffons actifs est refusé, et c'est le piège que la commande
+// tendait : le contenu livré est déjà dans le binaire, l'extraire là où le jeu
+// charge reviendrait à le déclarer deux fois, et deux greffons qui définissent
+// la même clé sont un conflit. Suivre l'invitation cassait le chargement.
+func extraire(dossier, actifs string) error {
 	if dossier == "" {
 		return errors.New("usage: filature exemples <dossier>")
+	}
+	if memeDossier(dossier, actifs) {
+		return fmt.Errorf("%s est le dossier des greffons actifs : le contenu livré y serait déclaré deux fois", dossier)
 	}
 
 	return fs.WalkDir(greffons.Livres(), ".", func(chemin string, e fs.DirEntry, err error) error {
