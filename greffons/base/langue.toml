@@ -18,6 +18,11 @@ menu_preferences = "Préférences"
 menu_quitter = "Quitter"
 menu_retour = "Retour"
 
+# Préréglages de partie
+prereglage_quartier = "Quartier"
+prereglage_faubourg = "Faubourg"
+prereglage_ville = "Ville"
+
 # Préférences
 pref_langue = "Langue"
 pref_affichage = "Affichage"

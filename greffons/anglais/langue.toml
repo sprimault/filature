@@ -15,6 +15,11 @@ menu_preferences = "Preferences"
 menu_quitter = "Quit"
 menu_retour = "Back"
 
+# Game presets
+prereglage_quartier = "District"
+prereglage_faubourg = "Outskirts"
+prereglage_ville = "City"
+
 # Preferences
 pref_langue = "Language"
 pref_affichage = "Display"
