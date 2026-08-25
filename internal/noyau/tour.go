@@ -11,11 +11,13 @@ package noyau
 const PlafondContacts = 3
 
 // resoudreFinDeTour enchaîne visibilité, contacts, traces, révélation, effets
-// différés et étranglement.
+// différés, étranglement et décompte d'extraction.
 //
 // L'ordre est un contrat : le décompte des contacts a lieu après le déplacement
-// du fugitif et non avant, et les effets différés arrivent à échéance avant le
-// test de fin. Le changer change le jeu, silencieusement.
+// du fugitif et non avant, les effets différés arrivent à échéance avant le test
+// de fin, et l'extraction se compte en dernier pour qu'une zone fermée à
+// l'instant interrompe le compte du tour même. Le changer change le jeu,
+// silencieusement.
 func (p *Partie) resoudreFinDeTour() []func() {
 	var defaire []func()
 	for _, etape := range []func() []func(){
@@ -26,6 +28,7 @@ func (p *Partie) resoudreFinDeTour() []func() {
 		p.revelerSiCestLHeure,
 		p.resoudreLesDifferes,
 		p.etrangler,
+		p.compterExtraction,
 	} {
 		defaire = append(defaire, etape()...)
 	}

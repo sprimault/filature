@@ -38,3 +38,5 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
 - Générateur déterministe à flux nommés, seul aléatoire du jeu.
 - Résolution de fin de tour : contacts plafonnés, traces, révélation
   périodique, effets différés et étranglement.
+- Arbitrage : extraction sur deux tours, zone neutralisée par un inspecteur ou
+  par sa fermeture, et les trois victoires des inspecteurs.
