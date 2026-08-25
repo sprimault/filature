@@ -75,9 +75,17 @@ peut refuser de jouer plutôt que de jouer faux.
 {"type":"joue","tour":7,"budget_ms":2000,"vue":{ … }}
 ```
 
-`vue` est l'objet décrit dans `schemas/vue.schema.json`, identique à celui que
+`vue` est l'objet décrit dans
+[`schemas/vue.schema.json`](../schemas/vue.schema.json), identique à celui que
 reçoit l'interface. Il porte `coups_legaux` : un bot minimal en choisit un et
 s'arrête là.
+
+Ce schéma est **généré depuis la structure Go**, jamais écrit à la main : un
+test compare les deux et échoue tant qu'ils divergent. Ce qu'il décrit est donc
+ce que le jeu envoie, sans décalage possible.
+
+Toute liste y est un tableau, jamais `null` : une vue sans barrage porte un
+tableau vide. Un bot n'a pas à traiter deux formes pour la même absence.
 
 `coups_legaux` contient tout ce que le camp peut faire ce tour-ci —
 déplacements, capacités, dépenses de résistance, meurtre compris. Un bot n'a
