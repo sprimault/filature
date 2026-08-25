@@ -20,6 +20,18 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
 
 ## [Non publié]
 
+## [0.1.0] — 2026-08-25
+
+Étape 1 de la feuille de route : le noyau. Une partie complète se joue depuis
+des appels Go, sans interface.
+
+**Le binaire ne joue pas encore.** `filature` lancé répond qu'il reste à
+implémenter : la boucle de jeu est l'étape 5. Cette version marque un jalon de
+développement, pas une version jouable.
+
+Rien à reprendre pour un auteur de greffon : `version_formes`, `protocole` et
+`version_effets` valent 1, et c'est leur première publication.
+
 ### Ajouté
 - Squelette du projet, contrats de formes et de bot.
 - Vocabulaire d'effets documenté, avec les primitives `differer` et
