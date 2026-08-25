@@ -36,3 +36,5 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
   manquait au contenu livré.
 - Application et annulation d'un coup, avec l'enchaînement des phases.
 - Générateur déterministe à flux nommés, seul aléatoire du jeu.
+- Résolution de fin de tour : contacts plafonnés, traces, révélation
+  périodique, effets différés et étranglement.

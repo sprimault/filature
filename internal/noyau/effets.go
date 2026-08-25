@@ -153,12 +153,14 @@ type Contexte struct {
 // qui tronquent une tranche en dépendent : les défaire dans le désordre
 // retirerait l'entrée d'un autre effet.
 func (p *Partie) Appliquer1Effet(e Effet, ctx Contexte) (annulation func(), err error) {
-	if ctx.Acteur == CampInspecteurs && (ctx.Pion < 0 || ctx.Pion >= len(p.Inspecteurs)) {
-		return nil, fmt.Errorf("pion hors bornes: %d", ctx.Pion)
-	}
-
 	switch e.Type {
 	case EffetDeplacer, EffetTeleporter:
+		// Seuls les effets qui indexent réellement les pions ont à vérifier
+		// l'indice. Le contrôler pour tous refusait un fermer_zone déclenché
+		// par le jeu lui-même, dont le contexte n'a pas de pion à désigner.
+		if ctx.Acteur == CampInspecteurs && (ctx.Pion < 0 || ctx.Pion >= len(p.Inspecteurs)) {
+			return nil, fmt.Errorf("pion hors bornes: %d", ctx.Pion)
+		}
 		return p.placer(ctx), nil
 
 	case EffetModifierPortee, EffetModifierMobilite, EffetRevelerTraces, EffetPartagerVue:
