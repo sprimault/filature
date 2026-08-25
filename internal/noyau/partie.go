@@ -49,7 +49,6 @@ type Fugitif struct {
 	ZoneScellee   int      `json:"zone_scellee"`
 	ToursDansZone int      `json:"tours_dans_zone"`
 	SilenceAchete bool     `json:"silence_achete"`
-	Meurtres      int      `json:"meurtres"`
 
 	// DeplacementsFaits est remis à zéro à chaque tour, comme celui des
 	// inspecteurs. Le fugitif n'a pas de quota de pions, mais une mobilité
@@ -116,6 +115,11 @@ type Partie struct {
 	// le drapeau du pion ne suffit donc pas.
 	CapaciteJouee bool `json:"capacite_jouee"`
 
+	// UsagesDepense compte les emplois des dépenses plafonnées. Générique
+	// parce que « usages » est un champ du contrat de greffon : le noyau n'a
+	// pas à savoir que celle qui plafonne à deux s'appelle meurtre.
+	UsagesDepense map[Depense]int `json:"usages_depense"`
+
 	// EffetsEnAttente est la file des differer posés, résolue en fin de tour
 	// avant le test de fin de partie. Elle se sérialise avec le reste : une
 	// reprise qui la perdrait escamoterait un barrage déjà annoncé.
@@ -127,6 +131,12 @@ type Partie struct {
 	// FinForcee est le seul moyen qu'un greffon termine une partie sans que le
 	// noyau connaisse sa condition de victoire. Resultat la consulte d'abord.
 	FinForcee *Resultat `json:"fin_forcee,omitempty"`
+
+	// annulations double le journal, une entrée par coup. Elle ne se sérialise
+	// pas — ce sont des fermetures — donc une partie rechargée ne s'annule
+	// pas : elle se rejoue, et c'est ce qui vérifie en continu que le journal
+	// reste suffisant.
+	annulations [][]func()
 
 	Journal    []Coup    `json:"journal"`
 	Extensions *Registre `json:"-"`
@@ -362,7 +372,7 @@ func (p *Partie) coupsDepense() []Coup {
 		if d.Camp != CampFugitif || d.Cout > p.Fugitif.Resistance {
 			continue
 		}
-		if d.Usages > 0 && cle == DepenseMeurtre && p.Fugitif.Meurtres >= d.Usages {
+		if d.Usages > 0 && p.UsagesDepense[cle] >= d.Usages {
 			continue
 		}
 		if cle == DepenseSilence && p.Fugitif.SilenceAchete {
@@ -406,23 +416,6 @@ func (p *Partie) occupee(pos Position) bool {
 		}
 	}
 	return false
-}
-
-// Appliquer joue un coup et fait avancer la phase. Un coup illégal est refusé
-// sans modifier l'état : l'appelant peut réessayer sans repartir d'un
-// instantané.
-func (p *Partie) Appliquer(c Coup) error {
-	return errors.New("à implémenter : étape 1")
-}
-
-// Annuler défait le dernier coup.
-//
-// Ce n'est pas un confort d'interface : c'est ce qui permet à l'IA d'explorer
-// des milliers de positions sans copier l'état à chaque nœud. Toute
-// modification d'état doit donc rester réversible, y compris celles d'un
-// greffon.
-func (p *Partie) Annuler() error {
-	return errors.New("à implémenter : étape 1")
 }
 
 // resoudreFinDeTour enchaîne visibilité, contacts, traces, révélation,
