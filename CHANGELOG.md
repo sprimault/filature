@@ -18,9 +18,14 @@ Quatre numéros à ne pas confondre :
 Les trois derniers sont des entiers sans rapport avec SemVer. Une version peut
 sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
 
+Un titre de section s'écrit `## [version] — date — titre`. La publication en
+tire le nom et les notes de la version : ce qui est relu ici est ce qui sera
+lu sur la page des versions, et il n'y a rien à recopier ensuite. Le titre est
+facultatif ; sans lui, la version se nomme par son tag.
+
 ## [Non publié]
 
-## [0.1.1] — 2026-08-25
+## [0.1.1] — 2026-08-25 — Correctifs du binaire
 
 ### Corrigé
 - Le dossier des greffons est cherché à côté de l'exécutable et non dans le
@@ -34,7 +39,7 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
 ### Ajouté
 - Le README décrit les deux commandes du binaire et l'emplacement des greffons.
 
-## [0.1.0] — 2026-08-25
+## [0.1.0] — 2026-08-25 — Le noyau
 
 Étape 1 de la feuille de route : le noyau. Une partie complète se joue depuis
 des appels Go, sans interface.
