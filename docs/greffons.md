@@ -293,6 +293,42 @@ pour une forme.
 Les manquements d'un manifeste sont listés en une fois. Quelqu'un qui met au
 point un greffon veut la liste, pas un aller-retour par erreur.
 
+### Vérifier avant d'installer
+
+```
+$ filature valide mon-greffon/
+mon-greffon/manifeste.toml:23: capacite.guetteur.effet[0].cible
+    « pion » n'est pas une cible connue
+    attendu : pion_courant, tous_pions, autre_pion, fugitif, case, zone
+mon-greffon/manifeste.toml: version_effets
+    obligatoire dès qu'une capacité, une dépense ou un mode est déclaré
+mon-greffon/formes.toml:41: forme.fugitif.trait[2].points[3]
+    y vaut 48, hors du gabarit du rôle pion (0 à 40)
+
+3 manquements
+```
+
+**Chaque manquement dit où il est** : le fichier, la ligne quand elle est
+connue, et le chemin complet de la clé fautive. « Cible invalide » sans autre
+précision oblige à relire tout un manifeste ; `capacite.guetteur.effet[0].cible`
+désigne un seul endroit.
+
+Le chemin de clé est donné même quand la ligne manque — un décodeur ne la
+connaît pas toujours pour une erreur de sens, alors qu'il sait toujours quelle
+clé il lisait. Et ce qui est attendu est dit avec ce qui est refusé : la liste
+des cibles connues vaut mieux que « cible invalide ».
+
+La commande charge le greffon **par le même code que le jeu**. Elle sort avec un
+code non nul s'il reste un manquement : de quoi la mettre dans une intégration
+continue, ce que le catalogue attend des auteurs.
+
+Elle évite surtout d'apprendre le problème par un jeu qui ne démarre plus. Et
+elle porte une garantie qui vaut pour qui installe : un greffon validé chez son
+auteur se charge chez les autres, puisque c'est la même validation.
+
+Le jeu, lui, montre dans son écran des greffons ceux qu'il a refusés et
+pourquoi — un greffon simplement absent de la liste laisserait deviner.
+
 ---
 
 ## 9. Ce qui est refusé
