@@ -36,11 +36,14 @@ remis plutôt que fabriqué — la génération est l'étape 3, et une partie se
 sans elle sur un plateau d'essai.
 
 Livré quand une partie complète se joue de bout en bout depuis des appels Go,
-sans interface, avec les cas limites de `docs/regles.md` §14 couverts par des
-tests.
+sans interface, avec les cas limites des règles couverts par des tests : contact
+plafonné, extraction interrompue, dernier tour, fugitif bloqué, révélation
+contre silence acheté, diagonale refusée par un angle fermé.
 
-C'est ici que se posent les quatre invariants de l'architecture. Les rétablir
-plus tard coûterait cher ; tout le reste est révisable.
+Trois des quatre invariants de l'architecture se posent ici — déterminisme,
+réversibilité, absence de coordonnée d'écran. **Le quatrième, la vue filtrée,
+est l'étape 2**, et c'est le plus coûteux à rétablir : tant qu'elle n'est pas
+écrite, rien n'empêche un appelant de lire l'état complet.
 
 ## 2 — Vue filtrée
 

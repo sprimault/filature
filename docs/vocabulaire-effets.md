@@ -62,7 +62,7 @@ ajouter une, vérifier que la composition des existantes ne suffit pas.
 | `marquer_scene` | `cible` | Inscrit un lieu, durablement et pour les deux camps |
 | `annuler_revelation` | `cible` | Neutralise la prochaine révélation périodique |
 | `partager_vue` | `cible`, `duree` | Un pion voit ce que voit un autre |
-| `reveler_traces` | `cible`, `rayon` | Découvre les traces dans le rayon |
+| `reveler_traces` | `cible`, `rayon` | Découvre les traces dans le rayon, en distance de Manhattan |
 | `effacer_traces` | `cible`, `duree` | Supprime les traces plus récentes que `duree` tours |
 
 `reveler_position` et `marquer_scene` sont volontairement distincts, et le

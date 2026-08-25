@@ -3,6 +3,8 @@
 
 package noyau
 
+import "strconv"
+
 // Position repère une case du plateau.
 //
 // L'origine est arbitraire : le plateau borné place (0,0) au coin nord-ouest,
@@ -50,6 +52,15 @@ var deplacements = [8]Position{
 func (p Position) Avance(d Direction) Position {
 	v := deplacements[d]
 	return Position{p.Colonne + v.Colonne, p.Ligne + v.Ligne}
+}
+
+// Cle rend la position sous une forme utilisable en clé JSON.
+//
+// JSON n'accepte que des chaînes en clé d'objet, et une map indexée par
+// Position ne s'y sérialise donc pas. Le format est un contrat : il part dans
+// la vue que lisent l'interface, le réseau et les bots.
+func (p Position) Cle() string {
+	return strconv.Itoa(p.Colonne) + "," + strconv.Itoa(p.Ligne)
 }
 
 // DirectionVers renvoie la direction d'un pas entre deux cases adjacentes, et
