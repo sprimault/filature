@@ -6,6 +6,10 @@
 # Les cibles appelées sont celles du Makefile, jamais des commandes go réécrites
 # ici : deux définitions finiraient par diverger, et c'est celle du workflow
 # qu'on ne peut pas essayer avant de pousser.
+#
+# Les matrices font exception. Celle des tests tourne sur un runner Windows, qui
+# n'a pas make ; celle des compilations ne produit aucun artefact et n'a donc
+# que faire du nommage de `make binary`.
 
 name: Vérification
 
@@ -120,3 +124,37 @@ jobs:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
         run: go build -trimpath ./cmd/filature
+
+  # Le déterminisme se vérifie en exécutant, pas en compilant. Les plateaux de
+  # référence de internal/noyau/testdata et la suite figée de Alea comparent
+  # octet pour octet : rejoués ici, ils prouvent qu'une graine donne le même
+  # plateau et la même suite de tirages quel que soit le système.
+  #
+  # Linux/amd64 est absent de la matrice parce que le job Contrôles est déjà
+  # dessus, et darwin/amd64 aussi : même système que darwin/arm64, pour du code
+  # sans flottant ni dépendance à la taille d'un mot, il ne prouverait rien de
+  # plus qu'un quatrième runner à faire tourner.
+  natifs:
+    name: Tests ${{ matrix.os }}/${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows, arch: amd64, runner: windows-latest }
+          - { os: darwin, arch: arm64, runner: macos-latest }
+          - { os: linux, arch: arm64, runner: ubuntu-24.04-arm }
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      # Toute la suite et pas seulement le noyau : l'extraction du contenu livré
+      # écrit sur disque, et les séparateurs de chemin sont le genre de chose qui
+      # ne se voit que sur le système concerné.
+      - name: Tests
+        shell: bash
+        run: go test ./...

@@ -292,3 +292,40 @@ func TestValidationRejette(t *testing.T) {
 		t.Skip("aucune case assez enclavée sur ce plateau")
 	})
 }
+
+// TestPlateauGenereMonteUnePartie relie les deux moitiés de la mise en place :
+// un plateau tiré au sort, et le noyau qui doit y placer le fugitif.
+//
+// La validation ne regarde que la connexité, le taux de rues et les zones — le
+// centre ne fait partie d'aucun des trois. Un tirage qui bâtirait tout le noyau
+// central serait donc retenu, puis refusé par Nouvelle sur « aucune rue au
+// centre du plateau » : à la première partie, et non à la génération.
+func TestPlateauGenereMonteUnePartie(t *testing.T) {
+	for _, pre := range Prereglages() {
+		t.Run(pre.Cle, func(t *testing.T) {
+			milieu := pre.Parametres.Cote / 2
+
+			for graine := int64(1); graine <= 40; graine++ {
+				b, retenue, err := Generer(graine, pre.Parametres)
+				if err != nil {
+					t.Fatalf("graine %d : %v", graine, err)
+				}
+
+				partie, err := Nouvelle(b, retenue, pre.Parametres, registreDEssai())
+				if err != nil {
+					t.Fatalf("graine %d : %v", graine, err)
+				}
+
+				depart := partie.Fugitif.Position
+				if !b.EstRue(depart) {
+					t.Fatalf("graine %d : le fugitif part d'un bâtiment en %v", graine, depart)
+				}
+				if abs(depart.Colonne-milieu) > RayonNoyauCentral ||
+					abs(depart.Ligne-milieu) > RayonNoyauCentral {
+					t.Fatalf("graine %d : départ en %v, hors du noyau central autour de (%d, %d)",
+						graine, depart, milieu, milieu)
+				}
+			}
+		})
+	}
+}

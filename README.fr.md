@@ -15,7 +15,8 @@ deviner.
 
 ## État
 
-Début de projet. Les règles sont figées, le moteur n'est pas écrit.
+**Le binaire ne joue pas encore** : la boucle de jeu est l'étape 5, le rendu
+l'étape 7.
 
 - [`docs/regles.md`](docs/regles.md) — la spécification complète
 - [`ROADMAP.md`](ROADMAP.md) — les étapes, et ce qui est hors périmètre v1
