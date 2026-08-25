@@ -28,6 +28,28 @@ de version sont ce que lit un auteur de greffon étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
+## [Non publié]
+
+### Ajouté
+- Vision : un inspecteur voit dans les huit directions jusqu'à sa portée, la
+  ligne s'arrêtant au premier bâtiment, au premier barrage ou au premier autre
+  inspecteur. Le fugitif est repéré en entrant dans une ligne de vue et cesse de
+  l'être en sortant — jusqu'ici il ne l'était jamais, quoi qu'il fasse.
+- La vue filtrée des inspecteurs porte les cases qu'ils couvrent réellement,
+  occlusion comprise : rien de ce qui se trouve derrière un collègue ou un
+  barrage n'y figure, et chacun voit la case où il se tient.
+
+***
+
+### Added
+- Sight: an inspector sees in all eight directions up to their range, the line
+  stopping at the first building, roadblock or fellow inspector. The fugitive is
+  spotted on entering a line of sight and stops being so on leaving it — until
+  now he never was, whatever he did.
+- The inspectors' filtered view carries the cells they actually cover, occlusion
+  included: nothing behind a fellow inspector or a roadblock appears in it, and
+  each of them sees the cell he stands on.
+
 ## [0.3.0] — 2026-08-25 — Le plateau
 
 Étape 3 de la feuille de route. Le plateau se fabrique au lieu d'être fourni :

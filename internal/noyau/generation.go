@@ -242,6 +242,21 @@ func (b *PlateauBorne) Graine() int64 { return b.graine }
 // Vision renvoie les cases vues depuis p, terrain seul. L'occlusion par les
 // pions et les barrages s'applique à la lecture : la précalculer supposerait de
 // tout recalculer à chaque déplacement.
+//
+// La table est calculée sans borne de portée, celle-ci s'appliquant ici. Elle
+// se mesure en Tchebychev, comme les déplacements du fugitif : à portée 8, huit
+// pas en diagonale sont dans la vue. Le prototype Python comptait en Manhattan
+// et lui donnait de fait le double.
 func (b *PlateauBorne) Vision(p Position, portee int) []Position {
-	return b.vues[p]
+	if portee <= 0 {
+		return nil
+	}
+
+	var vues []Position
+	for _, c := range b.vues[p] {
+		if DistanceTchebychev(p, c) <= portee {
+			vues = append(vues, c)
+		}
+	}
+	return vues
 }

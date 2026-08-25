@@ -56,6 +56,9 @@ func Generer(graine int64, p Parametres) (*PlateauBorne, int64, error) {
 		retenue := graine + int64(essai)
 		b := dessiner(retenue, p)
 		if err := b.valider(p); err == nil {
+			// Après validation seulement : un plateau rejeté n'a pas à payer le
+			// précalcul, et sur un Quartier il y en a une dizaine par tirage.
+			b.vues = precalculerVision(b, b.cote)
 			return b, retenue, nil
 		}
 	}

@@ -206,15 +206,31 @@ func (p *Partie) tracesPour(a Acteur) map[string]Trace {
 // Les inspecteurs voient depuis chacun de leurs pions. Le fugitif n'a pas de
 // vision propre dans les règles : il sait s'il est repéré, pas ce que l'autre
 // couvre.
+//
+// La table du plateau ne connaît que le terrain : elle donne les candidats, et
+// EstVisible tranche. Sans ce second passage, la vue annoncerait des cases
+// situées derrière un collègue ou un barrage, qu'au même instant le fugitif ne
+// serait pas repéré d'occuper — deux réponses contradictoires à la même
+// question, dont l'une part sur le réseau.
 func (p *Partie) casesVisiblesPour(a Acteur) []Position {
 	if a == CampFugitif {
 		return nil
 	}
 
+	occupees := p.casesOccupees()
 	vues := map[Position]bool{}
 	for i := range p.Inspecteurs {
-		for _, c := range p.Plateau.Vision(p.Inspecteurs[i].Position, p.PorteeDe(i)) {
-			vues[c] = true
+		depuis, portee := p.Inspecteurs[i].Position, p.PorteeDe(i)
+
+		// Sa propre case, qu'aucune ligne de vue ne contient : elles partent de
+		// lui sans l'inclure. Sans ça, la zone couverte aurait un trou sous
+		// chaque pion.
+		vues[depuis] = true
+
+		for _, c := range p.Plateau.Vision(depuis, portee) {
+			if !vues[c] && EstVisible(p.Plateau, depuis, c, portee, occupees) {
+				vues[c] = true
+			}
 		}
 	}
 	if len(vues) == 0 {

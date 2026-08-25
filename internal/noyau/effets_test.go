@@ -25,7 +25,7 @@ func (b plateauNu) Zones() []Zone {
 // Graine est figée : aucun test de ce fichier ne tire au sort.
 func (b plateauNu) Graine() int64 { return 1 }
 
-// Vision n'est pas exercée ici, la table de vision relevant de l'étape 4.
+// Vision reste vide : ce sont les effets qu'on applique ici, pas la vue.
 func (b plateauNu) Vision(p Position, portee int) []Position { return nil }
 
 // CasesDans énumère les cases du carré, dans l'ordre du plateau borné.
