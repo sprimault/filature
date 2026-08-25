@@ -287,8 +287,15 @@ func (p *Partie) appliquerEffets(effets []Effet, ctx Contexte) ([]func(), error)
 // L'ordre est un contrat : la résolution n'a lieu qu'après la phase du fugitif,
 // jamais entre les deux.
 func (p *Partie) finirPhase() ([]func(), error) {
+	// La main passe au fugitif, et c'est le seul moment où son immobilisation
+	// se constate : plus tard dans son tour, l'absence de déplacement veut dire
+	// qu'il a déjà bougé.
 	if p.Phase == PhaseInspecteurs {
-		return []func(){p.avancerPhase(PhaseFugitif)}, nil
+		defaire := []func(){p.avancerPhase(PhaseFugitif)}
+		if _, fini := p.Resultat(); fini {
+			defaire = append(defaire, p.avancerPhase(PhaseTerminee))
+		}
+		return defaire, nil
 	}
 
 	defaire := []func(){p.avancerPhase(PhaseInspecteurs)}
