@@ -292,7 +292,7 @@ func (p *Partie) finirPhase() ([]func(), error) {
 	}
 
 	defaire := []func(){p.avancerPhase(PhaseInspecteurs)}
-	p.resoudreFinDeTour()
+	defaire = append(defaire, p.resoudreFinDeTour()...)
 
 	tour := p.Tour
 	p.Tour++

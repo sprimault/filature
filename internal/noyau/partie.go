@@ -418,17 +418,4 @@ func (p *Partie) occupee(pos Position) bool {
 	return false
 }
 
-// resoudreFinDeTour enchaîne visibilité, contacts, traces, révélation,
-// étranglement et test de fin. L'ordre est un contrat : le décompte des
-// contacts a lieu après le déplacement du fugitif, pas avant.
-func (p *Partie) resoudreFinDeTour() {
-	// à implémenter : étape 1
-}
-
-// contacts compte les inspecteurs orthogonalement adjacents au fugitif. Les
-// diagonales ne comptent pas, et le total est plafonné : être encerclé doit
-// faire très mal sans être instantanément fatal.
-func (p *Partie) contacts() int {
-	// à implémenter : étape 1
-	return 0
-}
+// La résolution de fin de tour et le décompte des contacts vivent dans tour.go.

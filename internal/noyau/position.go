@@ -52,7 +52,28 @@ func (p Position) Avance(d Direction) Position {
 	return Position{p.Colonne + v.Colonne, p.Ligne + v.Ligne}
 }
 
-// EstDiagonale distingue les quatre directions réservées au fugitif.
+// DirectionVers renvoie la direction d'un pas entre deux cases adjacentes, et
+// dit si les cases le sont.
+//
+// Une trace porte la direction prise, et c'est ce qui la rend exploitable : un
+// inspecteur qui en découvre une sait vers où chercher. La reconstituer depuis
+// le journal évite de la stocker dans le coup, où elle serait redondante avec
+// le départ et l'arrivée.
+func DirectionVers(de, vers Position) (Direction, bool) {
+	ecart := Position{Colonne: vers.Colonne - de.Colonne, Ligne: vers.Ligne - de.Ligne}
+	for d, v := range deplacements {
+		if v == ecart {
+			return Direction(d), true
+		}
+	}
+	return 0, false
+}
+
+// EstDiagonale distingue les quatre diagonales des quatre orthogonales.
+//
+// Le fugitif dispose des huit directions ; les inspecteurs n'ont que les
+// orthogonales. C'est là qu'est sa vitesse : à distance égale en terrain
+// dégagé, il arrive avant eux.
 func (d Direction) EstDiagonale() bool { return d >= NordEst }
 
 // Contournement renvoie les deux cases orthogonales par lesquelles une
@@ -68,15 +89,24 @@ func (p Position) Contournement(d Direction) (Position, Position) {
 // relier deux cases en terrain dégagé, ses diagonales coûtant un tour comme les
 // autres. Sert d'heuristique, jamais de règle.
 func DistanceTchebychev(a, b Position) int {
-	dc, dl := a.Colonne-b.Colonne, a.Ligne-b.Ligne
-	if dc < 0 {
-		dc = -dc
+	return max(abs(a.Colonne-b.Colonne), abs(a.Ligne-b.Ligne))
+}
+
+// DistanceManhattan compte les pas orthogonaux entre deux cases.
+//
+// Les deux distances cohabitent et ne se remplacent pas : la portée de vue et
+// les déplacements du fugitif se mesurent en Tchebychev, l'adjacence d'un
+// contact en Manhattan. Un prototype antérieur les a confondues, et la portée 8
+// des rayons en valait 16 côté fugitif — un défaut qui ne se voit pas en
+// jouant, seulement en perdant.
+func DistanceManhattan(a, b Position) int {
+	return abs(a.Colonne-b.Colonne) + abs(a.Ligne-b.Ligne)
+}
+
+// abs renvoie la valeur absolue d'un entier.
+func abs(n int) int {
+	if n < 0 {
+		return -n
 	}
-	if dl < 0 {
-		dl = -dl
-	}
-	if dc > dl {
-		return dc
-	}
-	return dl
+	return n
 }
