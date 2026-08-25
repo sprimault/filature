@@ -301,6 +301,7 @@
             "effacer_traces",
             "fermer_zone",
             "ouvrir_zone",
+            "sceller_zone",
             "teleporter",
             "differer",
             "fin_partie"

@@ -3,7 +3,10 @@
 
 package noyau
 
-import "errors"
+import (
+	"errors"
+	"sort"
+)
 
 // Acteur désigne un camp. Le troisième cas n'existe pas : la partie se joue à
 // deux, un greffon ne peut pas en ajouter un.
@@ -47,6 +50,11 @@ type Fugitif struct {
 	ToursDansZone int      `json:"tours_dans_zone"`
 	SilenceAchete bool     `json:"silence_achete"`
 	Meurtres      int      `json:"meurtres"`
+
+	// DeplacementsFaits est remis à zéro à chaque tour, comme celui des
+	// inspecteurs. Le fugitif n'a pas de quota de pions, mais une mobilité
+	// qu'un double déplacement porte à deux.
+	DeplacementsFaits int `json:"deplacements_faits"`
 }
 
 // Scene est un lieu de meurtre. Contrairement à une trace, elle est connue des
@@ -71,6 +79,11 @@ type Inspecteur struct {
 	Position         Position `json:"position"`
 	Capacite         string   `json:"capacite"`
 	CapaciteUtilisee bool     `json:"capacite_utilisee"`
+
+	// DeplacementsFaits est remis à zéro à chaque tour. Il tient le quota :
+	// savoir combien de pions ont bougé ne suffit pas, il faut savoir
+	// lesquels, sinon le même pion consomme les trois places.
+	DeplacementsFaits int `json:"deplacements_faits"`
 }
 
 // Partie porte l'intégralité de l'état.
@@ -96,8 +109,12 @@ type Partie struct {
 	Barrages   map[Position]int `json:"barrages"`
 	Ouvertures map[Position]int `json:"ouvertures"`
 
-	PionsDeplaces int   `json:"pions_deplaces"`
-	ZonesFermees  []int `json:"zones_fermees"`
+	ZonesFermees []int `json:"zones_fermees"`
+
+	// CapaciteJouee dit qu'une capacité a déjà été déclenchée ce tour. La
+	// règle en autorise une par tour en plus d'une par pion et par partie :
+	// le drapeau du pion ne suffit donc pas.
+	CapaciteJouee bool `json:"capacite_jouee"`
 
 	// EffetsEnAttente est la file des differer posés, résolue en fin de tour
 	// avant le test de fin de partie. Elle se sérialise avec le reste : une
@@ -144,8 +161,251 @@ func (p *Partie) EstPraticable(pos Position) bool {
 // surligner les cases, l'IA pour explorer, le serveur pour valider ce qui
 // arrive du réseau. Aucun de ces trois ne réimplémente la règle.
 func (p *Partie) CoupsLegaux(a Acteur) []Coup {
-	// à implémenter : étape 1
+	switch p.Phase {
+	case PhasePlacementFugitif:
+		if a == CampFugitif {
+			return p.coupsSceller()
+		}
+	case PhasePlacementInspecteurs:
+		if a == CampInspecteurs {
+			return p.coupsPlacer()
+		}
+	case PhaseInspecteurs:
+		if a == CampInspecteurs {
+			return p.coupsInspecteurs()
+		}
+	case PhaseFugitif:
+		if a == CampFugitif {
+			return p.coupsFugitif()
+		}
+	}
 	return nil
+}
+
+// PionsDeplaces compte les inspecteurs qui ont bougé ce tour.
+//
+// Calculé et non stocké : le total se déduit des pions, et deux sources pour
+// un même chiffre finiraient par se contredire.
+func (p *Partie) PionsDeplaces() int {
+	n := 0
+	for _, i := range p.Inspecteurs {
+		if i.DeplacementsFaits > 0 {
+			n++
+		}
+	}
+	return n
+}
+
+// coupsSceller énumère les zones que le fugitif peut choisir à la mise en
+// place. Sa case, elle, est tirée au sort : il ne la choisit jamais.
+func (p *Partie) coupsSceller() []Coup {
+	zones := p.Plateau.Zones()
+	coups := make([]Coup, 0, len(zones))
+	for _, z := range zones {
+		coups = append(coups, Coup{Tour: p.Tour, Acteur: CampFugitif, Type: CoupPlacer, Zone: z.Numero})
+	}
+	return coups
+}
+
+// coupsPlacer énumère où poser le prochain inspecteur.
+//
+// La case du fugitif n'est pas retirée de la liste, bien qu'il soit déjà sur le
+// plateau : l'en exclure dirait aux inspecteurs où il n'est pas, ce qui est une
+// fuite exactement comme dire où il est. Un pion qui tombe dessus l'a trouvé
+// par hasard, et c'est un résultat de partie, pas un coup illégal.
+func (p *Partie) coupsPlacer() []Coup {
+	if len(p.Inspecteurs) >= p.Parametres.Inspecteurs {
+		return nil
+	}
+	rayon := p.Parametres.Cote / 2
+	centre := Position{Colonne: rayon, Ligne: rayon}
+
+	cases := p.Plateau.CasesDans(centre, rayon)
+	coups := make([]Coup, 0, len(cases))
+	for _, c := range cases {
+		if !p.EstPraticable(c) {
+			continue
+		}
+		coups = append(coups, Coup{
+			Tour:    p.Tour,
+			Acteur:  CampInspecteurs,
+			Type:    CoupPlacer,
+			Pion:    len(p.Inspecteurs),
+			Arrivee: c,
+		})
+	}
+	return coups
+}
+
+// coupsInspecteurs énumère déplacements et capacités de la phase.
+//
+// Le quota porte sur le nombre de pions distincts, pas sur le nombre de
+// déplacements : un pion déjà entamé continue sur sa mobilité propre sans
+// prendre une place de plus.
+func (p *Partie) coupsInspecteurs() []Coup {
+	var coups []Coup
+	placeLibre := p.PionsDeplaces() < p.Parametres.PionsParTour
+
+	for i := range p.Inspecteurs {
+		entame := p.Inspecteurs[i].DeplacementsFaits > 0
+		if !entame && !placeLibre {
+			continue
+		}
+		if p.Inspecteurs[i].DeplacementsFaits >= p.MobiliteDe(CampInspecteurs, i) {
+			continue
+		}
+		depart := p.Inspecteurs[i].Position
+		for _, d := range Orthogonales {
+			arrivee := depart.Avance(d)
+			if !p.EstPraticable(arrivee) {
+				continue
+			}
+			coups = append(coups, Coup{
+				Tour: p.Tour, Acteur: CampInspecteurs, Type: CoupDeplacer,
+				Pion: i, Depart: depart, Arrivee: arrivee,
+			})
+		}
+	}
+
+	coups = append(coups, p.coupsCapacite()...)
+	return append(coups, Coup{Tour: p.Tour, Acteur: CampInspecteurs, Type: CoupFinDePhase})
+}
+
+// coupsCapacite énumère les capacités déclenchables ce tour.
+//
+// Les clés du registre sont triées avant parcours : l'ordre d'une map n'est pas
+// stable en Go, et il déciderait ici de l'ordre des coups légaux — donc de ce
+// qu'un rejeu doit retrouver.
+func (p *Partie) coupsCapacite() []Coup {
+	if p.Extensions == nil || p.CapaciteJouee {
+		return nil
+	}
+
+	cles := make([]string, 0, len(p.Extensions.Capacites))
+	for cle := range p.Extensions.Capacites {
+		cles = append(cles, cle)
+	}
+	sort.Strings(cles)
+
+	var coups []Coup
+	for _, cle := range cles {
+		c := p.Extensions.Capacites[cle]
+		if c.Camp != CampInspecteurs || c.Passive || c.Declenchement != SurPhaseInspecteurs {
+			continue
+		}
+		for i := range p.Inspecteurs {
+			if p.Inspecteurs[i].Capacite != cle || p.Inspecteurs[i].CapaciteUtilisee {
+				continue
+			}
+			coups = append(coups, Coup{
+				Tour: p.Tour, Acteur: CampInspecteurs, Type: CoupCapacite,
+				Pion: i, Capacite: cle,
+			})
+		}
+	}
+	return coups
+}
+
+// coupsFugitif énumère déplacements, dépenses et changement de zone.
+//
+// Une case occupée par un inspecteur lui est fermée : il y serait à l'abri de
+// tout contact, l'adjacence n'incluant pas la superposition.
+func (p *Partie) coupsFugitif() []Coup {
+	var coups []Coup
+	depart := p.Fugitif.Position
+
+	if p.Fugitif.DeplacementsFaits < p.MobiliteDe(CampFugitif, 0) {
+		for d := Nord; d <= NordOuest; d++ {
+			arrivee := depart.Avance(d)
+			if !p.EstPraticable(arrivee) || p.occupee(arrivee) {
+				continue
+			}
+			// Un angle fermé ne se franchit pas : la diagonale exige qu'au
+			// moins une des deux cases orthogonales intermédiaires soit une
+			// rue, sinon le bâti ne bloque plus rien.
+			if d.EstDiagonale() {
+				a, b := depart.Contournement(d)
+				if !p.EstPraticable(a) && !p.EstPraticable(b) {
+					continue
+				}
+			}
+			coups = append(coups, Coup{
+				Tour: p.Tour, Acteur: CampFugitif, Type: CoupDeplacer,
+				Depart: depart, Arrivee: arrivee,
+			})
+		}
+	}
+
+	coups = append(coups, p.coupsDepense()...)
+	coups = append(coups, Coup{Tour: p.Tour, Acteur: CampFugitif, Type: CoupPasser})
+	return append(coups, Coup{Tour: p.Tour, Acteur: CampFugitif, Type: CoupFinDePhase})
+}
+
+// coupsDepense énumère ce que le fugitif peut acheter avec sa résistance.
+//
+// Le changement de zone est une dépense comme une autre, mais porte un type de
+// coup distinct : il désigne une zone, que les autres n'ont pas à porter.
+func (p *Partie) coupsDepense() []Coup {
+	if p.Extensions == nil {
+		return nil
+	}
+
+	cles := make([]Depense, 0, len(p.Extensions.Depenses))
+	for cle := range p.Extensions.Depenses {
+		cles = append(cles, cle)
+	}
+	sort.Slice(cles, func(i, j int) bool { return cles[i] < cles[j] })
+
+	var coups []Coup
+	for _, cle := range cles {
+		d := p.Extensions.Depenses[cle]
+		if d.Camp != CampFugitif || d.Cout > p.Fugitif.Resistance {
+			continue
+		}
+		if d.Usages > 0 && cle == DepenseMeurtre && p.Fugitif.Meurtres >= d.Usages {
+			continue
+		}
+		if cle == DepenseSilence && p.Fugitif.SilenceAchete {
+			continue
+		}
+		coups = append(coups, Coup{
+			Tour: p.Tour, Acteur: CampFugitif, Type: CoupDepense, Depense: cle,
+		})
+	}
+
+	return append(coups, p.coupsChangerZone()...)
+}
+
+// coupsChangerZone énumère les zones vers lesquelles le fugitif peut resceller.
+func (p *Partie) coupsChangerZone() []Coup {
+	if p.Extensions == nil {
+		return nil
+	}
+	d, connue := p.Extensions.Depenses[DepenseChangerZone]
+	if !connue || d.Cout > p.Fugitif.Resistance {
+		return nil
+	}
+
+	var coups []Coup
+	for _, z := range p.Plateau.Zones() {
+		if z.Numero == p.Fugitif.ZoneScellee {
+			continue
+		}
+		coups = append(coups, Coup{
+			Tour: p.Tour, Acteur: CampFugitif, Type: CoupChangerZone, Zone: z.Numero,
+		})
+	}
+	return coups
+}
+
+// occupee dit si un inspecteur tient la case.
+func (p *Partie) occupee(pos Position) bool {
+	for _, i := range p.Inspecteurs {
+		if i.Position == pos {
+			return true
+		}
+	}
+	return false
 }
 
 // Appliquer joue un coup et fait avancer la phase. Un coup illégal est refusé

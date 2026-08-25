@@ -78,6 +78,12 @@ dont toute mécanique de repérage a besoin.
 | `ouvrir_case` | `cible`, `duree` | Rouvre une case bâtie |
 | `fermer_zone` | `cible`, `zone` | Neutralise un point d'extraction |
 | `ouvrir_zone` | `cible`, `zone` | Le rouvre |
+| `sceller_zone` | `cible`, `zone` | Désigne la zone que le fugitif vise |
+
+`sceller_zone` écrit la zone scellée sans permettre de la lire. C'est la seule
+façon d'exprimer le changement de zone, que la règle facture 2 points, et un
+greffon qui l'emploie ne gagne aucun accès à l'information la plus sensible du
+jeu.
 
 Un barrage bloque la vue comme un bâtiment. Sans ça, la capacité ne serait
 qu'un mur de déplacement, sans effet sur l'information — ce qui, dans ce jeu,

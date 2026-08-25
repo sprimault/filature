@@ -32,3 +32,5 @@ sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
 - Greffons de langue, avec le français en repli et l'anglais livré.
 - Contenu livré embarqué dans le binaire, et `filature exemples` pour l'en
   ressortir.
+- Énumération des coups légaux, et la dépense de changement de zone qui
+  manquait au contenu livré.
