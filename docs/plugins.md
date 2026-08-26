@@ -179,6 +179,9 @@ fichiers.
 La géométrie, les gabarits, les quatre primitives de dessin et les noms de
 formes attendus sont dans [`contrat-formes.md`](contrat-formes.md).
 
+`filature preview <dossier>` en sort un aperçu SVG sans lancer le jeu : les
+formes sur les trois sols et un plateau en situation. Voir §8.
+
 ---
 
 ## 6. Langues
@@ -278,7 +281,7 @@ Les messages échangés sont dans [`protocole-bot.md`](protocole-bot.md).
 
 1. Lecture des manifestes, dans l'ordre alphabétique des dossiers.
 2. Validation de chacun contre
-   [`schemas/manifeste-plugin.schema.json`](../schemas/manifeste-plugin.schema.json).
+   [`schemas/plugin-manifest.schema.json`](../schemas/plugin-manifest.schema.json).
 3. Calcul de l'empreinte du contenu.
 4. Fusion dans le registre.
 
@@ -328,6 +331,37 @@ auteur se charge chez les autres, puisque c'est la même validation.
 
 Le jeu, lui, montre dans son écran des plugins ceux qu'il a refusés et
 pourquoi — un plugin simplement absent de la liste laisserait deviner.
+
+### Regarder ce que ça donne
+
+Un plugin d'apparence peut être valide et laid, ou valide et illisible. La
+validation ne dit rien de ça.
+
+```
+$ filature preview mes-vehicules/
+mes-vehicules-formes.svg
+mes-vehicules-plateau.svg
+```
+
+Deux fichiers, parce que les deux questions ne se jugent pas au même endroit :
+la planche pose chaque forme sur les trois sols possibles, où la même couleur
+ne se lit pas pareil, et le plateau la montre en situation. Un second argument
+dit où les écrire.
+
+Le plugin est fusionné sur le contenu livré avant d'être rendu — il ne déclare
+que ce qu'il remplace, et le montrer seul donnerait une pièce au milieu du
+vide. La planche marque d'une étoile les formes qui viennent de lui, ce qui
+rend visible la seule faute qu'aucun contrôle n'attrape : une clé mal
+orthographiée est un nom de forme inconnu, elle passe la validation et ne
+surcharge rien.
+
+Le plateau est une partie réellement jouée sur une graine figée, pas une
+position composée : les pions, les traces et les barrages y tombent où le jeu
+les met, et la graine étant figée, deux aperçus du même plugin donnent le même
+fichier — leur diff dit ce qui a bougé.
+
+Du SVG parce qu'il s'ouvre dans un navigateur, se relit sans lancer le jeu, et
+reste du texte comme le reste de ce qu'un plugin publie.
 
 ---
 

@@ -81,11 +81,40 @@ func Load(livres fs.FS, racine string) (*core.Registry, *render.ShapeSet, error)
 	return r, j, nil
 }
 
+// LoadOne charge le contenu livré et un seul plugin, désigné par son chemin.
+//
+// Pour l'aperçu et rien d'autre : on veut voir ce qu'un plugin donne, pas ce
+// que donne le dossier qui l'héberge. Passer par Load chargerait ses voisins,
+// et deux plugins en conflit empêcheraient de regarder le premier.
+func LoadOne(livres fs.FS, chemin string) (*core.Registry, *render.ShapeSet, error) {
+	parent, nom := filepathSplit(chemin)
+
+	r := &core.Registry{}
+	j := &render.ShapeSet{
+		Shapes:  map[string]render.Shape{},
+		Palette: render.Palette{},
+		Origins: map[string]string{},
+	}
+
+	if err := pourInto(r, j, livres, "livré", true); err != nil {
+		return nil, nil, err
+	}
+	if err := unPlugin(r, j, os.DirFS(parent), nom, false); err != nil {
+		return nil, nil, err
+	}
+
+	if manquements := j.Validate(); len(manquements) > 0 {
+		return nil, nil, fmt.Errorf("apparence : %w", errors.Join(manquements...))
+	}
+	return r, j, nil
+}
+
 // pourInto lit tous les plugins d'une source et les ajoute au registre.
 //
 // Un dossier sans manifeste est ignoré sans bruit : c'est ce que produit un
 // dossier de travail laissé à côté, et refuser le démarrage pour ça
 // n'apporterait rien.
+//
 // socle distingue le contenu livré des plugins du joueur, pour l'apparence
 // seulement. Le chemin de chargement reste le même — c'est ce qui garantit
 // qu'il est exercé à chaque démarrage — mais le socle ne revendique pas ses
@@ -105,34 +134,43 @@ func pourInto(r *core.Registry, j *render.ShapeSet, source fs.FS, origine string
 		if _, err := fs.Stat(source, path(dossier, ManifestName)); err != nil {
 			continue
 		}
-
-		m, err := readManifest(source, dossier)
-		if err != nil {
-			return err
-		}
-
-		somme, err := fingerprint(source, dossier)
-		if err != nil {
-			return err
-		}
-
-		if err := r.Merge(m.Name, m.versRegistre(somme)); err != nil {
-			return err
-		}
-
-		formes, err := render.Read(source, dossier)
-		if err != nil {
-			return err
-		}
-		revendiquant := m.Name
-		if socle {
-			revendiquant = ""
-		}
-		if err := j.Merge(revendiquant, formes); err != nil {
+		if err := unPlugin(r, j, source, dossier, socle); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+// unPlugin ajoute un plugin au registre et au jeu de formes.
+//
+// Extrait de la boucle pour que LoadOne l'emprunte : charger un seul plugin
+// doit suivre exactement le même chemin qu'en charger dix, faute de quoi un
+// aperçu montrerait ce qu'une partie ne montrera pas.
+func unPlugin(r *core.Registry, j *render.ShapeSet, source fs.FS, dossier string, socle bool) error {
+	m, err := readManifest(source, dossier)
+	if err != nil {
+		return err
+	}
+
+	somme, err := fingerprint(source, dossier)
+	if err != nil {
+		return err
+	}
+
+	if err := r.Merge(m.Name, m.versRegistre(somme)); err != nil {
+		return err
+	}
+
+	formes, err := render.Read(source, dossier)
+	if err != nil {
+		return err
+	}
+
+	revendiquant := m.Name
+	if socle {
+		revendiquant = ""
+	}
+	return j.Merge(revendiquant, formes)
 }
 
 // versRegistre projette un manifeste dans ce que le noyau consomme.

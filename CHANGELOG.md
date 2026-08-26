@@ -44,6 +44,12 @@ est un avantage de jeu déguisé en habillage.
 Deux plugins qui redéfinissent la même forme sont un conflit, nommé des deux
 côtés. Surcharger le contenu livré n'en est pas un.
 
+**`filature preview <dossier>` rend un plugin d'apparence en SVG**, sans lancer
+le jeu : la planche de ses formes sur les trois sols possibles, et un plateau en
+situation. Le plugin est fusionné sur le contenu livré avant d'être rendu, et la
+planche marque ce qui vient de lui — une clé mal orthographiée passe la
+validation sans rien surcharger, et rien d'autre ne le dirait.
+
 **L'archive `js/wasm` n'est plus publiée.** Elle ne contenait que le `.wasm`,
 inutilisable sans `wasm_exec.js` ni page HTML. La cible continue d'être
 compilée : c'est le seul contrôle qui empêche une dépendance d'introduire du
@@ -69,6 +75,12 @@ a gameplay advantage dressed up as decoration.
 
 Two plugins redefining the same shape are a conflict, named on both sides.
 Overriding shipped content is not.
+
+**`filature preview <folder>` renders an appearance plugin as SVG**, without
+launching the game: the sheet of its shapes on all three possible grounds, and a
+board in situation. The plugin is merged onto shipped content before rendering,
+and the sheet marks what comes from it — a misspelled key passes validation
+while overriding nothing, and nothing else would say so.
 
 **The `js/wasm` archive is no longer published.** It held only the `.wasm`,
 unusable without `wasm_exec.js` and an HTML page. The target is still built:

@@ -48,6 +48,7 @@ filature                      plays a game, in text
 filature version              the installed version number
 filature examples <folder>    writes the shipped plugins, as templates
 filature validate <folder>    checks a plugin and prints its fingerprint
+filature preview <folder>     renders its shapes and a board as SVG
 ```
 
 The last three belong in a terminal, not a double-click — their output is text,
@@ -57,6 +58,12 @@ and a window opened from the file explorer closes before anything can be read.
 `validate` runs exactly the checks the loader runs, and lists everything wrong at
 once rather than one fault at a time. A plugin it accepts will load for whoever
 you give it to.
+
+`preview` writes two files: the shape sheet, each shape on all three possible
+grounds, and a board in situation. The plugin is merged onto shipped content
+before rendering — it only declares what it replaces — and the sheet marks what
+comes from it, which also shows when a misspelled key overrode nothing. A second
+argument says where to write.
 
 `examples` refuses to write into the active plugin folder, and says so: what it
 writes out is already inside the binary, and putting it back there would declare

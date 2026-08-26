@@ -266,9 +266,34 @@ const GroundGrainAmplitude = 5
 //
 // Ce n'est pas une primitive du contrat et aucun plugin n'a à en tenir compte :
 // tous en bénéficient, y compris ceux qui ne changent que la palette.
+// Haché plutôt que calculé au fil de l'eau : une formule arithmétique simple
+// laisse des motifs visibles, des diagonales ou des bandes que l'œil retrouve
+// aussitôt sur seize cents cases. FNV-1a est ce que le générateur du noyau
+// emploie déjà pour mêler un nom de flux à la graine.
 func GroundGrain(graine int64, colonne, ligne int) int {
-	// à implémenter : étape 7
-	return 0
+	const (
+		base    uint64 = 14695981039346656037
+		premier uint64 = 1099511628211
+	)
+
+	// Les conversions cherchent le motif de bits et non la valeur : une graine
+	// ou une coordonnée négative doit donner un grain comme un autre. Même
+	// raison qu'au générateur du noyau, qui mêle sa graine de la même façon.
+	graines := [3]uint64{
+		uint64(graine),         // #nosec G115
+		uint64(int64(colonne)), // #nosec G115
+		uint64(int64(ligne)),   // #nosec G115
+	}
+
+	h := base
+	for _, v := range graines {
+		for i := range 8 {
+			h ^= (v >> (8 * i)) & 0xff
+			h *= premier
+		}
+	}
+
+	return int(h%(2*GroundGrainAmplitude+1)) - GroundGrainAmplitude
 }
 
 // ToScreen projette une case du plateau en coordonnées d'écran.

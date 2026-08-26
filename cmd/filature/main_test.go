@@ -144,7 +144,7 @@ func TestDefaultPluginsFollowExecutable(t *testing.T) {
 func TestCommandRejectsUnknownWord(t *testing.T) {
 	for _, nom := range []string{"exemples", "valide", "n'importe quoi"} {
 		t.Run(nom, func(t *testing.T) {
-			traitee, err := command(&strings.Builder{}, nom, "", t.TempDir())
+			traitee, err := command(&strings.Builder{}, nom, "", "", t.TempDir())
 
 			if !traitee {
 				t.Error("le mot est passé à la boucle de jeu au lieu d'être refusé")
@@ -161,7 +161,7 @@ func TestCommandRejectsUnknownWord(t *testing.T) {
 
 // TestEmptyCommandLetsPlay vérifie que le double-clic ordinaire passe.
 func TestEmptyCommandLetsPlay(t *testing.T) {
-	traitee, err := command(&strings.Builder{}, "", "", t.TempDir())
+	traitee, err := command(&strings.Builder{}, "", "", "", t.TempDir())
 	if err != nil {
 		t.Fatalf("sans argument : %v", err)
 	}
@@ -173,7 +173,7 @@ func TestEmptyCommandLetsPlay(t *testing.T) {
 // TestCommandVersion vérifie que le numéro sort sur la sortie qu'on lui donne.
 func TestCommandVersion(t *testing.T) {
 	var sortie strings.Builder
-	if _, err := command(&sortie, "version", "", t.TempDir()); err != nil {
+	if _, err := command(&sortie, "version", "", "", t.TempDir()); err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(sortie.String(), version) {

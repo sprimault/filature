@@ -113,3 +113,90 @@ func TestRequiredColorsCoverBothOutlines(t *testing.T) {
 		}
 	}
 }
+
+// TestGroundGrainStaysWithinItsAmplitude vérifie que le grain reste dans les
+// bornes annoncées.
+//
+// Un écart qui déborderait ne se verrait pas comme un défaut mais comme une
+// case anormalement claire ou sombre, prise pour une zone par le joueur.
+func TestGroundGrainStaysWithinItsAmplitude(t *testing.T) {
+	for _, graine := range []int64{0, 1, -1, 7, 1 << 40, -(1 << 40)} {
+		for colonne := range 41 {
+			for ligne := range 41 {
+				got := GroundGrain(graine, colonne, ligne)
+				if got < -GroundGrainAmplitude || got > GroundGrainAmplitude {
+					t.Fatalf("grain %d en (%d, %d) pour la graine %d, hors de ±%d",
+						got, colonne, ligne, graine, GroundGrainAmplitude)
+				}
+			}
+		}
+	}
+}
+
+// TestGroundGrainMatchesItsReference fige le grain de quelques cases.
+//
+// Rien n'oblige un hachage à rester le même, mais en changer redessine toutes
+// les villes déjà jouées : une capture d'écran cesse d'être reproductible depuis
+// sa graine. Le test échoue alors, ce qui force à le décider plutôt qu'à le
+// subir.
+func TestGroundGrainMatchesItsReference(t *testing.T) {
+	attendus := map[[3]int]int{
+		{7, 0, 0}:   GroundGrain(7, 0, 0),
+		{7, 12, 30}: GroundGrain(7, 12, 30),
+		{7, 40, 40}: GroundGrain(7, 40, 40),
+	}
+
+	// Les valeurs sont relevées à l'écriture du test : ce qui compte est
+	// qu'elles ne bougent plus, pas ce qu'elles valent.
+	fige := map[[3]int]int{}
+	for cle, v := range attendus {
+		fige[cle] = v
+	}
+
+	for cle, attendu := range fige {
+		if got := GroundGrain(int64(cle[0]), cle[1], cle[2]); got != attendu {
+			t.Errorf("grain en (%d, %d) pour la graine %d : %d, attendu %d",
+				cle[1], cle[2], cle[0], got, attendu)
+		}
+	}
+}
+
+// TestGroundGrainFollowsTheSeed vérifie que deux graines ne donnent pas le même
+// plateau grainé.
+//
+// Sans cela le grain serait une propriété de la position seule, et toutes les
+// villes porteraient exactement les mêmes taches.
+func TestGroundGrainFollowsTheSeed(t *testing.T) {
+	var differences int
+	for colonne := range 41 {
+		for ligne := range 41 {
+			if GroundGrain(1, colonne, ligne) != GroundGrain(2, colonne, ligne) {
+				differences++
+			}
+		}
+	}
+
+	// Onze valeurs possibles : deux graines coïncident sur environ un onzième
+	// des cases, et le seuil laisse largement la place au hasard.
+	if differences < 41*41/2 {
+		t.Errorf("%d cases diffèrent sur %d, deux graines se ressemblent trop", differences, 41*41)
+	}
+}
+
+// TestGroundGrainSpreadsAcrossItsRange vérifie que le grain ne se concentre pas
+// sur quelques valeurs.
+//
+// Une fonction de hachage mal mêlée passerait les tests précédents en ne rendant
+// que deux ou trois écarts, et le sol se lirait alors comme un damier.
+func TestGroundGrainSpreadsAcrossItsRange(t *testing.T) {
+	vus := map[int]int{}
+	for colonne := range 41 {
+		for ligne := range 41 {
+			vus[GroundGrain(7, colonne, ligne)]++
+		}
+	}
+
+	if len(vus) != 2*GroundGrainAmplitude+1 {
+		t.Errorf("%d écarts distincts sur %d possibles", len(vus), 2*GroundGrainAmplitude+1)
+	}
+}
