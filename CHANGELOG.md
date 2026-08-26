@@ -44,6 +44,11 @@ est un avantage de jeu déguisé en habillage.
 Deux plugins qui redéfinissent la même forme sont un conflit, nommé des deux
 côtés. Surcharger le contenu livré n'en est pas un.
 
+**Les archives portent `THIRD-PARTY-NOTICES`**, à côté de `LICENSE` et
+`NOTICE`. Les licences des bibliothèques liées au binaire l'exigent à la
+redistribution, et les versions précédentes ne le faisaient pas. Le fichier est
+généré depuis les dépendances réelles ; un test échoue quand il vieillit.
+
 ***
 
 **Appearance plugins now load and validate.** A plugin declares what it
@@ -59,6 +64,11 @@ a gameplay advantage dressed up as decoration.
 
 Two plugins redefining the same shape are a conflict, named on both sides.
 Overriding shipped content is not.
+
+**Archives now carry `THIRD-PARTY-NOTICES`**, alongside `LICENSE` and `NOTICE`.
+The licences of the libraries linked into the binary require it on
+redistribution, and earlier releases did not comply. The file is generated from
+the actual dependencies; a test fails when it goes stale.
 
 ## [0.5.0] — 2026-08-26 — La boucle de jeu
 

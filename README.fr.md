@@ -2,8 +2,9 @@
 
 English: [README.md](README.md)
 
-![CI](https://github.com/sprimault/filature/actions/workflows/ci.yml/badge.svg)
-![License](https://img.shields.io/badge/license-Apache%202.0-blue)
+[![CI](https://github.com/sprimault/filature/actions/workflows/ci.yml/badge.svg)](https://github.com/sprimault/filature/actions/workflows/ci.yml)
+[![Licence](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![Notices de tiers](https://img.shields.io/badge/tiers-notices-lightgrey)](THIRD-PARTY-NOTICES)
 
 Un jeu de plateau au tour par tour, à déplacement caché. Un fugitif contre cinq
 inspecteurs, sur une ville de rues et de bâtiments.
@@ -133,6 +134,10 @@ deux camps à la fois : on file, et on est filé.
 ## Licence
 
 Apache 2.0 — voir [`LICENSE`](LICENSE).
+
+Le binaire lie des bibliothèques tierces dont les licences exigent que leurs
+notices le suivent : [`THIRD-PARTY-NOTICES`](THIRD-PARTY-NOTICES), livré dans
+chaque archive.
 
 Le nom Filature, son identité visuelle et sa palette ne sont pas couverts par
 cette licence. Un fork est bienvenu sous un autre nom.

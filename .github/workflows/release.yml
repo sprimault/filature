@@ -76,12 +76,17 @@ jobs:
       # LICENSE et NOTICE vont dans l'archive et non à côté : Apache 2.0 les
       # exige à la redistribution, et personne ne télécharge un asset séparé.
       #
+      # THIRD-PARTY-NOTICES pour la même raison, mais au titre des licences des
+      # bibliothèques liées au binaire : la MIT, comme la plupart des licences
+      # permissives, exige que sa notice accompagne toute copie du logiciel, et
+      # un binaire qui la compile en est une.
+      #
       # Rien d'autre : le contenu livré est embarqué dans le binaire, qui se
       # suffit donc à lui-même.
       - name: Archive
         shell: bash
         run: |
-          cp LICENSE NOTICE paquet/
+          cp LICENSE NOTICE THIRD-PARTY-NOTICES paquet/
           nom="filature_${{ steps.version.outputs.valeur }}_${{ matrix.os }}_${{ matrix.arch }}"
           mkdir -p dist
           cd paquet
