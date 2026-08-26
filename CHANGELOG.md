@@ -28,7 +28,17 @@ de version sont ce que lit un auteur de greffon étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
-## [Non publié]
+## [0.4.0] — 2026-08-26 — La vision
+
+Étape 4 de la feuille de route. Le fugitif peut désormais être repéré : jusqu'à
+cette version il ne l'était jamais, quoi qu'il fasse, et ni la portée de vue ni
+les capacités des inspecteurs ne changeaient quoi que ce soit.
+
+**Le binaire ne joue toujours pas** : la boucle de jeu est l'étape 5.
+
+Rien à reprendre pour un auteur de greffon : `version_formes`, `protocole` et
+`version_effets` sont inchangés. Un bot recevra en revanche des vues plus
+fournies — le champ des cases couvertes n'était jamais rempli.
 
 ### Ajouté
 - Vision : un inspecteur voit dans les huit directions jusqu'à sa portée, la
@@ -40,6 +50,16 @@ publié, et explique les conventions du dépôt à qui y contribue.
   barrage n'y figure, et chacun voit la case où il se tient.
 
 ***
+
+Step 4 of the roadmap. The fugitive can now be spotted: until this release he
+never was, whatever he did, and neither sight range nor the inspectors'
+abilities changed anything at all.
+
+**The binary still does not play**: the game loop is step 5.
+
+Nothing for plugin authors to update: `version_formes`, `protocole` and
+`version_effets` are unchanged. A bot will however receive fuller views — the
+covered-cells field was never populated.
 
 ### Added
 - Sight: an inspector sees in all eight directions up to their range, the line
