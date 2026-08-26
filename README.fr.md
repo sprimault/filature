@@ -31,6 +31,17 @@ absente est refusée au démarrage.
 - [`docs/regles.md`](docs/regles.md) — la spécification complète
 - [`ROADMAP.md`](ROADMAP.md) — les étapes, et ce qui est hors périmètre v1
 
+## Comment ce jeu est écrit
+
+*Filature* est aussi une expérience de méthode : le jeu est écrit en binôme avec
+un assistant, sous des règles de dépôt explicites et versionnées avec le code.
+
+Les décisions de conception sont arbitrées et mesurées plutôt que devinées —
+[`docs/regles.md`](docs/regles.md) porte, pour chaque règle, ce qu'elle écarte et
+ce qui reste à vérifier. Ce que ça change pour une contribution est dans
+[`CONTRIBUTING.fr.md`](CONTRIBUTING.fr.md) : rien sur le fond, les mêmes contrôles
+s'appliquent à tout le monde.
+
 ## Installation
 
 Télécharger un binaire depuis la page des versions, extraire, lancer. Aucun

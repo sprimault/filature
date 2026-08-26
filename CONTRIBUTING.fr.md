@@ -2,6 +2,26 @@
 
 English: [CONTRIBUTING.md](CONTRIBUTING.md)
 
+## Comment ce projet est écrit
+
+Le code est écrit en binôme avec un assistant, sous les règles de ce dépôt. Ce
+n'est pas une note de bas de page : la méthode est le second objet du projet, et
+la façon dont les règles sont posées en découle.
+
+- **Les règles précèdent le code**, elles n'en sont pas déduites.
+  [`docs/regles.md`](docs/regles.md) fait foi, et un désaccord entre le document
+  et le code est un défaut du code.
+- **Une décision porte ce qu'elle écarte.** Chaque arbitrage garde le motif des
+  options rejetées, pour qu'on puisse le rouvrir sans le rejouer.
+- **Ce qui se mesure se mesure.** Plusieurs règles ont été corrigées par une
+  mesure qui contredisait un raisonnement ; c'est la mesure qui tranche.
+- **Les messages de commit ne racontent pas la fabrication.** Ils disent ce qui
+  change et pourquoi — le reste est dans le diff, et le récit de la façon dont
+  le travail a été mené n'apprend rien à qui l'a sous les yeux.
+
+Rien de cela ne s'applique différemment à une contribution extérieure : mêmes
+contrôles, mêmes règles de style, même bilingue.
+
 ## Avant d'écrire du code
 
 Ouvrir une issue d'abord, pour tout ce qui dépasse une correction. Les règles

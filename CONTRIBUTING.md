@@ -2,6 +2,26 @@
 
 Français : [CONTRIBUTING.fr.md](CONTRIBUTING.fr.md)
 
+## How this project is written
+
+The code is written alongside an assistant, under this repository's rules. It is
+not a footnote: the method is the project's second subject, and the way the rules
+are laid down follows from it.
+
+- **Rules come before code**, they are not inferred from it.
+  [`docs/regles.md`](docs/regles.md) is authoritative, and a disagreement between
+  the document and the code is a defect in the code.
+- **A decision carries what it rules out.** Every trade-off keeps the reason the
+  rejected options were rejected, so it can be reopened without being replayed.
+- **What can be measured is measured.** Several rules were corrected by a
+  measurement that contradicted an argument; the measurement decides.
+- **Commit messages do not narrate how the work was done.** They say what changes
+  and why — the rest is in the diff, and an account of the making teaches nothing
+  to someone who has it in front of them.
+
+None of this applies differently to an outside contribution: same checks, same
+style rules, same bilingual format.
+
 ## Before writing code
 
 Open an issue first for anything beyond a fix. The rules are settled and written
