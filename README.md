@@ -21,6 +21,10 @@ have to guess.
 12, and the opponent still draws its moves at random — the real AI comes with
 steps 9 and 10.
 
+Appearance plugins already load and validate, even though nothing draws them
+yet: a shape overflowing its template or naming a colour that does not exist is
+refused at startup.
+
 - [`docs/regles.md`](docs/regles.md) — the full specification (French)
 - [`ROADMAP.md`](ROADMAP.md) — the steps, and what is out of scope for v1
 

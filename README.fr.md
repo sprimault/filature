@@ -22,6 +22,10 @@ deviner.
 réseau l'étape 12, et l'adversaire choisit encore au hasard — la véritable
 IA vient aux étapes 9 et 10.
 
+Les plugins d'apparence se chargent et se valident déjà, bien que rien ne les
+dessine encore : une forme qui déborde de son gabarit ou référence une couleur
+absente est refusée au démarrage.
+
 - [`docs/regles.md`](docs/regles.md) — la spécification complète
 - [`ROADMAP.md`](ROADMAP.md) — les étapes, et ce qui est hors périmètre v1
 

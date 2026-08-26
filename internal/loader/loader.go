@@ -23,6 +23,8 @@ import (
 	"strings"
 
 	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/filature/internal/render"
+	"github.com/sprimault/filature/plugins"
 )
 
 // Load construit le registre depuis le contenu livré puis le dossier de
@@ -44,24 +46,39 @@ import (
 //
 // Un dossier de plugins absent n'est pas une erreur — c'est l'installation
 // ordinaire, personne n'ayant rien ajouté.
-func Load(livres fs.FS, racine string) (*core.Registry, error) {
+//
+// L'apparence remonte à part du registre : celui-ci vit dans internal/core, qui
+// est une feuille du graphe de dépendances et n'a pas à connaître le rendu.
+func Load(livres fs.FS, racine string) (*core.Registry, *render.ShapeSet, error) {
 	r := &core.Registry{}
+	j := &render.ShapeSet{
+		Shapes:  map[string]render.Shape{},
+		Palette: render.Palette{},
+		Origins: map[string]string{},
+	}
 
-	if err := pourInto(r, livres, "livré"); err != nil {
-		return nil, err
+	if err := pourInto(r, j, livres, "livré", true); err != nil {
+		return nil, nil, err
 	}
 
 	if racine != "" {
 		if _, err := os.Stat(racine); err == nil {
-			if err := pourInto(r, os.DirFS(racine), racine); err != nil {
-				return nil, err
+			if err := pourInto(r, j, os.DirFS(racine), racine, false); err != nil {
+				return nil, nil, err
 			}
 		} else if !errors.Is(err, fs.ErrNotExist) {
-			return nil, fmt.Errorf("dossier des plugins %s: %w", racine, err)
+			return nil, nil, fmt.Errorf("dossier des plugins %s: %w", racine, err)
 		}
 	}
 
-	return r, nil
+	// Après fusion et non pendant : une forme peut référencer une couleur
+	// qu'une palette chargée plus tard définit, et juger chaque plugin isolément
+	// refuserait un ensemble pourtant cohérent.
+	if manquements := j.Validate(); len(manquements) > 0 {
+		return nil, nil, fmt.Errorf("apparence : %w", errors.Join(manquements...))
+	}
+
+	return r, j, nil
 }
 
 // pourInto lit tous les plugins d'une source et les ajoute au registre.
@@ -69,7 +86,12 @@ func Load(livres fs.FS, racine string) (*core.Registry, error) {
 // Un dossier sans manifeste est ignoré sans bruit : c'est ce que produit un
 // dossier de travail laissé à côté, et refuser le démarrage pour ça
 // n'apporterait rien.
-func pourInto(r *core.Registry, source fs.FS, origine string) error {
+// socle distingue le contenu livré des plugins du joueur, pour l'apparence
+// seulement. Le chemin de chargement reste le même — c'est ce qui garantit
+// qu'il est exercé à chaque démarrage — mais le socle ne revendique pas ses
+// formes : surcharger le fugitif livré est précisément ce qu'un plugin
+// d'apparence vient faire, et le compter comme un conflit les interdirait tous.
+func pourInto(r *core.Registry, j *render.ShapeSet, source fs.FS, origine string, socle bool) error {
 	entrees, err := fs.ReadDir(source, ".")
 	if err != nil {
 		return fmt.Errorf("lecture des plugins %s: %w", origine, err)
@@ -95,6 +117,18 @@ func pourInto(r *core.Registry, source fs.FS, origine string) error {
 		}
 
 		if err := r.Merge(m.Name, m.versRegistre(somme)); err != nil {
+			return err
+		}
+
+		formes, err := render.Read(source, dossier)
+		if err != nil {
+			return err
+		}
+		revendiquant := m.Name
+		if socle {
+			revendiquant = ""
+		}
+		if err := j.Merge(revendiquant, formes); err != nil {
 			return err
 		}
 	}
@@ -151,11 +185,46 @@ func (m *manifeste) versRegistre(somme string) *core.Registry {
 // démarre plus.
 func Validate(dossier string) error {
 	parent, nom := filepathSplit(dossier)
+	source := os.DirFS(parent)
 
-	if _, err := readManifest(os.DirFS(parent), nom); err != nil {
+	if _, err := readManifest(source, nom); err != nil {
 		return err
 	}
+
+	formes, err := render.Read(source, nom)
+	if err != nil {
+		return err
+	}
+
+	// Un plugin se valide seul, donc sans la palette livrée sous lui. Ses
+	// couleurs ne sont contrôlées que s'il en fournit une : sinon il s'appuie
+	// légitimement sur celle du jeu, et exiger qu'il la redéclare reviendrait à
+	// refuser un plugin de formes seules.
+	if len(formes.Palette) == 0 {
+		for nom, couleur := range base().Palette {
+			formes.Palette[nom] = couleur
+		}
+	}
+
+	if manquements := formes.Validate(); len(manquements) > 0 {
+		return errors.Join(manquements...)
+	}
 	return nil
+}
+
+// base lit l'apparence livrée, sur laquelle un plugin s'appuie quand il ne
+// fournit pas la sienne.
+//
+// Sans elle, valider un plugin de formes seules reviendrait à lui reprocher
+// chaque couleur du socle — celles-là mêmes qu'il a le droit d'attendre.
+func base() *render.ShapeSet {
+	j, err := render.Read(plugins.Shipped(), "base")
+	if err != nil {
+		// Le contenu livré est embarqué et testé : s'il ne se lit plus, ce
+		// n'est pas un plugin qui est en cause mais le binaire lui-même.
+		return &render.ShapeSet{Palette: render.Palette{}}
+	}
+	return j
 }
 
 // Fingerprint calcule la somme du contenu d'un plugin, manifeste et module
