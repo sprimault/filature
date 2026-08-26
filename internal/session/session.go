@@ -75,7 +75,10 @@ func Run(o Options) (core.Outcome, error) {
 		o.Out = io.Discard
 	}
 
-	registre, err := loader.Load(plugins.Shipped(), o.Plugins)
+	// L'apparence est chargée et validée ici bien qu'une partie en texte n'en
+	// fasse rien : un plugin refusé doit l'être au démarrage, pas au moment où
+	// l'on ouvre la vue isométrique.
+	registre, _, err := loader.Load(plugins.Shipped(), o.Plugins)
 	if err != nil {
 		return core.Outcome{}, err
 	}

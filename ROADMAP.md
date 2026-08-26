@@ -85,6 +85,15 @@ moment où les règles se valident au jeu plutôt qu'en test, et donc le moment 
 `internal/render` : lecture, validation, fusion des surcharges partielles.
 Toujours pas de pixel à l'écran — le contrat se teste sur des fichiers.
 
+La validation s'applique **au chargement**, plugin local compris, et pas
+seulement à `filature validate` : une forme qui déborde masque les cases
+voisines, ce qui est un avantage de jeu déguisé en habillage.
+
+Le contenu livré ne revendique pas ses formes, sans quoi le premier plugin à
+toucher au fugitif serait refusé comme un conflit — alors que surcharger est
+précisément ce qu'un plugin d'apparence vient faire. Deux plugins tiers sur la
+même forme restent un conflit, nommé des deux côtés.
+
 ## 7 — Vue isométrique
 
 Projection, tri en profondeur, caméra, clic, grain du sol, occlusion. Plus la

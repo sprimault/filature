@@ -10,7 +10,6 @@
 package render
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -163,57 +162,6 @@ type Shape struct {
 	// ne le signale — un TOML dont on ignore une table se décode sans erreur.
 	Strokes  []Stroke            `toml:"stroke"`
 	Variants map[string][]Stroke `toml:"variant"`
-}
-
-// Palette associe des noms à des couleurs. Une forme ne référence que des noms :
-// c'est ce qui permet de reteinter tout le jeu sans toucher à la géométrie, et
-// à une forme tierce de suivre la palette active sans rien savoir d'elle.
-type Palette map[string]string
-
-// RequiredColors est le socle sur lequel toute forme peut compter. Une
-// palette qui n'en couvre pas la totalité est refusée : une couleur manquante
-// se verrait à l'écran comme un trou, plusieurs écrans plus loin.
-//
-// Les noms en _detail et marker_outline sont des contours et non des nuances
-// d'accompagnement. Un pion se pose sur des sols dont la luminance va du simple
-// au triple ; aucun remplissage ne se détache des trois, le contour le fait.
-// Une palette qui les remonterait au niveau de son remplissage rendrait les
-// pions illisibles sans qu'aucun contrôle ne s'en aperçoive.
-//
-// backdrop est ce qu'on voit autour du plateau, et n'appartient à aucune forme.
-// Il est dans le socle parce qu'une palette qui le laisserait au niveau du bâti
-// ferait disparaître les blocs du pourtour, et les pièces avec eux.
-var RequiredColors = []string{
-	"street", "building", "zone_open", "zone_closed", "backdrop",
-	"fugitive_main", "fugitive_detail",
-	"inspector_main", "inspector_detail",
-	"marker_outline", "trail", "roadblock", "crime_scene",
-}
-
-// ShapeSet rassemble les formes et la palette effectivement actives, après
-// application des surcharges.
-type ShapeSet struct {
-	Shapes  map[string]Shape
-	Palette Palette
-}
-
-// Validate applique les contrôles du contrat : gabarit, plafond de traits,
-// nombre de sommets, résolution des couleurs, absence de valeur hexadécimale.
-//
-// Renvoie tous les manquements plutôt que le premier : quelqu'un qui met au
-// point un plugin veut la liste, pas un aller-retour par erreur.
-func (j *ShapeSet) Validate() []error {
-	return []error{errors.New("à implémenter : étape 6")}
-}
-
-// Merge applique une surcharge partielle sur le jeu de base.
-//
-// Un plugin ne déclare que ce qu'il remplace, le reste retombe sur le contenu
-// livré — sans quoi changer un seul pion obligerait à livrer les quarante
-// formes, et personne ne le ferait. Deux plugins qui redéfinissent la même
-// forme sont un conflit, jamais un écrasement silencieux.
-func (j *ShapeSet) Merge(nom string, autre *ShapeSet) error {
-	return errors.New("à implémenter : étape 6")
 }
 
 // RimColor est le liseré que le moteur pose sous le contour des pions et des

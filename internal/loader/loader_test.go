@@ -53,7 +53,7 @@ trigger = "inspectors_phase"
 // le même chargeur qu'un plugin tiers, donc s'il se charge, ce chemin est
 // exercé à chaque partie plutôt qu'une fois de temps en temps.
 func TestLoadsShippedContent(t *testing.T) {
-	r, err := Load(plugins.Shipped(), "")
+	r, _, err := Load(plugins.Shipped(), "")
 	if err != nil {
 		t.Fatalf("chargement : %v", err)
 	}
@@ -86,7 +86,7 @@ func TestLoadsShippedContent(t *testing.T) {
 // une capacité ne saurait pas comment on la désigne, et l'interface afficherait
 // une chaîne vide là où le joueur attend un nom.
 func TestKeyCarriedFromTable(t *testing.T) {
-	r, err := Load(plugins.Shipped(), "")
+	r, _, err := Load(plugins.Shipped(), "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,7 +113,7 @@ func TestDiskPluginTakesSamePath(t *testing.T) {
 	}
 	writeFile(t, filepath.Join(dossier, ManifestName), manifesteValide("essai"))
 
-	r, err := Load(plugins.Shipped(), racine)
+	r, _, err := Load(plugins.Shipped(), racine)
 	if err != nil {
 		t.Fatalf("chargement : %v", err)
 	}
@@ -134,7 +134,7 @@ func TestDiskPluginTakesSamePath(t *testing.T) {
 // Personne n'a rien ajouté, il n'y a donc pas de dossier : refuser de démarrer
 // pour ça rendrait le binaire inutilisable tel qu'il est livré.
 func TestMissingPluginFolder(t *testing.T) {
-	r, err := Load(plugins.Shipped(), filepath.Join(t.TempDir(), "rien"))
+	r, _, err := Load(plugins.Shipped(), filepath.Join(t.TempDir(), "rien"))
 	if err != nil {
 		t.Fatalf("un dossier absent fait échouer le chargement : %v", err)
 	}
@@ -149,7 +149,7 @@ func TestMissingPluginFolder(t *testing.T) {
 // silencieusement donnerait une partie dont les règles dépendent de l'ordre
 // alphabétique des dossiers.
 func TestKeyConflict(t *testing.T) {
-	_, err := Load(source(map[string]string{
+	_, _, err := Load(source(map[string]string{
 		"un/manifest.toml":   manifesteValide("un"),
 		"deux/manifest.toml": strings.ReplaceAll(manifesteValide("deux"), "ability.deux", "ability.un"),
 	}), "")
@@ -315,7 +315,7 @@ side = "inspectors"
 
 	for _, c := range cas {
 		t.Run(c.nom, func(t *testing.T) {
-			_, err := Load(source(map[string]string{"essai/manifest.toml": c.manifeste}), "")
+			_, _, err := Load(source(map[string]string{"essai/manifest.toml": c.manifeste}), "")
 			if err == nil {
 				t.Fatal("accepté sans rien dire")
 			}
@@ -332,7 +332,7 @@ side = "inspectors"
 // TestFolderWithoutManifestIgnored vérifie qu'un dossier de travail laissé à côté
 // n'empêche pas le jeu de démarrer.
 func TestFolderWithoutManifestIgnored(t *testing.T) {
-	r, err := Load(source(map[string]string{
+	r, _, err := Load(source(map[string]string{
 		"un/manifest.toml":    manifesteValide("un"),
 		"brouillon/notes.txt": "rien à voir",
 	}), "")
@@ -482,5 +482,111 @@ func writeFile(t *testing.T, chemin, contenu string) {
 	t.Helper()
 	if err := os.WriteFile(chemin, []byte(contenu), 0o600); err != nil {
 		t.Fatal(err)
+	}
+}
+
+// ecrire pose un fichier de plugin sous racine, en créant son dossier.
+func ecrire(t *testing.T, racine, chemin, contenu string) {
+	t.Helper()
+
+	complet := filepath.Join(racine, filepath.FromSlash(chemin))
+	if err := os.MkdirAll(filepath.Dir(complet), 0o750); err != nil {
+		t.Fatal(err)
+	}
+	writeFile(t, complet, contenu)
+}
+
+// TestShippedShapesCanBeOverridden vérifie qu'un plugin d'apparence surcharge
+// le contenu livré sans que ce soit un conflit.
+//
+// C'est ce pour quoi un plugin d'apparence existe. Le contenu livré passe par
+// le même chemin de chargement qu'un plugin tiers, ce qui a failli le lui
+// interdire : il revendiquait ses formes, et le premier plugin à toucher au
+// fugitif était refusé.
+func TestShippedShapesCanBeOverridden(t *testing.T) {
+	racine := t.TempDir()
+	ecrire(t, racine, "mien/manifest.toml", manifesteValide("mien"))
+	ecrire(t, racine, "mien/shapes.toml", `shapes_version = 3
+
+[shape.fugitive]
+role = "piece"
+
+  [[shape.fugitive.stroke]]
+  type = "circle"
+  center = [0, 12]
+  radius = 7
+  color = "fugitive_main"
+`)
+
+	_, formes, err := Load(plugins.Shipped(), racine)
+	if err != nil {
+		t.Fatalf("surcharge du contenu livré refusée : %v", err)
+	}
+
+	if got := formes.Shapes["fugitive"].Strokes[0].Radius; got != 7 {
+		t.Errorf("rayon %d, attendu celui du plugin", got)
+	}
+	if got := formes.Shapes["inspector"].Role; got == "" {
+		t.Error("les formes livrées non surchargées ont disparu")
+	}
+}
+
+// TestTwoPluginsOnTheSameShapeConflict vérifie qu'un conflit entre deux plugins
+// est signalé, et qu'il nomme les deux.
+func TestTwoPluginsOnTheSameShapeConflict(t *testing.T) {
+	racine := t.TempDir()
+	forme := `shapes_version = 3
+
+[shape.fugitive]
+role = "piece"
+
+  [[shape.fugitive.stroke]]
+  type = "circle"
+  center = [0, 12]
+  radius = 7
+  color = "fugitive_main"
+`
+	for _, nom := range []string{"un", "deux"} {
+		ecrire(t, racine, nom+"/manifest.toml", manifesteValide(nom))
+		ecrire(t, racine, nom+"/shapes.toml", forme)
+	}
+
+	_, _, err := Load(plugins.Shipped(), racine)
+	if err == nil {
+		t.Fatal("deux plugins redéfinissent la même forme sans conflit")
+	}
+	for _, attendu := range []string{"fugitive", "un", "deux"} {
+		if !strings.Contains(err.Error(), attendu) {
+			t.Errorf("message %q, attendu qu'il nomme %q", err, attendu)
+		}
+	}
+}
+
+// TestBrokenAppearanceStopsTheLoad vérifie qu'une forme hors gabarit arrête le
+// chargement plutôt que d'attendre l'ouverture de la vue.
+//
+// Une forme qui déborde masque les cases voisines, ce qui est un avantage de
+// jeu déguisé en habillage : le refus vaut pour un plugin local comme pour un
+// plugin publié.
+func TestBrokenAppearanceStopsTheLoad(t *testing.T) {
+	racine := t.TempDir()
+	ecrire(t, racine, "large/manifest.toml", manifesteValide("large"))
+	ecrire(t, racine, "large/shapes.toml", `shapes_version = 3
+
+[shape.fugitive]
+role = "piece"
+
+  [[shape.fugitive.stroke]]
+  type = "polygon"
+  points = [[-40, 0], [40, 0], [0, 60]]
+  color = "fugitive_main"
+`)
+
+	_, _, err := Load(plugins.Shipped(), racine)
+	if err == nil {
+		t.Fatal("une forme hors gabarit se charge")
+	}
+	if !strings.Contains(err.Error(), "gabarit") {
+		t.Errorf("message %q, attendu qu'il dise le gabarit", err)
 	}
 }

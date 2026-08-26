@@ -28,6 +28,38 @@ de version sont ce que lit un auteur de plugin étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
+## [Non publié]
+
+**Les plugins d'apparence se chargent et se valident.** Un plugin déclare ce
+qu'il remplace, le reste retombe sur le contenu livré. Une forme qui déborde de
+son gabarit, un polygone hors de ses trois à trente-deux sommets, une couleur
+absente de la palette, une valeur hexadécimale écrite dans une forme, un prisme
+hors du rôle bâtiment : chacun arrête le chargement en nommant le chemin
+complet de la clé fautive, et tous sont listés d'un coup.
+
+Le contrôle vaut **au démarrage**, plugin local compris, et pas seulement pour
+`filature validate` — une forme qui déborde masque les cases voisines, ce qui
+est un avantage de jeu déguisé en habillage.
+
+Deux plugins qui redéfinissent la même forme sont un conflit, nommé des deux
+côtés. Surcharger le contenu livré n'en est pas un.
+
+***
+
+**Appearance plugins now load and validate.** A plugin declares what it
+replaces; everything else falls back on shipped content. A shape overflowing its
+template, a polygon outside its three-to-thirty-two vertices, a colour missing
+from the palette, a hexadecimal value written inside a shape, a prism outside
+the building role: each stops the load naming the full path of the offending
+key, and all are listed at once.
+
+The check applies **at startup**, local plugins included, not only to
+`filature validate` — a shape that overflows hides neighbouring tiles, which is
+a gameplay advantage dressed up as decoration.
+
+Two plugins redefining the same shape are a conflict, named on both sides.
+Overriding shipped content is not.
+
 ## [0.5.0] — 2026-08-26 — La boucle de jeu
 
 Étape 5 de la feuille de route. **Le binaire joue** : une partie se déroule
