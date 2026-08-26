@@ -203,6 +203,9 @@
     "Settings": {
       "type": "object",
       "properties": {
+        "centre_radius": {
+          "type": "integer"
+        },
         "inspectors": {
           "type": "integer"
         },
@@ -238,6 +241,7 @@
         }
       },
       "required": [
+        "centre_radius",
         "inspectors",
         "pieces_per_turn",
         "range",

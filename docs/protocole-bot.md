@@ -55,7 +55,7 @@ vivant au bout d'une seconde, il est tué.
 
 ```json
 {"type":"bonjour","protocol":2,"side":"inspectors","seed":178342119,
- "settings":{"size":41,"range":8,"turns":40,"stamina":10,
+ "settings":{"size":41,"range":8,"turns":40,"centre_radius":10,"stamina":10,
  "inspectors":5,"pieces_per_turn":3,"reveal_period":4,"zones":6,
  "trail_lifetime":6,"strangling_start":30,"strangling_period":2},
  "plugins":[{"name":"base","version":"0.1.0","fingerprint":"…","rules":true}]}

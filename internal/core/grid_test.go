@@ -46,10 +46,7 @@ func referenceBoards() []casPlateau {
 
 // settingsFor rend des paramètres valides pour une taille donnée.
 func settingsFor(cote int) Settings {
-	p := DefaultSettings()
-	p.Size = cote
-	p.Range = max(3, cote/5)
-	return p
+	return SettingsForSize(cote)
 }
 
 // TestReferenceBoards fige ce que la génération produit.
@@ -271,6 +268,35 @@ func TestValidationRejects(t *testing.T) {
 		}
 	})
 
+	t.Run("aucune rue hors du noyau", func(t *testing.T) {
+		// Un bloc plein au centre : le taux de rues tombe dans ses bornes et
+		// tout se tient, mais les inspecteurs n'ont nulle part où se placer.
+		// Le rayon est poussé à sa borne haute, seule façon d'atteindre le
+		// critère — aux rayons dérivés du côté, la couronne porte des
+		// centaines de rues et il ne se déclenche jamais.
+		q := p
+		q.CentreRadius = q.Size/2 - ZoneSize
+
+		b := &BoundedBoard{cote: q.Size, rues: make([]bool, q.Size*q.Size)}
+		milieu := q.Size / 2
+		for ligne := milieu - 7; ligne <= milieu+6; ligne++ {
+			for colonne := milieu - 7; colonne <= milieu+6; colonne++ {
+				b.rues[ligne*b.cote+colonne] = true
+			}
+		}
+
+		err := b.validate(q)
+		if err == nil {
+			t.Fatal("un plateau sans rue hors du noyau est accepté")
+		}
+		// Le message autant que le rejet : ce plateau tient ses autres
+		// critères, et un échec sur le taux de rues ferait croire que celui-ci
+		// mord alors qu'il n'aurait pas été atteint.
+		if !strings.Contains(err.Error(), "hors du noyau") {
+			t.Errorf("rejeté pour %q, attendu le critère des rues hors du noyau", err)
+		}
+	})
+
 	t.Run("rue isolée", func(t *testing.T) {
 		b, _, err := Generate(3, p)
 		if err != nil {
@@ -377,8 +403,8 @@ func TestGeneratedBoardStartsAGame(t *testing.T) {
 				if !b.IsStreet(depart) {
 					t.Fatalf("graine %d : le fugitif part d'un bâtiment en %v", graine, depart)
 				}
-				if abs(depart.Column-milieu) > CentreRadius ||
-					abs(depart.Row-milieu) > CentreRadius {
+				if abs(depart.Column-milieu) > pre.Settings.CentreRadius ||
+					abs(depart.Row-milieu) > pre.Settings.CentreRadius {
 					t.Fatalf("graine %d : départ en %v, hors du noyau central autour de (%d, %d)",
 						graine, depart, milieu, milieu)
 				}

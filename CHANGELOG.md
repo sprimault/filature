@@ -30,6 +30,13 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le noyau de départ suit la taille du plateau, et les inspecteurs ne s'y
+placent plus.** Son rayon valait cinq quelle que soit la ville, pendant que la
+portée de vue, elle, suivait le côté : cinq pions posés autour du centre y
+voyaient le fugitif dès le premier tour dans la quasi-totalité des parties, et
+d'autant mieux que le plateau était grand. `Settings` porte donc un
+`centre_radius`, que les bots reçoivent dans `bonjour`.
+
 **Les plugins d'apparence se chargent et se valident.** Un plugin déclare ce
 qu'il remplace, le reste retombe sur le contenu livré. Une forme qui déborde de
 son gabarit, un polygone hors de ses trois à trente-deux sommets, une couleur
@@ -61,6 +68,13 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The starting core follows the board size, and inspectors can no longer be
+placed inside it.** Its radius was five whatever the city, while sight range
+followed the board's side: five pieces set around the centre spotted the
+fugitive on the very first turn in nearly every game, and all the more easily
+on a large board. `Settings` therefore carries a `centre_radius`, which bots
+receive in `bonjour`.
 
 **Appearance plugins now load and validate.** A plugin declares what it
 replaces; everything else falls back on shipped content. A shape overflowing its

@@ -25,8 +25,8 @@ type Preset struct {
 // lancement à l'autre serait déroutant.
 func Presets() []Preset {
 	return []Preset{
-		{Key: "quartier", Settings: settingsForSize(21)},
-		{Key: "faubourg", Settings: settingsForSize(31)},
+		{Key: "quartier", Settings: SettingsForSize(21)},
+		{Key: "faubourg", Settings: SettingsForSize(31)},
 		{Key: "ville", Settings: DefaultSettings()},
 	}
 }
@@ -41,17 +41,27 @@ func PresetByKey(cle string) (Preset, bool) {
 	return Preset{}, false
 }
 
-// settingsForSize dérive un jeu de paramètres d'une taille de plateau.
+// SettingsForSize dérive un jeu de paramètres d'une taille de plateau.
 //
-// Seuls la portée, la durée et le début de l'étranglement en dépendent. Le
-// reste — résistance, inspecteurs, zones, quota — ne tient pas à la taille du
-// terrain mais à l'équilibre entre les deux camps, et ne bougera qu'à l'étape
-// d'équilibrage.
-func settingsForSize(cote int) Settings {
+// Seuls la portée, la durée, le rayon du noyau et le début de l'étranglement en
+// dépendent. Le reste — résistance, inspecteurs, zones, quota — ne tient pas à
+// la taille du terrain mais à l'équilibre entre les deux camps, et ne bougera
+// qu'à l'étape d'équilibrage.
+//
+// Exportée parce que partir de DefaultSettings et n'y changer que le côté donne
+// un réglage incohérent : quatre valeurs suivent la taille, et les oublier
+// produit un rayon de noyau plus grand que le plateau ou une portée qui voit
+// d'un bord à l'autre.
+func SettingsForSize(cote int) Settings {
 	p := DefaultSettings()
 	p.Size = cote
 	p.Range = max(MinRange, cote/5)
 	p.Turns = cote
+
+	// Le noyau suit le côté, sans quoi la portée de vue le rattrape : à rayon
+	// fixe, cinq inspecteurs voient d'autant mieux le départ que la ville est
+	// grande, ce qui est l'inverse de ce qu'on attend d'elle.
+	p.CentreRadius = cote / 4
 
 	// L'étranglement commence aux trois quarts de la partie, comme au tour 30
 	// sur quarante. Plus tôt, il décide de l'issue ; plus tard, il n'a pas le
