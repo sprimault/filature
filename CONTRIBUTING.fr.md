@@ -19,7 +19,7 @@ une discussion de conception, pas un correctif.
   l'aléatoire vient du générateur alimenté par la graine de la partie. Un
   changement qui fait diverger un rejeu de son journal est un défaut même si
   tous les tests passent.
-- Rien dans `internal/noyau` ni `internal/ia` n'importe le rendu. Les runners
+- Rien dans `internal/core` ni `internal/ai` n'importe le rendu. Les runners
   sont sans écran ; un test qui exige une fenêtre n'a pas sa place dans la suite
   par défaut.
 
@@ -34,9 +34,9 @@ tout ce qui suit.
 Les contributions en anglais sont bienvenues et ne sont pas soumises à la règle
 bilingue.
 
-## Greffons
+## Plugins
 
-Les greffons vivent dans leurs propres dépôts. Le catalogue les indexe, il
+Les plugins vivent dans leurs propres dépôts. Le catalogue les indexe, il
 n'héberge aucun exécutable, et il n'accepte **aucun fichier binaire, sous aucune
 extension**. C'est une règle mécanique et non un jugement : elle supprime toute
 question de provenance.

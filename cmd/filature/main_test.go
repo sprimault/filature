@@ -6,16 +6,17 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
-// ailleurs est un dossier de greffons actifs qui n'entre en conflit avec aucune
+// ailleurs est un dossier de plugins actifs qui n'entre en conflit avec aucune
 // destination d'essai.
 const ailleurs = "/un/dossier/qui/n/est/pas/la/destination"
 
-// TestExtraireEcritLesGreffonsLivres vérifie que la commande rend le contenu
+// TestExtraireEcritLesPluginsLivres vérifie que la commande rend le contenu
 // embarqué recopiable.
-func TestExtraireEcritLesGreffonsLivres(t *testing.T) {
+func TestExtraireEcritLesPluginsLivres(t *testing.T) {
 	dossier := t.TempDir()
 	if err := extraire(dossier, ailleurs); err != nil {
 		t.Fatalf("extraction refusée : %v", err)
@@ -70,14 +71,14 @@ func TestExtraireSansDossier(t *testing.T) {
 // TestExtraireRefuseLeDossierActif ferme le piège que la commande tendait.
 //
 // Extraire le contenu livré là où le jeu charge le déclarerait deux fois : une
-// fois depuis le binaire, une fois depuis le disque. Deux greffons qui
+// fois depuis le binaire, une fois depuis le disque. Deux plugins qui
 // définissent la même clé sont un conflit, donc suivre l'invitation cassait le
 // chargement.
 func TestExtraireRefuseLeDossierActif(t *testing.T) {
 	actif := t.TempDir()
 
 	if err := extraire(actif, actif); err == nil {
-		t.Fatal("extraction acceptée dans le dossier des greffons actifs")
+		t.Fatal("extraction acceptée dans le dossier des plugins actifs")
 	}
 
 	// Le refus doit venir avant toute écriture : un dossier à moitié rempli
@@ -92,9 +93,9 @@ func TestExtraireRefuseLeDossierActif(t *testing.T) {
 }
 
 // TestExtraireRefuseMemeAvecUneCasseDifferente vérifie que le refus tient sous
-// Windows, où « Greffons » et « greffons » désignent le même dossier.
+// Windows, où « Plugins » et « plugins » désignent le même dossier.
 func TestExtraireRefuseMemeAvecUneCasseDifferente(t *testing.T) {
-	actif := filepath.Join(t.TempDir(), "greffons")
+	actif := filepath.Join(t.TempDir(), "plugins")
 	if err := os.MkdirAll(actif, 0o750); err != nil {
 		t.Fatal(err)
 	}
@@ -105,19 +106,19 @@ func TestExtraireRefuseMemeAvecUneCasseDifferente(t *testing.T) {
 	}
 }
 
-// TestGreffonsParDefautSuitLExecutable vérifie que le dossier ne dépend pas du
+// TestPluginsParDefautSuitLExecutable vérifie que le dossier ne dépend pas du
 // répertoire courant.
 //
-// Sans cela, un raccourci sur le bureau ferait chercher les greffons ailleurs,
+// Sans cela, un raccourci sur le bureau ferait chercher les plugins ailleurs,
 // et ceux qui sont installés seraient ignorés sans un mot.
-func TestGreffonsParDefautSuitLExecutable(t *testing.T) {
-	defaut := greffonsParDefaut()
+func TestPluginsParDefautSuitLExecutable(t *testing.T) {
+	defaut := pluginsParDefaut()
 
 	if !filepath.IsAbs(defaut) {
 		t.Fatalf("%s n'est pas absolu : il dépendrait du répertoire courant", defaut)
 	}
-	if filepath.Base(defaut) != "greffons" {
-		t.Errorf("dossier %s, attendu un chemin finissant par greffons", defaut)
+	if filepath.Base(defaut) != "plugins" {
+		t.Errorf("dossier %s, attendu un chemin finissant par plugins", defaut)
 	}
 
 	exe, err := os.Executable()
@@ -127,7 +128,53 @@ func TestGreffonsParDefautSuitLExecutable(t *testing.T) {
 	if resolu, err := filepath.EvalSymlinks(exe); err == nil {
 		exe = resolu
 	}
-	if attendu := filepath.Join(filepath.Dir(exe), "greffons"); defaut != attendu {
+	if attendu := filepath.Join(filepath.Dir(exe), "plugins"); defaut != attendu {
 		t.Errorf("dossier %s, attendu %s", defaut, attendu)
+	}
+}
+
+// TestCommandeRefuseUnMotInconnu vérifie qu'un mot qui n'est pas une commande
+// ne lance pas de partie.
+//
+// Le cas n'est pas théorique : « exemples » et « valide » ont existé sous ces
+// noms jusqu'à ce lot. Sans ce refus, quelqu'un qui garde l'ancien réflexe
+// lancerait une partie en croyant valider un plugin.
+func TestCommandeRefuseUnMotInconnu(t *testing.T) {
+	for _, nom := range []string{"exemples", "valide", "n'importe quoi"} {
+		t.Run(nom, func(t *testing.T) {
+			traitee, err := commande(&strings.Builder{}, nom, "", t.TempDir())
+
+			if !traitee {
+				t.Error("le mot est passé à la boucle de jeu au lieu d'être refusé")
+			}
+			if err == nil {
+				t.Fatal("accepté sans rien dire")
+			}
+			if !strings.Contains(err.Error(), "commande inconnue") {
+				t.Errorf("message %q, attendu qu'il dise la commande inconnue", err)
+			}
+		})
+	}
+}
+
+// TestCommandeVideLaisseJouer vérifie que le double-clic ordinaire passe.
+func TestCommandeVideLaisseJouer(t *testing.T) {
+	traitee, err := commande(&strings.Builder{}, "", "", t.TempDir())
+	if err != nil {
+		t.Fatalf("sans argument : %v", err)
+	}
+	if traitee {
+		t.Error("aucune sous-commande ne devrait avoir répondu")
+	}
+}
+
+// TestCommandeVersion vérifie que le numéro sort sur la sortie qu'on lui donne.
+func TestCommandeVersion(t *testing.T) {
+	var sortie strings.Builder
+	if _, err := commande(&sortie, "version", "", t.TempDir()); err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(sortie.String(), version) {
+		t.Errorf("sortie %q, attendu qu'elle porte %q", sortie.String(), version)
 	}
 }

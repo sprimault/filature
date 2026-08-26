@@ -40,8 +40,8 @@ and a window opened from the file explorer closes before anything can be read.
 
 ```
 filature version              the installed version number
-filature exemples <folder>    writes the shipped plugins, as templates
-filature valide <folder>      checks a plugin and prints its fingerprint
+filature examples <folder>    writes the shipped plugins, as templates
+filature validate <folder>      checks a plugin and prints its fingerprint
 ```
 
 `valide` runs exactly the checks the loader runs, and lists everything wrong at
@@ -52,9 +52,9 @@ you give it to.
 writes out is already inside the binary, and putting it back there would declare
 it twice. These are templates to copy under another name.
 
-The game looks for plugins in a `greffons` folder **next to the executable**,
+The game looks for plugins in a `plugins` folder **next to the executable**,
 not in the current directory — so a shortcut behaves like a direct launch. Use
-`--greffons` to point elsewhere.
+`--plugins` to point elsewhere.
 
 ## Extending
 
@@ -84,7 +84,7 @@ Outside the catalogue, nothing is restricted. Your machine, your rules.
 - [`docs/architecture.md`](docs/architecture.md) — the core, the filtered view,
   determinism
 - [`docs/regles.md`](docs/regles.md) — the full rules and their numbers
-- [`docs/greffons.md`](docs/greffons.md) — a plugin's format, file by file and
+- [`docs/plugins.md`](docs/plugins.md) — a plugin's format, file by file and
   field by field (French)
 - [`docs/vocabulaire-effets.md`](docs/vocabulaire-effets.md) — the primitives
   abilities, costs and game modes are composed from (French)

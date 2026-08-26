@@ -2,7 +2,7 @@
 
 Version du vocabulaire : **1**
 
-Un greffon qui déclare une capacité, une dépense ou un mode porte
+Un plugin qui déclare une capacité, une dépense ou un mode porte
 `version_effets` dans son manifeste. C'est le quatrième numéro de contrat du
 projet, indépendant des trois autres : le vocabulaire peut changer sans que le
 contrat de formes ni celui des bots bougent, et l'inverse est vrai aussi.
@@ -13,7 +13,7 @@ projet : il rend le modding accessible sans bac à sable, sans faille, sans
 problème de compatibilité de version.
 
 Les capacités et dépenses livrées avec le jeu sont écrites dans ce format, au
-même titre qu'un greffon tiers. C'est le test qui prouve que le vocabulaire
+même titre qu'un plugin tiers. C'est le test qui prouve que le vocabulaire
 suffit : **si une mécanique du jeu de base ne s'y exprime pas, il manque une
 primitive** — et c'est une décision de contrat public, pas un cas particulier à
 coder dans le noyau.
@@ -22,7 +22,7 @@ coder dans le noyau.
 
 ## 1. Trois règles qui gouvernent tout
 
-**Un greffon ne touche jamais `*Partie`.** Il produit des `Effet`, le noyau les
+**Un plugin ne touche jamais `*Partie`.** Il produit des `Effet`, le noyau les
 applique. C'est ce qui l'empêche de lire la position cachée du fugitif ou sa
 zone scellée, et ce qui garde `Annuler` praticable.
 
@@ -31,7 +31,7 @@ effet qui ne sait pas se défaire n'entre pas dans le vocabulaire : sans ça,
 l'IA ne peut plus explorer des milliers de positions sans copier l'état, et le
 rejeu du journal diverge.
 
-**Tout effet est déterministe.** L'aléatoire disponible est `noyau.Alea`,
+**Tout effet est déterministe.** L'aléatoire disponible est `core.Alea`,
 alimenté par la graine de la partie. Ni horloge, ni entropie système, ni
 parcours de `map` — dont l'ordre n'est pas stable en Go.
 
@@ -40,7 +40,7 @@ parcours de `map` — dont l'ordre n'est pas stable en Go.
 ## 2. Les primitives
 
 Ajouter une primitive est une décision lourde : elle entre dans le contrat
-public et ne peut plus en sortir sans casser les greffons existants. Avant d'en
+public et ne peut plus en sortir sans casser les plugins existants. Avant d'en
 ajouter une, vérifier que la composition des existantes ne suffit pas.
 
 ### Déplacement et position
@@ -82,7 +82,7 @@ dont toute mécanique de repérage a besoin.
 
 `sceller_zone` écrit la zone scellée sans permettre de la lire. C'est la seule
 façon d'exprimer le changement de zone, que la règle facture 2 points, et un
-greffon qui l'emploie ne gagne aucun accès à l'information la plus sensible du
+plugin qui l'emploie ne gagne aucun accès à l'information la plus sensible du
 jeu.
 
 Un barrage bloque la vue comme un bâtiment. Sans ça, la capacité ne serait
@@ -247,12 +247,12 @@ décroissant. Ne touche ni aux règles ni aux paramètres. Persisté dans
 résistance initiale, nombre de zones. Ce sont les `Parametres`, exposés dans
 l'interface, enregistrés avec la partie.
 
-**Axe 3 — les règles.** Un greffon qui ajoute une capacité, change un coût,
+**Axe 3 — les règles.** Un plugin qui ajoute une capacité, change un coût,
 introduit un plateau mouvant. C'est là que `regles = true` s'applique, et donc
 la poignée de main réseau.
 
 Un préréglage de difficulté nomme une combinaison des trois. Le manifeste des
-greffons actifs partant en base avec la partie, les statistiques se segmentent
+plugins actifs partant en base avec la partie, les statistiques se segmentent
 par empreinte : deux parties jouées sous des règles différentes ne se comparent
 jamais par accident.
 
@@ -266,12 +266,12 @@ de meurtre n'est pas un effet : ils sont libres de l'ignorer, et c'est ce qui
 fait du meurtre un pari plutôt qu'un automatisme.
 
 **Rien qui lise l'état caché.** Pas de primitive « connaître la zone scellée ».
-Un greffon qui en aurait besoin demanderait en fait un autre jeu.
+Un plugin qui en aurait besoin demanderait en fait un autre jeu.
 
 **Rien de conditionnel.** Pas de `si`, pas de boucle. Le vocabulaire est
 délibérément non calculable : une condition arbitraire ferait d'un manifeste un
 programme, ce qui ramènerait tous les problèmes que le format déclaratif évite.
-Un greffon qui a besoin de logique passe par WebAssembly.
+Un plugin qui a besoin de logique passe par WebAssembly.
 
 **Aucune primitive de rendu.** L'apparence relève du contrat de formes, qui est
 un contrat distinct avec sa propre version.
@@ -280,7 +280,7 @@ un contrat distinct avec sa propre version.
 
 ## 9. Validation
 
-Contrôles appliqués au chargement, greffon local compris :
+Contrôles appliqués au chargement, plugin local compris :
 
 - type de primitive connu, `version_effets` prise en charge ;
 - `duree` d'un `differer` supérieure à zéro, et `annonce` comme `puis` refusés

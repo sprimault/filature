@@ -4,13 +4,14 @@
 
 ```
 cmd/filature/     drapeaux, injection des dépendances
-internal/noyau/   règles pures — aucune dépendance UI, réseau ni disque
-internal/ia/      croyance bayésienne, IA embarquée, pilotage des bots
-internal/rendu/   projection isométrique, contrat de formes
-internal/stockage/ SQLite : journal, instantanés, poids d'IA
-internal/serveur/ WebSocket, hébergement et jonction
-internal/greffons/ chargement des manifestes, bac à sable WebAssembly
-greffons/         le contenu livré, embarqué dans le binaire par go:embed
+internal/core/    règles pures — aucune dépendance UI, réseau ni disque
+internal/ai/      croyance bayésienne, IA embarquée, pilotage des bots
+internal/render/  projection isométrique, contrat de formes
+internal/storage/ SQLite : journal, instantanés, poids d'IA
+internal/server/  WebSocket, hébergement et jonction
+internal/loader/  chargement des manifestes, bac à sable WebAssembly
+internal/text/    rendu d'une vue en caractères, saisie d'un coup
+plugins/          le contenu livré, embarqué dans le binaire par go:embed
 schemas/          les contrats publics, versionnés à part
 ```
 
@@ -35,7 +36,7 @@ c'est la même projection, appliquée au même endroit.
 ### Le déterminisme
 
 Graine explicite portée par l'état, jamais de générateur global, IA comprise.
-`noyau.Alea` est le seul générateur autorisé, y compris pour les greffons.
+`core.Alea` est le seul générateur autorisé, y compris pour les plugins.
 
 C'est ce qui rend possible le rejeu depuis le journal, la reproduction d'un
 défaut, et la comparaison de deux versions d'IA sur les mêmes plateaux.
@@ -45,14 +46,14 @@ influence une décision passe par une tranche triée.
 
 ### La réversibilité
 
-`Appliquer` a son `Annuler`, effets de greffons compris. Ce n'est pas un confort
+`Appliquer` a son `Annuler`, effets de plugins compris. Ce n'est pas un confort
 d'interface : c'est ce qui permet à l'IA d'explorer des milliers de positions
 sans copier l'état à chaque nœud.
 
 ### Aucune coordonnée d'écran dans l'état
 
 L'état ne connaît que colonne et ligne. La conversion isométrique vit dans
-`internal/rendu`, et nulle part ailleurs.
+`internal/render`, et nulle part ailleurs.
 
 ## Le journal est la source de vérité
 
@@ -77,9 +78,9 @@ exprime pas, il manque une primitive, ce qui est une décision de contrat public
 
 La référence complète du vocabulaire est
 [`vocabulaire-effets.md`](vocabulaire-effets.md), et le format des fichiers qui
-le portent est dans [`greffons.md`](greffons.md).
+le portent est dans [`plugins.md`](plugins.md).
 
-Un greffon ne touche jamais `*Partie`. Il produit des `Effet` ou des `Coup`, le
+Un plugin ne touche jamais `*Partie`. Il produit des `Effet` ou des `Coup`, le
 noyau les applique. C'est ce qui fait qu'il ne peut pas lire la zone scellée du
 fugitif, et que `Annuler` reste praticable.
 
