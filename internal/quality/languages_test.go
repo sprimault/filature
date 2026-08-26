@@ -14,7 +14,7 @@ import (
 
 // dictionnaire est la forme d'un langue.toml.
 type dictionnaire struct {
-	Libelle map[string]string `toml:"libelle"`
+	Libelle map[string]string `toml:"label"`
 }
 
 // langueDeBase est le plugin qui porte le français, langue de repli.
@@ -42,7 +42,7 @@ func TestShippedLanguagesCoverKeys(t *testing.T) {
 		if !d.IsDir() || d.Name() == langueDeBase {
 			continue
 		}
-		chemin := filepath.Join(racine, "plugins", d.Name(), "langue.toml")
+		chemin := filepath.Join(racine, "plugins", d.Name(), "language.toml")
 		if _, err := os.Stat(chemin); err != nil {
 			continue
 		}
@@ -63,7 +63,7 @@ func TestShippedLanguagesCoverKeys(t *testing.T) {
 func lireDictionnaire(t *testing.T, plugin string) map[string]string {
 	t.Helper()
 	var d dictionnaire
-	if _, err := toml.DecodeFile(filepath.Join(racine, "plugins", plugin, "langue.toml"), &d); err != nil {
+	if _, err := toml.DecodeFile(filepath.Join(racine, "plugins", plugin, "language.toml"), &d); err != nil {
 		t.Fatalf("lecture de %s : %v", plugin, err)
 	}
 	return d.Libelle

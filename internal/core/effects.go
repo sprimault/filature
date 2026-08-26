@@ -22,25 +22,25 @@ type EffectType string
 // EffectTeleport ne sert à aucune capacité de base — la téléportation a été
 // retirée des règles — et reste offert aux plugins qui voudraient la rétablir.
 const (
-	EffectMove           EffectType = "deplacer"
-	EffectChangeRange    EffectType = "modifier_portee"
-	EffectChangeMobility EffectType = "modifier_mobilite"
-	EffectBlockCell      EffectType = "bloquer_case"
-	EffectOpenCell       EffectType = "ouvrir_case"
-	EffectRevealTrails   EffectType = "reveler_traces"
-	EffectRevealPosition EffectType = "reveler_position"
-	EffectMarkCrimeScene EffectType = "marquer_scene"
-	EffectCancelReveal   EffectType = "annuler_revelation"
-	EffectShareView      EffectType = "partager_vue"
-	EffectCostStamina    EffectType = "couter_resistance"
-	EffectRestoreStamina EffectType = "rendre_resistance"
-	EffectWipeTrails     EffectType = "effacer_traces"
-	EffectCloseZone      EffectType = "fermer_zone"
-	EffectOpenZone       EffectType = "ouvrir_zone"
-	EffectSealZone       EffectType = "sceller_zone"
-	EffectTeleport       EffectType = "teleporter"
-	EffectDefer          EffectType = "differer"
-	EffectEndGame        EffectType = "fin_partie"
+	EffectMove           EffectType = "step"
+	EffectChangeRange    EffectType = "change_range"
+	EffectChangeMobility EffectType = "change_mobility"
+	EffectBlockCell      EffectType = "block_cell"
+	EffectOpenCell       EffectType = "open_cell"
+	EffectRevealTrails   EffectType = "reveal_trails"
+	EffectRevealPosition EffectType = "reveal_position"
+	EffectMarkCrimeScene EffectType = "mark_crime_scene"
+	EffectCancelReveal   EffectType = "cancel_reveal"
+	EffectShareView      EffectType = "share_view"
+	EffectCostStamina    EffectType = "cost_stamina"
+	EffectRestoreStamina EffectType = "restore_stamina"
+	EffectEraseTrails    EffectType = "erase_trails"
+	EffectCloseZone      EffectType = "close_zone"
+	EffectOpenZone       EffectType = "open_zone"
+	EffectSealZone       EffectType = "seal_zone"
+	EffectTeleport       EffectType = "teleport"
+	EffectDefer          EffectType = "defer"
+	EffectEndGame        EffectType = "end_game"
 )
 
 // EffectTypes énumère le vocabulaire, dans l'ordre de sa déclaration.
@@ -56,7 +56,7 @@ func EffectTypes() []EffectType {
 		EffectBlockCell, EffectOpenCell, EffectRevealTrails,
 		EffectRevealPosition, EffectMarkCrimeScene, EffectCancelReveal,
 		EffectShareView, EffectCostStamina, EffectRestoreStamina,
-		EffectWipeTrails, EffectCloseZone, EffectOpenZone,
+		EffectEraseTrails, EffectCloseZone, EffectOpenZone,
 		EffectSealZone, EffectTeleport, EffectDefer, EffectEndGame,
 	}
 }
@@ -77,11 +77,11 @@ type Target string
 // TargetCurrentPiece est le cas ordinaire ; les autres valeurs supposent que le
 // contexte porte le pion, la case ou la zone visée.
 const (
-	TargetCurrentPiece Target = "pion_courant"
-	TargetAllPieces    Target = "tous_pions"
-	TargetOtherPiece   Target = "autre_pion"
-	TargetFugitive     Target = "fugitif"
-	TargetCell         Target = "case"
+	TargetCurrentPiece Target = "current_piece"
+	TargetAllPieces    Target = "all_pieces"
+	TargetOtherPiece   Target = "other_piece"
+	TargetFugitive     Target = "fugitive"
+	TargetCell         Target = "cell"
 	TargetZone         Target = "zone"
 )
 
@@ -109,10 +109,10 @@ func TargetKnown(c Target) bool {
 // à une hiérarchie de types.
 type Effect struct {
 	Type     EffectType `toml:"type" json:"type"`
-	Target   Target     `toml:"cible" json:"cible,omitempty"`
-	Value    int        `toml:"valeur" json:"valeur,omitempty"`
-	Duration int        `toml:"duree" json:"duree,omitempty"`
-	Radius   int        `toml:"rayon" json:"rayon,omitempty"`
+	Target   Target     `toml:"target" json:"target,omitempty"`
+	Value    int        `toml:"value" json:"value,omitempty"`
+	Duration int        `toml:"duration" json:"duration,omitempty"`
+	Radius   int        `toml:"radius" json:"radius,omitempty"`
 
 	// Announced et Then n'ont de sens que pour EffectDefer.
 	//
@@ -123,8 +123,8 @@ type Effect struct {
 	// Un differer imbriqué dans un differer est refusé au chargement : deux
 	// durées s'additionnent, donc ça n'ajoute rien, et ça permettrait des
 	// chaînes qu'aucune annulation ne saurait dérouler.
-	Announced bool     `toml:"annonce" json:"annonce,omitempty"`
-	Then      []Effect `toml:"puis" json:"puis,omitempty"`
+	Announced bool     `toml:"announced" json:"announced,omitempty"`
+	Then      []Effect `toml:"then" json:"then,omitempty"`
 }
 
 // PendingEffect est une entrée de la file des effets différés.
@@ -133,10 +133,10 @@ type Effect struct {
 // la mise en file, pas l'effet : annuler le tour où le differer a été posé le
 // retire de la file.
 type PendingEffect struct {
-	Effets        []Effect      `json:"effets"`
-	Turn          int           `json:"tour"`
-	Announced     bool          `json:"annonce"`
-	EffectContext EffectContext `json:"contexte"`
+	Effets        []Effect      `json:"effects"`
+	Turn          int           `json:"turn"`
+	Announced     bool          `json:"announced"`
+	EffectContext EffectContext `json:"context"`
 }
 
 // ActiveEffect est un effet qui dure, avec le tour où il cesse.
@@ -146,12 +146,12 @@ type PendingEffect struct {
 // l'a produit ; le figer dans Inspector en ferait un cache que rien ne
 // réconcilie, et fermerait la porte aux capacités qu'un plugin invente.
 type ActiveEffect struct {
-	Effect        Effect        `json:"effet"`
-	EffectContext EffectContext `json:"contexte"`
+	Effect        Effect        `json:"effect"`
+	EffectContext EffectContext `json:"context"`
 
 	// Echeance est le dernier tour où l'effet vaut. Zéro pour un effet
 	// permanent — la capacité passive du Traqueur en est une.
-	Echeance int `json:"echeance"`
+	Echeance int `json:"due_turn"`
 }
 
 // AppliesAt dit si l'effet court encore au tour donné.
@@ -176,9 +176,9 @@ func (a ActiveEffect) Aims(pion int) bool {
 // à la Game entière : un plugin ne doit pas pouvoir lire la zone scellée du
 // fugitif ni écrire dans le journal.
 type EffectContext struct {
-	Side  Side     `json:"acteur"`
-	Piece int      `json:"pion"`
-	Case  Position `json:"case"`
+	Side  Side     `json:"side"`
+	Piece int      `json:"piece"`
+	Case  Position `json:"cell"`
 	Zone  int      `json:"zone"`
 
 	// AutrePion est le second pion d'un effet qui en relie deux. Le Chef, qui
@@ -238,7 +238,7 @@ func (p *Game) ApplyOneEffect(e Effect, ctx EffectContext) (annulation func(), e
 	case EffectRestoreStamina:
 		return p.adjustStamina(e.Value), nil
 
-	case EffectWipeTrails:
+	case EffectEraseTrails:
 		return p.wipeTrails(e.Duration), nil
 
 	case EffectCloseZone:

@@ -13,8 +13,8 @@ import (
 
 // manifesteLivre est ce que plugins/base déclare, dans les types du noyau.
 type manifesteLivre struct {
-	Ability map[string]core.Ability `toml:"capacite"`
-	Expense map[string]core.Ability `toml:"depense"`
+	Ability map[string]core.Ability `toml:"ability"`
+	Expense map[string]core.Ability `toml:"expense"`
 	Mode    map[string]core.Mode    `toml:"mode"`
 }
 
@@ -72,7 +72,7 @@ func (b plateauPlat) CellsWithin(centre core.Position, rayon int) []core.Positio
 // C'est la validation au chargement, à l'étape 8, qui couvrira celles-là.
 func TestShippedEffectsApply(t *testing.T) {
 	var livre manifesteLivre
-	chemin := filepath.Join(racine, "plugins", "base", "manifeste.toml")
+	chemin := filepath.Join(racine, "plugins", "base", "manifest.toml")
 	if _, err := toml.DecodeFile(chemin, &livre); err != nil {
 		t.Fatalf("lecture du manifeste : %v", err)
 	}

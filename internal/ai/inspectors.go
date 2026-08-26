@@ -17,12 +17,12 @@ import (
 // gagnants conservés. Léger, explicable, et suffisant pour un jeu à quelques
 // milliers de cases — inutile d'embarquer un réseau de neurones.
 type Poids struct {
-	Couverture   float64 `json:"couverture"`
+	Couverture   float64 `json:"coverage"`
 	Interception float64 `json:"interception"`
-	Dispersion   float64 `json:"dispersion"`
-	GardeZones   float64 `json:"garde_zones"`
-	Centroid     float64 `json:"barycentre"`
-	Bruit        float64 `json:"bruit"`
+	Dispersion   float64 `json:"spread"`
+	GardeZones   float64 `json:"zone_guard"`
+	Centroid     float64 `json:"centroid"`
+	Bruit        float64 `json:"noise"`
 }
 
 // Inspectors est l'IA embarquée du camp des poursuivants.

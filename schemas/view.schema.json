@@ -1,7 +1,7 @@
 {
   "$comment": "Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>. SPDX-License-Identifier: Apache-2.0",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/sprimault/filature/schemas/vue.schema.json",
+  "$id": "https://github.com/sprimault/filature/schemas/view.schema.json",
   "title": "Vue Filature",
   "description": "Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis core.View : ne pas modifier a la main.",
   "$ref": "#/$defs/View",
@@ -12,40 +12,40 @@
         "position": {
           "$ref": "#/$defs/Position"
         },
-        "tour": {
+        "turn": {
           "type": "integer"
         }
       },
       "required": [
         "position",
-        "tour"
+        "turn"
       ]
     },
     "Effect": {
       "type": "object",
       "properties": {
-        "annonce": {
+        "announced": {
           "type": "boolean"
         },
-        "cible": {
-          "type": "string"
-        },
-        "duree": {
+        "duration": {
           "type": "integer"
         },
-        "puis": {
+        "radius": {
+          "type": "integer"
+        },
+        "target": {
+          "type": "string"
+        },
+        "then": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/Effect"
           }
         },
-        "rayon": {
-          "type": "integer"
-        },
         "type": {
           "type": "string"
         },
-        "valeur": {
+        "value": {
           "type": "integer"
         }
       },
@@ -56,75 +56,75 @@
     "EffectContext": {
       "type": "object",
       "properties": {
-        "acteur": {
-          "type": "string"
-        },
         "autre_pion": {
           "type": "integer"
         },
-        "case": {
+        "cell": {
           "$ref": "#/$defs/Position"
         },
-        "pion": {
+        "piece": {
           "type": "integer"
+        },
+        "side": {
+          "type": "string"
         },
         "zone": {
           "type": "integer"
         }
       },
       "required": [
-        "acteur",
         "autre_pion",
-        "case",
-        "pion",
+        "cell",
+        "piece",
+        "side",
         "zone"
       ]
     },
     "Inspector": {
       "type": "object",
       "properties": {
-        "capacite": {
+        "ability": {
           "type": "string"
         },
-        "capacite_utilisee": {
+        "ability_used": {
           "type": "boolean"
-        },
-        "deplacements_faits": {
-          "type": "integer"
         },
         "position": {
           "$ref": "#/$defs/Position"
+        },
+        "steps_taken": {
+          "type": "integer"
         }
       },
       "required": [
-        "capacite",
-        "capacite_utilisee",
-        "deplacements_faits",
-        "position"
+        "ability",
+        "ability_used",
+        "position",
+        "steps_taken"
       ]
     },
     "Move": {
       "type": "object",
       "properties": {
-        "acteur": {
+        "ability": {
           "type": "string"
         },
-        "arrivee": {
+        "expense": {
+          "type": "string"
+        },
+        "from": {
           "$ref": "#/$defs/Position"
         },
-        "capacite": {
-          "type": "string"
-        },
-        "depart": {
-          "$ref": "#/$defs/Position"
-        },
-        "depense": {
-          "type": "string"
-        },
-        "pion": {
+        "piece": {
           "type": "integer"
         },
-        "tour": {
+        "side": {
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/$defs/Position"
+        },
+        "turn": {
           "type": "integer"
         },
         "type": {
@@ -135,54 +135,54 @@
         }
       },
       "required": [
-        "acteur",
-        "tour",
+        "side",
+        "turn",
         "type"
       ]
     },
     "Outcome": {
       "type": "object",
       "properties": {
-        "motif": {
+        "reason": {
           "type": "string"
         },
-        "tour": {
+        "turn": {
           "type": "integer"
         },
-        "vainqueur": {
+        "winner": {
           "type": "string"
         }
       },
       "required": [
-        "motif",
-        "tour",
-        "vainqueur"
+        "reason",
+        "turn",
+        "winner"
       ]
     },
     "PendingEffect": {
       "type": "object",
       "properties": {
-        "annonce": {
+        "announced": {
           "type": "boolean"
         },
-        "contexte": {
+        "context": {
           "$ref": "#/$defs/EffectContext"
         },
-        "effets": {
+        "effects": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/Effect"
           }
         },
-        "tour": {
+        "turn": {
           "type": "integer"
         }
       },
       "required": [
-        "annonce",
-        "contexte",
-        "effets",
-        "tour"
+        "announced",
+        "context",
+        "effects",
+        "turn"
       ]
     },
     "Position": {
@@ -203,34 +203,34 @@
     "Settings": {
       "type": "object",
       "properties": {
-        "cote": {
+        "inspectors": {
           "type": "integer"
         },
-        "debut_etranglement": {
+        "pieces_per_turn": {
           "type": "integer"
         },
-        "duree_trace": {
+        "range": {
           "type": "integer"
         },
-        "inspecteurs": {
+        "reveal_period": {
           "type": "integer"
         },
-        "periode_etranglement": {
+        "size": {
           "type": "integer"
         },
-        "periode_revelation": {
+        "stamina": {
           "type": "integer"
         },
-        "pions_par_tour": {
+        "strangling_period": {
           "type": "integer"
         },
-        "portee": {
+        "strangling_start": {
           "type": "integer"
         },
-        "resistance": {
+        "trail_lifetime": {
           "type": "integer"
         },
-        "tours": {
+        "turns": {
           "type": "integer"
         },
         "zones": {
@@ -238,16 +238,16 @@
         }
       },
       "required": [
-        "cote",
-        "debut_etranglement",
-        "duree_trace",
-        "inspecteurs",
-        "periode_etranglement",
-        "periode_revelation",
-        "pions_par_tour",
-        "portee",
-        "resistance",
-        "tours",
+        "inspectors",
+        "pieces_per_turn",
+        "range",
+        "reveal_period",
+        "size",
+        "stamina",
+        "strangling_period",
+        "strangling_start",
+        "trail_lifetime",
+        "turns",
         "zones"
       ]
     },
@@ -257,126 +257,126 @@
         "direction": {
           "type": "integer"
         },
-        "tour": {
+        "turn": {
           "type": "integer"
         }
       },
       "required": [
         "direction",
-        "tour"
+        "turn"
       ]
     },
     "View": {
       "type": "object",
       "properties": {
-        "acteur": {
-          "type": "string"
-        },
-        "barrages": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Position"
-          }
-        },
-        "cases_visibles": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Position"
-          }
-        },
-        "coups_legaux": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Move"
-          }
-        },
-        "effets_annonces": {
+        "announced_effects": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/PendingEffect"
           }
         },
-        "inspecteurs": {
+        "announced_zones": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/Inspector"
+            "type": "integer"
           }
         },
-        "parametres": {
-          "$ref": "#/$defs/Settings"
-        },
-        "phase": {
-          "type": "string"
-        },
-        "position_fugitif": {
-          "$ref": "#/$defs/Position"
-        },
-        "prochaine_revelation": {
-          "type": "integer"
-        },
-        "resistance": {
-          "type": "integer"
-        },
-        "resultat": {
-          "$ref": "#/$defs/Outcome"
-        },
-        "rues": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Position"
-          }
-        },
-        "scenes": {
+        "crime_scenes": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/CrimeScene"
           }
         },
-        "silence_paye": {
-          "type": "boolean"
+        "fugitive_position": {
+          "$ref": "#/$defs/Position"
         },
-        "tour": {
-          "type": "integer"
+        "inspectors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Inspector"
+          }
         },
-        "traces_connues": {
+        "known_trails": {
           "type": "object",
           "additionalProperties": {
             "$ref": "#/$defs/Trail"
           }
         },
-        "zone_scellee": {
+        "legal_moves": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Move"
+          }
+        },
+        "next_reveal": {
           "type": "integer"
+        },
+        "outcome": {
+          "$ref": "#/$defs/Outcome"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "roadblocks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Position"
+          }
+        },
+        "sealed_zone": {
+          "type": "integer"
+        },
+        "settings": {
+          "$ref": "#/$defs/Settings"
+        },
+        "side": {
+          "type": "string"
+        },
+        "silence_paid": {
+          "type": "boolean"
+        },
+        "stamina": {
+          "type": "integer"
+        },
+        "streets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Position"
+          }
+        },
+        "turn": {
+          "type": "integer"
+        },
+        "visible_cells": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Position"
+          }
         },
         "zones": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/Zone"
           }
-        },
-        "zones_annoncees": {
-          "type": "array",
-          "items": {
-            "type": "integer"
-          }
         }
       },
       "required": [
-        "acteur",
-        "barrages",
-        "cases_visibles",
-        "coups_legaux",
-        "effets_annonces",
-        "inspecteurs",
-        "parametres",
+        "announced_effects",
+        "announced_zones",
+        "crime_scenes",
+        "inspectors",
+        "known_trails",
+        "legal_moves",
+        "next_reveal",
         "phase",
-        "prochaine_revelation",
-        "rues",
-        "scenes",
-        "silence_paye",
-        "tour",
-        "traces_connues",
-        "zones",
-        "zones_annoncees"
+        "roadblocks",
+        "settings",
+        "side",
+        "silence_paid",
+        "streets",
+        "turn",
+        "visible_cells",
+        "zones"
       ]
     },
     "Zone": {

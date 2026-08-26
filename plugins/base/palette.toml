@@ -4,31 +4,31 @@
 # Palette livrée. Les noms de CouleursObligatoires doivent tous y figurer : une
 # forme tierce s'appuie dessus sans savoir quelle palette sera active.
 
-version_formes = 1
+shapes_version = 2
 
 [palette]
 
 # Le sol. Ces trois noms n'ont pas d'autre existence : rue et zones ne sont pas
 # des formes, ce sont les seules prises qu'un plugin a sur le losange.
-rue = "#d8d2c4"
-zone_ouverte = "#7fa86b"
-zone_fermee = "#6b4a4a"
+street = "#d8d2c4"
+zone_open = "#7fa86b"
+zone_closed = "#6b4a4a"
 
 # Le bâti, nettement plus sombre que la rue : c'est le contraste sol / obstacle
 # qui porte la lecture du plateau, avant toute autre distinction.
-batiment = "#3a3f4a"
+building = "#3a3f4a"
 
 # Les pions. Chaud contre froid, pour que les deux camps se distinguent même
 # sur une capture en niveaux de gris.
-fugitif_principal = "#c85a3c"
-fugitif_detail = "#8a3a26"
-inspecteur_principal = "#2f5f8f"
-inspecteur_detail = "#1c3d5c"
+fugitive_main = "#c85a3c"
+fugitive_detail = "#8a3a26"
+inspector_main = "#2f5f8f"
+inspector_detail = "#1c3d5c"
 
 # Les marqueurs, tenus près du sol pour ne pas concurrencer les pions.
-trace = "#a89c84"
-barrage = "#8a7a4a"
+trail = "#a89c84"
+roadblock = "#8a7a4a"
 
 # La scène est la seule exception : un meurtre est public et coûte cher, il se
 # voit.
-scene = "#9b2c2c"
+crime_scene = "#9b2c2c"

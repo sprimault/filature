@@ -19,7 +19,7 @@ import (
 	"io/fs"
 )
 
-//go:embed base anglais
+//go:embed base english
 var embarques embed.FS
 
 // Shipped renvoie le contenu livré avec le jeu.

@@ -1,6 +1,6 @@
 # Contrat de formes
 
-Version du contrat : **1**
+Version du contrat : **2**
 
 Tout ce qui se dessine sur le plateau — pions, sol, bâtiments, marqueurs — est
 décrit en géométrie, jamais en image. Un plugin d'apparence est un fichier
@@ -121,7 +121,7 @@ couleur = "fugitif_principal"
 [[forme.fugitif.trait]]
 type = "cercle"
 centre = [-8, 4]
-rayon = 4
+radius = 4
 couleur = "fugitif_detail"
 ```
 
@@ -176,11 +176,11 @@ automatiquement la palette active. Un plugin de palette seule est le mod le
 moins cher qui existe — un fichier de quinze lignes, aucun éditeur, aucune
 géométrie.
 
-`version_formes` est à la racine du fichier, hors de la table `[palette]` : il
+`shapes_version` est à la racine du fichier, hors de la table `[palette]` : il
 qualifie le fichier, pas la palette.
 
 ```toml
-version_formes = 1
+shapes_version = 2
 
 [palette]
 rue = "#d8d2c4"
@@ -217,16 +217,16 @@ mes-vehicules/
 
 ```toml
 # manifeste.toml
-nom = "mes-vehicules"
+name = "mes-vehicules"
 version = "1.0.0"
-regles = false
-licence = "CC0-1.0"
+rules = false
+license = "CC0-1.0"
 description = "Le fugitif en voiture, les inspecteurs en gyrophare"
 ```
 
 ```toml
 # formes.toml
-version_formes = 1
+shapes_version = 2
 
 [forme.fugitif]
 [[forme.fugitif.trait]]
@@ -237,13 +237,13 @@ couleur = "fugitif_principal"
 [[forme.fugitif.trait]]
 type = "cercle"
 centre = [-9, 2]
-rayon = 3
+radius = 3
 couleur = "fugitif_detail"
 
 [[forme.fugitif.trait]]
 type = "cercle"
 centre = [9, 2]
-rayon = 3
+radius = 3
 couleur = "fugitif_detail"
 ```
 
@@ -298,12 +298,12 @@ couleurs, pas des formes.
 
 Contrôles appliqués au chargement comme à la publication :
 
-- schéma respecté, `version_formes` connue ;
+- schéma respecté, `shapes_version` connue ;
 - tout point à l'intérieur du gabarit du rôle ;
 - nombre de traits sous le plafond, polygones de 3 à 32 sommets ;
 - toute `couleur` et tout `contour` résolus dans la palette active ;
 - aucune valeur hexadécimale dans une forme ;
-- pour un plugin d'apparence, `regles = false` **et** absence de toute
+- pour un plugin d'apparence, `rules = false` **et** absence de toute
   capacité, dépense, effet ou module exécutable. La déclaration ne suffit pas,
   elle est vérifiée.
 
@@ -355,5 +355,5 @@ refus de vérifier les provenances, assumé.
 redéfinit la tuile de sol ni l'emprise d'un bâtiment, et rien n'est prévu pour
 l'ouvrir : entrebâiller la porte coûterait de la complexité
 dans tout le rendu pour un besoin hypothétique. Une grille hexagonale ou une vue
-de dessus seraient une rupture du contrat, avec un `version_formes` incrémenté,
+de dessus seraient une rupture du contrat, avec un `shapes_version` incrémenté,
 pas une extension.

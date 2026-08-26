@@ -13,7 +13,7 @@ import (
 // Un plugin écrit contre une version inconnue est refusé plutôt qu'appliqué de
 // travers. Sans ce numéro, un manifeste employant une primitive apparue plus
 // tard échouerait sur un message de champ inconnu.
-const EffectsVersion = 1
+const EffectsVersion = 2
 
 // Trigger dit quand une capacité ou un mode entre en jeu.
 type Trigger string
@@ -21,26 +21,26 @@ type Trigger string
 // Les six moments de déclenchement. OnContact et OnReveal n'ont aucun
 // usage dans le contenu livré : ils existent pour les plugins de règles.
 const (
-	OnInspectorsPhase Trigger = "phase_inspecteurs"
-	OnFugitivePhase   Trigger = "phase_fugitif"
-	OnTurnEnd         Trigger = "fin_de_tour"
+	OnInspectorsPhase Trigger = "inspectors_phase"
+	OnFugitivePhase   Trigger = "fugitive_phase"
+	OnTurnEnd         Trigger = "turn_end"
 	OnContact         Trigger = "contact"
-	OnReveal          Trigger = "revelation"
-	OnStrangling      Trigger = "etranglement"
+	OnReveal          Trigger = "reveal"
+	OnStrangling      Trigger = "strangling"
 )
 
 // Ability est une entrée déclarative, chargée depuis un manifeste. Les cinq
 // capacités livrées ne sont pas codées en dur : elles vivent dans
 // plugins/base, au même format que celles d'un tiers.
 type Ability struct {
-	Key     string   `toml:"-" json:"cle"`
-	Name    string   `toml:"nom" json:"nom"`
-	Camp    Side     `toml:"camp" json:"camp"`
-	Uses    int      `toml:"usages" json:"usages"`
-	Cost    int      `toml:"cout" json:"cout"`
-	Trigger Trigger  `toml:"declenchement" json:"declenchement"`
+	Key     string   `toml:"-" json:"key"`
+	Name    string   `toml:"name" json:"name"`
+	Camp    Side     `toml:"side" json:"side"`
+	Uses    int      `toml:"uses" json:"uses"`
+	Cost    int      `toml:"cost" json:"cost"`
+	Trigger Trigger  `toml:"trigger" json:"trigger"`
 	Passive bool     `toml:"passive" json:"passive"`
-	Effets  []Effect `toml:"effet" json:"effets"`
+	Effets  []Effect `toml:"effect" json:"effects"`
 }
 
 // Mode est une règle de partie déclarée en effets, que le noyau déclenche sans
@@ -51,10 +51,10 @@ type Ability struct {
 // se passe, le paramètre dit quand. Les inscrire tous deux ici donnerait deux
 // sources de vérité pour un même réglage.
 type Mode struct {
-	Key     string   `toml:"-" json:"cle"`
-	Name    string   `toml:"nom" json:"nom"`
-	Trigger Trigger  `toml:"declenchement" json:"declenchement"`
-	Effets  []Effect `toml:"effet" json:"effets"`
+	Key     string   `toml:"-" json:"key"`
+	Name    string   `toml:"name" json:"name"`
+	Trigger Trigger  `toml:"trigger" json:"trigger"`
+	Effets  []Effect `toml:"effect" json:"effects"`
 }
 
 // Registry rassemble tout ce que les plugins ont apporté, plus le contenu de
@@ -81,10 +81,10 @@ type Registry struct {
 // sur le contenu, pas sur le numéro de version : deux plugins qui se disent
 // « 1.2.0 » sans être identiques doivent être détectés.
 type ManifestEntry struct {
-	Name        string `json:"nom"`
+	Name        string `json:"name"`
 	Version     string `json:"version"`
-	Fingerprint string `json:"empreinte"`
-	Regles      bool   `json:"regles"`
+	Fingerprint string `json:"fingerprint"`
+	Regles      bool   `json:"rules"`
 }
 
 // Les deux signatures qu'un plugin exécutable peut honorer. Elles sont

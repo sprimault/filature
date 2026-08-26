@@ -20,12 +20,12 @@ func TestShippedCarriesExpectedContent(t *testing.T) {
 	livres := Shipped()
 
 	for _, attendu := range []string{
-		"base/manifeste.toml",
-		"base/formes.toml",
+		"base/manifest.toml",
+		"base/shapes.toml",
 		"base/palette.toml",
-		"base/langue.toml",
-		"anglais/manifeste.toml",
-		"anglais/langue.toml",
+		"base/language.toml",
+		"english/manifest.toml",
+		"english/language.toml",
 	} {
 		if _, err := fs.Stat(livres, attendu); err != nil {
 			t.Errorf("%s n'est pas embarqué", attendu)

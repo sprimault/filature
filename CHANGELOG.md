@@ -30,18 +30,29 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
-**Le dossier de plugins s'appelle désormais `plugins` et non plus `greffons`**, et le
-drapeau `--plugins` remplace `--greffons`. Un dossier `greffons` posé à côté de
-l'exécutable cesse d'être lu : le renommer suffit.
+**Le jeu cherche ses extensions dans un dossier `plugins`**, à côté de
+l'exécutable, et non plus dans `greffons` — le renommer suffit. Le drapeau
+`--plugins` remplace `--greffons`.
 
 Les deux sous-commandes suivent : `filature examples` et `filature validate`,
 là où l'on écrivait `exemples` et `valide`.
 
-**Le code passe à l'anglais** : paquets, types, fonctions, champs. `Partie`
-devient `Game`, `Plateau` devient `Board`, `CoupsLegaux` devient `LegalMoves`.
-Ce que voient les plugins et les bots ne bouge pas d'un caractère — clés JSON,
-valeurs de manifeste et noms de flux d'aléa sont inchangés, et les plateaux de
-référence sont identiques.
+**Tout passe à l'anglais, contrats publics compris.** Les trois numéros
+l'annoncent, et changent de nom au passage : `version_effets` devient
+`effects_version`, `version_formes` devient `shapes_version`, `protocole`
+devient `protocol` — et tous trois valent 2. Un plugin écrit contre la version 1
+est refusé au chargement plutôt qu'appliqué de travers.
+
+Ce qu'un auteur de plugin doit reprendre : les clés de son manifeste — `nom`
+devient `name`, `regles` devient `rules`, `capacite` devient `ability` — et les
+valeurs qu'il y écrit — `"deplacer"` devient `"step"`, `"phase_inspecteurs"`
+devient `"inspectors_phase"`. Un bot doit relire `schemas/view.schema.json`,
+dont toutes les clés changent. Les quatre schémas sont renommés en conséquence.
+
+**Une graine ne rend plus le même plateau.** Les flux d'aléa portent des noms
+anglais, et ces noms entrent dans le tirage : la ville de la graine 7 n'est plus
+celle d'hier. Aucune partie enregistrée n'existait, mais c'est la dernière
+version où ce changement était sans conséquence.
 
 Le mot « greffon » disparaît du projet au profit de « plugin », partout — code,
 documentation et libellés. Il est exclusivement français, absent de l'usage
@@ -67,18 +78,28 @@ courant, et il ne se cherche pas.
 
 ***
 
-**The plugin folder is now named `plugins` rather than `greffons`**, and the `--plugins`
-flag replaces `--greffons`. A `greffons` folder next to the executable is no longer read:
-renaming it is enough.
+**The game looks for extensions in a `plugins` folder**, next to the executable,
+rather than in `greffons` — renaming it is enough. The `--plugins` flag replaces
+`--greffons`.
 
 Both subcommands follow: `filature examples` and `filature validate`, where one
 used to write `exemples` and `valide`.
 
-**The code moves to English**: packages, types, functions, fields. `Partie`
-becomes `Game`, `Plateau` becomes `Board`, `CoupsLegaux` becomes `LegalMoves`.
-What plugins and bots see does not change by a single character — JSON keys,
-manifest values and random-stream names are untouched, and reference boards are
-identical.
+**Everything moves to English, public contracts included.** The three numbers
+say so, and are renamed on the way: `version_effets` becomes `effects_version`,
+`version_formes` becomes `shapes_version`, `protocole` becomes `protocol` — and
+all three are now 2. A plugin written against version 1 is refused at load
+rather than applied wrongly.
+
+What a plugin author must revisit: their manifest keys — `nom` becomes `name`,
+`regles` becomes `rules`, `capacite` becomes `ability` — and the values written
+there — `"deplacer"` becomes `"step"`, `"phase_inspecteurs"` becomes
+`"inspectors_phase"`. A bot must re-read `schemas/view.schema.json`, whose every
+key changes. All four schemas are renamed accordingly.
+
+**A seed no longer yields the same board.** Random streams carry English names,
+and those names feed the draw: seed 7's city is not yesterday's. No saved game
+existed, but this is the last release where that change came free.
 
 The word « greffon » is gone from the project in favour of « plugin », everywhere —
 code, documentation and labels. It is exclusively French, absent from common

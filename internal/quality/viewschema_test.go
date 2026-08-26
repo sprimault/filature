@@ -22,7 +22,7 @@ import (
 var majSchemas = flag.Bool("maj-schemas", false, "réécrire les schémas générés")
 
 // cheminSchemaVue est le contrat que lisent les bots et le mode réseau.
-var cheminSchemaVue = filepath.Join(racine, "schemas", "vue.schema.json")
+var cheminSchemaVue = filepath.Join(racine, "schemas", "view.schema.json")
 
 // TestViewSchemaFollowsStruct vérifie que le contrat publié correspond au type
 // Go dont il est tiré.
@@ -37,7 +37,7 @@ var cheminSchemaVue = filepath.Join(racine, "schemas", "vue.schema.json")
 func TestViewSchemaFollowsStruct(t *testing.T) {
 	attendu, err := schema.Generate(
 		reflect.TypeOf(core.View{}),
-		"https://github.com/sprimault/filature/schemas/vue.schema.json",
+		"https://github.com/sprimault/filature/schemas/view.schema.json",
 		"Vue Filature",
 		"Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis core.View : ne pas modifier a la main.",
 		"Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>. SPDX-License-Identifier: Apache-2.0",
@@ -60,7 +60,7 @@ func TestViewSchemaFollowsStruct(t *testing.T) {
 	}
 
 	if string(publie) != string(attendu) {
-		t.Error("schemas/vue.schema.json ne correspond plus à core.View — " +
+		t.Error("schemas/view.schema.json ne correspond plus à core.View — " +
 			"relancer « go test ./internal/quality -maj-schemas » et relire le diff")
 	}
 }
@@ -78,14 +78,14 @@ func TestViewSchemaMarksSecretsOptional(t *testing.T) {
 	}
 
 	requis := requiredFields(t, brut, "View")
-	for _, secret := range []string{"position_fugitif", "zone_scellee", "resistance"} {
+	for _, secret := range []string{"fugitive_position", "sealed_zone", "stamina"} {
 		if requis[secret] {
 			t.Errorf("%s est déclaré obligatoire alors qu'il manque aux inspecteurs", secret)
 		}
 	}
 
 	// Et l'inverse : ce qui est toujours là doit être annoncé comme tel.
-	for _, public := range []string{"acteur", "tour", "phase", "scenes"} {
+	for _, public := range []string{"side", "turn", "phase", "crime_scenes"} {
 		if !requis[public] {
 			t.Errorf("%s n'est pas déclaré obligatoire alors qu'il est toujours présent", public)
 		}

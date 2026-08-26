@@ -10,8 +10,8 @@ import (
 	"github.com/sprimault/filature/internal/core"
 )
 
-// ProtocoleBot est la version parlée par ce binaire.
-const ProtocoleBot = 1
+// BotProtocol est la version parlée par ce binaire.
+const BotProtocol = 2
 
 // Un bot remplace l'IA du jeu, il ne l'étend pas : le jeu envoie une View, le
 // bot renvoie un Move. L'IA livrée parle ce même protocole, ce qui garantit
@@ -27,24 +27,24 @@ const ProtocoleBot = 1
 type Message struct {
 	Type string `json:"type"`
 
-	Protocole int                  `json:"protocole,omitempty"`
-	Camp      core.Side            `json:"camp,omitempty"`
-	Seed      int64                `json:"graine,omitempty"`
-	Settings  *core.Settings       `json:"parametres,omitempty"`
+	Protocole int                  `json:"protocol,omitempty"`
+	Camp      core.Side            `json:"side,omitempty"`
+	Seed      int64                `json:"seed,omitempty"`
+	Settings  *core.Settings       `json:"settings,omitempty"`
 	Plugins   []core.ManifestEntry `json:"plugins,omitempty"`
 
-	Turn     int        `json:"tour,omitempty"`
+	Turn     int        `json:"turn,omitempty"`
 	BudgetMs int        `json:"budget_ms,omitempty"`
-	View     *core.View `json:"vue,omitempty"`
+	View     *core.View `json:"view,omitempty"`
 
-	Name         string `json:"nom,omitempty"`
+	Name         string `json:"name,omitempty"`
 	Version      string `json:"version,omitempty"`
-	Deterministe bool   `json:"deterministe,omitempty"`
+	Deterministe bool   `json:"deterministic,omitempty"`
 
-	Move *core.Move `json:"coup,omitempty"`
+	Move *core.Move `json:"move,omitempty"`
 
-	Winner  core.Side `json:"vainqueur,omitempty"`
-	Reason  string    `json:"motif,omitempty"`
+	Winner  core.Side `json:"winner,omitempty"`
+	Reason  string    `json:"reason,omitempty"`
 	Message string    `json:"message,omitempty"`
 }
 

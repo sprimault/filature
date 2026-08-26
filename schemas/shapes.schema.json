@@ -1,22 +1,22 @@
 {
   "$comment": "Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>. SPDX-License-Identifier: Apache-2.0",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/sprimault/filature/schemas/formes.schema.json",
+  "$id": "https://github.com/sprimault/filature/schemas/shapes.schema.json",
   "title": "Contrat de formes Filature",
   "description": "Vocabulaire géométrique des greffons d'apparence. Contrat public, versionné indépendamment du jeu. Aucune image : une forme est du texte, ce qui la rend relisible en diff et sans question de provenance.",
   "type": "object",
   "required": [
-    "version_formes"
+    "shapes_version"
   ],
   "additionalProperties": false,
   "properties": {
-    "version_formes": {
+    "shapes_version": {
       "type": "integer",
       "enum": [
         1
       ]
     },
-    "forme": {
+    "shape": {
       "type": "object",
       "propertyNames": {
         "pattern": "^[a-z][a-z0-9_]{1,31}$"
@@ -76,7 +76,7 @@
       "type": "object",
       "required": [
         "type",
-        "couleur"
+        "color"
       ],
       "additionalProperties": false,
       "properties": {
@@ -91,45 +91,45 @@
         "points": {
           "$ref": "#/$defs/contour"
         },
-        "centre": {
+        "center": {
           "$ref": "#/$defs/point"
         },
-        "rayon": {
+        "radius": {
           "type": "integer",
           "minimum": 1,
           "maximum": 32
         },
-        "de": {
+        "from": {
           "$ref": "#/$defs/point"
         },
-        "a": {
+        "to": {
           "$ref": "#/$defs/point"
         },
-        "epaisseur": {
+        "thickness": {
           "type": "integer",
           "minimum": 1,
           "maximum": 8
         },
-        "hauteur": {
+        "height": {
           "type": "integer",
           "minimum": 1,
           "maximum": 24
         },
-        "couleur": {
+        "color": {
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]{1,31}$",
           "description": "Nom de palette. Aucune valeur hexadécimale ici : c'est ce qui rend formes et couleurs indépendantes."
         },
-        "contour": {
+        "outline": {
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]{1,31}$"
         },
-        "epaisseur_contour": {
+        "outline_thickness": {
           "type": "integer",
           "minimum": 1,
           "maximum": 4
         },
-        "opacite": {
+        "opacity": {
           "type": "integer",
           "minimum": 0,
           "maximum": 100
@@ -166,8 +166,8 @@
           },
           "then": {
             "required": [
-              "centre",
-              "rayon"
+              "center",
+              "radius"
             ]
           }
         },
@@ -184,9 +184,9 @@
           },
           "then": {
             "required": [
-              "de",
-              "a",
-              "epaisseur"
+              "from",
+              "to",
+              "thickness"
             ]
           }
         },
@@ -203,7 +203,7 @@
           },
           "then": {
             "required": [
-              "hauteur"
+              "height"
             ]
           }
         }

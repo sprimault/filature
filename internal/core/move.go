@@ -11,13 +11,13 @@ type MoveType string
 // peuvent rendre la main avant leurs trois déplacements, et le journal doit
 // distinguer ce choix d'une phase épuisée.
 const (
-	MovePlace      MoveType = "placer"
-	MoveStep       MoveType = "deplacer"
-	MoveAbility    MoveType = "capacite"
-	MoveExpense    MoveType = "depense"
-	MoveChangeZone MoveType = "changer_zone"
-	MovePass       MoveType = "passer"
-	MoveEndPhase   MoveType = "fin_de_phase"
+	MovePlace      MoveType = "place"
+	MoveStep       MoveType = "step"
+	MoveAbility    MoveType = "ability"
+	MoveExpense    MoveType = "expense"
+	MoveChangeZone MoveType = "change_zone"
+	MovePass       MoveType = "pass"
+	MoveEndPhase   MoveType = "end_phase"
 )
 
 // Expense énumère les usages de la résistance. Le nom d'une dépense est une
@@ -28,11 +28,11 @@ type Expense string
 // dans le manifeste de plugins/base, ce qui permet de les rééquilibrer sans
 // recompiler.
 const (
-	ExpenseDoubleStep Expense = "double_deplacement"
+	ExpenseDoubleStep Expense = "double_step"
 	ExpenseSilence    Expense = "silence"
-	ExpenseWipeTrails Expense = "effacement"
-	ExpenseChangeZone Expense = "changer_zone"
-	ExpenseMurder     Expense = "meurtre"
+	ExpenseWipeTrails Expense = "wipe_trails"
+	ExpenseChangeZone Expense = "change_zone"
+	ExpenseMurder     Expense = "murder"
 )
 
 // Move est volontairement un enregistrement plat plutôt qu'une interface.
@@ -41,13 +41,13 @@ const (
 // se compare par égalité pour tester qu'un coup proposé figure bien dans
 // LegalMoves. Les champs inutilisés restent à zéro.
 type Move struct {
-	Turn    int      `json:"tour"`
-	Side    Side     `json:"acteur"`
+	Turn    int      `json:"turn"`
+	Side    Side     `json:"side"`
 	Type    MoveType `json:"type"`
-	Piece   int      `json:"pion,omitempty"`
-	From    Position `json:"depart,omitempty"`
-	To      Position `json:"arrivee,omitempty"`
-	Ability string   `json:"capacite,omitempty"`
-	Expense Expense  `json:"depense,omitempty"`
+	Piece   int      `json:"piece,omitempty"`
+	From    Position `json:"from,omitempty"`
+	To      Position `json:"to,omitempty"`
+	Ability string   `json:"ability,omitempty"`
+	Expense Expense  `json:"expense,omitempty"`
 	Zone    int      `json:"zone,omitempty"`
 }

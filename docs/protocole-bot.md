@@ -1,6 +1,6 @@
 # Protocole de bot
 
-Version du protocole : **1**
+Version du protocole : **2**
 
 Un bot **remplace** l'IA du jeu, il ne l'étend pas. Le jeu lui transmet une vue
 de la partie, il renvoie un coup. Aucune API interne à respecter, aucun plugin
@@ -36,7 +36,7 @@ elle est appliquée au même endroit.
 ## 2. Séquence
 
 ```
-jeu  -> bot   bonjour     version du protocole, paramètres, graine, camp
+jeu  -> bot   bonjour     version du protocole, réglages, graine, camp
 bot  -> jeu   pret        nom, version, déterminisme
 jeu  -> bot   joue        vue de la partie, budget en millisecondes
 bot  -> jeu   coup        le coup choisi
@@ -54,14 +54,14 @@ vivant au bout d'une seconde, il est tué.
 ### bonjour
 
 ```json
-{"type":"bonjour","protocole":1,"camp":"inspecteurs","graine":178342119,
- "parametres":{"cote":41,"portee":8,"tours":40,"resistance":10,
- "inspecteurs":5,"pions_par_tour":3,"periode_revelation":4,"zones":6,
- "duree_trace":6,"debut_etranglement":30,"periode_etranglement":2},
- "plugins":[{"nom":"base","version":"0.1.0","empreinte":"…","regles":true}]}
+{"type":"bonjour","protocol":2,"side":"inspectors","seed":178342119,
+ "settings":{"size":41,"range":8,"turns":40,"stamina":10,
+ "inspectors":5,"pieces_per_turn":3,"reveal_period":4,"zones":6,
+ "trail_lifetime":6,"strangling_start":30,"strangling_period":2},
+ "plugins":[{"name":"base","version":"0.1.0","fingerprint":"…","rules":true}]}
 ```
 
-`graine` est fournie pour qu'un bot puisse être déterministe s'il le souhaite.
+`seed` est fournie pour qu'un bot puisse être déterministe s'il le souhaite.
 **Un bot ne tire jamais de l'entropie système ni de l'horloge s'il se déclare
 déterministe** : c'est la seule chose que le jeu lui demande, et elle est
 vérifiée.
@@ -72,12 +72,12 @@ peut refuser de jouer plutôt que de jouer faux.
 ### joue
 
 ```json
-{"type":"joue","tour":7,"budget_ms":2000,"vue":{ … }}
+{"type":"joue","turn":7,"budget_ms":2000,"view":{ … }}
 ```
 
-`vue` est l'objet décrit dans
-[`schemas/vue.schema.json`](../schemas/vue.schema.json), identique à celui que
-reçoit l'interface. Il porte `coups_legaux` : un bot minimal en choisit un et
+`view` est l'objet décrit dans
+[`schemas/view.schema.json`](../schemas/view.schema.json), identique à celui que
+reçoit l'interface. Il porte `legal_moves` : un bot minimal en choisit un et
 s'arrête là.
 
 Ce schéma est **généré depuis la structure Go**, jamais écrit à la main : un
@@ -87,7 +87,7 @@ ce que le jeu envoie, sans décalage possible.
 Toute liste y est un tableau, jamais `null` : une vue sans barrage porte un
 tableau vide. Un bot n'a pas à traiter deux formes pour la même absence.
 
-`coups_legaux` contient tout ce que le camp peut faire ce tour-ci —
+`legal_moves` contient tout ce que le camp peut faire ce tour-ci —
 déplacements, capacités, dépenses de résistance, meurtre compris. Un bot n'a
 donc rien à savoir des règles pour être correct : il ne peut pas jouer un coup
 illégal s'il choisit dans cette liste. C'est aussi ce qui fait qu'un plugin de
@@ -96,7 +96,7 @@ règles ajoutant une dépense est utilisable par un bot qui l'ignore.
 ### fin
 
 ```json
-{"type":"fin","vainqueur":"fugitif","motif":"extraction","tour":34}
+{"type":"fin","winner":"fugitive","reason":"extraction","turn":34}
 ```
 
 Le jeu de base produit quatre motifs : `extraction`, `resistance_epuisee`,
@@ -112,18 +112,18 @@ actifs. Traiter le champ comme une chaîne, jamais comme une énumération.
 ### pret
 
 ```json
-{"type":"pret","nom":"traqueur-glouton","version":"0.3.1",
- "protocole":1,"deterministe":true,"auteur":"…"}
+{"type":"pret","name":"traqueur-glouton","version":"0.3.1",
+ "protocol":2,"deterministic":true,"author":"…"}
 ```
 
 ### coup
 
 ```json
-{"type":"coup","coup":{"tour":7,"acteur":"inspecteurs","type":"deplacer",
- "pion":2,"depart":{"Colonne":18,"Ligne":9},"arrivee":{"Colonne":19,"Ligne":9}}}
+{"type":"move","move":{"turn":7,"side":"inspectors","type":"step",
+ "pion":2,"from":{"Colonne":18,"Ligne":9},"to":{"Colonne":19,"Ligne":9}}}
 ```
 
-Le coup doit figurer tel quel dans `coups_legaux`. Le jeu ne corrige rien et
+Le coup doit figurer tel quel dans `legal_moves`. Le jeu ne corrige rien et
 n'interprète rien.
 
 ### erreur
@@ -141,12 +141,12 @@ message affiché.
 
 | Écart | Réaction |
 |---|---|
-| Coup absent de `coups_legaux` | partie interrompue, coup fautif journalisé |
+| Coup absent de `legal_moves` | partie interrompue, coup fautif journalisé |
 | JSON invalide, type inconnu | idem |
 | `budget_ms` dépassé une fois | coup légal tiré au sort, incident journalisé |
 | Budget dépassé trois fois | partie interrompue |
 | Processus mort | partie interrompue |
-| `protocole` inconnu dans `pret` | refus avant le début |
+| `protocol` inconnu dans `pret` | refus avant le début |
 
 Un bot lent est toléré une fois puis écarté : laisser une partie se figer sur un
 processus tiers est pire qu'un coup au hasard, et le journal garde la trace des
@@ -170,7 +170,7 @@ Le déterminisme n'est requis que pour deux usages :
 - entrer dans une passe d'équilibrage, où des milliers de parties doivent être
   comparables entre deux versions.
 
-D'où le drapeau `deterministe` dans `pret`, et le contrôle correspondant : deux
+D'où le drapeau `deterministic` dans `pret`, et le contrôle correspondant : deux
 parties sur la même graine, comparaison des coups. Un bot qui se déclare
 déterministe sans l'être est refusé au catalogue.
 
@@ -181,24 +181,24 @@ déterministe sans l'être est refusé au catalogue.
 Un bot se déclare dans son manifeste :
 
 ```toml
-nom = "traqueur-glouton"
+name = "traqueur-glouton"
 version = "0.3.1"
-regles = false
-licence = "MIT"
+rules = false
+license = "MIT"
 
 [bot]
-camp = "inspecteurs"
-commande = "traqueur"
+side = "inspectors"
+command = "traqueur"
 arguments = ["--niveau", "3"]
-deterministe = true
+deterministic = true
 ```
 
-`regles = false` : un bot ne modifie pas les règles, il joue avec. Un plugin
+`rules = false` : un bot ne modifie pas les règles, il joue avec. Un plugin
 qui déclare un bot **et** des effets est refusé — ce sont deux choses, et les
 mélanger casserait la poignée de main réseau, où les plugins de règles doivent
 être identiques des deux côtés.
 
-`commande` est cherchée dans le dossier du plugin puis dans le `PATH`. Aucun
+`command` est cherchée dans le dossier du plugin puis dans le `PATH`. Aucun
 interpréteur n'est fourni : un bot Python se livre avec son lanceur, ou en
 paquet autonome.
 
@@ -229,11 +229,11 @@ import json, random, sys
 for ligne in sys.stdin:
     message = json.loads(ligne)
     if message["type"] == "bonjour":
-        reponse = {"type": "pret", "nom": "hasard", "version": "1.0.0",
-                   "protocole": 1, "deterministe": False}
+        reponse = {"type": "pret", "name": "hasard", "version": "1.0.0",
+                   "protocol": 2, "deterministic": False}
     elif message["type"] == "joue":
-        reponse = {"type": "coup",
-                   "coup": random.choice(message["vue"]["coups_legaux"])}
+        reponse = {"type": "move",
+                   "move": random.choice(message["view"]["legal_moves"])}
     else:
         break
     print(json.dumps(reponse), flush=True)

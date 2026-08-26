@@ -47,7 +47,7 @@ est l'étape 2**, et c'est le plus coûteux à rétablir : tant qu'elle n'est pa
 
 ## 2 — Vue filtrée
 
-`ViewFor` et sa sérialisation, plus `schemas/vue.schema.json`, généré depuis le
+`ViewFor` et sa sérialisation, plus `schemas/view.schema.json`, généré depuis le
 Go et non écrit à la main.
 
 Séparée de l'étape 1 pour une raison : c'est l'invariant le plus facile à

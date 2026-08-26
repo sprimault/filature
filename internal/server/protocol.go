@@ -16,14 +16,14 @@ type Enveloppe struct {
 	// client vers serveur
 	Jeton string     `json:"jeton,omitempty"`
 	Role  core.Side  `json:"role,omitempty"`
-	Move  *core.Move `json:"coup,omitempty"`
+	Move  *core.Move `json:"move,omitempty"`
 
 	// serveur vers client
-	View    *core.View    `json:"vue,omitempty"`
-	Outcome *core.Outcome `json:"resultat,omitempty"`
+	View    *core.View    `json:"view,omitempty"`
+	Outcome *core.Outcome `json:"outcome,omitempty"`
 	Message string        `json:"message,omitempty"`
 
-	Manifeste []core.ManifestEntry `json:"manifeste,omitempty"`
+	Manifeste []core.ManifestEntry `json:"manifest,omitempty"`
 }
 
 // Types de messages. La reconnexion passe par le jeton de session : le serveur

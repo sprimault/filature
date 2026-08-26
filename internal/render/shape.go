@@ -20,7 +20,7 @@ const (
 
 // ShapesVersion est la version du contrat que ce binaire sait lire. Un plugin
 // écrit contre une version inconnue est refusé plutôt que lu de travers.
-const ShapesVersion = 1
+const ShapesVersion = 2
 
 // TypeTrait énumère les quatre primitives. Le vocabulaire est volontairement
 // pauvre : tout ce qui est livré avec le jeu s'y exprime, et une primitive de
@@ -49,17 +49,17 @@ type Point struct {
 type Trait struct {
 	Type             TypeTrait `toml:"type"`
 	Points           []Point   `toml:"points"`
-	Centre           Point     `toml:"centre"`
-	Radius           int       `toml:"rayon"`
-	De               Point     `toml:"de"`
-	A                Point     `toml:"a"`
-	Epaisseur        int       `toml:"epaisseur"`
-	Emprise          []Point   `toml:"emprise"`
-	Hauteur          int       `toml:"hauteur"`
-	Couleur          string    `toml:"couleur"`
-	Contour          string    `toml:"contour"`
-	EpaisseurContour int       `toml:"epaisseur_contour"`
-	Opacite          int       `toml:"opacite"`
+	Centre           Point     `toml:"center"`
+	Radius           int       `toml:"radius"`
+	De               Point     `toml:"from"`
+	A                Point     `toml:"to"`
+	Epaisseur        int       `toml:"thickness"`
+	Emprise          []Point   `toml:"footprint"`
+	Hauteur          int       `toml:"height"`
+	Couleur          string    `toml:"color"`
+	Contour          string    `toml:"outline"`
+	EpaisseurContour int       `toml:"outline_thickness"`
+	Opacite          int       `toml:"opacity"`
 }
 
 // Role détermine ce qu'un plugin a le droit de redéfinir.

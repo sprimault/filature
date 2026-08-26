@@ -85,9 +85,9 @@ func draw(graine int64, p Settings) *BoundedBoard {
 		rues:   make([]bool, p.Size*p.Size),
 	}
 
-	b.traceAvenues(NewRandom(graine, "trame"))
-	b.punchCourtyards(NewRandom(graine, "percages"))
-	b.carveDeadEnds(NewRandom(graine, "impasses"))
+	b.traceAvenues(NewRandom(graine, "grid"))
+	b.punchCourtyards(NewRandom(graine, "courtyards"))
+	b.carveDeadEnds(NewRandom(graine, "deadends"))
 	b.placeZones(p.Zones)
 	return b
 }

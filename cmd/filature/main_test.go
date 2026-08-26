@@ -23,8 +23,8 @@ func TestExtractWritesShippedPlugins(t *testing.T) {
 	}
 
 	for _, attendu := range []string{
-		filepath.Join("base", "manifeste.toml"),
-		filepath.Join("anglais", "langue.toml"),
+		filepath.Join("base", "manifest.toml"),
+		filepath.Join("english", "language.toml"),
 	} {
 		if _, err := os.Stat(filepath.Join(dossier, attendu)); err != nil {
 			t.Errorf("%s n'a pas été écrit", attendu)
@@ -42,7 +42,7 @@ func TestExtractDoesNotOverwrite(t *testing.T) {
 		t.Fatalf("première extraction refusée : %v", err)
 	}
 
-	temoin := filepath.Join(dossier, "anglais", "langue.toml")
+	temoin := filepath.Join(dossier, "english", "language.toml")
 	if err := os.WriteFile(temoin, []byte("# mon travail\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
