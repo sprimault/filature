@@ -13,14 +13,25 @@ en croisé que vers Windows et WebAssembly ; Linux et macOS exigent une
 compilation native, parce que le moteur y passe par les API graphiques du
 système.
 
-| Cible | Où | cgo |
-|---|---|---|
-| windows/amd64 | Linux, croisé | `0` |
-| js/wasm | Linux, croisé | `0` |
-| linux/amd64 | Linux, natif | `1` |
-| linux/arm64 | Linux ARM, natif | `1` |
-| darwin/arm64 | macOS Apple Silicon, natif | `1` |
-| darwin/amd64 | macOS Intel, natif | `1` |
+| Cible | Où | cgo | Publiée |
+|---|---|---|---|
+| windows/amd64 | Linux, croisé | `0` | oui |
+| js/wasm | Linux, croisé | `0` | **non** |
+| linux/amd64 | Linux, natif | `1` | oui |
+| linux/arm64 | Linux ARM, natif | `1` | oui |
+| darwin/arm64 | macOS Apple Silicon, natif | `1` | oui |
+| darwin/amd64 | macOS Intel, natif | `1` | oui |
+
+**`js/wasm` se compile sans être publiée**, et ce n'est pas un oubli. L'archive
+serait inutilisable seule — il y faudrait `wasm_exec.js` et une page HTML — et le
+mode web n'est pas au programme : un plugin tiers y arriverait par le navigateur
+plutôt que par un dossier, et un bot externe, qui est un processus, n'y arrive
+pas du tout.
+
+La cible reste dans la matrice parce qu'elle est le seul contrôle qui **empêche
+une dépendance d'introduire du cgo** sans que personne le voie. La retirer
+rendrait windows/amd64 vulnérable au même défaut, une compilation croisée plus
+tard.
 
 La cible Intel a une date de péremption connue : l'image correspondante est
 annoncée comme la dernière x86_64 disponible en intégration continue, jusqu'en
