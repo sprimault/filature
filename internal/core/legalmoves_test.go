@@ -398,7 +398,7 @@ func TestChangeZone(t *testing.T) {
 	b.zones = []Zone{{Number: 0}, {Number: 1}, {Number: 2}}
 	p := gameOn(b, Position{Column: 2, Row: 2})
 	p.Fugitive.SealedZone = 1
-	p.Extensions = &Registry{Depenses: map[Expense]Ability{
+	p.Extensions = &Registry{Expenses: map[Expense]Ability{
 		ExpenseChangeZone: {Name: "Changement de zone", Camp: SideFugitive, Cost: 2},
 	}}
 
@@ -421,7 +421,7 @@ func TestChangeZoneTooExpensive(t *testing.T) {
 	b.zones = []Zone{{Number: 0}, {Number: 1}}
 	p := gameOn(b, Position{Column: 2, Row: 2})
 	p.Fugitive.Stamina = 1
-	p.Extensions = &Registry{Depenses: map[Expense]Ability{
+	p.Extensions = &Registry{Expenses: map[Expense]Ability{
 		ExpenseChangeZone: {Name: "Changement de zone", Camp: SideFugitive, Cost: 2},
 	}}
 

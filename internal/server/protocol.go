@@ -23,7 +23,7 @@ type Enveloppe struct {
 	Outcome *core.Outcome `json:"outcome,omitempty"`
 	Message string        `json:"message,omitempty"`
 
-	Manifeste []core.ManifestEntry `json:"manifest,omitempty"`
+	Manifest []core.ManifestEntry `json:"manifest,omitempty"`
 }
 
 // Types de messages. La reconnexion passe par le jeton de session : le serveur

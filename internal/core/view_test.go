@@ -100,8 +100,8 @@ func TestFugitiveViewSeesAll(t *testing.T) {
 	if v.Stamina == nil || *v.Stamina != 7 {
 		t.Error("le fugitif ne voit pas sa résistance")
 	}
-	if len(v.TracesConnues) != len(p.Trails) {
-		t.Errorf("%d traces vues sur %d : il voit les siennes", len(v.TracesConnues), len(p.Trails))
+	if len(v.KnownTrails) != len(p.Trails) {
+		t.Errorf("%d traces vues sur %d : il voit les siennes", len(v.KnownTrails), len(p.Trails))
 	}
 }
 
@@ -157,10 +157,10 @@ func TestTrailsFilteredByRange(t *testing.T) {
 	proche := Position{Column: 1, Row: 4}
 	loin := Position{Column: 2, Row: 1}
 
-	if _, vue := v.TracesConnues[proche.Key()]; !vue {
+	if _, vue := v.KnownTrails[proche.Key()]; !vue {
 		t.Error("une trace adjacente à un inspecteur n'est pas découverte")
 	}
-	if _, vue := v.TracesConnues[loin.Key()]; vue {
+	if _, vue := v.KnownTrails[loin.Key()]; vue {
 		t.Error("une trace hors de portée est découverte")
 	}
 }
@@ -173,7 +173,7 @@ func TestDiagonalTrailStaysHidden(t *testing.T) {
 	p.Trails = map[Position]Trail{diagonale: {Turn: 2}}
 
 	v := p.ViewFor(SideInspectors)
-	if _, vue := v.TracesConnues[diagonale.Key()]; vue {
+	if _, vue := v.KnownTrails[diagonale.Key()]; vue {
 		t.Error("une trace en diagonale est découverte : la portée est en Tchebychev")
 	}
 }
@@ -185,7 +185,7 @@ func TestTrackerExtendsRange(t *testing.T) {
 	loin := Position{Column: 2, Row: 4} // à deux pas de l'inspecteur 0
 	p.Trails = map[Position]Trail{loin: {Turn: 2}}
 
-	if _, vue := p.ViewFor(SideInspectors).TracesConnues[loin.Key()]; vue {
+	if _, vue := p.ViewFor(SideInspectors).KnownTrails[loin.Key()]; vue {
 		t.Fatal("la trace est déjà vue sans le Traqueur")
 	}
 
@@ -193,7 +193,7 @@ func TestTrackerExtendsRange(t *testing.T) {
 		Effect:        Effect{Type: EffectRevealTrails, Target: TargetCurrentPiece, Radius: 2},
 		EffectContext: EffectContext{Side: SideInspectors, Piece: 0},
 	}}
-	if _, vue := p.ViewFor(SideInspectors).TracesConnues[loin.Key()]; !vue {
+	if _, vue := p.ViewFor(SideInspectors).KnownTrails[loin.Key()]; !vue {
 		t.Error("le Traqueur ne découvre pas une trace à deux pas")
 	}
 }
@@ -254,15 +254,15 @@ func TestViewGivesOnlyItsLegalMoves(t *testing.T) {
 func TestOnlyAnnouncedEffects(t *testing.T) {
 	p := hiddenGame()
 	p.PendingEffects = []PendingEffect{
-		{Effets: []Effect{{Type: EffectCloseZone}}, Turn: 9, Announced: true,
+		{Effects: []Effect{{Type: EffectCloseZone}}, Turn: 9, Announced: true,
 			EffectContext: EffectContext{Zone: 3}},
-		{Effets: []Effect{{Type: EffectBlockCell}}, Turn: 9, Announced: false,
+		{Effects: []Effect{{Type: EffectBlockCell}}, Turn: 9, Announced: false,
 			EffectContext: EffectContext{Case: Position{Column: 1, Row: 1}}},
 	}
 
 	v := p.ViewFor(SideInspectors)
-	if len(v.EffetsAnnonces) != 1 {
-		t.Fatalf("%d effets annoncés, attendu 1", len(v.EffetsAnnonces))
+	if len(v.AnnouncedEffects) != 1 {
+		t.Fatalf("%d effets annoncés, attendu 1", len(v.AnnouncedEffects))
 	}
 	if !reflect.DeepEqual(v.ZonesAnnoncees, []int{3}) {
 		t.Errorf("zones annoncées %v, attendu [3]", v.ZonesAnnoncees)
@@ -315,7 +315,7 @@ func TestViewSerialises(t *testing.T) {
 	if relue.PositionFugitif == nil || *relue.PositionFugitif != p.Fugitive.Position {
 		t.Error("la position ne survit pas à l'aller-retour")
 	}
-	if len(relue.TracesConnues) != len(p.Trails) {
+	if len(relue.KnownTrails) != len(p.Trails) {
 		t.Error("les traces ne survivent pas à l'aller-retour")
 	}
 }

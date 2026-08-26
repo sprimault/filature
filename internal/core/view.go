@@ -42,9 +42,9 @@ type View struct {
 	// déplacement ou un changement de zone.
 	Stamina *int `json:"stamina,omitempty"`
 
-	// TracesConnues ne contient que ce que les inspecteurs ont effectivement
+	// KnownTrails ne contient que ce que les inspecteurs ont effectivement
 	// découvert. Le fugitif, lui, voit les siennes.
-	TracesConnues map[string]Trail `json:"known_trails"`
+	KnownTrails map[string]Trail `json:"known_trails"`
 
 	// CrimeScenes est identique pour les deux camps : un meurtre est public, c'est
 	// ce que le fugitif paie. Ne jamais la filtrer par acteur.
@@ -56,10 +56,10 @@ type View struct {
 	SilencePaye     bool       `json:"silence_paid"`
 	ZonesAnnoncees  []int      `json:"announced_zones"`
 
-	// EffetsAnnonces ne porte que les differer déclarés avec annonce, et les
+	// AnnouncedEffects ne porte que les differer déclarés avec annonce, et les
 	// porte à l'identique pour les deux camps. Un differer sans annonce reste
 	// invisible jusqu'à sa résolution, sinon le champ le trahirait.
-	EffetsAnnonces []PendingEffect `json:"announced_effects"`
+	AnnouncedEffects []PendingEffect `json:"announced_effects"`
 
 	Outcome *Outcome `json:"outcome,omitempty"`
 }
@@ -77,23 +77,23 @@ type View struct {
 // intérêt.
 func (p *Game) ViewFor(a Side) View {
 	v := View{
-		Side:            a,
-		Turn:            p.Turn,
-		Phase:           p.Phase,
-		Settings:        p.Settings,
-		Streets:         list(p.knownStreets()),
-		Zones:           list(p.seenZones()),
-		Roadblocks:      list(p.barrages()),
-		Inspectors:      list(append([]Inspector(nil), p.Inspectors...)),
-		TracesConnues:   p.trailsFor(a),
-		CrimeScenes:     list(append([]CrimeScene(nil), p.CrimeScenes...)),
-		CasesVisibles:   list(p.visibleCellsFor(a)),
-		LegalMoves:      list(p.LegalMoves(a)),
-		ProchaineReveal: p.nextReveal(),
-		SilencePaye:     p.Fugitive.SilenceBought,
-		EffetsAnnonces:  list(p.announcedEffects()),
+		Side:             a,
+		Turn:             p.Turn,
+		Phase:            p.Phase,
+		Settings:         p.Settings,
+		Streets:          list(p.knownStreets()),
+		Zones:            list(p.seenZones()),
+		Roadblocks:       list(p.barrages()),
+		Inspectors:       list(append([]Inspector(nil), p.Inspectors...)),
+		KnownTrails:      p.trailsFor(a),
+		CrimeScenes:      list(append([]CrimeScene(nil), p.CrimeScenes...)),
+		CasesVisibles:    list(p.visibleCellsFor(a)),
+		LegalMoves:       list(p.LegalMoves(a)),
+		ProchaineReveal:  p.nextReveal(),
+		SilencePaye:      p.Fugitive.SilenceBought,
+		AnnouncedEffects: list(p.announcedEffects()),
 	}
-	v.ZonesAnnoncees = list(announcedZones(v.EffetsAnnonces))
+	v.ZonesAnnoncees = list(announcedZones(v.AnnouncedEffects))
 
 	// Le fugitif voit tout de lui-même. Les inspecteurs ne voient sa position
 	// que s'il est repéré ou révélé, et sa zone jamais.
@@ -284,7 +284,7 @@ func (p *Game) announcedEffects() []PendingEffect {
 func announcedZones(annonces []PendingEffect) []int {
 	var zones []int
 	for _, e := range annonces {
-		for _, effet := range e.Effets {
+		for _, effet := range e.Effects {
 			if effet.Type == EffectCloseZone {
 				zones = append(zones, e.EffectContext.Zone)
 			}

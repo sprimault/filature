@@ -131,15 +131,15 @@ func (p *Game) abilityMoves() []Move {
 		return nil
 	}
 
-	cles := make([]string, 0, len(p.Extensions.Capacites))
-	for cle := range p.Extensions.Capacites {
+	cles := make([]string, 0, len(p.Extensions.Abilities))
+	for cle := range p.Extensions.Abilities {
 		cles = append(cles, cle)
 	}
 	sort.Strings(cles)
 
 	var coups []Move
 	for _, cle := range cles {
-		c := p.Extensions.Capacites[cle]
+		c := p.Extensions.Abilities[cle]
 		if c.Camp != SideInspectors || c.Passive || c.Trigger != OnInspectorsPhase {
 			continue
 		}
@@ -200,15 +200,15 @@ func (p *Game) expenseMoves() []Move {
 		return nil
 	}
 
-	cles := make([]Expense, 0, len(p.Extensions.Depenses))
-	for cle := range p.Extensions.Depenses {
+	cles := make([]Expense, 0, len(p.Extensions.Expenses))
+	for cle := range p.Extensions.Expenses {
 		cles = append(cles, cle)
 	}
 	sort.Slice(cles, func(i, j int) bool { return cles[i] < cles[j] })
 
 	var coups []Move
 	for _, cle := range cles {
-		d := p.Extensions.Depenses[cle]
+		d := p.Extensions.Expenses[cle]
 		if d.Camp != SideFugitive || d.Cost > p.Fugitive.Stamina {
 			continue
 		}
@@ -231,7 +231,7 @@ func (p *Game) changeZoneMoves() []Move {
 	if p.Extensions == nil {
 		return nil
 	}
-	d, connue := p.Extensions.Depenses[ExpenseChangeZone]
+	d, connue := p.Extensions.Expenses[ExpenseChangeZone]
 	if !connue || d.Cost > p.Fugitive.Stamina {
 		return nil
 	}

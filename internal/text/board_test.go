@@ -66,7 +66,7 @@ func TestPiecesCoverTheRest(t *testing.T) {
 	v := testView()
 	sur := core.Position{Column: 1, Row: 1}
 
-	v.TracesConnues = map[string]core.Trail{sur.Key(): {Turn: 2, Direction: core.Est}}
+	v.KnownTrails = map[string]core.Trail{sur.Key(): {Turn: 2, Direction: core.Est}}
 	v.CrimeScenes = []core.CrimeScene{{Position: sur, Turn: 2}}
 	v.Inspectors = []core.Inspector{{Position: sur}}
 
@@ -147,7 +147,7 @@ func TestMergeGivesWatcherWhatNobodyKnows(t *testing.T) {
 	fugitif.PositionFugitif = &cache
 	fugitif.SealedZone = &zone
 	fugitif.Stamina = &resistance
-	fugitif.TracesConnues = map[string]core.Trail{
+	fugitif.KnownTrails = map[string]core.Trail{
 		cache.Key(): {Turn: 2, Direction: core.Nord},
 	}
 
@@ -155,7 +155,7 @@ func TestMergeGivesWatcherWhatNobodyKnows(t *testing.T) {
 	inspecteurs.Side = core.SideInspectors
 	inspecteurs.Inspectors = []core.Inspector{{Position: core.Position{Column: 0, Row: 4}}}
 	ailleurs := core.Position{Column: 4, Row: 0}
-	inspecteurs.TracesConnues = map[string]core.Trail{
+	inspecteurs.KnownTrails = map[string]core.Trail{
 		ailleurs.Key(): {Turn: 1, Direction: core.Sud},
 	}
 
@@ -173,8 +173,8 @@ func TestMergeGivesWatcherWhatNobodyKnows(t *testing.T) {
 	if len(v.Inspectors) != 1 {
 		t.Error("le spectateur ne voit pas les inspecteurs")
 	}
-	if len(v.TracesConnues) != 2 {
-		t.Errorf("%d traces, attendu les deux camps réunis", len(v.TracesConnues))
+	if len(v.KnownTrails) != 2 {
+		t.Errorf("%d traces, attendu les deux camps réunis", len(v.KnownTrails))
 	}
 	if len(v.LegalMoves) != 0 {
 		t.Error("un spectateur ne joue pas, il n'a pas à recevoir de coups")

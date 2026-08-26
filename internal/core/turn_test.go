@@ -182,7 +182,7 @@ func TestDeferredComesDue(t *testing.T) {
 		Position{Column: 2, Row: 2})
 	p.Extensions = testRegistry()
 	p.PendingEffects = []PendingEffect{{
-		Effets:        []Effect{{Type: EffectCloseZone, Target: TargetZone}},
+		Effects:       []Effect{{Type: EffectCloseZone, Target: TargetZone}},
 		Turn:          p.Turn + 1,
 		Announced:     true,
 		EffectContext: EffectContext{Side: SideInspectors, Zone: 2},
@@ -217,7 +217,7 @@ func TestStranglingTriggersMode(t *testing.T) {
 	p.Extensions = testRegistry()
 	p.Extensions.Modes = map[string]Mode{"etranglement": {
 		Name: "Étranglement", Trigger: OnStrangling,
-		Effets: []Effect{{
+		Effects: []Effect{{
 			Type: EffectDefer, Duration: 2, Announced: true,
 			Then: []Effect{{Type: EffectCloseZone, Target: TargetZone}},
 		}},
@@ -308,7 +308,7 @@ func TestTurnEndUndoes(t *testing.T) {
 		p.Turn = 4
 		p.Trails = map[Position]Trail{{Column: 0, Row: 0}: {Turn: 0}}
 		p.PendingEffects = []PendingEffect{{
-			Effets:        []Effect{{Type: EffectCloseZone, Target: TargetZone}},
+			Effects:       []Effect{{Type: EffectCloseZone, Target: TargetZone}},
 			Turn:          4,
 			EffectContext: EffectContext{Side: SideInspectors, Zone: 1},
 		}}
