@@ -23,8 +23,15 @@ run:
 
 # Aucun test ne doit ouvrir de fenêtre : les runners sont sans écran, et un test
 # qui exigerait xvfb n'a rien à faire dans la suite par défaut.
+#
+# PKG et RUN restreignent la portée sans sortir du Makefile : une commande go
+# tapée directement perd les réglages de makefile.local, et l'oubli ne se voit
+# pas dans la sortie.
+PKG ?= ./...
+RUN ?=
+
 test:
-	go test ./...
+	go test $(if $(RUN),-run '$(RUN)') $(PKG)
 
 race:
 	CGO_ENABLED=1 go test -race ./...
