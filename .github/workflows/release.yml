@@ -34,7 +34,11 @@ jobs:
       matrix:
         include:
           - { os: windows, arch: amd64, cgo: 0, runner: ubuntu-latest, ext: .exe }
-          - { os: js, arch: wasm, cgo: 0, runner: ubuntu-latest, ext: .wasm }
+          # js/wasm se compile mais ne se publie pas : l'archive serait
+          # inutilisable seule, faute de wasm_exec.js et d'une page HTML, et le
+          # mode web n'est pas au programme. La cible reste ici parce qu'elle est
+          # ce qui empêche une dépendance d'introduire du cgo sans qu'on le voie.
+          - { os: js, arch: wasm, cgo: 0, runner: ubuntu-latest, ext: .wasm, publier: false }
           - { os: linux, arch: amd64, cgo: 1, runner: ubuntu-latest, ext: "" }
           - { os: linux, arch: arm64, cgo: 1, runner: ubuntu-24.04-arm, ext: "" }
           - { os: darwin, arch: arm64, cgo: 1, runner: macos-latest, ext: "" }
@@ -97,6 +101,7 @@ jobs:
           fi
 
       - uses: actions/upload-artifact@v7
+        if: matrix.publier != false
         with:
           name: archive-${{ matrix.os }}-${{ matrix.arch }}
           path: dist/*

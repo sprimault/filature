@@ -44,6 +44,11 @@ est un avantage de jeu déguisé en habillage.
 Deux plugins qui redéfinissent la même forme sont un conflit, nommé des deux
 côtés. Surcharger le contenu livré n'en est pas un.
 
+**L'archive `js/wasm` n'est plus publiée.** Elle ne contenait que le `.wasm`,
+inutilisable sans `wasm_exec.js` ni page HTML. La cible continue d'être
+compilée : c'est le seul contrôle qui empêche une dépendance d'introduire du
+cgo sans que rien ne le signale.
+
 **Les archives portent `THIRD-PARTY-NOTICES`**, à côté de `LICENSE` et
 `NOTICE`. Les licences des bibliothèques liées au binaire l'exigent à la
 redistribution, et les versions précédentes ne le faisaient pas. Le fichier est
@@ -64,6 +69,10 @@ a gameplay advantage dressed up as decoration.
 
 Two plugins redefining the same shape are a conflict, named on both sides.
 Overriding shipped content is not.
+
+**The `js/wasm` archive is no longer published.** It held only the `.wasm`,
+unusable without `wasm_exec.js` and an HTML page. The target is still built:
+it is the one check that keeps a dependency from pulling in cgo unnoticed.
 
 **Archives now carry `THIRD-PARTY-NOTICES`**, alongside `LICENSE` and `NOTICE`.
 The licences of the libraries linked into the binary require it on
