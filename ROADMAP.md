@@ -181,7 +181,8 @@ Simulation en masse, taux de victoire par camp et par motif de fin, ajustement
 évolutionnaire des poids.
 
 Le premier paramètre à corriger sera le nombre de pions déplaçables par tour.
-Le second, le coût du meurtre.
+Le second, les trois chiffres du ressourcement — nombre de lieux, gain et durée
+de recharge — posés ensemble et jamais joués.
 
 Ce n'est pas un test qui passe ou échoue : c'est une mesure, et une étape qui
 peut renvoyer à `docs/regles.md`.

@@ -9,9 +9,10 @@ conforme, pas l'inverse.
 
 Deux joueurs, tour par tour, information imparfaite asymétrique.
 
-Un **fugitif** doit rejoindre l'un des six points d'extraction de la ville et s'y
-maintenir un tour complet. Cinq **inspecteurs** doivent l'en empêcher, en le
-piégeant ou en épuisant sa résistance.
+Un **fugitif** doit rejoindre l'un des six points d'extraction de la ville — il
+n'en restera que trois en fin de partie — et s'y maintenir un tour complet. Cinq
+**inspecteurs** doivent l'en empêcher, en le piégeant ou en épuisant sa
+résistance.
 
 Le fugitif est plus rapide (8 directions contre 4) mais seul et invisible la
 plupart du temps. Les inspecteurs sont nombreux et voient loin, mais ne peuvent
@@ -24,21 +25,61 @@ deviner.
 
 ## 2. Décisions tranchées
 
-Ces points étaient contradictoires ou ouverts dans l'énoncé initial. Ils sont
-figés ici.
+Ces points étaient contradictoires ou ouverts dans l'énoncé initial, ou ont été
+tranchés depuis contre lui. Ils sont figés ici.
 
 **Ordre du tour.** Les inspecteurs jouent avant le fugitif. L'énoncé initial
 disait l'inverse, mais les inspecteurs disposent de trois déplacements contre un :
 donner au fugitif la position réactive est ce qui compense. Il voit le barrage se
 former avant de choisir.
 
+**Cette compensation est plus faible qu'annoncé, et la décision reste
+provisoire.** Voir le barrage ne sert qu'à qui a où aller : le terrain n'offre
+au fugitif que trois destinations et demie en moyenne, deux ou moins sur une
+case de rue sur cinq. Les huit directions sont un chiffre de règlement, pas de
+plateau (§14).
+
 **Téléportation supprimée.** Un inspecteur qui repère le fugitif ne saute plus sur
 sa case : il gagne un déplacement supplémentaire immédiat, hors quota. La pression
 est conservée, la partie ne se termine plus sur un seul coup.
 
-**Décompte des contacts.** Un point de résistance par inspecteur orthogonalement
-adjacent, évalué une seule fois par tour, à la fin du tour complet, plafonné à
-trois. Être encerclé doit faire très mal sans être instantanément fatal.
+**Décompte des contacts.** Un point de résistance par inspecteur au contact,
+évalué une seule fois par tour, à la fin du tour complet, plafonné à trois. Être
+encerclé doit faire très mal sans être instantanément fatal.
+
+**La capture existe, et elle est graduée.** Un inspecteur qui maintient le
+contact deux tours de suite capture le fugitif. L'énoncé initial n'avait que le
+blocage — plus aucun déplacement légal —, un cas rare et brutal qui ne
+récompensait jamais la poursuite. Le contact maintenu la récompense, et il ne
+tombe pas n'importe où : en terrain ouvert le fugitif rompt le contact d'une
+diagonale, mais dans un couloir d'une case il ne le peut pas. C'est là que le
+double déplacement redevient une dépense de survie.
+
+**Une case occupée est neutralisée, pas la zone entière.** Un inspecteur posté
+sur une zone n'en ferme que la case qu'il occupe. Neutraliser la zone entière
+donnait au camp le moyen de verrouiller les dernières sorties en fin de partie,
+au moment précis où couvrir ne coûte plus rien puisqu'il n'y a plus rien à
+chercher. Une zone porte au moins cinq cases de rue : cinq inspecteurs n'en
+ferment jamais deux.
+
+**Le meurtre est remplacé par le leurre.** Le fugitif ne tue plus, il falsifie
+la trace qu'il laisse. Le meurtre achetait du mouvement adverse en payant sa
+position ; le leurre achète la même chose moins cher, en mentant au lieu de
+révéler. Contre un adversaire qui raisonne par carte de croyance, un faux
+indice attaque la déduction elle-même.
+
+**La résistance se récupère, et elle se récupère sur le plateau.** Quatre lieux
+de ressourcement, au même format qu'une zone d'extraction. Le fugitif doit s'y
+rendre, donc il devient prévisible au moment où il est le plus faible, et les
+inspecteurs gagnent des points à couvrir. Les deux autres formes envisagées ont
+été écartées : une récupération passive après quelques tours sans être vu ne se
+décide pas, elle se subit ; une récupération à l'immobilité récompense le
+campement, que le jeu doit décourager des deux côtés.
+
+**Les cases surveillées sont publiques.** Les positions des inspecteurs le sont
+déjà, et leurs lignes de vue s'en déduisent : les afficher ne livre rien qui ne
+soit calculable. Les cacher ferait reposer l'équilibre sur la fatigue du joueur,
+quand son adversaire machine refait ce calcul entier à chaque coup.
 
 **Trois pions par tour, pas cinq.** L'énoncé initial laissait les inspecteurs
 déplacer tous leurs pions. Le quota est ce qui fait de leur phase une décision :
@@ -50,10 +91,29 @@ viser : leur problème est l'information, pas la vitesse.
 C'est un paramètre et non une constante. Trois par défaut, mesuré à l'étape 11,
 et le premier chiffre à corriger si l'équilibrage penche.
 
-**Placement.** Le fugitif est placé aléatoirement dans le noyau central (rayon 5).
-Les inspecteurs se placent ensuite librement sur n'importe quelle case claire,
-sans connaître sa position exacte — seulement la zone. Le premier vrai choix de
-la partie : verrouiller les sorties ou resserrer sur le centre.
+**Placement.** Le fugitif est placé aléatoirement dans le noyau central, dont le
+rayon vaut un quart du côté. Les inspecteurs se placent ensuite librement sur
+n'importe quelle case claire **hors du noyau**, sans connaître sa position exacte
+— seulement le quartier. Le premier vrai choix de la partie : verrouiller les
+sorties ou resserrer autour du centre.
+
+**Les inspecteurs ne commencent pas dans le quartier où le fugitif se cache.**
+Sans cette interdiction, cinq pions posés au mieux autour du centre voient plus
+de neuf dixièmes du noyau dès le premier tour : l'invisibilité que le §1 promet
+au fugitif n'existe alors pas, et le placement cesse d'être un choix puisque
+resserrer domine.
+
+Le rayon suit le côté pour la même raison. À rayon fixe, la portée de vue
+grandit avec le plateau pendant que le noyau ne bouge pas : c'est la plus grande
+ville qui cache le moins bien, l'inverse de ce qu'on attend d'elle. Un quart et
+non un tiers, qui corrigerait davantage mais rapprocherait le départ des zones
+d'extraction — dont la distance au noyau n'est pas fixée (§14).
+
+**L'interdiction porte sur le placement, pas sur l'accès.** Rien n'empêche un
+inspecteur d'entrer dans le noyau dès le premier tour, et leurs lignes de vue y
+plongent depuis l'extérieur avant même qu'ils avancent. Le noyau n'est pas un
+sanctuaire : c'est l'endroit où la couverture initiale est la plus faible, et
+elle se dégrade dès le premier déplacement.
 
 **Diagonales.** Le fugitif ne peut pas franchir un angle fermé : le déplacement
 diagonal exige qu'au moins une des deux cases orthogonales intermédiaires soit une
@@ -79,12 +139,31 @@ Génération déterministe depuis une graine :
    sont elles qui permettent le piégeage. Un couloir fait trois cases au plus et
    ne débouche jamais.
 5. Placement des six zones d'extraction, en périphérie, réparties angulairement.
-6. **Validation** : toutes les cases claires forment une seule composante
-   connexe, chaque zone est atteignable, le taux de rues tombe entre 35 % et 50 %.
-   Un plateau qui échoue est rejeté et régénéré avec la graine suivante.
+6. Placement des quatre lieux de ressourcement, dans la couronne intermédiaire
+   entre le noyau central et les zones, un par quadrant.
+7. **Validation** : toutes les cases claires forment une seule composante
+   connexe, chaque zone et chaque lieu sont atteignables, le taux de rues tombe
+   entre 35 % et 50 %. Un plateau qui échoue est rejeté et régénéré avec la
+   graine suivante.
 
 Une zone d'extraction est un bloc de 3×3 dont au moins 5 cases sont des rues.
 Les six zones sont visibles des deux joueurs dès le début.
+
+**Un lieu de ressourcement a exactement le même format** : un bloc de 3×3 dont
+au moins 5 cases sont des rues, visible des deux joueurs dès le début. Ce n'est
+pas de l'économie de code, c'est ce qui fait qu'un joueur n'a rien de neuf à
+apprendre — et une case isolée se fermerait avec un seul inspecteur, ce que le
+format de zone interdit.
+
+La couronne intermédiaire plutôt que la périphérie : posés près des zones, les
+lieux transformeraient la partie en allers-retours entre deux bords. Ils sont
+sur le chemin, et le détour se compte en tours plutôt qu'en demi-plateau.
+
+**Le noyau central est un élément du plateau, pas seulement une zone de
+tirage.** Il porte le départ du fugitif et interdit le placement des inspecteurs
+(§4), donc les deux camps en voient les limites dès le début, au même titre que
+les zones et les lieux. Un inspecteur qui les ignorerait ne saurait pas où il a
+le droit de se poser.
 
 ---
 
@@ -94,7 +173,8 @@ Les six zones sont visibles des deux joueurs dès le début.
 2. Placement aléatoire du fugitif dans le noyau central. Position cachée.
 3. Le fugitif choisit secrètement sa zone d'extraction. **Le choix est scellé** :
    en changer coûtera 2 points de résistance.
-4. Les inspecteurs placent leurs cinq pions, librement, sur des cases claires.
+4. Les inspecteurs placent leurs cinq pions, librement, sur des cases claires
+   **hors du noyau central**.
 5. Le tour 1 commence.
 
 ---
@@ -121,10 +201,26 @@ revient sur sa case a consommé son déplacement, sinon un joueur sonderait le
 terrain gratuitement.
 
 **Plusieurs inspecteurs peuvent tenir la même case**, et n'y gagnent rien : une
-ligne de vue s'arrête au premier d'entre eux, et le contact plafonne à trois
-quel que soit leur nombre. **Le fugitif, lui, ne peut pas entrer sur une case
-occupée.** Il y serait à l'abri de tout, puisque le contact exige l'adjacence et
-qu'une case partagée n'est pas adjacente à elle-même.
+ligne de vue s'arrête au premier d'entre eux, et le contact plafonne à trois quel
+que soit leur nombre.
+
+**S'empiler sur la case du fugitif est même désavantageux.** Trois pions
+rassemblés dessus donnent les trois mêmes contacts que trois pions sur trois
+côtés, mais laissent ouvertes les cases que l'encerclement lui interdirait, et ne
+bloquent qu'une ligne de vue au lieu de trois. La meute n'est pas une façon
+d'économiser le travail de dispersion.
+
+**Le fugitif, lui, ne peut pas entrer sur une case occupée.** C'est ce qui fait
+d'un barrage de pions un barrage : sans cette interdiction, encercler ne
+restreindrait plus rien.
+
+**Mais une case partagée ne le retient pas.** Un inspecteur qui marche sur lui ne
+le cloue pas au sol : le fugitif joue après les inspecteurs, ses huit
+destinations restent ouvertes, et le contact tombe dès qu'il s'écarte.
+
+Rien n'interdit ce déplacement à l'inspecteur, et rien ne doit l'interdire : un
+coup refusé est une information. Empêcher un pion d'entrer sur une case parce
+qu'un fugitif invisible s'y trouve reviendrait à le lui annoncer.
 
 **Une phase se termine quand son camp rend la main.** Les inspecteurs ne sont
 pas tenus de déplacer trois pions, le fugitif n'est pas tenu de bouger, et
@@ -139,14 +235,35 @@ suit n'a lieu entre elles.
 1. Calcul de la visibilité. Si le fugitif est dans une ligne de vue, son pion
    devient visible et le reste jusqu'à ce qu'il en sorte.
 2. Contacts : perte de résistance selon §7.
-3. Traces : dépôt sur la case quittée, vieillissement des traces existantes.
-4. Révélation périodique si le tour est multiple de 4.
-5. Fermeture de zone si le tour l'impose (§8).
-6. Test des conditions de fin (§8).
+3. Capture : le fugitif tombe s'il est resté au contact du même inspecteur
+   depuis la résolution précédente (§10).
+4. Traces : dépôt sur la case quittée ou leurre à sa place, vieillissement des
+   traces existantes (§8).
+5. Ressourcement : un lieu actif sous le fugitif lui rend de la résistance et
+   passe en recharge (§7).
+6. Révélation périodique si le tour est multiple de 4.
+7. Fermeture de zone si le tour l'impose (§10).
+8. Test des conditions de fin (§10).
+
+**La résistance tombée à zéro est fatale au moment où elle y tombe**, avant
+tout ressourcement. Un lieu n'est pas un sanctuaire : des inspecteurs qui
+acculent le fugitif dessus l'emportent, et il ne se relève pas d'un point qu'il
+n'a plus.
 
 ---
 
 ## 6. Vision et information
+
+**Ce que chaque camp voit.** Le terrain, les zones et leur état, les lieux de
+ressourcement et leur recharge, le noyau, les barrages, les cases surveillées et
+**les positions des cinq inspecteurs** sont publics, et le restent toute la
+partie. Trois choses seulement sont cachées, et ce sont elles qui font le jeu :
+où est le fugitif, quelle zone il a scellée, et les traces qu'aucun inspecteur
+n'a encore découvertes.
+
+L'asymétrie est donc étroite, et mieux vaut l'énoncer que la laisser déduire de
+ce qui est caché : le fugitif n'est pas le camp qui ne sait rien, c'est le camp
+qu'on ne voit pas.
 
 Chaque inspecteur voit dans 8 directions, jusqu'à 8 cases, la ligne s'arrêtant au
 premier bâtiment. La vision est **calculée avant le déplacement du fugitif comme
@@ -156,6 +273,23 @@ après** : un fugitif qui sort d'une ligne de vue redevient invisible.
 sont à portée 8, comme huit pas tout droit. C'est la même distance que celle des
 déplacements du fugitif, et elle ne se confond pas avec celle des contacts, qui
 se comptent orthogonalement.
+
+**Les cases surveillées sont affichées aux deux camps.** Chacun voit l'ensemble
+des cases tenues par une ligne de vue d'inspecteur : les inspecteurs y lisent
+leur couverture, le fugitif ce qui l'expose.
+
+Ce n'est pas une information de plus, c'en est une déjà donnée sous une forme
+inutilisable. Les positions des inspecteurs sont publiques et le terrain aussi,
+donc les lignes de vue se déduisent — mais les déduire, c'est dérouler cinq
+champs à travers le bâti, avec l'occlusion mutuelle des pions et les barrages, à
+chaque coup adverse. Personne ne le fait entièrement de tête, et une machine le
+fait sans y penser. Cacher ce calcul n'équilibrerait rien : ça handicaperait le
+seul des deux joueurs qui fatigue.
+
+Conséquence à connaître pour l'équilibrage : le fugitif se fera moins repérer
+qu'un joueur qui devait tout évaluer à vue. C'est l'effet recherché, et il ne
+doit pas être corrigé en allongeant la portée — la portée se juge en simulation,
+où les deux camps ont toujours eu ce calcul.
 
 **Révélation périodique.** Tous les 4 tours, la position exacte du fugitif est
 affichée aux deux joueurs. Sans ce battement, l'incertitude des inspecteurs ne
@@ -178,9 +312,31 @@ savent qu'il s'est appauvri.
 | Silence | 3 | Annule la prochaine révélation périodique |
 | Effacement | 1 | Supprime toutes ses traces de moins de 3 tours |
 | Changement de zone | 2 | Rescelle une autre zone d'extraction |
+| Leurre | 1 | Falsifie la trace du tour, 3 fois par partie (§12) |
 
-**Contact** : 1 point par inspecteur orthogonalement adjacent en fin de tour,
-plafond de 3 par tour. Les diagonales ne comptent pas.
+**Contact** : 1 point par inspecteur en contact en fin de tour, plafond de 3 par
+tour. Un inspecteur est en contact s'il **occupe la case du fugitif ou une case
+orthogonalement adjacente**. Les diagonales ne comptent pas.
+
+**Ressourcement** : 2 points en entrant sur un lieu actif, en fin de tour. Le
+lieu passe alors en recharge et redevient actif 8 tours plus tard.
+
+C'est la seule source de résistance de la partie, et elle se paie en
+information. Un lieu en recharge est visible des deux camps avec le tour où il
+reviendra : les inspecteurs y lisent que le fugitif est passé là, et savent où
+il pourrait revenir. Le fugitif achète des points contre du renseignement, ce
+qui est l'économie de toutes ses autres dépenses.
+
+**Le lieu entier se consomme**, pas seulement la case foulée. Neuf recharges
+décalées sur un même bloc dissoudraient l'indice en neuf indices tièdes, et
+c'est l'indice qui justifie la mécanique.
+
+La recharge ne suit pas la taille du plateau, contrairement à la portée et à la
+durée. Le nombre d'occasions de se ressourcer est déjà proportionnel à la durée
+par construction — deux fois plus de tours, deux fois plus de recharges — et
+faire dériver le délai le rendrait constant, ce qui est l'inverse. L'économie du
+fugitif est un système fermé : sa jauge, ses coûts et ses gains ne dépendent pas
+du terrain.
 
 **Une dépense ne peut pas prendre le dernier point.** À zéro le fugitif est
 vaincu sur-le-champ, donc ce qu'il vient d'acheter ne lui sert à rien : il lui
@@ -203,6 +359,16 @@ case ou une case orthogonalement adjacente. Elle s'efface au bout de 6 tours.
 C'est ce qui donne aux inspecteurs quelque chose à chercher entre deux
 révélations, ce qui récompense la patrouille plutôt que le campement, et ce qui
 fournit à l'IA un objet de jeu concret.
+
+**Il y a exactement une trace par tour joué, leurre compris.** Un leurre ne
+s'ajoute pas à la trace du tour, il s'y substitue : le fugitif paie pour qu'elle
+soit posée sur une case voisine de son choix, avec la direction de son choix.
+
+Cette forme est ce qui rend le mensonge indétectable. Deux traces datées du même
+tour seraient impossibles en jeu honnête, et l'inspecteur qui les découvrirait
+saurait aussitôt que l'une est fausse — l'achat serait annulé par le fait même
+de l'avoir fait. Rien ne distingue donc un leurre d'une trace, ni sa date, ni sa
+forme, ni sa couleur.
 
 ---
 
@@ -228,20 +394,63 @@ n'y en a pas. Sur un plateau ouvert, c'est lui qui rend le piégeage possible.
 **Le fugitif gagne** s'il se trouve dans sa zone scellée à la fin de son tour et
 qu'il y est toujours à la fin du tour suivant.
 
-Une zone occupée par un inspecteur est **neutralisée** tant qu'il y reste : le
-compte d'extraction ne démarre pas et s'interrompt s'il était en cours. Camper est
-une stratégie valide — mais un inspecteur assis sur une zone est un inspecteur qui
-ne cherche pas.
+**Une zone ne se neutralise pas, ses cases s'occupent.** Le fugitif ne peut pas
+entrer sur une case tenue par un inspecteur (§5) : un pion posté sur une zone
+lui en retire une case d'entrée, et rien de plus.
 
-**Les inspecteurs gagnent** dans trois cas :
+Camper reste une stratégie, mais elle se paie. Fermer une zone demande autant de
+pions qu'elle a de cases de rue — cinq au minimum, neuf au plus : le camp entier
+dans le meilleur des cas, et alors plus rien ne couvre les autres zones ni ne
+poursuit.
 
+**Un compte d'extraction en cours n'est pas une victoire acquise.** Pendant le
+tour qu'il doit tenir, le fugitif reste capturable, épuisable et blocable, et son
+compte s'interrompt s'il quitte la zone. Combiné à la capture, cela produit la
+règle du tour d'extraction : un fugitif déjà au contact quand il entre dans la
+zone tombe avant d'avoir tenu. **Il faut entrer propre.**
+
+**Les inspecteurs gagnent** dans quatre cas :
+
+- **capture** : un même inspecteur est resté en contact (§7) à deux résolutions
+  de tour consécutives ;
 - résistance du fugitif tombée à 0 ;
-- fugitif sans déplacement légal en début de sa phase ;
-- tour 40 atteint sans extraction.
+- fugitif sans déplacement légal en début de sa phase — cas de terrain, que les
+  bâtiments et les barrages du Barreur produisent seuls, la capture couvrant tous
+  les autres ;
+- tour limite atteint sans extraction.
 
-**Étranglement.** À partir du tour 30, une zone se ferme tous les 2 tours. L'ordre
-est déterminé par la graine et **annoncé 2 tours à l'avance** aux deux joueurs. Si
-la zone scellée se ferme, le fugitif doit payer 2 points pour en choisir une autre.
+**Le tour limite est un filet, pas une façon normale de finir.** Il tranche le
+seul cas que rien d'autre n'atteint : un fugitif qui refuse le rendez-vous des
+dernières zones et tourne en ville en se ressourçant. Il tranche contre lui, ce
+qui est juste — n'avoir jamais tenté l'extraction n'est pas l'avoir réussie.
+
+**En cas de simultanéité, la condition de victoire du fugitif l'emporte.** Les
+inspecteurs disposent de quatre voies de conclusion, le fugitif d'une seule : si
+toutes les égalités tombaient du côté des quatre, l'unique se refermerait sans
+que personne ne l'ait décidé. La règle vaut telle quelle pour les conditions
+qu'un plugin de règles ajouterait.
+
+**Étranglement.** Aux trois quarts de la partie, les zones commencent à se
+fermer à intervalle régulier, **jusqu'à ce qu'il n'en reste que trois**. L'ordre
+est déterminé par la graine et **annoncé 2 tours à l'avance** aux deux joueurs.
+Si la zone scellée se ferme, le fugitif doit payer 2 points pour en choisir une
+autre.
+
+| Préréglage | Durée | Fermetures |
+|---|---|---|
+| Quartier | 21 | 15, 17, 19 |
+| Faubourg | 31 | 23, 26, 29 |
+| Ville | 40 | 30, 34, 38 |
+
+Le début suit la durée, comme la portée suit le côté : plus tôt, l'étranglement
+déciderait de l'issue ; plus tard, il n'aurait pas le temps de peser. L'intervalle
+en découle, la dernière fermeture tombant deux tours avant la fin — sans quoi la
+pression s'épuiserait à mi-chemin et les derniers tours seraient plats.
+
+**Trois zones et non une.** L'entonnoir doit créer un rendez-vous, pas un
+verrou : avec une seule issue, il n'y a plus d'arbitrage et le camp entier s'y
+assied. À trois, couvrir demande de se diviser, et se diviser coûte la masse qui
+capture.
 
 ---
 
@@ -255,64 +464,87 @@ d'équilibrage.
 | Taille du plateau | 41×41 | Préréglages Quartier 21, Faubourg 31, Ville 41 |
 | Portée de vue | 8 | Un cinquième du côté, jamais moins de 3 |
 | Durée | 40 tours | Environ le côté du plateau |
+| Rayon du noyau central | 10 | Un quart du côté, deux effets à lui seul (§14) |
 | Résistance | 10 | |
 | Inspecteurs | 5 | |
 | Pions déplaçables par tour | 3 sur 5 | **Premier levier à ajuster** |
 | Période de révélation | 4 tours | |
 | Zones d'extraction | 6 | Doit rester supérieur au nombre d'inspecteurs |
 | Durée d'une trace | 6 tours | |
-| Coût d'un meurtre | 3 points | |
-| Meurtres par partie | 2 | |
-| Début de l'étranglement | Tour 30 | |
+| Coût d'un leurre | 1 point | |
+| Leurres par partie | 3 | |
+| Lieux de ressourcement | 4 | Même format qu'une zone |
+| Gain d'un ressourcement | 2 points | |
+| Recharge d'un lieu | 8 tours | Ne suit pas la taille, voir §7 |
+| Contacts consécutifs pour capturer | 2 | |
+| Début de l'étranglement | 3/4 de la durée | Tour 30 sur quarante |
+| Zones restantes après étranglement | 3 | |
+
+**Quatre de ces valeurs suivent le côté du plateau au lieu d'être posées** : la
+portée de vue, la durée, le rayon du noyau et la période d'étranglement. Les
+figer donnerait trois jeux différents sous le même nom — c'est ce qui arrivait au
+noyau, dont le rayon fixe laissait la portée de vue le rattraper à mesure que la
+ville grandissait.
 
 Suspicion à vérifier en simulation : trois déplacements contre un reste peut-être
 trop favorable aux inspecteurs. C'est là qu'il faudra corriger en premier.
 
+**Mais si c'est le fugitif qui gagne trop, regarder le rayon du noyau avant la
+portée ou le quota.** Il n'agit qu'une fois, au placement, là où les autres
+agissent à chaque tour — mais il porte deux effets à lui seul, et l'un d'eux
+n'a pas été voulu (§14).
+
 ---
 
-## 12. Le meurtre
+## 12. Le leurre
 
-Le fugitif peut tuer. C'est sa carte la plus forte, et elle se paie en
-information.
+Le fugitif peut mentir. C'est sa seule action offensive, et elle porte sur
+l'information plutôt que sur le plateau.
 
-**Coût : 3 points de résistance. Deux fois par partie au maximum.**
+**Coût : 1 point de résistance. Trois fois par partie au maximum.**
 
-Au moment du meurtre, sa position exacte est révélée aux inspecteurs, et la
-scène reste marquée sur le plateau. Il ne gagne rien d'autre — pas de
-déplacement, pas d'avantage direct.
+Un leurre ne pose pas une trace de plus : il remplace celle du tour. Le fugitif
+choisit la case, la sienne ou une voisine, et la direction inscrite. Rien ne
+distingue le résultat d'une trace honnête (§8).
 
-Ce qu'il achète, c'est **du mouvement adverse**. Cinq inspecteurs qui convergent
-sur une scène de crime sont cinq inspecteurs qui ne gardent plus les zones
-d'extraction. Un meurtre commis loin de sa zone scellée, suivi d'une course dans
-l'autre sens, est le seul moyen dont il dispose pour déplacer le dispositif
-entier.
+Ce qu'il achète, c'est **du mouvement adverse**. Une direction fausse est une
+patrouille qui part du mauvais côté, et surtout une déduction faussée : contre un
+adversaire qui raisonne en carte de croyance, un faux indice attaque le
+mécanisme lui-même plutôt que son résultat.
 
-Rien n'oblige les inspecteurs à s'y rendre. C'est justement l'intérêt : ils
-savent où il *était*, ils doivent parier sur ce que ça dit de sa destination. Un
-joueur qui ignore la scène refuse le leurre, et prend le risque que ce n'en soit
-pas un.
+Rien n'oblige les inspecteurs à suivre une trace. C'est justement l'intérêt :
+ils savent où il *était*, ils doivent parier sur ce que ça dit de sa
+destination. Un joueur qui l'ignore refuse le leurre, et prend le risque que
+ce n'en soit pas un.
 
 ### Pourquoi ce coût
 
-Trois points, c'est plus cher que le silence. Un fugitif qui tue deux fois a
-dépensé six de ses dix points et ne peut plus se permettre d'être approché. La
-mécanique ne doit pas devenir un réflexe d'ouverture.
+Un point, c'est bon marché, et c'est voulu : le fugitif doit pouvoir mentir sans
+se ruiner, sans quoi il ne ment jamais et la mécanique n'existe que sur le
+papier.
 
-Le plafond de deux existe pour la même raison : trois leurres suffiraient à
-promener les inspecteurs d'un bout à l'autre du plateau sans qu'ils puissent
-jamais se replacer.
+Le plafond de trois est ce qui la retient. La trace est le seul levier que les
+inspecteurs actionnent eux-mêmes — tout le reste leur tombe dessus au rythme du
+jeu — et des leurres illimités la dévalueraient entièrement : une information
+qu'on ne peut plus croire ne vaut pas mieux qu'une information absente.
 
 ### Ce qui n'est pas retenu
 
-**Le meurtre n'est pas involontaire.** Une pulsion qui monte tour après tour et
-finit par se déclencher toute seule est thématiquement juste, mais le fugitif la
-subit au lieu de la décider — et il n'en tire aucun avantage, seulement la
-convergence adverse. La version volontaire garde la tension et ajoute
-l'arbitrage.
+**Le meurtre.** Il occupait cette place et achetait la même chose, plus cher : 3
+points, deux fois, avec révélation de la position. Le leurre fait le même
+travail en mentant au lieu de se dénoncer, ce qui laisse au fugitif quelque
+chose à faire de son information au lieu de la sacrifier. La scène de crime
+disparaît donc du plateau, et le jeu quitte le registre du polar noir — c'est le
+prix, assumé.
 
-Un plugin de règles peut rétablir la pulsion : compteur croissant, meurtre
-imposé au-delà d'un seuil. Le coût et le plafond sont déclaratifs, ils se
-changent sans toucher au code.
+Un plugin de règles peut le rétablir : le coût et le plafond sont déclaratifs.
+Il devra en revanche livrer la forme et la couleur de sa scène, que le contenu
+de base ne porte plus.
+
+**Le leurre à distance libre.** Poser un faux indice à l'autre bout du plateau
+serait bien plus fort, et bien trop : le fugitif déplacerait le dispositif
+adverse sans jamais rien risquer. Se limiter à sa case et à ses voisines fait
+que le mensonge part d'un endroit où il se trouvait vraiment.
 
 ---
 
@@ -338,15 +570,66 @@ ne serait qu'un mur de déplacement sans effet sur l'information.
 
 - Le rapport de trois déplacements contre un est à mesurer avant d'être
   défendu. C'est le premier paramètre à corriger si l'équilibrage penche.
+- **L'ordre du tour repose sur une compensation mesurée plus faible qu'attendu.**
+  Sur deux cents plateaux par préréglage, le fugitif dispose de 3,5 destinations
+  en moyenne contre 2,3 à un inspecteur : le rapport réel est de 1,5 et non de 2,
+  et une case de rue sur cinq ne lui en offre que deux. Son avantage de
+  déplacement survit — il traverse en Tchebychev là où l'inspecteur traverse en
+  Manhattan — mais son pouvoir d'esquive, qui est ce que la position réactive
+  était censée lui rendre, est amputé. À réexaminer à l'étape 11 avec les taux
+  de victoire, pas avant : inverser l'ordre remplacerait une hypothèse non
+  mesurée par une autre.
 - La distance minimale entre le noyau de départ et les zones d'extraction n'est
-  pas fixée ; elle dépend du taux de rues obtenu par la génération.
+  pas fixée ; elle dépend du taux de rues obtenu par la génération. Le noyau au
+  quart du côté l'a raccourcie sans que ce soit l'intention : sur la plus grande
+  ville, le fugitif atteint la zone la plus proche en quatorze pas au lieu de
+  dix-sept, soit un tiers de la partie. Il commence donc plus souvent caché
+  **et** marche moins longtemps — deux effets dans le même sens, à ne pas
+  compter deux fois quand on jugera l'équilibre.
+- **Le milieu de partie doit avoir un contenu propre.** Sur la plus grande
+  ville, le fugitif atteint sa zone en quatorze pas et l'étranglement ne démarre
+  qu'au tour trente : près des deux tiers de la partie ne sont ni du trajet ni
+  de la fin. Le trajet n'est pas le jeu, l'occupation du temps l'est — et ce
+  sont les lieux de ressourcement et les leurres qui doivent la porter, puisque
+  rien d'autre ne s'y passe. Si le milieu se joue à vide, c'est là qu'il faut
+  corriger, pas dans la fin de partie qui n'en serait que le symptôme.
+- **Le noyau ne doit pas devenir un abri où le fugitif s'attarde.** C'est
+  l'endroit où la couverture initiale est la plus faible, donc celui où il est
+  tentant de rester — mais y rester ne le rapproche d'aucune zone, et
+  l'étranglement finira par le forcer à traverser une ville mieux tenue qu'au
+  départ. À vérifier sur le tour moyen de sortie du noyau : s'il approche du
+  début de l'étranglement, l'arbitrage est faussé.
 - Le coût du silence, trois points, est le chiffre le plus arbitraire du
-  document.
+  document — et il a probablement été dévalué sans qu'on y touche. Il achète le
+  saut d'une révélation, mais les inspecteurs disposent désormais de deux
+  canaux de plus : les cases surveillées lisibles d'un coup d'œil (§6) et les
+  lieux consommés, qui sont des indices datés (§7). Un chiffre juste dans son
+  voisinage d'origine devient faux quand le voisinage bouge.
 - Les capacités des inspecteurs n'ont jamais été essayées ensemble. Le Coureur
   et le Barreur sont les deux suspects.
-- Le meurtre à 3 points, deux fois par partie, n'a jamais été mesuré. S'il n'est
+- Le leurre à 1 point, trois fois par partie, n'a jamais été mesuré. S'il n'est
   jamais joué, il est trop cher ; s'il est joué systématiquement au premier
   tour, il l'est trop peu.
+- La capture demande un inspecteur ; deux la rendraient plus rare et plus
+  spectaculaire. À trancher sur la part de parties qu'elle conclut.
+- Capture et résistance épuisée mènent au même endroit par le même chemin, le
+  motif ne dépendant que de la réserve du fugitif au moment où il est acculé. Si
+  l'un des deux tombe sous un dixième des fins de partie, il est décoratif.
+- Le tour limite doit rester rare, sous une partie sur dix, et se lire **par
+  camp** : des fugitifs qui refusaient l'extraction signifient qu'il fait son
+  travail, des inspecteurs qui n'ont jamais trouvé signifient que la couverture
+  est trop mince.
+- Les quatre lieux de ressourcement, à 2 points et 8 tours de recharge, sont
+  trois chiffres posés ensemble et jamais joués. Le symptôme à guetter est le
+  campement : si les inspecteurs occupent les lieux plus qu'ils ne patrouillent,
+  la recharge est trop rapide ou les lieux trop peu nombreux.
+- Trois zones restantes après l'étranglement est une marge, pas une mesure.
+  Deux redeviennent tenables si aucun plateau ne se laisse verrouiller ; c'est
+  un resserrement facile, et l'inverse coûterait une seconde refonte de la fin
+  de partie.
+- Le taux de repérage du fugitif va baisser du fait des cases surveillées
+  affichées (§6). C'est un effet attendu, à ne pas confondre avec une portée
+  trop courte.
 - Le taux de bâtiments visé, 35 à 50 %, vient d'une estimation. Un prototype
   antérieur tournait à 28 % et produisait des plateaux jouables : la fourchette
   est peut-être à revoir vers le bas.
