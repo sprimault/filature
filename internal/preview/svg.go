@@ -1,0 +1,169 @@
+// Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
+// SPDX-License-Identifier: Apache-2.0
+
+// Package preview rend un jeu de formes en SVG, pour qui met au point un
+// plugin d'apparence.
+//
+// C'est de l'outillage et non le chemin du rendu : en jeu, une forme se
+// rastérise une fois au chargement puis se blitte. Le SVG sert à relire un
+// plugin sans lancer le jeu, et à voir ce qu'une relecture de catalogue
+// accepte.
+//
+// Le paquet ne décide de rien : il dessine ce que le contrat décrit, avec les
+// mêmes règles que le rendu — coefficients de faces, liseré, encadrement des
+// épaisseurs. Un aperçu qui s'en écarterait montrerait autre chose que le jeu.
+package preview
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/sprimault/filature/internal/render"
+)
+
+// faces sont les coefficients des trois faces d'un prisme, tels que le contrat
+// de formes les énonce.
+var faces = [3]float64{1.50, 1.14, 0.72}
+
+// trait rend une primitive à l'échelle donnée, liseré compris.
+//
+// L'ordre compte : liseré, contour, puis remplissage. Un tracé SVG est centré
+// sur le chemin et mord donc vers l'intérieur autant que vers l'extérieur ;
+// peindre le remplissage en dernier recouvre ce qui a mordu, et il ne subsiste
+// que l'épaisseur voulue, à l'extérieur.
+func trait(s *strings.Builder, t render.Stroke, x, y, k float64, pal render.Palette) {
+	c := pal[t.Color]
+	mini := minDimension(t)
+
+	ep := t.OutlineThickness
+	if ep == 0 {
+		ep = 1
+	}
+	epContour := render.StrokeWidth(ep, k, mini)
+	epLisere := render.StrokeWidth(render.RimWidth, k, mini)
+
+	op := ""
+	if t.Opacity > 0 {
+		op = fmt.Sprintf(` opacity="%.2f"`, float64(t.Opacity)/100)
+	}
+	borde := func(couleur string, epaisseur float64) string {
+		return fmt.Sprintf(` stroke="%s" stroke-width="%.2f" stroke-linejoin="round"`, couleur, 2*epaisseur)
+	}
+
+	switch t.Type {
+	case render.StrokePolygon:
+		var pts []string
+		for _, p := range t.Points {
+			pts = append(pts, fmt.Sprintf("%.1f,%.1f", x+float64(p.X)*k, y-float64(p.Y)*k))
+		}
+		p := strings.Join(pts, " ")
+		fmt.Fprintf(s, `<polygon points="%s" fill="none"%s%s/>`, p, borde(render.RimColor, epContour+epLisere), op)
+		if t.Outline != "" {
+			fmt.Fprintf(s, `<polygon points="%s" fill="none"%s%s/>`, p, borde(pal[t.Outline], epContour), op)
+		}
+		fmt.Fprintf(s, `<polygon points="%s" fill="%s"%s/>`, p, c, op)
+
+	case render.StrokeCircle:
+		cx, cy, r := x+float64(t.Center.X)*k, y-float64(t.Center.Y)*k, float64(t.Radius)*k
+		cercle := func(attrs string) {
+			fmt.Fprintf(s, `<circle cx="%.1f" cy="%.1f" r="%.1f" fill="none"%s%s/>`, cx, cy, r, attrs, op)
+		}
+		cercle(borde(render.RimColor, epContour+epLisere))
+		if t.Outline != "" {
+			cercle(borde(pal[t.Outline], epContour))
+		}
+		fmt.Fprintf(s, `<circle cx="%.1f" cy="%.1f" r="%.1f" fill="%s"%s/>`, cx, cy, r, c, op)
+
+	case render.StrokeSegment:
+		x1, y1 := x+float64(t.From.X)*k, y-float64(t.From.Y)*k
+		x2, y2 := x+float64(t.To.X)*k, y-float64(t.To.Y)*k
+		corps := float64(t.Thickness) * k
+		ligne := func(couleur string, epaisseur float64) {
+			fmt.Fprintf(s, `<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f" stroke="%s" stroke-width="%.2f" stroke-linecap="round"%s/>`,
+				x1, y1, x2, y2, couleur, epaisseur, op)
+		}
+		ligne(render.RimColor, corps+2*(epContour+epLisere))
+		if t.Outline != "" {
+			ligne(pal[t.Outline], corps+2*epContour)
+		}
+		ligne(c, corps)
+
+	case render.StrokePrism:
+		prisme(s, t, x, y, k, pal)
+	}
+}
+
+// prisme extrude le losange de la case, trois faces dérivées d'une couleur.
+func prisme(s *strings.Builder, t render.Stroke, x, y, k float64, pal render.Palette) {
+	dx, dy := render.TileWidth/2*k, render.TileHeight/2*k
+	c, h := pal[t.Color], float64(t.Height)*k
+
+	fmt.Fprintf(s,
+		`<polygon points="%.1f,%.1f %.1f,%.1f %.1f,%.1f %.1f,%.1f" fill="%s"/>`+
+			`<polygon points="%.1f,%.1f %.1f,%.1f %.1f,%.1f %.1f,%.1f" fill="%s"/>`+
+			`<polygon points="%.1f,%.1f %.1f,%.1f %.1f,%.1f %.1f,%.1f" fill="%s"/>`,
+		x-dx, y-h, x, y-dy-h, x+dx, y-h, x, y+dy-h, teinte(c, faces[0]),
+		x+dx, y-h, x, y+dy-h, x, y+dy, x+dx, y, teinte(c, faces[1]),
+		x-dx, y-h, x, y+dy-h, x, y+dy, x-dx, y, teinte(c, faces[2]))
+}
+
+// losange trace le sol d'une case, teinté par son grain.
+func losange(s *strings.Builder, x, y, k float64, couleur string, grain float64) {
+	dx, dy := render.TileWidth/2*k, render.TileHeight/2*k
+	fmt.Fprintf(s, `<polygon points="%.1f,%.1f %.1f,%.1f %.1f,%.1f %.1f,%.1f" fill="%s"/>`,
+		x-dx, y, x, y-dy, x+dx, y, x, y+dy, teinte(couleur, grain))
+}
+
+// minDimension renvoie la plus petite dimension d'un trait, en unités de
+// contrat. C'est elle que le plafond d'épaisseur ne doit pas laisser avaler.
+func minDimension(t render.Stroke) int {
+	switch t.Type {
+	case render.StrokeCircle:
+		return 2 * t.Radius
+	case render.StrokeSegment:
+		return t.Thickness
+	case render.StrokePolygon:
+		if len(t.Points) == 0 {
+			return 1
+		}
+		xmin, xmax := t.Points[0].X, t.Points[0].X
+		ymin, ymax := t.Points[0].Y, t.Points[0].Y
+		for _, p := range t.Points[1:] {
+			xmin, xmax = min(xmin, p.X), max(xmax, p.X)
+			ymin, ymax = min(ymin, p.Y), max(ymax, p.Y)
+		}
+		return min(xmax-xmin, ymax-ymin)
+	}
+	return 1
+}
+
+// teinte applique un coefficient à une couleur, en bornant chaque canal.
+//
+// Une couleur illisible rend du noir plutôt que d'échouer : un aperçu sert à
+// voir ce qui ne va pas, et s'interrompre sur une valeur mal formée priverait
+// de la vue d'ensemble pour un défaut que la validation nomme déjà.
+func teinte(hexa string, k float64) string {
+	var r, v, b int
+	if _, err := fmt.Sscanf(hexa, "#%02x%02x%02x", &r, &v, &b); err != nil {
+		return "#000000"
+	}
+	borne := func(n int) int {
+		return min(int(float64(n)*k), 255)
+	}
+	return fmt.Sprintf("#%02x%02x%02x", borne(r), borne(v), borne(b))
+}
+
+// etiquette écrit un libellé lisible sur un fond quelconque.
+func etiquette(s *strings.Builder, x, y float64, texte, couleur string, taille int, ancrage string) {
+	fmt.Fprintf(s, `<text x="%.1f" y="%.1f" font-family="sans-serif" font-size="%d" text-anchor="%s" fill="%s">%s</text>`,
+		x, y, taille, ancrage, couleur, echapper(texte))
+}
+
+// echapper rend un texte sûr dans un document XML.
+//
+// Un nom de forme vient d'un fichier écrit par un tiers : le passer tel quel
+// produirait un SVG invalide au premier chevron, et l'aperçu servirait
+// justement à comprendre pourquoi.
+func echapper(s string) string {
+	return strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;", `"`, "&quot;").Replace(s)
+}

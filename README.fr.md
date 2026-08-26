@@ -54,6 +54,7 @@ filature                      joue une partie, en texte
 filature version              le numéro de la version installée
 filature examples <dossier>   écrit les plugins livrés, pour servir de modèle
 filature validate <dossier>   contrôle un plugin et affiche son empreinte
+filature preview <dossier>    rend ses formes et un plateau en SVG
 ```
 
 `--version` est accepté comme équivalent de `version`.
@@ -61,6 +62,12 @@ filature validate <dossier>   contrôle un plugin et affiche son empreinte
 `validate` applique exactement les contrôles du chargement, et liste tout ce qui
 cloche d'un coup plutôt qu'une faute à la fois. Un plugin qu'il accepte se
 chargera chez ceux à qui vous le donnez.
+
+`preview` écrit deux fichiers : la planche des formes, chacune sur les trois
+sols possibles, et un plateau en situation. Le plugin est fusionné sur le
+contenu livré avant d'être rendu — il ne déclare que ce qu'il remplace — et la
+planche marque ce qui vient de lui, ce qui montre du même coup qu'une clé mal
+orthographiée n'a rien surchargé. Un second argument dit où écrire.
 
 `examples` ne peut pas écrire dans le dossier des plugins actifs, et le refuse
 en le disant : ce qu'il en sort est déjà dans le binaire, l'y remettre le

@@ -20,6 +20,7 @@ import (
 
 	"github.com/sprimault/filature/internal/core"
 	"github.com/sprimault/filature/internal/loader"
+	"github.com/sprimault/filature/internal/preview"
 	"github.com/sprimault/filature/internal/session"
 	"github.com/sprimault/filature/plugins"
 )
@@ -35,7 +36,7 @@ var version = "dev"
 // inconnu, et ce refus compte — « exemples » et « valide » ont existé sous ces
 // noms, et sans lui l'ancien mot lancerait une partie au lieu de dire qu'il
 // n'existe plus.
-func command(sortie io.Writer, nom, argument, dossierPlugins string) (traitee bool, err error) {
+func command(sortie io.Writer, nom, argument, second, dossierPlugins string) (traitee bool, err error) {
 	switch nom {
 	case "":
 		// Sans argument, on joue : c'est le cas ordinaire du double-clic.
@@ -51,8 +52,11 @@ func command(sortie io.Writer, nom, argument, dossierPlugins string) (traitee bo
 	case "validate":
 		return true, validate(sortie, argument)
 
+	case "preview":
+		return true, writePreviews(sortie, argument, second)
+
 	default:
-		return true, fmt.Errorf("commande inconnue %q, attendu version, examples ou validate", nom)
+		return true, fmt.Errorf("commande inconnue %q, attendu version, examples, validate ou preview", nom)
 	}
 }
 
@@ -80,7 +84,7 @@ func main() {
 		nom = "version"
 	}
 
-	traitee, err := command(os.Stdout, nom, flag.Arg(1), *dossierPlugins)
+	traitee, err := command(os.Stdout, nom, flag.Arg(1), flag.Arg(2), *dossierPlugins)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "filature:", err)
 		os.Exit(1)
@@ -290,4 +294,69 @@ func extract(dossier, actifs string) error {
 		fmt.Println(cible)
 		return nil
 	})
+}
+
+// preview écrit deux aperçus SVG d'un plugin d'apparence.
+//
+// Le plugin est fusionné sur le contenu livré avant d'être rendu : il ne
+// déclare que ce qu'il remplace, et le montrer seul donnerait un plateau vide
+// autour d'une pièce. La planche marque ce qui vient de lui — une clé mal
+// orthographiée passe la validation sans rien surcharger, et rien d'autre ne le
+// dirait.
+//
+// Deux fichiers plutôt qu'un : les formes se jugent côte à côte sur les trois
+// sols, le plateau se juge en situation, et personne ne veut ouvrir l'un pour
+// regarder l'autre.
+func writePreviews(sortie io.Writer, dossier, destination string) error {
+	if dossier == "" {
+		return errors.New("usage: filature preview <dossier> [destination]")
+	}
+	if destination == "" {
+		destination = "."
+	}
+
+	registre, formes, err := loader.LoadOne(plugins.Shipped(), dossier)
+	if err != nil {
+		return err
+	}
+
+	nom := filepath.Base(filepath.Clean(dossier))
+	cible := func(suffixe string) string {
+		return filepath.Join(destination, nom+suffixe+".svg")
+	}
+
+	if err := ecrireSVG(cible("-formes"), func(w io.Writer) error {
+		return preview.Shapes(w, formes, nom)
+	}); err != nil {
+		return err
+	}
+	if err := ecrireSVG(cible("-plateau"), func(w io.Writer) error {
+		return preview.Board(w, formes, registre, "quartier")
+	}); err != nil {
+		return err
+	}
+
+	_, err = fmt.Fprintf(sortie, "%s\n%s\n", cible("-formes"), cible("-plateau"))
+	return err
+}
+
+// ecrireSVG crée un fichier et y déverse ce que rend une fonction.
+func ecrireSVG(chemin string, rendre func(io.Writer) error) error {
+	// #nosec G304 -- le chemin vient de l'utilisateur, qui demande justement
+	// d'écrire là : la commande n'a pas d'autre entrée que celle-là.
+	f, err := os.OpenFile(chemin, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o600)
+	if err != nil {
+		return err
+	}
+
+	if err := rendre(f); err != nil {
+		// La fermeture ne dirait rien d'utile ici : c'est l'échec du rendu qui
+		// explique le fichier tronqué, et le masquer perdrait la cause.
+		_ = f.Close()
+		return err
+	}
+
+	// La fermeture est le retour et non un defer : une écriture qui n'échoue
+	// qu'au vidage du tampon ne se signale que là.
+	return f.Close()
 }
