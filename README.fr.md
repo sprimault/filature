@@ -45,7 +45,12 @@ qu'on ait pu lire quoi que ce soit.
 ```
 filature version              le numéro de la version installée
 filature exemples <dossier>   écrit les greffons livrés, pour servir de modèle
+filature valide <dossier>     contrôle un greffon et affiche son empreinte
 ```
+
+`valide` applique exactement les contrôles du chargement, et liste tout ce qui
+cloche d'un coup plutôt qu'une faute à la fois. Un greffon qu'il accepte se
+chargera chez ceux à qui vous le donnez.
 
 `exemples` ne peut pas écrire dans le dossier des greffons actifs, et le refuse
 en le disant : ce qu'il en sort est déjà dans le binaire, l'y remettre le

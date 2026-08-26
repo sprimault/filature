@@ -41,7 +41,12 @@ and a window opened from the file explorer closes before anything can be read.
 ```
 filature version              the installed version number
 filature exemples <folder>    writes the shipped plugins, as templates
+filature valide <folder>      checks a plugin and prints its fingerprint
 ```
+
+`valide` runs exactly the checks the loader runs, and lists everything wrong at
+once rather than one fault at a time. A plugin it accepts will load for whoever
+you give it to.
 
 `exemples` refuses to write into the active plugin folder, and says so: what it
 writes out is already inside the binary, and putting it back there would declare
