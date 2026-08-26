@@ -58,16 +58,27 @@ func command(sortie io.Writer, nom, argument, dossierPlugins string) (traitee bo
 // main lit les drapeaux et fixe le code de sortie. Tout ce qui peut échouer est
 // dans command et dans run.
 func main() {
-	heberger := flag.Bool("heberger", false, "héberger une partie en réseau")
-	rejoindre := flag.String("rejoindre", "", "adresse d'une partie à rejoindre")
+	heberger := flag.Bool("host", false, "héberger une partie en réseau")
+	rejoindre := flag.String("join", "", "adresse d'une partie à rejoindre")
 	dossierPlugins := flag.String("plugins", pluginsParDefaut(), "dossier des plugins")
-	partie := flag.String("partie", "", "nom d'une partie enregistrée à reprendre")
-	cote := flag.String("camp", "inspectors", "camp joué : fugitive, inspectors, ou watch pour regarder")
+	partie := flag.String("game", "", "nom d'une partie enregistrée à reprendre")
+	cote := flag.String("side", "inspectors", "camp joué : fugitive, inspectors, ou watch pour regarder")
 	preset := flag.String("preset", "ville", "préréglage : quartier, faubourg ou ville")
-	graine := flag.Int64("graine", 1, "graine de la partie")
+	graine := flag.Int64("seed", 1, "graine de la partie")
+
+	// Alias de la sous-commande. Les trois sous-commandes ne lancent pas le jeu
+	// et deux d'entre elles prennent un opérande, ce qui les rend maladroites en
+	// drapeau ; mais --version est ce qu'on essaie en premier, et le refuser
+	// donnerait une erreur là où la réponse est évidente.
+	versionSeule := flag.Bool("version", false, "afficher la version puis sortir")
 	flag.Parse()
 
-	traitee, err := command(os.Stdout, flag.Arg(0), flag.Arg(1), *dossierPlugins)
+	nom := flag.Arg(0)
+	if *versionSeule {
+		nom = "version"
+	}
+
+	traitee, err := command(os.Stdout, nom, flag.Arg(1), *dossierPlugins)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "filature:", err)
 		os.Exit(1)
@@ -193,17 +204,22 @@ func options(cote, preset string, graine int64, dossierPlugins string) (session.
 	}, nil
 }
 
-// camp traduit le drapeau de camp en côté du noyau.
+// camp traduit le drapeau --side en côté du noyau.
 //
 // Vide vaut spectateur : deux cerveaux jouent et personne ne saisit rien. C'est
 // aussi ce qui permet de dérouler une partie entière sans intervention.
+//
+// Une seule orthographe acceptée par valeur. Les formes françaises ont existé
+// et sont refusées : une interface qui en accepte deux n'en documente qu'une,
+// et celle qu'on ne documente pas finit par diverger sans que personne s'en
+// aperçoive.
 func camp(choix string) (core.Side, error) {
 	switch choix {
-	case "fugitif", "fugitive":
+	case "fugitive":
 		return core.SideFugitive, nil
-	case "inspecteurs", "inspectors":
+	case "inspectors":
 		return core.SideInspectors, nil
-	case "", "spectateur", "watch":
+	case "", "watch":
 		return "", nil
 	default:
 		return "", fmt.Errorf("camp %q inconnu, attendu fugitive, inspectors ou watch", choix)

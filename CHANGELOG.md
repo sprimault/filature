@@ -75,10 +75,10 @@ Les faces d'un bâtiment sont dérivées de sa couleur par trois coefficients fi
 
 ### Ajouté
 - **Le binaire joue.** Lancé sans argument, il donne la main aux inspecteurs
-  face à un adversaire, en texte. `--camp fugitive` prend l'autre rôle,
-  `--camp watch` regarde deux machines s'affronter, `--preset` et `--graine`
+  face à un adversaire, en texte. `--side fugitive` prend l'autre rôle,
+  `--side watch` regarde deux machines s'affronter, `--preset` et `--seed`
   choisissent la partie.
-- Un adversaire qui tire ses coups au hasard parmi les coups légaux, en
+- Un adversaire qui choisit au hasard parmi les coups légaux, en
   attendant l'IA des étapes 9 et 10. Il est déterministe : une graine donnée
   rejoue la même partie.
 - Chargement des plugins : capacités, dépenses et modes entrent au registre
@@ -146,8 +146,8 @@ A building's faces are derived from its colour by three fixed coefficients —
 
 ### Added
 - **The binary plays.** Run with no argument, it hands you the inspectors
-  against an opponent, in text. `--camp fugitive` takes the other side,
-  `--camp watch` watches two machines play, `--preset` and `--graine` choose
+  against an opponent, in text. `--side fugitive` takes the other side,
+  `--side watch` watches two machines play, `--preset` and `--seed` choose
   the game.
 - An opponent drawing its moves at random among the legal ones, standing in
   until the AI of steps 9 and 10. It is deterministic: a given seed replays the

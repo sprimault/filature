@@ -19,7 +19,7 @@ deviner.
 ## État
 
 **Le binaire joue, en texte.** Le rendu isométrique est l'étape 7, le mode
-réseau l'étape 12, et l'adversaire tire encore ses coups au hasard — la véritable
+réseau l'étape 12, et l'adversaire choisit encore au hasard — la véritable
 IA vient aux étapes 9 et 10.
 
 - [`docs/regles.md`](docs/regles.md) — la spécification complète
@@ -50,9 +50,23 @@ filature examples <dossier>   écrit les plugins livrés, pour servir de modèle
 filature validate <dossier>   contrôle un plugin et affiche son empreinte
 ```
 
+`--version` est accepté comme équivalent de `version`.
+
+### Les drapeaux
+
 Lancé sans argument, le jeu vous donne le camp des inspecteurs face à un
-adversaire. `--camp fugitive` prend l'autre rôle, `--camp watch` regarde deux
-machines s'affronter. `--preset` choisit la taille, `--graine` la partie.
+adversaire.
+
+```
+--side fugitive     prend l'autre rôle ; inspectors par défaut,
+                    watch regarde deux machines s'affronter
+--preset ville      taille du plateau : quartier, faubourg ou ville
+--seed 1            la graine ; la même rejoue la même partie
+--plugins <dossier> où chercher les plugins
+--host              héberger une partie en réseau
+--join <adresse>    en rejoindre une
+--game <nom>        reprendre une partie enregistrée
+```
 
 `validate` applique exactement les contrôles du chargement, et liste tout ce qui
 cloche d'un coup plutôt qu'une faute à la fois. Un plugin qu'il accepte se
