@@ -3,7 +3,7 @@
 Version du protocole : **1**
 
 Un bot **remplace** l'IA du jeu, il ne l'étend pas. Le jeu lui transmet une vue
-de la partie, il renvoie un coup. Aucune API interne à respecter, aucun greffon
+de la partie, il renvoie un coup. Aucune API interne à respecter, aucun plugin
 à compiler, n'importe quel langage.
 
 L'IA livrée avec le jeu parle ce protocole comme les autres. C'est ce qui
@@ -58,7 +58,7 @@ vivant au bout d'une seconde, il est tué.
  "parametres":{"cote":41,"portee":8,"tours":40,"resistance":10,
  "inspecteurs":5,"pions_par_tour":3,"periode_revelation":4,"zones":6,
  "duree_trace":6,"debut_etranglement":30,"periode_etranglement":2},
- "greffons":[{"nom":"base","version":"0.1.0","empreinte":"…","regles":true}]}
+ "plugins":[{"nom":"base","version":"0.1.0","empreinte":"…","regles":true}]}
 ```
 
 `graine` est fournie pour qu'un bot puisse être déterministe s'il le souhaite.
@@ -66,7 +66,7 @@ vivant au bout d'une seconde, il est tué.
 déterministe** : c'est la seule chose que le jeu lui demande, et elle est
 vérifiée.
 
-`greffons` liste les extensions de règles actives. Un bot qui ne les connaît pas
+`plugins` liste les extensions de règles actives. Un bot qui ne les connaît pas
 peut refuser de jouer plutôt que de jouer faux.
 
 ### joue
@@ -90,7 +90,7 @@ tableau vide. Un bot n'a pas à traiter deux formes pour la même absence.
 `coups_legaux` contient tout ce que le camp peut faire ce tour-ci —
 déplacements, capacités, dépenses de résistance, meurtre compris. Un bot n'a
 donc rien à savoir des règles pour être correct : il ne peut pas jouer un coup
-illégal s'il choisit dans cette liste. C'est aussi ce qui fait qu'un greffon de
+illégal s'il choisit dans cette liste. C'est aussi ce qui fait qu'un plugin de
 règles ajoutant une dépense est utilisable par un bot qui l'ignore.
 
 ### fin
@@ -100,9 +100,9 @@ règles ajoutant une dépense est utilisable par un bot qui l'ignore.
 ```
 
 Le jeu de base produit quatre motifs : `extraction`, `resistance_epuisee`,
-`fugitif_bloque`, `temps_ecoule`. **La liste n'est pas fermée** — un greffon de
+`fugitif_bloque`, `temps_ecoule`. **La liste n'est pas fermée** — un plugin de
 règles qui invente une condition de victoire produit son propre motif, et un bot
-qui ne le connaît pas l'a appris dans `bonjour`, qui annonce les greffons
+qui ne le connaît pas l'a appris dans `bonjour`, qui annonce les plugins
 actifs. Traiter le champ comme une chaîne, jamais comme une énumération.
 
 ---
@@ -193,12 +193,12 @@ arguments = ["--niveau", "3"]
 deterministe = true
 ```
 
-`regles = false` : un bot ne modifie pas les règles, il joue avec. Un greffon
+`regles = false` : un bot ne modifie pas les règles, il joue avec. Un plugin
 qui déclare un bot **et** des effets est refusé — ce sont deux choses, et les
-mélanger casserait la poignée de main réseau, où les greffons de règles doivent
+mélanger casserait la poignée de main réseau, où les plugins de règles doivent
 être identiques des deux côtés.
 
-`commande` est cherchée dans le dossier du greffon puis dans le `PATH`. Aucun
+`commande` est cherchée dans le dossier du plugin puis dans le `PATH`. Aucun
 interpréteur n'est fourni : un bot Python se livre avec son lanceur, ou en
 paquet autonome.
 
@@ -215,7 +215,7 @@ déclaré — tournent chez l'auteur, via un workflow réutilisable publié avec
 jeu. Un bot arrive au catalogue validé, ou n'y arrive pas.
 
 Hors catalogue, aucune restriction : un exécutable posé dans le dossier des
-greffons est lancé tel quel.
+plugins est lancé tel quel.
 
 ---
 

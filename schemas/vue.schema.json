@@ -3,7 +3,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/sprimault/filature/schemas/vue.schema.json",
   "title": "Vue Filature",
-  "description": "Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis noyau.Vue : ne pas modifier a la main.",
+  "description": "Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis core.Vue : ne pas modifier a la main.",
   "$ref": "#/$defs/Vue",
   "$defs": {
     "Contexte": {

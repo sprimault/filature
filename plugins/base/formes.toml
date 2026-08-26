@@ -1,0 +1,103 @@
+# Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
+# SPDX-License-Identifier: Apache-2.0
+
+# Formes livrées avec le jeu, écrites dans le même format qu'un plugin tiers.
+#
+# C'est le test du vocabulaire : si l'une d'elles ne s'exprime pas avec les
+# quatre primitives, il en manque une, et c'est une décision de contrat — pas un
+# cas particulier à coder dans le rendu.
+#
+# Ni rue, ni zone : le sol n'est pas une forme. Le losange est tracé par le
+# moteur, un plugin n'en change que la couleur par la palette.
+
+version_formes = 1
+
+# Seul trait accepté pour un bâtiment : l'emprise est le losange de la case,
+# elle ne se déclare pas. Une emprise libre permettrait de déborder sur les
+# cases voisines et de masquer ce que l'adversaire doit voir.
+[forme.batiment]
+role = "batiment"
+
+  [[forme.batiment.trait]]
+  type = "prisme"
+  hauteur = 12
+  couleur = "batiment"
+
+# Le fugitif est plus étroit et plus haut que les inspecteurs : sur un plateau
+# où cinq pions bleus se ressemblent, c'est la silhouette qui doit se lire d'un
+# coup d'œil, pas la couleur seule.
+[forme.fugitif]
+role = "pion"
+
+  [[forme.fugitif.trait]]
+  type = "polygone"
+  points = [[-7, 0], [7, 0], [5, 22], [-5, 22]]
+  couleur = "fugitif_principal"
+
+  [[forme.fugitif.trait]]
+  type = "cercle"
+  centre = [0, 28]
+  rayon = 6
+  couleur = "fugitif_principal"
+  contour = "fugitif_detail"
+
+# Une seule forme pour les cinq pions, que le moteur teinte par numéro. Les
+# surcharges inspecteur_1 à inspecteur_5 existent pour qui veut distinguer les
+# capacités ; les livrer d'office rendrait le plateau plus difficile à lire.
+[forme.inspecteur]
+role = "pion"
+
+  [[forme.inspecteur.trait]]
+  type = "polygone"
+  points = [[-9, 0], [9, 0], [6, 18], [-6, 18]]
+  couleur = "inspecteur_principal"
+
+  [[forme.inspecteur.trait]]
+  type = "cercle"
+  centre = [0, 23]
+  rayon = 5
+  couleur = "inspecteur_principal"
+  contour = "inspecteur_detail"
+
+# Un trait discret, et volontairement à demi transparent : une trace est une
+# piste à interpréter, pas une position. La confondre du coin de l'œil avec un
+# pion fausserait la lecture du plateau.
+[forme.trace]
+role = "marqueur"
+
+  [[forme.trace.trait]]
+  type = "segment"
+  de = [-10, 0]
+  a = [10, 0]
+  epaisseur = 3
+  couleur = "trace"
+  opacite = 60
+
+# Un losange plein, aux dimensions de la case : un barrage bloque la vue comme
+# un bâtiment, et doit se lire comme un obstacle et non comme une décoration.
+[forme.barrage]
+role = "marqueur"
+
+  [[forme.barrage.trait]]
+  type = "polygone"
+  points = [[-20, 0], [0, -10], [20, 0], [0, 10]]
+  couleur = "barrage"
+
+# La scène reste sur le plateau une fois posée : c'est ce que le fugitif a payé,
+# elle ne s'efface pas comme une trace.
+[forme.scene]
+role = "marqueur"
+
+  [[forme.scene.trait]]
+  type = "segment"
+  de = [-9, -9]
+  a = [9, 9]
+  epaisseur = 3
+  couleur = "scene"
+
+  [[forme.scene.trait]]
+  type = "segment"
+  de = [-9, 9]
+  a = [9, -9]
+  epaisseur = 3
+  couleur = "scene"

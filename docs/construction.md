@@ -81,7 +81,7 @@ contenu livré — règles, formes, palette, français et anglais — est embarq
 l'exécutable par `//go:embed` : un binaire déplacé continue de fonctionner, et
 personne ne casse ses règles en éditant un fichier qu'il n'a pas écrit.
 
-Ce contenu reste accessible à qui veut s'en inspirer : `filature exemples
+Ce contenu reste accessible à qui veut s'en inspirer : `filature examples
 <dossier>` l'écrit sur le disque, sans jamais écraser un fichier existant. C'est
 par là que passe un traducteur qui recopie l'anglais pour en faire sa langue.
 
@@ -116,7 +116,7 @@ faisable — mais rien ne le réclame aujourd'hui.
 
 ## Tests et intégration continue
 
-Les machines d'intégration sont sans écran. `internal/noyau` et `internal/ia`
+Les machines d'intégration sont sans écran. `internal/core` et `internal/ai`
 n'importent pas Ebitengine, ce qui rend la contrainte facile à tenir : aucun
 test de la suite par défaut n'ouvre de fenêtre.
 

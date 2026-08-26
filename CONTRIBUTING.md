@@ -17,7 +17,7 @@ discussion, not a patch.
 - Determinism is preserved. Nothing reads the clock or system entropy; random
   numbers come from the game's seeded generator. A change that makes a replay
   diverge from its journal is a defect even if every test passes.
-- Nothing in `internal/noyau` or `internal/ia` imports the renderer. CI runners
+- Nothing in `internal/core` or `internal/ai` imports the renderer. CI runners
   are headless; a test that needs a window does not belong in the default suite.
 
 ## Language

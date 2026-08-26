@@ -24,11 +24,11 @@ linters:
     rules:
       # Les corps sont encore des stubs : unused remonte les champs et les
       # fonctions que personne n'appelle. Retirer un chemin de cette liste dès
-      # que son étape est écrite — 1 pour noyau, 6 pour rendu, 8 pour greffons,
-      # 9 et 10 pour ia.
+      # que son étape est écrite — 6 pour render, 9 et 10 pour ai, 13 pour le
+      # bac à sable de loader.
       - linters:
           - unused
-        path: internal/(noyau|rendu|greffons|ia)/
+        path: internal/(core|render|loader|ai)/
 
       # executer ne renvoie pour l'instant qu'une erreur de stub, donc le test
       # qui suit son appel est toujours vrai et staticcheck le dit. À retirer à

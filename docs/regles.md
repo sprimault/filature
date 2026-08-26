@@ -306,7 +306,7 @@ subit au lieu de la décider — et il n'en tire aucun avantage, seulement la
 convergence adverse. La version volontaire garde la tension et ajoute
 l'arbitrage.
 
-Un greffon de règles peut rétablir la pulsion : compteur croissant, meurtre
+Un plugin de règles peut rétablir la pulsion : compteur croissant, meurtre
 imposé au-delà d'un seuil. Le coût et le plafond sont déclaratifs, ils se
 changent sans toucher au code.
 

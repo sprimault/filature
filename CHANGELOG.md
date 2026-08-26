@@ -13,7 +13,7 @@ Quatre numéros à ne pas confondre :
 | version du dépôt | tag git | le binaire |
 | `version_formes` | chaque fichier de formes | le contrat d'apparence |
 | `protocole` | échanges avec un bot | le contrat de bot |
-| `version_effets` | manifeste d'un greffon de règles | le vocabulaire d'effets |
+| `version_effets` | manifeste d'un plugin de règles | le vocabulaire d'effets |
 
 Les trois derniers sont des entiers sans rapport avec SemVer. Une version peut
 sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
@@ -24,25 +24,36 @@ lu sur la page des versions, et il n'y a rien à recopier ensuite. Le titre est
 facultatif ; sans lui, la version se nomme par son tag.
 
 Chaque section est **bilingue, français d'abord, séparé par `***`** — les notes
-de version sont ce que lit un auteur de greffon étranger avant de savoir s'il
+de version sont ce que lit un auteur de plugin étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le dossier de plugins s'appelle désormais `plugins` et non plus `greffons`**, et le
+drapeau `--plugins` remplace `--greffons`. Un dossier `greffons` posé à côté de
+l'exécutable cesse d'être lu : le renommer suffit.
+
+Les deux sous-commandes suivent : `filature examples` et `filature validate`,
+là où l'on écrivait `exemples` et `valide`.
+
+Le mot « greffon » disparaît du projet au profit de « plugin », partout — code,
+documentation et libellés. Il est exclusivement français, absent de l'usage
+courant, et il ne se cherche pas.
+
 ### Ajouté
-- Chargement des greffons : capacités, dépenses et modes entrent au registre
-  depuis les manifestes. Le contenu livré emprunte le même chemin qu'un greffon
+- Chargement des plugins : capacités, dépenses et modes entrent au registre
+  depuis les manifestes. Le contenu livré emprunte le même chemin qu'un plugin
   posé sur le disque, si bien qu'il est exercé à chaque démarrage.
-- Les refus de `docs/greffons.md` §9 sont appliqués : un champ inconnu, une
+- Les refus de `docs/plugins.md` §9 sont appliqués : un champ inconnu, une
   primitive que ce binaire ne sait pas appliquer, `regles = false` accompagné
   d'une capacité, un `differer` imbriqué, un bot mêlé à des effets. Chacun
   arrête le chargement entier en nommant le fichier et la clé fautive.
-- Empreinte de contenu par greffon, qui distingue deux greffons se disant
+- Empreinte de contenu par plugin, qui distingue deux plugins se disant
   identiques sans l'être.
-- `filature valide <dossier>`, annoncée à la version 0.2.0 : le même contrôle
+- `filature validate <dossier>`, annoncée à la version 0.2.0 : le même contrôle
   que le chargement, tous les manquements listés d'un coup avec leur fichier et
-  leur chemin de clé, et l'empreinte quand le greffon tient.
+  leur chemin de clé, et l'empreinte quand le plugin tient.
 
 ### Corrigé
 - La vue du fugitif annonçait une zone scellée numéro -1 tant qu'il n'avait pas
@@ -50,17 +61,28 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ***
 
+**The plugin folder is now named `plugins` rather than `greffons`**, and the `--plugins`
+flag replaces `--greffons`. A `greffons` folder next to the executable is no longer read:
+renaming it is enough.
+
+Both subcommands follow: `filature examples` and `filature validate`, where one
+used to write `exemples` and `valide`.
+
+The word « greffon » is gone from the project in favour of « plugin », everywhere —
+code, documentation and labels. It is exclusively French, absent from common
+usage, and nobody searches for it.
+
 ### Added
 - Plugin loading: abilities, expenses and modes now enter the registry from
   manifests. Shipped content takes the same path as a plugin dropped on disk,
   so that path is exercised on every start.
-- The refusals in `docs/greffons.md` §9 are enforced: an unknown field, a
+- The refusals in `docs/plugins.md` §9 are enforced: an unknown field, a
   primitive this binary cannot apply, `regles = false` alongside an ability, a
   nested `differer`, a bot mixed with effects. Each aborts the whole load,
   naming the file and the offending key.
 - Per-plugin content fingerprint, telling apart two plugins that claim to be
   identical without being so.
-- `filature valide <folder>`, announced back in 0.2.0: the same checks the
+- `filature validate <folder>`, announced back in 0.2.0: the same checks the
   loader runs, every failure listed at once with its file and key path, and the
   fingerprint when the plugin holds.
 

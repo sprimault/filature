@@ -27,7 +27,7 @@ s'ajoute donc à la fin, quelle que soit sa place logique.
 
 ## 1 — Noyau
 
-`internal/noyau` : état, coups légaux, application et annulation, contacts,
+`internal/core` : état, coups légaux, application et annulation, contacts,
 arbitrage, vocabulaire d'effets et file des différés, registre.
 
 Le registre est posé ici, mais rempli à l'étape 8 : lire un manifeste donnerait
@@ -82,7 +82,7 @@ moment où les règles se valident au jeu plutôt qu'en test, et donc le moment 
 
 ## 6 — Contrat de formes
 
-`internal/rendu` : lecture, validation, fusion des surcharges partielles.
+`internal/render` : lecture, validation, fusion des surcharges partielles.
 Toujours pas de pixel à l'écran — le contrat se teste sur des fichiers.
 
 ## 7 — Vue isométrique
@@ -112,15 +112,15 @@ Deux moyens de jeu, complets l'un comme l'autre :
   isométrique le nord logique part vers le haut-droite, et les deux attentes
   existent chez de vrais joueurs.
 
-## 8 — Persistance et greffons
+## 8 — Persistance et plugins
 
-`internal/stockage` : journal, instantané, reprise par nom.
-`internal/greffons` : chargement des manifestes, empreintes, fusion au registre.
+`internal/storage` : journal, instantané, reprise par nom.
+`internal/loader` : chargement des manifestes, empreintes, fusion au registre.
 
-Ensemble parce qu'une sauvegarde porte le manifeste des greffons actifs : une
+Ensemble parce qu'une sauvegarde porte le manifeste des plugins actifs : une
 partie ne se recharge pas sans eux.
 
-Avec `filature valide <chemin>`, qui charge un greffon par **le même code que
+Avec `filature valide <chemin>`, qui charge un plugin par **le même code que
 le jeu** et liste ses manquements en une fois. Deux validateurs finiraient par
 diverger, et c'est alors la partie qui tranche — au pire moment.
 
@@ -128,10 +128,10 @@ diverger, et c'est alors la partie qui tranche — au pire moment.
 chemin complet de la clé fautive, avec ce qui était attendu. Une erreur qu'on
 doit chercher coûte plus cher que celle qu'on lit.
 
-Elle existe pour deux raisons. Un greffon invalide fait échouer le chargement
+Elle existe pour deux raisons. Un plugin invalide fait échouer le chargement
 entier, ce qui est juste en jeu et détestable en développement : le jeu ne
 démarre plus, et il faut deviner lequel des fichiers pèche. Et surtout, un
-greffon validé chez son auteur se charge chez n'importe qui — c'est la
+plugin validé chez son auteur se charge chez n'importe qui — c'est la
 condition pour installer le travail d'un inconnu sans crainte. Un code de sortie
 suffit à en faire la brique du workflow que `docs/protocole-bot.md` §8 promet
 aux auteurs.
@@ -166,7 +166,7 @@ peut renvoyer à `docs/regles.md`.
 
 ## 12 — Réseau
 
-`internal/serveur` : hébergement, jonction, poignée de main des manifestes,
+`internal/server` : hébergement, jonction, poignée de main des manifestes,
 reconnexion par jeton.
 
 Placée tard sans risque : le protocole ne construit rien de neuf, l'hôte fait
@@ -177,12 +177,12 @@ un bouton en solo, où l'adversaire est une machine. En réseau deux joueurs
 s'affrontent, et défaire un coup reviendrait à rejouer celui d'en face après
 l'avoir vu.
 
-## 13 — Greffons exécutables
+## 13 — Plugins exécutables
 
 Bac à sable wazero, générateurs de plateau et IA tierces. Hôtes sans horloge,
 sans entropie système, sans disque, sans réseau.
 
-Dernière parce que c'est le seul niveau de greffon dont la valeur est étroite :
+Dernière parce que c'est le seul niveau de plugin dont la valeur est étroite :
 les trois autres couvrent l'essentiel, et un bot en processus séparé fait déjà
 ce dont un contributeur a besoin.
 
@@ -200,15 +200,15 @@ Menus, écran de préférences, `Échap` pour l'ouvrir, et la persistance des
 réglages. Plus le chargement des langues et le sélecteur qui va avec.
 
 Les libellés ne sont jamais dans le code : ils viennent d'un dictionnaire, et un
-greffon de langue en fournit un. Le format se pose à l'étape 8 avec les autres
-contrats de greffon ; c'est ici qu'il est consommé.
+plugin de langue en fournit un. Le format se pose à l'étape 8 avec les autres
+contrats de plugin ; c'est ici qu'il est consommé.
 
-**L'écran des greffons montre les refusés autant que les actifs**, chacun avec
-sa raison. Un greffon absent de la liste sans explication laisse son auteur
+**L'écran des plugins montre les refusés autant que les actifs**, chacun avec
+sa raison. Un plugin absent de la liste sans explication laisse son auteur
 deviner, et le journal n'est pas un endroit où il pensera à regarder.
 
 Numérotée en dernier sans être la dernière à faire : rien de tout cela ne
-dépend du réseau ni des greffons exécutables, et un écran de réglages sera
+dépend du réseau ni des plugins exécutables, et un écran de réglages sera
 utile bien avant. C'est aussi ici que se tranche `ebitenui` contre des widgets
 écrits à la main — la question se règle en écrivant le premier écran, pas
 avant.

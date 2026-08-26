@@ -1,0 +1,19 @@
+# Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
+# SPDX-License-Identifier: Apache-2.0
+
+# L'anglais livré avec le jeu. C'est un plugin de langue ordinaire, et il sert
+# de modèle : un traducteur recopie ce dossier, change le code, le nom et les
+# libellés.
+#
+# Il ne déclare rien d'autre qu'une langue. Un plugin qui mêlerait traduction
+# et règles serait refusé — ce sont deux choses, et seules les secondes doivent
+# être identiques des deux côtés d'une partie en réseau.
+
+nom = "anglais"
+version = "0.1.0"
+licence = "Apache-2.0"
+description = "Filature in English"
+
+[langue]
+code = "en"
+nom = "English"

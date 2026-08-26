@@ -3,15 +3,15 @@
 Version du contrat : **1**
 
 Tout ce qui se dessine sur le plateau — pions, sol, bâtiments, marqueurs — est
-décrit en géométrie, jamais en image. Un greffon d'apparence est un fichier
+décrit en géométrie, jamais en image. Un plugin d'apparence est un fichier
 TOML.
 
-Ce n'est pas une limitation de moyens, c'est ce qui rend un greffon publiable :
+Ce n'est pas une limitation de moyens, c'est ce qui rend un plugin publiable :
 du texte se relit en diff, ne pose aucune question de provenance, et respecte le
 gabarit par construction plutôt que par contrôle.
 
 Le contenu livré avec le jeu est écrit dans ce format, au même titre qu'un
-greffon tiers. Si une forme de base ne s'exprime pas avec les primitives
+plugin tiers. Si une forme de base ne s'exprime pas avec les primitives
 ci-dessous, c'est qu'il en manque une — pas qu'il faut un cas particulier.
 
 ---
@@ -53,7 +53,7 @@ le haut. Le sol est donc `y = 0`, et une forme s'élève en `y` positif.
         -24   |    24
 ```
 
-### Ce qu'un greffon peut changer, par rôle
+### Ce qu'un plugin peut changer, par rôle
 
 | Rôle | Géométrie | Ce qui reste au moteur |
 |---|---|---|
@@ -62,7 +62,7 @@ le haut. Le sol est donc `y = 0`, et une forme s'élève en `y` positif.
 | `pion` — fugitif, inspecteur | libre, dans le gabarit | rien |
 | `marqueur` — trace, barrage, scène | libre, dans le gabarit | rien |
 
-**Le sol ne se dessine pas.** Le losange est tracé par le moteur ; un greffon
+**Le sol ne se dessine pas.** Le losange est tracé par le moteur ; un plugin
 n'en change que la couleur, par la palette. Il n'existe donc pas de
 `forme.rue` : `rue`, `zone_ouverte` et `zone_fermee` sont des noms de couleurs,
 pas des formes.
@@ -74,11 +74,11 @@ formule fermée. Avec une tuile de forme libre, il faudrait une boîte englobant
 par case, un test de survol forme par forme, et le tri par ordre de peintre
 cesserait d'être valide : tout le rendu repasserait en calcul, à chaque image.
 
-S'y ajoute que la projection resterait sinon une propriété du greffon actif
+S'y ajoute que la projection resterait sinon une propriété du plugin actif
 plutôt que du jeu, et que deux joueurs ne verraient plus la même grille.
 
 **Un bâtiment occupe exactement une case.** Son emprise est le losange, un
-greffon ne déclare que sa hauteur et sa couleur. Cette contrainte n'est pas
+plugin ne déclare que sa hauteur et sa couleur. Cette contrainte n'est pas
 esthétique : une emprise libre permettrait de déborder sur les cases voisines,
 et de masquer ce que l'adversaire doit voir.
 
@@ -95,7 +95,7 @@ sur un jeu qui porte entièrement sur ce qu'on voit, ce n'est pas un choix
 esthétique. Le plafond de 24 vaut une demi-case.
 
 Le gabarit est vérifié au chargement, pas seulement à la publication : un
-greffon local qui déborde est refusé de la même façon. Une forme qui masque les
+plugin local qui déborde est refusé de la même façon. Une forme qui masque les
 cases voisines est un avantage de jeu déguisé en habillage.
 
 ---
@@ -152,7 +152,7 @@ couleur = "batiment"
 
 L'emprise n'est pas déclarable : c'est le losange, toujours. Le moteur assombrit
 les faces latérales selon leur orientation à partir de la couleur donnée — un
-greffon ne gère ni l'éclairage, ni l'ordre des faces, ni la forme au sol.
+plugin ne gère ni l'éclairage, ni l'ordre des faces, ni la forme au sol.
 
 ### Attributs communs
 
@@ -172,7 +172,7 @@ un nom de palette, et rien d'autre.
 
 C'est ce qui rend les deux catégories indépendantes : changer une palette
 reteinte tout le jeu sans toucher aux formes, et une forme tierce suit
-automatiquement la palette active. Un greffon de palette seule est le mod le
+automatiquement la palette active. Un plugin de palette seule est le mod le
 moins cher qui existe — un fichier de quinze lignes, aucun éditeur, aucune
 géométrie.
 
@@ -197,14 +197,14 @@ barrage = "#8a7a4a"
 
 Les noms ci-dessus sont **obligatoires** : ils constituent le socle sur lequel
 toute forme peut compter. `rue`, `zone_ouverte` et `zone_fermee` n'ont d'ailleurs
-pas d'autre existence — ce sont les seules prises qu'un greffon a sur le sol. Une palette peut en ajouter, et une forme qui
+pas d'autre existence — ce sont les seules prises qu'un plugin a sur le sol. Une palette peut en ajouter, et une forme qui
 référence un nom ajouté doit livrer la palette qui le définit.
 
 ---
 
 ## 4. Surcharge partielle
 
-Un greffon déclare **uniquement ce qu'il remplace**. Tout le reste retombe sur
+Un plugin déclare **uniquement ce qu'il remplace**. Tout le reste retombe sur
 le contenu de base.
 
 Changer l'allure du fugitif tient donc en un dossier et deux fichiers :
@@ -250,7 +250,7 @@ couleur = "fugitif_detail"
 Rien d'autre n'est nécessaire. Le sol, les bâtiments et les inspecteurs restent
 ceux du jeu.
 
-Deux greffons qui redéfinissent la même forme sont un conflit signalé au
+Deux plugins qui redéfinissent la même forme sont un conflit signalé au
 chargement, pas un écrasement silencieux.
 
 ---
@@ -258,7 +258,7 @@ chargement, pas un écrasement silencieux.
 ## 5. États
 
 Les états d'une forme — surlignée, hors de vue, sélectionnée — sont produits par
-le moteur : variation de teinte et contour. **Un greffon n'a rien à en
+le moteur : variation de teinte et contour. **Un plugin n'a rien à en
 déclarer.**
 
 Il peut le faire, à titre optionnel, en nommant la variante :
@@ -303,7 +303,7 @@ Contrôles appliqués au chargement comme à la publication :
 - nombre de traits sous le plafond, polygones de 3 à 32 sommets ;
 - toute `couleur` et tout `contour` résolus dans la palette active ;
 - aucune valeur hexadécimale dans une forme ;
-- pour un greffon d'apparence, `regles = false` **et** absence de toute
+- pour un plugin d'apparence, `regles = false` **et** absence de toute
   capacité, dépense, effet ou module exécutable. La déclaration ne suffit pas,
   elle est vérifiée.
 
@@ -322,11 +322,11 @@ Un plateau de couleurs pleines est plat à l'œil sur seize cents cases. Le mote
 applique donc à chaque case de sol un écart de luminosité de quelques pourcents,
 dérivé de sa position et de la graine du plateau.
 
-**Ce n'est pas une primitive et ça ne se déclare pas.** Aucun greffon n'a à en
+**Ce n'est pas une primitive et ça ne se déclare pas.** Aucun plugin n'a à en
 tenir compte, et tous en bénéficient — y compris ceux qui ne changent que la
 palette. C'est la raison d'avoir écarté une cinquième primitive de motif : elle
 aurait alourdi le contrat public de façon permanente pour un besoin décoratif,
-en déplaçant la responsabilité du fini visuel vers les auteurs de greffons.
+en déplaçant la responsabilité du fini visuel vers les auteurs de plugins.
 
 Trois contraintes, qui sont ce qui fait la différence entre du grain et du
 bruit :
@@ -351,7 +351,7 @@ grain, donc une capture d'écran n'est pas reproductible sans sa graine.
 **Le pixel-art et le dessin à la main ne sont pas publiables.** C'est le prix du
 refus de vérifier les provenances, assumé.
 
-**Le losange est figé, et le sol n'est pas une forme.** Aucun greffon ne
+**Le losange est figé, et le sol n'est pas une forme.** Aucun plugin ne
 redéfinit la tuile de sol ni l'emprise d'un bâtiment, et rien n'est prévu pour
 l'ouvrir : entrebâiller la porte coûterait de la complexité
 dans tout le rendu pour un besoin hypothétique. Une grille hexagonale ou une vue
