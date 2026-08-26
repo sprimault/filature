@@ -24,7 +24,7 @@ const (
 // clé d'effets : un greffon en ajoute une sans toucher au noyau.
 type Depense string
 
-// Les quatre dépenses de la règle standard. Leurs coûts ne sont pas ici mais
+// Les cinq dépenses de la règle standard. Leurs coûts ne sont pas ici mais
 // dans le manifeste de greffons/base, ce qui permet de les rééquilibrer sans
 // recompiler.
 const (
