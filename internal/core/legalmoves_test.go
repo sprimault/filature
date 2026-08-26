@@ -67,13 +67,12 @@ func (b *plateauTrame) CellsWithin(centre Position, rayon int) []Position {
 // gameOn monte une partie en phase fugitif sur un plateau dessiné.
 func gameOn(b *plateauTrame, fugitif Position, inspecteurs ...Position) *Game {
 	p := &Game{
-		Settings: DefaultSettings(),
+		Settings: SettingsForSize(len(b.cote)),
 		Board:    b,
 		Turn:     3,
 		Phase:    PhaseFugitive,
 		Fugitive: Fugitive{Position: fugitif, Stamina: 10},
 	}
-	p.Settings.Size = len(b.cote)
 	for _, pos := range inspecteurs {
 		p.Inspectors = append(p.Inspectors, Inspector{Position: pos})
 	}
@@ -352,25 +351,58 @@ func TestSealAZone(t *testing.T) {
 	}
 }
 
-// TestSetupDoesNotExcludeFugitiveCell protège l'invariant de la vue filtrée
-// à la mise en place.
+// TestSetupExcludesCentre vérifie qu'aucun inspecteur ne se place dans le noyau
+// de départ.
 //
-// Retirer sa case de la liste dirait aux inspecteurs où il n'est pas, ce qui
-// est une fuite exactement comme dire où il est.
-func TestSetupDoesNotExcludeFugitiveCell(t *testing.T) {
-	cache := Position{Column: 2, Row: 2}
-	p := gameOn(grid(".....", ".....", ".....", ".....", "....."), cache)
+// Sans cette exclusion, cinq pions posés au mieux autour du centre voient plus
+// de neuf dixièmes du noyau dès le premier tour, et l'invisibilité que
+// docs/regles.md §1 promet au fugitif n'existe pas.
+func TestSetupExcludesCentre(t *testing.T) {
+	p := gameOn(grid(".....", ".....", ".....", ".....", "....."), Position{Column: 0, Row: 0})
 	p.Phase = PhaseInspectorsSetup
-	p.Settings.Inspectors = 2
 
-	trouve := false
-	for _, c := range p.LegalMoves(SideInspectors) {
-		if c.To == cache {
-			trouve = true
+	milieu := p.Settings.Size / 2
+	centre := Position{Column: milieu, Row: milieu}
+
+	coups := p.LegalMoves(SideInspectors)
+	if len(coups) == 0 {
+		t.Fatal("aucun placement proposé, le test ne prouve rien")
+	}
+	for _, c := range coups {
+		if d := ChebyshevDistance(c.To, centre); d <= p.Settings.CentreRadius {
+			t.Errorf("placement proposé en %v, à %d du centre pour un noyau de rayon %d",
+				c.To, d, p.Settings.CentreRadius)
 		}
 	}
-	if !trouve {
-		t.Error("la case du fugitif est absente des placements, ce qui la trahit")
+}
+
+// TestSetupIgnoresFugitivePosition protège l'invariant de la vue filtrée à la
+// mise en place.
+//
+// La liste des placements ne dépend que du terrain et du noyau central. Une
+// case retirée parce que le fugitif s'y trouve dirait aux inspecteurs où il
+// n'est pas, ce qui est une fuite exactement comme dire où il est. Le noyau,
+// lui, s'exclut sans le regarder : il est le même pour toutes les parties de
+// même taille.
+func TestSetupIgnoresFugitivePosition(t *testing.T) {
+	var reference []Move
+	for _, cache := range []Position{{Column: 2, Row: 2}, {Column: 0, Row: 4}, {Column: 4, Row: 0}} {
+		p := gameOn(grid(".....", ".....", ".....", ".....", "....."), cache)
+		p.Phase = PhaseInspectorsSetup
+		p.Settings.Inspectors = 2
+
+		coups := p.LegalMoves(SideInspectors)
+		if len(coups) == 0 {
+			t.Fatalf("fugitif en %v : aucun placement, le test ne prouve plus rien", cache)
+		}
+		if reference == nil {
+			reference = coups
+			continue
+		}
+		if !reflect.DeepEqual(coups, reference) {
+			t.Errorf("fugitif en %v : %d placements au lieu des %d obtenus ailleurs, "+
+				"la liste dépend de sa position", cache, len(coups), len(reference))
+		}
 	}
 }
 

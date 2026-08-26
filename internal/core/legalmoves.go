@@ -63,6 +63,12 @@ func (p *Game) sealMoves() []Move {
 // plateau : l'en exclure dirait aux inspecteurs où il n'est pas, ce qui est une
 // fuite exactement comme dire où il est. Un pion qui tombe dessus l'a trouvé
 // par hasard, et c'est un résultat de partie, pas un coup illégal.
+//
+// Le noyau central en est exclu, et c'est une règle de jeu et non une commodité
+// : cinq pions posés autour du départ y voient plus de neuf dixièmes des cases
+// dès le premier tour, et l'invisibilité du fugitif n'existe alors pas.
+// L'exclusion ne porte que sur le placement — rien n'empêche d'y entrer au
+// premier tour.
 func (p *Game) placeMoves() []Move {
 	if len(p.Inspectors) >= p.Settings.Inspectors {
 		return nil
@@ -73,7 +79,7 @@ func (p *Game) placeMoves() []Move {
 	cases := p.Board.CellsWithin(centre, rayon)
 	coups := make([]Move, 0, len(cases))
 	for _, c := range cases {
-		if !p.IsWalkable(c) {
+		if !p.IsWalkable(c) || ChebyshevDistance(c, centre) <= p.Settings.CentreRadius {
 			continue
 		}
 		coups = append(coups, Move{

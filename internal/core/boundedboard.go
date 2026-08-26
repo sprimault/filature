@@ -15,6 +15,7 @@ type Settings struct {
 	Size             int `json:"size"`
 	Range            int `json:"range"`
 	Turns            int `json:"turns"`
+	CentreRadius     int `json:"centre_radius"`
 	Stamina          int `json:"stamina"`
 	Inspectors       int `json:"inspectors"`
 	PiecesPerTurn    int `json:"pieces_per_turn"`
@@ -33,6 +34,7 @@ func DefaultSettings() Settings {
 		Size:             41,
 		Range:            8,
 		Turns:            40,
+		CentreRadius:     10,
 		Stamina:          10,
 		Inspectors:       5,
 		PiecesPerTurn:    3,
@@ -49,7 +51,12 @@ const (
 	// MinSize laisse la place au noyau central de départ et aux zones qui
 	// l'entourent. En dessous, le fugitif naît à portée d'un point
 	// d'extraction et la traversée qui fait le jeu disparaît.
-	MinSize = 2*CentreRadius + ZoneSize + 2
+	//
+	// Le rayon du noyau se déduisant désormais du côté, l'exprimer par lui
+	// serait circulaire. C'est donc un nombre : le plus petit côté dont la
+	// couronne hors noyau loge une zone et laisse une rue pour la contourner,
+	// division entière comprise.
+	MinSize = 15
 
 	// MaxSize borne BoundedBoard, et lui seul.
 	//
@@ -85,6 +92,13 @@ func (p Settings) Validate() error {
 	case p.Range < MinRange || p.Range > p.Size/2:
 		return fmt.Errorf("portee de %d, attendu entre %d et %d sur un plateau de %d",
 			p.Range, MinRange, p.Size/2, p.Size)
+
+	// La borne haute laisse la couronne loger une zone : les inspecteurs se
+	// placent hors du noyau, et un noyau qui mange le plateau ne leur laisserait
+	// nulle part où se poser.
+	case p.CentreRadius < 1 || p.CentreRadius > p.Size/2-ZoneSize:
+		return fmt.Errorf("rayon du noyau de %d, attendu entre 1 et %d sur un plateau de %d",
+			p.CentreRadius, p.Size/2-ZoneSize, p.Size)
 	case p.StranglingStart >= p.Turns:
 		return fmt.Errorf("etranglement au tour %d pour une partie de %d tours : "+
 			"il doit commencer avant la fin", p.StranglingStart, p.Turns)
@@ -138,7 +152,24 @@ func (b *BoundedBoard) validate(p Settings) error {
 			return fmt.Errorf("la zone %d n'a aucune case praticable atteignable", z.Number)
 		}
 	}
+
+	// Les inspecteurs se placent hors du noyau central : une couronne qui n'en
+	// porte pas assez rendrait la mise en place impossible. Le cas ne se
+	// rattrape pas une fois la partie montée, et il ne se voit pas sur les
+	// critères précédents — un plateau peut tenir son taux de rues en les
+	// concentrant au centre.
+	if hors := b.streetsOutsideCentre(p); hors < p.Inspectors {
+		return fmt.Errorf("%d rues hors du noyau pour %d inspecteurs a placer",
+			hors, p.Inspectors)
+	}
 	return nil
+}
+
+// streetsOutsideCentre compte les rues où un inspecteur peut se placer.
+func (b *BoundedBoard) streetsOutsideCentre(p Settings) int {
+	milieu := b.cote / 2
+	centre := Position{Column: milieu, Row: milieu}
+	return b.countStreets() - len(b.CellsWithin(centre, p.CentreRadius))
 }
 
 // countStreets totalise les cases praticables.

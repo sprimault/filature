@@ -143,17 +143,6 @@ type Game struct {
 	alea       *Random
 }
 
-// La distance minimale entre le noyau central et les zones d'extraction reste
-// ouverte : elle dépend du taux de rues que la génération obtiendra, donc de
-// l'étape 3. Ce rayon la borne par le haut en attendant.
-
-// CentreRadius borne la zone où le fugitif est tiré au sort.
-//
-// Assez large pour que les inspecteurs ne puissent pas la couvrir, assez
-// resserrée pour qu'aucune sortie ne soit à portée immédiate : il doit avoir à
-// traverser, sinon les six points d'extraction ne servent à rien.
-const CentreRadius = 5
-
 // NewGame prépare une partie au premier coup de placement.
 //
 // Le plateau est reçu, pas fabriqué. Le noyau applique des règles à un terrain,
@@ -199,7 +188,7 @@ func NewGame(plateau Board, graine int64, p Settings, r *Registry) (*Game, error
 // le fugitif d'une partie qu'on rejoue.
 func fugitiveStart(plateau Board, graine int64, p Settings) (Position, error) {
 	milieu := p.Size / 2
-	cases := plateau.CellsWithin(Position{Column: milieu, Row: milieu}, CentreRadius)
+	cases := plateau.CellsWithin(Position{Column: milieu, Row: milieu}, p.CentreRadius)
 	if len(cases) == 0 {
 		return Position{}, errors.New("aucune rue au centre du plateau")
 	}

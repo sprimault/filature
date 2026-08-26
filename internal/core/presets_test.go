@@ -3,7 +3,10 @@
 
 package core
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 // TestPresetsArePlayable vérifie que chaque préréglage livré produit un
 // plateau.
@@ -91,6 +94,45 @@ func TestPresetRangeAndLengthFollowSize(t *testing.T) {
 		if p.Settings.StranglingStart >= p.Settings.Turns {
 			t.Errorf("%s : étranglement au tour %d sur %d",
 				p.Key, p.Settings.StranglingStart, p.Settings.Turns)
+		}
+		if attendu := cote / 4; p.Settings.CentreRadius != attendu {
+			t.Errorf("%s : noyau de rayon %d, attendu %d",
+				p.Key, p.Settings.CentreRadius, attendu)
+		}
+	}
+}
+
+// TestValidateRejectsOversizedCentre vérifie qu'un noyau trop large est refusé
+// à la lecture du réglage plutôt qu'au premier placement impossible.
+//
+// Le cas n'arrive pas des préréglages, qui dérivent le rayon du côté, mais d'un
+// réglage écrit à la main — ou d'un appelant qui part de DefaultSettings et n'y
+// change que la taille.
+func TestValidateRejectsOversizedCentre(t *testing.T) {
+	p := SettingsForSize(21)
+	p.CentreRadius = p.Size/2 - ZoneSize + 1
+
+	err := p.Validate()
+	if err == nil {
+		t.Fatal("noyau plus large que la couronne accepté")
+	}
+	if !strings.Contains(err.Error(), "noyau") {
+		t.Errorf("message %q, attendu qu'il nomme le noyau", err)
+	}
+}
+
+// TestCentreLeavesRoomForInspectors vérifie que la couronne hors noyau existe
+// dans chaque préréglage.
+//
+// C'est devenu une condition de jouabilité et non d'esthétique : les
+// inspecteurs s'y placent, et un noyau qui mange le plateau ne leur laisserait
+// nulle part où se poser.
+func TestCentreLeavesRoomForInspectors(t *testing.T) {
+	for _, p := range Presets() {
+		couronne := p.Settings.Size/2 - p.Settings.CentreRadius
+		if couronne < ZoneSize {
+			t.Errorf("%s : couronne de %d cases hors noyau, une zone en demande %d",
+				p.Key, couronne, ZoneSize)
 		}
 	}
 }

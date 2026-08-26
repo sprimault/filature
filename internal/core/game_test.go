@@ -79,8 +79,7 @@ func (b *plateauOuvert) CellsWithin(centre Position, rayon int) []Position {
 
 // testSettings réduit le plateau sans sortir de ce que Validate accepte.
 func testSettings() Settings {
-	p := DefaultSettings()
-	p.Size = 15
+	p := SettingsForSize(15)
 	p.Range = 7
 	return p
 }
@@ -122,8 +121,8 @@ func TestNewGamePlacesFugitiveAtCentre(t *testing.T) {
 			t.Fatal(err)
 		}
 		centre := Position{Column: milieu, Row: milieu}
-		if d := ChebyshevDistance(p.Fugitive.Position, centre); d > CentreRadius {
-			t.Fatalf("graine %d : fugitif à %d du centre, rayon %d", graine, d, CentreRadius)
+		if d := ChebyshevDistance(p.Fugitive.Position, centre); d > params.CentreRadius {
+			t.Fatalf("graine %d : fugitif à %d du centre, rayon %d", graine, d, params.CentreRadius)
 		}
 	}
 }
