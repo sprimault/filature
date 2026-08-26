@@ -428,7 +428,7 @@ func TestPublicFingerprintReadsDisk(t *testing.T) {
 // une liste, pas un aller-retour par erreur.
 //
 // Un auteur qui corrige une ligne pour en découvrir une autre au lancement
-// next y passe la soirée, et c'est exactement ce que la command doit lui
+// suivant y passe la soirée, et c'est exactement ce que la commande doit lui
 // éviter.
 func TestValidateReturnsEveryFailure(t *testing.T) {
 	racine := t.TempDir()

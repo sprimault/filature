@@ -235,7 +235,15 @@ func Ending(r core.Outcome) string {
 	if motif == "" {
 		motif = r.Reason
 	}
-	return fmt.Sprintf("Tour %d — %s l'emportent : %s", r.Turn, sideName(r.Winner), motif)
+
+	// Le vainqueur ne se nomme pas comme une vue : « les inspecteurs
+	// l'emportent », pas « vue des inspecteurs ». Et l'accord suit — l'un est
+	// seul, les autres sont cinq.
+	vainqueur := "le fugitif l'emporte"
+	if r.Winner == core.SideInspectors {
+		vainqueur = "les inspecteurs l'emportent"
+	}
+	return fmt.Sprintf("Tour %d — %s : %s", r.Turn, vainqueur, motif)
 }
 
 // Merge superpose les deux vues d'une même partie, pour qui regarde sans

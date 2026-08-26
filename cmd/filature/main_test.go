@@ -14,7 +14,7 @@ import (
 // destination d'essai.
 const ailleurs = "/un/dossier/qui/n/est/pas/la/destination"
 
-// TestExtractWritesShippedPlugins vérifie que la command rend le contenu
+// TestExtractWritesShippedPlugins vérifie que la commande rend le contenu
 // embarqué recopiable.
 func TestExtractWritesShippedPlugins(t *testing.T) {
 	dossier := t.TempDir()
@@ -32,10 +32,10 @@ func TestExtractWritesShippedPlugins(t *testing.T) {
 	}
 }
 
-// TestExtractDoesNotOverwrite vérifie qu'un fichier existant arrête la command.
+// TestExtractDoesNotOverwrite vérifie qu'un fichier existant arrête la commande.
 //
 // Un traducteur qui relance l'extraction sur son dossier de travail perdrait
-// ses libellés. Le refus est ce qui rend la command sûre à relancer.
+// ses libellés. Le refus est ce qui rend la commande sûre à relancer.
 func TestExtractDoesNotOverwrite(t *testing.T) {
 	dossier := t.TempDir()
 	if err := extract(dossier, ailleurs); err != nil {
@@ -60,7 +60,7 @@ func TestExtractDoesNotOverwrite(t *testing.T) {
 	}
 }
 
-// TestExtractWithoutFolder vérifie que la command dit son usage plutôt que
+// TestExtractWithoutFolder vérifie que la commande dit son usage plutôt que
 // d'écrire dans le répertoire courant.
 func TestExtractWithoutFolder(t *testing.T) {
 	if err := extract("", ailleurs); err == nil {
@@ -68,7 +68,7 @@ func TestExtractWithoutFolder(t *testing.T) {
 	}
 }
 
-// TestExtractRejectsActiveFolder ferme le piège que la command tendait.
+// TestExtractRejectsActiveFolder ferme le piège que la commande tendait.
 //
 // Extraire le contenu livré là où le jeu charge le déclarerait deux fois : une
 // fois depuis le binaire, une fois depuis le disque. Deux plugins qui
@@ -133,7 +133,7 @@ func TestDefaultPluginsFollowExecutable(t *testing.T) {
 	}
 }
 
-// TestCommandRejectsUnknownWord vérifie qu'un mot qui n'est pas une command
+// TestCommandRejectsUnknownWord vérifie qu'un mot qui n'est pas une commande
 // ne lance pas de partie.
 //
 // Le cas n'est pas théorique : « exemples » et « valide » ont existé sous ces

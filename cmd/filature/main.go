@@ -17,7 +17,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/sprimault/filature/internal/core"
 	"github.com/sprimault/filature/internal/loader"
+	"github.com/sprimault/filature/internal/session"
 	"github.com/sprimault/filature/plugins"
 )
 
@@ -60,6 +62,9 @@ func main() {
 	rejoindre := flag.String("rejoindre", "", "adresse d'une partie à rejoindre")
 	dossierPlugins := flag.String("plugins", pluginsParDefaut(), "dossier des plugins")
 	partie := flag.String("partie", "", "nom d'une partie enregistrée à reprendre")
+	cote := flag.String("camp", "inspectors", "camp joué : fugitive, inspectors, ou watch pour regarder")
+	preset := flag.String("preset", "ville", "préréglage : quartier, faubourg ou ville")
+	graine := flag.Int64("graine", 1, "graine de la partie")
 	flag.Parse()
 
 	traitee, err := command(os.Stdout, flag.Arg(0), flag.Arg(1), *dossierPlugins)
@@ -71,19 +76,25 @@ func main() {
 		return
 	}
 
-	if err := run(*heberger, *rejoindre, *dossierPlugins, *partie); err != nil {
+	o, err := options(*cote, *preset, *graine, *dossierPlugins)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "filature:", err)
+		os.Exit(1)
+	}
+
+	if err := run(o, *heberger, *rejoindre, *partie); err != nil {
 		fmt.Fprintln(os.Stderr, "filature:", err)
 		os.Exit(1)
 	}
 }
 
-// sameFolderb compare deux chemins après résolution.
+// sameFolder compare deux chemins après résolution.
 //
 // La comparaison est insensible à la casse : Windows l'est, et « Plugins »
 // y désigne le même dossier que « plugins ». Se tromper dans ce sens fait
 // refuser une extraction légitime, ce qui se voit et se corrige ; l'inverse
 // laisserait passer celle qui casse le chargement.
-func sameFolderb(a, b string) bool {
+func sameFolder(a, b string) bool {
 	absA, err := filepath.Abs(a)
 	if err != nil {
 		return false
@@ -118,7 +129,7 @@ func pluginsParDefaut() string {
 // validate contrôle un plugin avant qu'il soit installé, et affiche son
 // fingerprint quand il tient.
 //
-// L'fingerprint est ce qu'un auteur publie à côté de son plugin : elle porte sur
+// L'empreinte est ce qu'un auteur publie à côté de son plugin : elle porte sur
 // le contenu et pas sur le numéro de version, donc elle distingue deux
 // « 1.2.0 » qui ne sont pas le même fichier.
 func validate(sortie io.Writer, dossier string) error {
@@ -137,31 +148,88 @@ func validate(sortie io.Writer, dossier string) error {
 	return err
 }
 
-// run assemble les dépendances et lance la boucle de jeu.
-func run(heberger bool, rejoindre, dossierPlugins, partie string) error {
-	return fmt.Errorf("à implémenter : étape 5")
+// run lance la boucle de jeu, ou dit ce qui n'est pas encore écrit.
+//
+// Les options arrivent construites : le camp est un paramètre de partie, et
+// l'écran de nouvelle partie devra le fournir sans contourner cette fonction.
+func run(o session.Options, heberger bool, rejoindre, partie string) error {
+	switch {
+	case heberger || rejoindre != "":
+		return errors.New("à implémenter : étape 12")
+	case partie != "":
+		return errors.New("à implémenter : étape 8")
+	}
+
+	// L'abandon n'est pas une panne : le joueur a tapé « q », le binaire sort
+	// sans rien signaler.
+	if _, err := session.Run(o); err != nil && !errors.Is(err, session.ErrAbandon) {
+		return err
+	}
+	return nil
+}
+
+// options assemble ce que la session attend à partir des drapeaux.
+//
+// C'est le seul endroit du binaire qui les lit : `internal/` reçoit ses
+// dépendances construites, jamais un `flag`.
+func options(cote, preset string, graine int64, dossierPlugins string) (session.Options, error) {
+	choisi, err := camp(cote)
+	if err != nil {
+		return session.Options{}, err
+	}
+
+	reglage, connu := core.PresetByKey(preset)
+	if !connu {
+		return session.Options{}, fmt.Errorf("préréglage %q inconnu", preset)
+	}
+
+	return session.Options{
+		Seed:     graine,
+		Settings: reglage.Settings,
+		Human:    choisi,
+		Plugins:  dossierPlugins,
+		In:       os.Stdin,
+		Out:      os.Stdout,
+	}, nil
+}
+
+// camp traduit le drapeau de camp en côté du noyau.
+//
+// Vide vaut spectateur : deux cerveaux jouent et personne ne saisit rien. C'est
+// aussi ce qui permet de dérouler une partie entière sans intervention.
+func camp(choix string) (core.Side, error) {
+	switch choix {
+	case "fugitif", "fugitive":
+		return core.SideFugitive, nil
+	case "inspecteurs", "inspectors":
+		return core.SideInspectors, nil
+	case "", "spectateur", "watch":
+		return "", nil
+	default:
+		return "", fmt.Errorf("camp %q inconnu, attendu fugitive, inspectors ou watch", choix)
+	}
 }
 
 // extract écrit les plugins livrés dans un dossier, pour servir de modèle.
 //
 // Le contenu vit dans le binaire, ce qui le met hors de portée de celui qui
-// voudrait s'en inspirer. Cette command est la contrepartie : un traducteur
-// recopie « anglais », change le code et les libellés, et pose le résultat dans
+// voudrait s'en inspirer. Cette commande est la contrepartie : un traducteur
+// recopie « english », change le code et les libellés, et pose le résultat dans
 // son dossier de plugins.
 //
-// Un fichier existant n'est jamais écrasé. Quelqu'un qui relance la command
+// Un fichier existant n'est jamais écrasé. Quelqu'un qui relance la commande
 // sur un dossier où il a déjà travaillé perdrait son travail, et il n'y a pas
 // de bonne raison de lui offrir ça.
 //
-// Le dossier des plugins actifs est refusé, et c'est le piège que la command
-// tendait : le contenu livré est déjà dans le binaire, l'extract là où le jeu
+// Le dossier des plugins actifs est refusé, et c'est le piège que la commande
+// tendait : le contenu livré est déjà dans le binaire, l'extraire là où le jeu
 // charge reviendrait à le déclarer deux fois, et deux plugins qui définissent
 // la même clé sont un conflit. Suivre l'invitation cassait le chargement.
 func extract(dossier, actifs string) error {
 	if dossier == "" {
 		return errors.New("usage: filature examples <dossier>")
 	}
-	if sameFolderb(dossier, actifs) {
+	if sameFolder(dossier, actifs) {
 		return fmt.Errorf("%s est le dossier des plugins actifs : le contenu livré y serait déclaré deux fois", dossier)
 	}
 

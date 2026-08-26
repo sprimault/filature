@@ -11,9 +11,9 @@ Quatre numéros à ne pas confondre :
 | Numéro | Où | Ce qu'il suit |
 |---|---|---|
 | version du dépôt | tag git | le binaire |
-| `version_formes` | chaque fichier de formes | le contrat d'apparence |
-| `protocole` | échanges avec un bot | le contrat de bot |
-| `version_effets` | manifeste d'un plugin de règles | le vocabulaire d'effets |
+| `shapes_version` | chaque fichier de formes | le contrat d'apparence |
+| `protocol` | échanges avec un bot | le contrat de bot |
+| `effects_version` | manifeste d'un plugin de règles | le vocabulaire d'effets |
 
 Les trois derniers sont des entiers sans rapport avec SemVer. Une version peut
 sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
@@ -59,11 +59,18 @@ documentation et libellés. Il est exclusivement français, absent de l'usage
 courant, et il ne se cherche pas.
 
 ### Ajouté
+- **Le binaire joue.** Lancé sans argument, il donne la main aux inspecteurs
+  face à un adversaire, en texte. `--camp fugitive` prend l'autre rôle,
+  `--camp watch` regarde deux machines s'affronter, `--preset` et `--graine`
+  choisissent la partie.
+- Un adversaire qui tire ses coups au hasard parmi les coups légaux, en
+  attendant l'IA des étapes 9 et 10. Il est déterministe : une graine donnée
+  rejoue la même partie.
 - Chargement des plugins : capacités, dépenses et modes entrent au registre
   depuis les manifestes. Le contenu livré emprunte le même chemin qu'un plugin
   posé sur le disque, si bien qu'il est exercé à chaque démarrage.
 - Les refus de `docs/plugins.md` §9 sont appliqués : un champ inconnu, une
-  primitive que ce binaire ne sait pas appliquer, `regles = false` accompagné
+  primitive que ce binaire ne sait pas appliquer, `rules = false` accompagné
   d'une capacité, un `differer` imbriqué, un bot mêlé à des effets. Chacun
   arrête le chargement entier en nommant le fichier et la clé fautive.
 - Empreinte de contenu par plugin, qui distingue deux plugins se disant
@@ -75,6 +82,9 @@ courant, et il ne se cherche pas.
 ### Corrigé
 - La vue du fugitif annonçait une zone scellée numéro -1 tant qu'il n'avait pas
   choisi. Le champ reste maintenant absent, ce qui est ce qu'il faut lire.
+- Le fugitif pouvait dépenser son dernier point de résistance, ce qui le faisait
+  perdre sur-le-champ sans que l'effet acheté serve jamais. La règle lui en fait
+  garder un.
 
 ***
 
@@ -106,11 +116,18 @@ code, documentation and labels. It is exclusively French, absent from common
 usage, and nobody searches for it.
 
 ### Added
+- **The binary plays.** Run with no argument, it hands you the inspectors
+  against an opponent, in text. `--camp fugitive` takes the other side,
+  `--camp watch` watches two machines play, `--preset` and `--graine` choose
+  the game.
+- An opponent drawing its moves at random among the legal ones, standing in
+  until the AI of steps 9 and 10. It is deterministic: a given seed replays the
+  same game.
 - Plugin loading: abilities, expenses and modes now enter the registry from
   manifests. Shipped content takes the same path as a plugin dropped on disk,
   so that path is exercised on every start.
 - The refusals in `docs/plugins.md` §9 are enforced: an unknown field, a
-  primitive this binary cannot apply, `regles = false` alongside an ability, a
+  primitive this binary cannot apply, `rules = false` alongside an ability, a
   nested `differer`, a bot mixed with effects. Each aborts the whole load,
   naming the file and the offending key.
 - Per-plugin content fingerprint, telling apart two plugins that claim to be
@@ -122,6 +139,8 @@ usage, and nobody searches for it.
 ### Fixed
 - The fugitive's view reported a sealed zone numbered -1 until he had chosen
   one. The field is now simply absent, which is what should be read.
+- The fugitive could spend his last stamina point, losing on the spot without
+  the purchased effect ever serving. The rule makes him keep one.
 
 ## [0.4.0] — 2026-08-26 — La vision
 
