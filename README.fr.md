@@ -52,6 +52,14 @@ filature validate <dossier>   contrôle un plugin et affiche son empreinte
 
 `--version` est accepté comme équivalent de `version`.
 
+`validate` applique exactement les contrôles du chargement, et liste tout ce qui
+cloche d'un coup plutôt qu'une faute à la fois. Un plugin qu'il accepte se
+chargera chez ceux à qui vous le donnez.
+
+`examples` ne peut pas écrire dans le dossier des plugins actifs, et le refuse
+en le disant : ce qu'il en sort est déjà dans le binaire, l'y remettre le
+déclarerait deux fois. Ce sont des modèles à recopier sous un autre nom.
+
 ### Les drapeaux
 
 Lancé sans argument, le jeu vous donne le camp des inspecteurs face à un
@@ -62,19 +70,13 @@ adversaire.
                     watch regarde deux machines s'affronter
 --preset ville      taille du plateau : quartier, faubourg ou ville
 --seed 1            la graine ; la même rejoue la même partie
+--delay 800ms       pause entre deux tours quand personne ne joue ; sans
+                    elle la partie entière défile d'un bloc
 --plugins <dossier> où chercher les plugins
 --host              héberger une partie en réseau
 --join <adresse>    en rejoindre une
 --game <nom>        reprendre une partie enregistrée
 ```
-
-`validate` applique exactement les contrôles du chargement, et liste tout ce qui
-cloche d'un coup plutôt qu'une faute à la fois. Un plugin qu'il accepte se
-chargera chez ceux à qui vous le donnez.
-
-`examples` ne peut pas écrire dans le dossier des plugins actifs, et le refuse
-en le disant : ce qu'il en sort est déjà dans le binaire, l'y remettre le
-déclarerait deux fois. Ce sont des modèles à recopier sous un autre nom.
 
 Le jeu cherche ses plugins dans un dossier `plugins` **à côté de
 l'exécutable**, et non dans le répertoire courant — un raccourci fonctionne donc

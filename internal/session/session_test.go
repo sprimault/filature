@@ -8,6 +8,7 @@ import (
 	"io"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/sprimault/filature/internal/core"
 )
@@ -152,5 +153,107 @@ func TestUnknownPresetIsRefused(t *testing.T) {
 
 	if _, err := Run(o); err == nil {
 		t.Error("une partie démarre sur un plateau trop petit")
+	}
+}
+
+// TestWatchedGameShowsEveryTurn vérifie qu'une partie sans joueur se donne à
+// voir, et pas seulement son résultat.
+//
+// C'est ce que --side watch promet. L'affichage n'était conditionné qu'au camp
+// du joueur : sans joueur, aucun camp ne correspondait et quarante tours
+// passaient sans qu'une ligne sorte.
+func TestWatchedGameShowsEveryTurn(t *testing.T) {
+	var sortie strings.Builder
+
+	issue, err := Run(partieRegardee(3, &sortie))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	vus := strings.Count(sortie.String(), "Tour ")
+	if vus < issue.Turn {
+		t.Errorf("%d écrans pour %d tours joués", vus, issue.Turn)
+	}
+}
+
+// TestWatchedGameShowsOneScreenPerTurn vérifie qu'un tour ne produit qu'un
+// écran, et non un par coup.
+//
+// Un tour porte trois déplacements d'inspecteurs puis celui du fugitif :
+// afficher à chaque coup rendrait le déroulé illisible, quatre écrans quasi
+// identiques se succédant sans qu'on distingue ce qui a bougé.
+func TestWatchedGameShowsOneScreenPerTurn(t *testing.T) {
+	var sortie strings.Builder
+
+	issue, err := Run(partieRegardee(3, &sortie))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Un écran par tour, plus celui de la fin.
+	if vus := strings.Count(sortie.String(), "Tour "); vus > issue.Turn+1 {
+		t.Errorf("%d écrans pour %d tours, attendu un par tour", vus, issue.Turn)
+	}
+}
+
+// TestRedrawStaysOutOfThePlainOutput vérifie qu'aucune séquence d'échappement
+// ne sort quand on ne l'a pas demandée.
+//
+// Une sortie redirigée vers un fichier ou un pagineur les recevrait telles
+// quelles, et Redraw reste faux par défaut précisément pour ça.
+func TestRedrawStaysOutOfThePlainOutput(t *testing.T) {
+	var sortie strings.Builder
+
+	if _, err := Run(partieRegardee(3, &sortie)); err != nil {
+		t.Fatal(err)
+	}
+
+	if strings.Contains(sortie.String(), "\033[") {
+		t.Error("la sortie porte des séquences d'échappement sans que Redraw soit demandé")
+	}
+}
+
+// TestRedrawRepositionsEachTurn vérifie qu'avec Redraw chaque tour est précédé
+// du retour en haut de l'écran.
+func TestRedrawRepositionsEachTurn(t *testing.T) {
+	var sortie strings.Builder
+
+	o := partieRegardee(3, &sortie)
+	o.Redraw = true
+	issue, err := Run(o)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vus := strings.Count(sortie.String(), home); vus < issue.Turn {
+		t.Errorf("%d repositionnements pour %d tours", vus, issue.Turn)
+	}
+}
+
+// TestDelayDoesNotChangeTheGame vérifie que la pause d'affichage ne touche pas
+// au déroulé.
+//
+// C'est la seule horloge du paquet, et l'invariant de déterminisme veut qu'elle
+// reste sans effet : la même graine rend la même partie, avec ou sans attente.
+func TestDelayDoesNotChangeTheGame(t *testing.T) {
+	var sans, avec strings.Builder
+
+	issueSans, err := Run(partieRegardee(5, &sans))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	o := partieRegardee(5, &avec)
+	o.Delay = time.Millisecond
+	issueAvec, err := Run(o)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if issueSans != issueAvec {
+		t.Errorf("issue %+v avec pause, %+v sans", issueAvec, issueSans)
+	}
+	if sans.String() != avec.String() {
+		t.Error("le déroulé affiché diffère selon la pause")
 	}
 }

@@ -12,6 +12,7 @@ package session
 import (
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/sprimault/filature/internal/ai"
 	"github.com/sprimault/filature/internal/core"
@@ -40,6 +41,20 @@ type Options struct {
 	// Plugins est le dossier du joueur. Vide, seul le contenu livré est
 	// chargé, ce qui est l'installation ordinaire.
 	Plugins string
+
+	// Delay est la pause entre deux tours d'une partie que personne ne joue.
+	// Zéro déroule sans attendre, ce qu'exigent les mesures d'équilibrage :
+	// quelques milliers de parties ne peuvent pas s'offrir une seconde chacune.
+	//
+	// C'est la seule horloge du paquet, et elle ne touche rien : aucune
+	// décision de jeu n'en dépend, la même graine rend la même partie quelle
+	// que soit la valeur.
+	Delay time.Duration
+
+	// Redraw redessine chaque tour à la place du précédent, au lieu de les
+	// empiler. Réservé à une sortie qui est un vrai terminal — l'appelant en
+	// décide, le paquet n'a pas à savoir ce qu'est Out.
+	Redraw bool
 
 	In  io.Reader
 	Out io.Writer
@@ -89,10 +104,21 @@ func jouer(p *core.Game, o Options) (core.Outcome, error) {
 		core.SideInspectors: core.NewRandom(p.Seed, "brain_inspectors"),
 	}
 
+	// Le tour du dernier affichage, pour n'en produire qu'un par tour. Un tour
+	// porte trois déplacements d'inspecteurs puis celui du fugitif : afficher à
+	// chaque coup noierait le déroulé sous quatre écrans identiques aux détails
+	// près. Commence à zéro, le premier tour valant un.
+	montre := 0
+
 	for joues := 0; joues < coupsMax; joues++ {
 		if issue, fini := p.Outcome(); fini {
 			afficherLaFin(o, p, issue)
 			return issue, nil
+		}
+
+		if o.Human == "" && p.Turn != montre {
+			montre = p.Turn
+			afficherLeTour(o, p)
 		}
 
 		camp, connu := campActif(p.Phase)
@@ -141,6 +167,31 @@ func campActif(phase core.Phase) (core.Side, bool) {
 	}
 }
 
+// home ramène le curseur en haut à gauche et efface ce qui suit.
+//
+// Pas « effacer tout l'écran puis revenir » : la séquence usuelle vide d'abord
+// et repeint ensuite, ce qui laisse voir un écran blanc entre les deux. Celle-ci
+// écrase au fur et à mesure.
+const home = "\033[H\033[J"
+
+// afficherLeTour montre l'état d'une partie que personne ne joue.
+//
+// Les deux vues fusionnées et non l'état complet : c'est ce qui garantit qu'un
+// spectateur ne voit rien qu'un joueur ne pourrait voir, et que le contrat de
+// vue reste le seul chemin vers ce qui s'affiche.
+func afficherLeTour(o Options, p *core.Game) {
+	vue := text.Merge(p.ViewFor(core.SideFugitive), p.ViewFor(core.SideInspectors))
+
+	if o.Redraw {
+		_, _ = fmt.Fprint(o.Out, home)
+	}
+	_, _ = fmt.Fprint(o.Out, text.Status(vue), text.Board(vue))
+
+	if o.Delay > 0 {
+		time.Sleep(o.Delay)
+	}
+}
+
 // afficherLaFin montre le plateau tel qu'il est au dernier coup, puis l'issue.
 //
 // Pour qui joue, sa propre vue : découvrir la position du fugitif au moment où
@@ -150,6 +201,12 @@ func afficherLaFin(o Options, p *core.Game, issue core.Outcome) {
 	vue := p.ViewFor(o.Human)
 	if o.Human == "" {
 		vue = text.Merge(p.ViewFor(core.SideFugitive), p.ViewFor(core.SideInspectors))
+	}
+
+	// Repositionner ici aussi : sans cela l'écran de fin s'empilerait sous le
+	// dernier tour, et le redessin lâcherait au moment où l'on regarde.
+	if o.Redraw {
+		_, _ = fmt.Fprint(o.Out, home)
 	}
 
 	// La partie est jouée : une écriture qui échoue ici ne change plus rien à
