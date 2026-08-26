@@ -42,7 +42,7 @@ func (plateauPlat) Zones() []noyau.Zone {
 // Graine est figée : ce test ne tire rien au sort.
 func (plateauPlat) Graine() int64 { return 1 }
 
-// Vision n'est pas exercée : la table relève de l'étape 4.
+// Vision reste vide : ce test applique les effets livrés, il ne regarde rien.
 func (plateauPlat) Vision(p noyau.Position, portee int) []noyau.Position { return nil }
 
 // CasesDans énumère le carré autour du centre.

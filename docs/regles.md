@@ -152,6 +152,11 @@ Chaque inspecteur voit dans 8 directions, jusqu'à 8 cases, la ligne s'arrêtant
 premier bâtiment. La vision est **calculée avant le déplacement du fugitif comme
 après** : un fugitif qui sort d'une ligne de vue redevient invisible.
 
+**La portée compte les pas, pas les cases traversées** : huit pas en diagonale
+sont à portée 8, comme huit pas tout droit. C'est la même distance que celle des
+déplacements du fugitif, et elle ne se confond pas avec celle des contacts, qui
+se comptent orthogonalement.
+
 **Révélation périodique.** Tous les 4 tours, la position exacte du fugitif est
 affichée aux deux joueurs. Sans ce battement, l'incertitude des inspecteurs ne
 converge jamais et la partie devient une loterie. C'est aussi ce qui borne la

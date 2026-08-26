@@ -47,8 +47,22 @@ func (b *plateauOuvert) Zones() []Zone { return b.zones }
 // Graine est figée : le tirage vient de la partie, pas du plateau.
 func (b *plateauOuvert) Graine() int64 { return 1 }
 
-// Vision n'est pas exercée : la table relève de l'étape 4.
-func (b *plateauOuvert) Vision(p Position, portee int) []Position { return nil }
+// Vision déroule les huit directions à la demande.
+//
+// Pas de table précalculée ici : sur un terrain sans le moindre bâtiment, la
+// ligne se calcule aussi vite qu'elle se lirait, et un plateau d'essai n'a pas
+// à porter la mémoire d'un vrai.
+func (b *plateauOuvert) Vision(p Position, portee int) []Position {
+	if !b.EstRue(p) || portee <= 0 {
+		return nil
+	}
+
+	var vues []Position
+	for d := Nord; d <= NordOuest; d++ {
+		vues = append(vues, ligneDeVue(b, p, d, portee)...)
+	}
+	return vues
+}
 
 // CasesDans énumère le carré autour du centre.
 func (b *plateauOuvert) CasesDans(centre Position, rayon int) []Position {

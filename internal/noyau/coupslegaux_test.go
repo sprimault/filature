@@ -48,7 +48,7 @@ func (b *plateauTrame) Zones() []Zone { return b.zones }
 // Graine est figée : aucun test de ce fichier ne tire au sort.
 func (b *plateauTrame) Graine() int64 { return 1 }
 
-// Vision n'est pas exercée ici, la table relevant de l'étape 4.
+// Vision reste vide : la légalité d'un coup ne dépend pas de ce qu'on voit.
 func (b *plateauTrame) Vision(p Position, portee int) []Position { return nil }
 
 // CasesDans énumère les rues du carré, ligne par ligne.

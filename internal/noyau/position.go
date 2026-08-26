@@ -121,3 +121,15 @@ func abs(n int) int {
 	}
 	return n
 }
+
+// signe rend -1, 0 ou 1 selon le sens d'un écart.
+func signe(n int) int {
+	switch {
+	case n < 0:
+		return -1
+	case n > 0:
+		return 1
+	default:
+		return 0
+	}
+}

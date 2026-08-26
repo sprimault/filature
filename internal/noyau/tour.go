@@ -40,8 +40,8 @@ func (p *Partie) resoudreFinDeTour() []func() {
 // La visibilité se recalcule entièrement : un fugitif qui sort d'une ligne de
 // vue redevient invisible, ce qu'un simple « devient visible » ne rendrait pas.
 //
-// EstVisible relève de l'étape 4 et renvoie false pour l'instant : le câblage
-// est ici, la table de vision viendra sous lui.
+// Un seul inspecteur suffit, d'où l'arrêt au premier : la vue est partagée, et
+// savoir lequel a repéré le fugitif ne change rien à la suite du tour.
 func (p *Partie) recalculerVisibilite() []func() {
 	vu := false
 	occupees := p.casesOccupees()
