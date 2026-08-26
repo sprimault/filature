@@ -63,6 +63,8 @@ it twice. These are templates to copy under another name.
                     watch lets two machines play
 --preset ville      board size: quartier, faubourg or ville
 --seed 1            the game's seed; the same one replays the same game
+--delay 800ms       pause between turns when nobody plays; without it
+                    the whole game scrolls past at once
 --plugins <folder>  where to look for plugins
 --host              host a network game
 --join <address>    join one

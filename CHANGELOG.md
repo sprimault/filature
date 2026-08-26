@@ -77,7 +77,8 @@ Les faces d'un bâtiment sont dérivées de sa couleur par trois coefficients fi
 - **Le binaire joue.** Lancé sans argument, il donne la main aux inspecteurs
   face à un adversaire, en texte. `--side fugitive` prend l'autre rôle,
   `--side watch` regarde deux machines s'affronter, `--preset` et `--seed`
-  choisissent la partie.
+  choisissent la partie. En spectateur, chaque tour s'affiche ; `--delay`
+  espace les tours et redessine à la même place plutôt que de les empiler.
 - Un adversaire qui choisit au hasard parmi les coups légaux, en
   attendant l'IA des étapes 9 et 10. Il est déterministe : une graine donnée
   rejoue la même partie.
@@ -148,7 +149,8 @@ A building's faces are derived from its colour by three fixed coefficients —
 - **The binary plays.** Run with no argument, it hands you the inspectors
   against an opponent, in text. `--side fugitive` takes the other side,
   `--side watch` watches two machines play, `--preset` and `--seed` choose
-  the game.
+  the game. When watching, every turn is shown; `--delay` spaces them out and
+  redraws in place rather than stacking them.
 - An opponent drawing its moves at random among the legal ones, standing in
   until the AI of steps 9 and 10. It is deterministic: a given seed replays the
   same game.

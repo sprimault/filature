@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/sprimault/filature/internal/core"
 	"github.com/sprimault/filature/internal/loader"
@@ -65,6 +66,7 @@ func main() {
 	cote := flag.String("side", "inspectors", "camp joué : fugitive, inspectors, ou watch pour regarder")
 	preset := flag.String("preset", "ville", "préréglage : quartier, faubourg ou ville")
 	graine := flag.Int64("seed", 1, "graine de la partie")
+	pause := flag.Duration("delay", 0, "pause entre deux tours quand personne ne joue, par exemple 800ms")
 
 	// Alias de la sous-commande. Les trois sous-commandes ne lancent pas le jeu
 	// et deux d'entre elles prennent un opérande, ce qui les rend maladroites en
@@ -87,7 +89,7 @@ func main() {
 		return
 	}
 
-	o, err := options(*cote, *preset, *graine, *dossierPlugins)
+	o, err := options(*cote, *preset, *graine, *dossierPlugins, *pause)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "filature:", err)
 		os.Exit(1)
@@ -183,7 +185,7 @@ func run(o session.Options, heberger bool, rejoindre, partie string) error {
 //
 // C'est le seul endroit du binaire qui les lit : `internal/` reçoit ses
 // dépendances construites, jamais un `flag`.
-func options(cote, preset string, graine int64, dossierPlugins string) (session.Options, error) {
+func options(cote, preset string, graine int64, dossierPlugins string, pause time.Duration) (session.Options, error) {
 	choisi, err := camp(cote)
 	if err != nil {
 		return session.Options{}, err
@@ -194,14 +196,31 @@ func options(cote, preset string, graine int64, dossierPlugins string) (session.
 		return session.Options{}, fmt.Errorf("préréglage %q inconnu", preset)
 	}
 
+	if pause < 0 {
+		return session.Options{}, fmt.Errorf("délai négatif : %s", pause)
+	}
+
 	return session.Options{
 		Seed:     graine,
 		Settings: reglage.Settings,
 		Human:    choisi,
 		Plugins:  dossierPlugins,
+		Delay:    pause,
+		Redraw:   pause > 0 && terminal(os.Stdout),
 		In:       os.Stdin,
 		Out:      os.Stdout,
 	}, nil
+}
+
+// terminal dit si une sortie est un terminal plutôt qu'un fichier ou un tube.
+//
+// Les séquences de repositionnement n'ont de sens que là : redirigées vers un
+// fichier ou un pagineur, elles y entrent telles quelles et le rendent
+// illisible. La question ne se pose qu'ici — session reçoit un io.Writer et n'a
+// pas à savoir ce qu'il y a derrière.
+func terminal(f *os.File) bool {
+	info, err := f.Stat()
+	return err == nil && info.Mode()&os.ModeCharDevice != 0
 }
 
 // camp traduit le drapeau --side en côté du noyau.
