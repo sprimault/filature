@@ -3,11 +3,12 @@
 Français : [README.fr.md](README.fr.md)
 
 [![CI](https://github.com/sprimault/filature/actions/workflows/ci.yml/badge.svg)](https://github.com/sprimault/filature/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
-[![Third-party notices](https://img.shields.io/badge/third--party-notices-lightgrey)](THIRD-PARTY-NOTICES)
 
 A turn-based board game of hidden movement. One fugitive against five
 inspectors, on a city of streets and buildings.
+
+Apache 2.0 — [`LICENSE`](LICENSE), and [`THIRD-PARTY-NOTICES`](THIRD-PARTY-NOTICES)
+for the libraries linked into the binary.
 
 The fugitive moves in eight directions, the inspectors in four. He is faster,
 but alone and invisible most of the time. They are many and see far, but cannot
@@ -124,11 +125,9 @@ both camps at once: you tail, and you are tailed.
 
 ## License
 
-Apache 2.0 — see [`LICENSE`](LICENSE).
+Apache 2.0. **The name Filature, its visual identity and its palette are not
+part of it** — forks are welcome under a different name.
 
-The binary links third-party libraries whose licences require their notices
-to travel with it: [`THIRD-PARTY-NOTICES`](THIRD-PARTY-NOTICES), shipped in
-every archive.
-
-The name Filature, its visual identity and its palette are not covered by that
-license. Forks are welcome under a different name.
+The binary embeds third-party libraries whose licences require their notices to
+travel with it: `THIRD-PARTY-NOTICES` ships in every archive, next to
+`LICENSE`.
