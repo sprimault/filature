@@ -58,7 +58,7 @@ const dialecte = "https://json-schema.org/draft/2020-12/schema"
 func Generate(t reflect.Type, id, titre, description, entete string) ([]byte, error) {
 	g := &generateur{defs: map[string]*Noeud{}, encours: map[string]bool{}}
 
-	racine := g.noeud(t)
+	racine := g.node(t)
 	if racine.Ref == "" {
 		return nil, fmt.Errorf("le type racine %s n'est pas une structure", t.Name())
 	}
@@ -89,13 +89,13 @@ type generateur struct {
 	encours map[string]bool
 }
 
-// noeud rend le schéma d'un type, en le plaçant en $defs si c'est une structure.
-func (g *generateur) noeud(t reflect.Type) *Noeud {
+// node rend le schéma d'un type, en le plaçant en $defs si c'est une structure.
+func (g *generateur) node(t reflect.Type) *Noeud {
 	switch t.Kind() {
 	case reflect.Pointer:
 		// Un pointeur ne change pas la forme, seulement la présence : le champ
 		// porte omitempty, et son absence dit qu'on n'en sait rien.
-		return g.noeud(t.Elem())
+		return g.node(t.Elem())
 
 	case reflect.String:
 		return &Noeud{Type: "string"}
@@ -111,10 +111,10 @@ func (g *generateur) noeud(t reflect.Type) *Noeud {
 		return &Noeud{Type: "number"}
 
 	case reflect.Slice, reflect.Array:
-		return &Noeud{Type: "array", Items: g.noeud(t.Elem())}
+		return &Noeud{Type: "array", Items: g.node(t.Elem())}
 
 	case reflect.Map:
-		return &Noeud{Type: "object", ProprietesLibres: g.noeud(t.Elem())}
+		return &Noeud{Type: "object", ProprietesLibres: g.node(t.Elem())}
 
 	case reflect.Struct:
 		return g.structure(t)
@@ -143,35 +143,35 @@ func (g *generateur) structure(t reflect.Type) *Noeud {
 	g.encours[nom] = true
 	defer delete(g.encours, nom)
 
-	noeud := &Noeud{Type: "object", Proprietes: map[string]*Noeud{}}
-	g.defs[nom] = noeud
+	node := &Noeud{Type: "object", Proprietes: map[string]*Noeud{}}
+	g.defs[nom] = node
 
 	for i := 0; i < t.NumField(); i++ {
 		champ := t.Field(i)
 		if !champ.IsExported() {
 			continue
 		}
-		cle, requis, garde := nomJSON(champ)
+		cle, requis, garde := jsonName(champ)
 		if !garde {
 			continue
 		}
-		noeud.Proprietes[cle] = g.noeud(champ.Type)
+		node.Proprietes[cle] = g.node(champ.Type)
 		if requis {
-			noeud.Requis = append(noeud.Requis, cle)
+			node.Requis = append(node.Requis, cle)
 		}
 	}
-	sort.Strings(noeud.Requis)
+	sort.Strings(node.Requis)
 
 	return ref
 }
 
-// nomJSON lit le tag d'un champ : sa clé, s'il est obligatoire, et s'il est
+// jsonName lit le tag d'un champ : sa clé, s'il est obligatoire, et s'il est
 // sérialisé du tout.
 //
 // Un champ marqué omitempty peut manquer, donc n'est pas requis. C'est ainsi
 // que la vue dit « je n'en sais rien » plutôt que de mentir avec une valeur
 // nulle.
-func nomJSON(champ reflect.StructField) (cle string, requis, garde bool) {
+func jsonName(champ reflect.StructField) (cle string, requis, garde bool) {
 	tag := champ.Tag.Get("json")
 	if tag == "-" {
 		return "", false, false

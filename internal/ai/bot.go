@@ -50,7 +50,7 @@ type Message struct {
 
 // Bot pilote un processus externe.
 //
-// Il ne reçoit que la View de son sideName, la même que l'interface : il ne voit
+// Il ne reçoit que la View de son camp, la même que l'interface : il ne voit
 // jamais la position cachée du fugitif ni sa zone scellée. Ce n'est pas une
 // politesse, c'est la projection qui protège déjà le mode réseau, appliquée au
 // même endroit.

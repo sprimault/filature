@@ -80,7 +80,7 @@ func main() {
 // sameFolderb compare deux chemins après résolution.
 //
 // La comparaison est insensible à la casse : Windows l'est, et « Plugins »
-// y désign le même dossier que « plugins ». Se tromper dans ce sens fait
+// y désigne le même dossier que « plugins ». Se tromper dans ce sens fait
 // refuser une extraction légitime, ce qui se voit et se corrige ; l'inverse
 // laisserait passer celle qui casse le chargement.
 func sameFolderb(a, b string) bool {

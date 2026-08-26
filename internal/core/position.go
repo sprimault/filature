@@ -12,7 +12,7 @@ import (
 //
 // L'origine est arbitraire : le plateau borné place (0,0) au coin nord-ouest,
 // la génération par tuiles de la v2 acceptera des coordonnées négatives. Aucun
-// code hors de generation.go ne doit supposer que les coordonnées sont
+// code hors de boundedboard.go ne doit supposer que les coordonnées sont
 // positives ou bornées.
 type Position struct {
 	Column int
@@ -37,7 +37,7 @@ const (
 	NordOuest
 )
 
-// Orthogonales et Diagonales découpent l'énumération selon ce qu'un sideName a le
+// Orthogonales et Diagonales découpent l'énumération selon ce qu'un camp a le
 // droit d'emprunter.
 var (
 	Orthogonales = [4]Direction{Nord, Est, Sud, Ouest}
