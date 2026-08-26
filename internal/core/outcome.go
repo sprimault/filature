@@ -147,7 +147,7 @@ func (p *Game) countExtraction() []func() {
 // du noyau depuis que le mode le déclare, et rendre « ce qui est annoncé » ici
 // dupliquerait ce que la file des différés porte déjà.
 func (p *Game) zoneToStrangle() (int, bool) {
-	debut, periode := p.Settings.StranglingStart, p.Settings.PeriodeEtranglement
+	debut, periode := p.Settings.StranglingStart, p.Settings.StranglingPeriod
 	if periode <= 0 || p.Turn < debut || (p.Turn-debut)%periode != 0 {
 		return 0, false
 	}

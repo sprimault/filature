@@ -213,7 +213,7 @@ func TestStranglingTriggersMode(t *testing.T) {
 	p := gameOn(b, Position{Column: 2, Row: 2})
 	p.Seed = 99
 	p.Settings.StranglingStart = 3
-	p.Settings.PeriodeEtranglement = 2
+	p.Settings.StranglingPeriod = 2
 	p.Extensions = testRegistry()
 	p.Extensions.Modes = map[string]Mode{"etranglement": {
 		Name: "Étranglement", Trigger: OnStrangling,
@@ -284,7 +284,7 @@ func TestStranglingCadence(t *testing.T) {
 		p.Seed = 5
 		p.Turn = c.tour
 		p.Settings.StranglingStart = 3
-		p.Settings.PeriodeEtranglement = 2
+		p.Settings.StranglingPeriod = 2
 
 		if _, vise := p.zoneToStrangle(); vise != c.attend {
 			t.Errorf("tour %d : visé=%v, attendu %v", c.tour, vise, c.attend)

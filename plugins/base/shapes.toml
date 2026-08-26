@@ -10,94 +10,121 @@
 # Ni rue, ni zone : le sol n'est pas une forme. Le losange est tracé par le
 # moteur, un plugin n'en change que la couleur par la palette.
 
-shapes_version = 2
+shapes_version = 3
 
 # Seul trait accepté pour un bâtiment : l'emprise est le losange de la case,
 # elle ne se déclare pas. Une emprise libre permettrait de déborder sur les
 # cases voisines et de masquer ce que l'adversaire doit voir.
+#
+# Hauteur uniforme, jamais d'empilement : c'est ce qui rend l'occlusion
+# prévisible. Un joueur doit savoir d'un coup d'œil ce qui est caché.
 [shape.building]
 role = "building"
 
-  [[forme.batiment.trait]]
+  [[shape.building.stroke]]
   type = "prism"
-  height = 12
+  height = 24
   color = "building"
 
-# Le fugitif est plus étroit et plus haut que les inspecteurs : sur un plateau
+# Le fugitif est plus étroit et plus élancé que les inspecteurs : sur un plateau
 # où cinq pions bleus se ressemblent, c'est la silhouette qui doit se lire d'un
-# coup d'œil, pas la couleur seule.
+# coup d'œil, pas la couleur seule. D'où l'écart de hauteur, franc plutôt que
+# discret — un pion se repère de loin ou ne se repère pas.
+#
+# Contour sur les deux traits et non sur la seule tête : c'est lui qui détache
+# le pion du sol, quelle que soit la case sous lui.
 [shape.fugitive]
 role = "piece"
 
-  [[forme.fugitif.trait]]
+  [[shape.fugitive.stroke]]
   type = "polygon"
-  points = [[-7, 0], [7, 0], [5, 22], [-5, 22]]
-  color = "fugitive_main"
-
-  [[forme.fugitif.trait]]
-  type = "circle"
-  center = [0, 28]
-  radius = 6
+  points = [[-8, 0], [8, 0], [5, 26], [-5, 26]]
   color = "fugitive_main"
   outline = "fugitive_detail"
+  outline_thickness = 2
+
+  [[shape.fugitive.stroke]]
+  type = "circle"
+  center = [0, 32]
+  radius = 7
+  color = "fugitive_main"
+  outline = "fugitive_detail"
+  outline_thickness = 2
 
 # Une seule forme pour les cinq pions, que le moteur teinte par numéro. Les
-# surcharges inspecteur_1 à inspecteur_5 existent pour qui veut distinguer les
+# surcharges inspector_1 à inspector_5 existent pour qui veut distinguer les
 # capacités ; les livrer d'office rendrait le plateau plus difficile à lire.
 [shape.inspector]
 role = "piece"
 
-  [[forme.inspecteur.trait]]
+  [[shape.inspector.stroke]]
   type = "polygon"
   points = [[-9, 0], [9, 0], [6, 18], [-6, 18]]
   color = "inspector_main"
+  outline = "inspector_detail"
+  outline_thickness = 2
 
-  [[forme.inspecteur.trait]]
+  [[shape.inspector.stroke]]
   type = "circle"
   center = [0, 23]
   radius = 5
   color = "inspector_main"
   outline = "inspector_detail"
+  outline_thickness = 2
 
-# Un trait discret, et volontairement à demi transparent : une trace est une
-# piste à interpréter, pas une position. La confondre du coin de l'œil avec un
-# pion fausserait la lecture du plateau.
-[shape.trace]
+# Un trait discret, mais pas au point de se perdre dans le grain du sol : c'est
+# la trace qui récompense la patrouille, et une piste qu'on ne voit pas ne vaut
+# pas mieux qu'une piste absente.
+#
+# Opaque, contrairement à ce qu'on ferait spontanément. Une transparence compose
+# la couleur avec la case en dessous : la trace y devenait claire sur la rue et
+# sombre sur une zone fermée, donc invisible dans les deux cas. Ce qui la tient
+# à sa place d'indice, c'est sa finesse et le fait qu'elle reste au sol, pas son
+# effacement.
+[shape.trail]
 role = "marker"
 
-  [[forme.trace.trait]]
+  [[shape.trail.stroke]]
   type = "segment"
-  de = [-10, 0]
-  a = [10, 0]
-  thickness = 3
+  from = [-10, 0]
+  to = [10, 0]
+  thickness = 4
   color = "trail"
-  opacity = 60
+  outline = "marker_outline"
 
-# Un losange plein, aux dimensions de la case : un barrage bloque la vue comme
-# un bâtiment, et doit se lire comme un obstacle et non comme une décoration.
-[shape.barrage]
+# Un losange plein : un barrage bloque la vue comme un bâtiment, et doit se lire
+# comme un obstacle. Quatorze unités et non vingt : deux barrages adjacents
+# formeraient sinon un aplat continu où les cases ne se distinguent plus,
+# précisément là où le joueur a besoin de les compter.
+[shape.roadblock]
 role = "marker"
 
-  [[forme.barrage.trait]]
+  [[shape.roadblock.stroke]]
   type = "polygon"
-  points = [[-20, 0], [0, -10], [20, 0], [0, 10]]
+  points = [[-14, 0], [0, -7], [14, 0], [0, 7]]
   color = "roadblock"
+  outline = "marker_outline"
 
 # La scène reste sur le plateau une fois posée : c'est ce que le fugitif a payé,
 # elle ne s'efface pas comme une trace.
-[shape.scene]
+#
+# Son rouge est presque exactement la luminance d'une zone fermée : sans contour
+# elle y disparaît, et une zone est justement l'endroit où un meurtre se produit.
+[shape.crime_scene]
 role = "marker"
 
-  [[forme.scene.trait]]
+  [[shape.crime_scene.stroke]]
   type = "segment"
-  de = [-9, -9]
-  a = [9, 9]
+  from = [-9, -9]
+  to = [9, 9]
   thickness = 3
   color = "crime_scene"
+  outline = "marker_outline"
 
-  [[forme.scene.trait]]
+  [[shape.crime_scene.stroke]]
   type = "segment"
-  de = [-9, 9]
-  a = [9, -9]
+  from = [-9, 9]
+  to = [9, -9]
   thickness = 3
   color = "crime_scene"
+  outline = "marker_outline"

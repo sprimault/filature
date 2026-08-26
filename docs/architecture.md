@@ -93,13 +93,47 @@ Le prix, à connaître : la compilation croisée ne fonctionne que vers Windows 
 WebAssembly. Les cibles Linux et macOS se construisent en natif, sur des runners
 d'intégration continue. Voir [`construction.md`](construction.md).
 
-Deux vues coexistent :
+Deux vues **affichées ensemble**, l'isométrique et la carte à plat à côté
+d'elle. Ce n'est pas un basculement : chacune fait ce que l'autre ne sait pas
+faire, et on a besoin des deux en même temps.
 
-- **une vue de débogage 2D**, une touche pour l'activer, gardée en permanence.
-  Elle sert à superposer les lignes de vue, la carte de croyance de l'IA et les
-  cases atteignables — illisible en isométrique ;
-- **la vue isométrique**, losanges en rapport 2:1, tri en profondeur par
-  `colonne + ligne`.
+- **la vue isométrique** occupe l'essentiel de la fenêtre. Losanges en rapport
+  2:1, tri en profondeur par `colonne + ligne`. **Elle ne montre jamais le
+  plateau entier et n'essaie pas** : elle défile en suivant le jeu ;
+- **la carte à plat** tient dans un panneau latéral, en permanence. Elle porte
+  la vue d'ensemble, que l'isométrique abandonne : le fugitif y planifie un
+  itinéraire vers une zone, les inspecteurs y répartissent une couverture. Elle
+  superpose aussi les lignes de vue, la carte de croyance de l'IA et les cases
+  atteignables, illisibles en isométrique.
+
+**L'échelle isométrique est un intervalle fermé, fixé par la règle et non par le
+confort.** Par le bas, `MinRenderScale`. Par le haut, la vue doit contenir en
+entier le champ du pion sélectionné — `Span(2*portée+1)` donne la place qu'il
+demande. Le pire cas prévu, une fenêtre de 1280 sur le plus grand préréglage,
+donne 55 pixels par case : le plafond commande partout et le plancher ne se
+déclenche jamais en jeu normal.
+
+La portée qui entre dans ce calcul est celle du **préréglage**, pas celle du
+tour. Une capacité qui double la vue ferait autrement sauter l'échelle d'un
+tiers à son déclenchement, puis la rendrait au tour suivant.
+
+**La garantie porte sur le pion sélectionné, pas sur tous.** Un inspecteur au
+bord du panneau a sa ligne de vue tronquée à l'écran, et à cinq pions dispersés
+sur quarante et une cases c'est le cas courant. D'où le rôle le plus important
+de la carte à plat : elle porte la couverture d'ensemble du camp inspecteurs,
+qui est leur information la plus stratégique et que l'isométrique ne peut pas
+montrer.
+
+Le panneau vaut 26 % de la largeur, borné entre 320 et 520 pixels — dimensionné
+par ce qu'il doit montrer, soit douze pixels par case sur le plus grand
+préréglage. Cette couverture s'y rend **en teinte de fond de case, jamais en
+halo autour d'un pion** : à huit pixels par case, un halo déborderait sur les
+huit voisines.
+
+**La carte à plat passe par `ViewFor` comme tout le reste.** C'est une vue de
+plus, pas un accès privilégié : celle des inspecteurs ne montre pas le fugitif,
+et une minicarte permanente ne donne donc aucun avantage. L'oublier ferait
+fuiter la position par le chemin le plus discret du programme.
 
 Le piège de l'isométrique est l'occlusion : les bâtiments en volume sont ce qui
 rend la vue jolie et ce qui masque les cases derrière. Or le jeu porte

@@ -42,8 +42,12 @@ lint:
 vulncheck:
 	govulncheck ./...
 
+# .tmp porte les programmes jetables, qui ne sont pas versionnés : gosec les
+# analyse en local et pas en intégration continue, où le dossier n'existe pas.
+# Sans exclusion, la cible échoue ici et passe là-bas, ce qui finit par la faire
+# ignorer — et par masquer un vrai signalement.
 sec:
-	gosec ./...
+	gosec -exclude-dir=.tmp ./...
 
 cover:
 	go test -coverprofile=$(SORTIE)/couverture.out ./...

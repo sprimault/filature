@@ -2,8 +2,8 @@
   "$comment": "Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>. SPDX-License-Identifier: Apache-2.0",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/sprimault/filature/schemas/plugin-manifest.schema.json",
-  "title": "Manifeste de greffon Filature",
-  "description": "Contrat public. Versionné indépendamment du jeu : un greffon écrit contre la version 1 doit continuer à charger.",
+  "title": "Manifeste de plugin Filature",
+  "description": "Contrat public. Versionné indépendamment du jeu : un plugin écrit contre la version 1 doit continuer à charger.",
   "type": "object",
   "required": [
     "name",
@@ -14,7 +14,7 @@
     "name": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9-]{1,31}$",
-      "description": "Identifiant du greffon, qui est aussi son nom de dossier."
+      "description": "Identifiant du plugin, qui est aussi son nom de dossier."
     },
     "version": {
       "type": "string",
@@ -29,12 +29,12 @@
     },
     "description": {
       "type": "string",
-      "description": "Une phrase, affichee dans l'ecran des greffons."
+      "description": "Une phrase, affichee dans l'ecran des plugins."
     },
     "rules": {
       "type": "boolean",
       "default": false,
-      "description": "Vrai si le greffon modifie les regles. Ceux-la doivent etre identiques des deux cotes en reseau."
+      "description": "Vrai si le plugin modifie les regles. Ceux-la doivent etre identiques des deux cotes en reseau."
     },
     "wasm": {
       "type": "string",
@@ -72,7 +72,7 @@
         "CC-BY-SA-4.0",
         "BSD-3-Clause"
       ],
-      "description": "Identifiant SPDX. Obligatoire pour un greffon publie, facultatif hors catalogue."
+      "description": "Identifiant SPDX. Obligatoire pour un plugin publie, facultatif hors catalogue."
     }
   },
   "allOf": [
@@ -236,7 +236,7 @@
         "code": {
           "type": "string",
           "pattern": "^[a-z]{2,3}(-[A-Za-z]{2,8})*$",
-          "description": "Etiquette BCP 47 : de, pt-BR, zh-Hans. Deux greffons qui declarent le meme code sont un conflit."
+          "description": "Etiquette BCP 47 : de, pt-BR, zh-Hans. Deux plugins qui declarent le meme code sont un conflit."
         },
         "name": {
           "type": "string",
@@ -261,7 +261,7 @@
         },
         "command": {
           "type": "string",
-          "description": "Executable, cherche dans le dossier du greffon puis dans le PATH. Aucun interpreteur n'est fourni."
+          "description": "Executable, cherche dans le dossier du plugin puis dans le PATH. Aucun interpreteur n'est fourni."
         },
         "arguments": {
           "type": "array",

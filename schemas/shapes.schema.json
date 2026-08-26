@@ -3,7 +3,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/sprimault/filature/schemas/shapes.schema.json",
   "title": "Contrat de formes Filature",
-  "description": "Vocabulaire géométrique des greffons d'apparence. Contrat public, versionné indépendamment du jeu. Aucune image : une forme est du texte, ce qui la rend relisible en diff et sans question de provenance.",
+  "description": "Vocabulaire géométrique des plugins d'apparence. Contrat public, versionné indépendamment du jeu. Aucune image : une forme est du texte, ce qui la rend relisible en diff et sans question de provenance.",
   "type": "object",
   "required": [
     "shapes_version"
@@ -12,68 +12,77 @@
   "properties": {
     "shapes_version": {
       "type": "integer",
+      "description": "Version du contrat de formes. Un fichier écrit contre une autre version est refusé, jamais lu partiellement.",
       "enum": [
-        1
+        3
       ]
     },
     "shape": {
       "type": "object",
+      "description": "Les formes, indexées par nom. Un plugin ne déclare que celles qu'il remplace ; les autres retombent sur le contenu livré.",
       "propertyNames": {
         "pattern": "^[a-z][a-z0-9_]{1,31}$"
       },
       "additionalProperties": {
-        "$ref": "#/$defs/forme"
+        "$ref": "#/$defs/shape"
       }
     },
     "palette": {
       "type": "object",
-      "description": "Couleurs nommées. Un greffon qui ajoute un nom doit livrer la palette qui le définit.",
+      "description": "Couleurs nommées. Un plugin qui ajoute un nom doit livrer la palette qui le définit.",
       "propertyNames": {
         "pattern": "^[a-z][a-z0-9_]{1,31}$"
       },
       "additionalProperties": {
         "type": "string",
+        "description": "Valeur hexadécimale sur six chiffres, précédée d'un croisillon.",
         "pattern": "^#[0-9a-fA-F]{6}$"
       }
     }
   },
   "$defs": {
-    "forme": {
+    "shape": {
       "type": "object",
+      "description": "Un dessin nommé, plus ses variantes d'état facultatives.",
       "required": [
-        "trait"
+        "stroke"
       ],
       "additionalProperties": false,
       "properties": {
         "role": {
           "enum": [
-            "pion",
-            "batiment",
-            "marqueur"
+            "piece",
+            "building",
+            "marker"
           ],
-          "description": "Il n'existe pas de rôle « sol » : le losange est trace par le moteur et ne se redessine pas. Rue et zones sont des noms de couleurs. Un batiment n'accepte qu'un trait de type prisme, sans emprise : son emprise est le losange de la case."
+          "description": "Il n'existe pas de rôle « sol » : le losange est tracé par le moteur et ne se redessine pas. Rue et zones sont des noms de couleurs. Un bâtiment n'accepte qu'un trait de type prism, sans emprise : son emprise est le losange de la case."
         },
-        "trait": {
-          "$ref": "#/$defs/traits"
+        "stroke": {
+          "$ref": "#/$defs/strokes",
+          "description": "Les traits de l'état normal, dessinés dans l'ordre de déclaration."
         },
-        "surligne": {
-          "$ref": "#/$defs/traits"
+        "highlighted": {
+          "$ref": "#/$defs/strokes",
+          "description": "Variante de l'état surligné. En son absence, le moteur la dérive de l'état normal."
         },
-        "hors_vue": {
-          "$ref": "#/$defs/traits"
+        "out_of_sight": {
+          "$ref": "#/$defs/strokes",
+          "description": "Variante de l'état hors de vue. En son absence, le moteur la dérive de l'état normal."
         }
       }
     },
-    "traits": {
+    "strokes": {
       "type": "array",
+      "description": "Suite de traits. Le plafond réel dépend du rôle et est vérifié au chargement : 24 pour un pion, 8 pour un marqueur, 1 pour un bâtiment.",
       "minItems": 1,
       "maxItems": 24,
       "items": {
-        "$ref": "#/$defs/trait"
+        "$ref": "#/$defs/stroke"
       }
     },
-    "trait": {
+    "stroke": {
       "type": "object",
+      "description": "Une primitive paramétrée. Les clés inutiles au type déclaré sont refusées.",
       "required": [
         "type",
         "color"
@@ -82,36 +91,44 @@
       "properties": {
         "type": {
           "enum": [
-            "polygone",
-            "cercle",
+            "polygon",
+            "circle",
             "segment",
-            "prisme"
-          ]
+            "prism"
+          ],
+          "description": "La primitive. Chacune impose ses propres clés obligatoires."
         },
         "points": {
-          "$ref": "#/$defs/contour"
+          "$ref": "#/$defs/polyline",
+          "description": "Sommets d'un polygone, fermé automatiquement."
         },
         "center": {
-          "$ref": "#/$defs/point"
+          "$ref": "#/$defs/point",
+          "description": "Centre d'un cercle."
         },
         "radius": {
           "type": "integer",
+          "description": "Rayon d'un cercle, en unités du contrat.",
           "minimum": 1,
           "maximum": 32
         },
         "from": {
-          "$ref": "#/$defs/point"
+          "$ref": "#/$defs/point",
+          "description": "Première extrémité d'un segment."
         },
         "to": {
-          "$ref": "#/$defs/point"
+          "$ref": "#/$defs/point",
+          "description": "Seconde extrémité d'un segment."
         },
         "thickness": {
           "type": "integer",
+          "description": "Épaisseur d'un segment, en unités du contrat. Les extrémités sont arrondies.",
           "minimum": 1,
           "maximum": 8
         },
         "height": {
           "type": "integer",
+          "description": "Élévation d'un prisme, en unités du contrat. Tous les bâtiments d'une partie ont la même, et le plafond de 24 vaut une demi-case.",
           "minimum": 1,
           "maximum": 24
         },
@@ -122,15 +139,18 @@
         },
         "outline": {
           "type": "string",
-          "pattern": "^[a-z][a-z0-9_]{1,31}$"
+          "pattern": "^[a-z][a-z0-9_]{1,31}$",
+          "description": "Nom de palette du contour. C'est lui qui détache une forme d'un sol dont la luminance varie du simple au triple ; un remplissage seul ne le fait pas."
         },
         "outline_thickness": {
           "type": "integer",
+          "description": "Épaisseur du contour, en unités du contrat.",
           "minimum": 1,
           "maximum": 4
         },
         "opacity": {
           "type": "integer",
+          "description": "Opacité en pourcents, contour compris. Une valeur inférieure à 100 compose la couleur avec la case en dessous, dont la teinte varie : la lisibilité cesse alors d'être garantie.",
           "minimum": 0,
           "maximum": 100
         }
@@ -140,7 +160,7 @@
           "if": {
             "properties": {
               "type": {
-                "const": "polygone"
+                "const": "polygon"
               }
             },
             "required": [
@@ -157,7 +177,7 @@
           "if": {
             "properties": {
               "type": {
-                "const": "cercle"
+                "const": "circle"
               }
             },
             "required": [
@@ -194,7 +214,7 @@
           "if": {
             "properties": {
               "type": {
-                "const": "prisme"
+                "const": "prism"
               }
             },
             "required": [
@@ -209,8 +229,9 @@
         }
       ]
     },
-    "contour": {
+    "polyline": {
       "type": "array",
+      "description": "Suite de sommets, de 3 à 32.",
       "minItems": 3,
       "maxItems": 32,
       "items": {
@@ -219,14 +240,15 @@
     },
     "point": {
       "type": "array",
+      "description": "x puis y, origine au point d'ancrage au sol, y vers le haut. Les bornes fines dépendent du rôle et sont vérifiées au chargement.",
       "minItems": 2,
       "maxItems": 2,
       "items": {
         "type": "integer",
+        "description": "Une coordonnée, en unités du contrat.",
         "minimum": -32,
         "maximum": 40
-      },
-      "description": "x puis y, origine au point d'ancrage au sol, y vers le haut. Les bornes fines dépendent du rôle et sont vérifiées au chargement."
+      }
     }
   }
 }

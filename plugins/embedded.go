@@ -25,7 +25,7 @@ var embarques embed.FS
 // Shipped renvoie le contenu livré avec le jeu.
 //
 // Chaque entrée de la racine est un plugin, comme dans le dossier que désigne
-// --plugins : « base » porte les règles, les formes et le français, « anglais »
+// --plugins : « base » porte les règles, les formes et le français, « english »
 // la traduction.
 func Shipped() fs.FS {
 	return embarques
