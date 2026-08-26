@@ -30,20 +30,20 @@ func source(fichiers map[string]string) fstest.MapFS {
 
 // manifesteValide rend un plugin de règles minimal mais complet.
 func manifesteValide(nom string) string {
-	return `nom = "` + nom + `"
+	return `name = "` + nom + `"
 version = "1.0.0"
-version_effets = 1
-regles = true
+effects_version = 2
+rules = true
 
-[capacite.` + nom + `]
-nom = "Capacité"
-camp = "inspecteurs"
-declenchement = "phase_inspecteurs"
+[ability.` + nom + `]
+name = "Capacité"
+side = "inspectors"
+trigger = "inspectors_phase"
 
-  [[capacite.` + nom + `.effet]]
-  type = "modifier_portee"
-  cible = "pion_courant"
-  valeur = 1
+  [[ability.` + nom + `.effect]]
+  type = "change_range"
+  target = "current_piece"
+  value = 1
 `
 }
 
@@ -58,7 +58,7 @@ func TestLoadsShippedContent(t *testing.T) {
 		t.Fatalf("chargement : %v", err)
 	}
 
-	for _, cle := range []string{"guetteur", "coureur", "traqueur", "barreur", "chef"} {
+	for _, cle := range []string{"lookout", "runner", "tracker", "blocker", "chief"} {
 		if _, connue := r.Capacites[cle]; !connue {
 			t.Errorf("la capacité %s manque", cle)
 		}
@@ -71,7 +71,7 @@ func TestLoadsShippedContent(t *testing.T) {
 			t.Errorf("la dépense %s manque", cle)
 		}
 	}
-	if _, connu := r.Modes["etranglement"]; !connu {
+	if _, connu := r.Modes["strangling"]; !connu {
 		t.Fatal("l'étranglement manque : aucune zone ne se fermerait jamais")
 	}
 
@@ -121,7 +121,7 @@ func TestDiskPluginTakesSamePath(t *testing.T) {
 	if _, connue := r.Capacites["essai"]; !connue {
 		t.Error("la capacité du plugin posé sur le disque manque")
 	}
-	if _, connue := r.Capacites["guetteur"]; !connue {
+	if _, connue := r.Capacites["lookout"]; !connue {
 		t.Error("le contenu livré a disparu")
 	}
 	if len(r.Manifeste) != 3 {
@@ -150,8 +150,8 @@ func TestMissingPluginFolder(t *testing.T) {
 // alphabétique des dossiers.
 func TestKeyConflict(t *testing.T) {
 	_, err := Load(source(map[string]string{
-		"un/manifeste.toml":   manifesteValide("un"),
-		"deux/manifeste.toml": strings.ReplaceAll(manifesteValide("deux"), "capacite.deux", "capacite.un"),
+		"un/manifest.toml":   manifesteValide("un"),
+		"deux/manifest.toml": strings.ReplaceAll(manifesteValide("deux"), "ability.deux", "ability.un"),
 	}), "")
 
 	if err == nil {
@@ -180,134 +180,134 @@ func TestRejections(t *testing.T) {
 		},
 		{
 			nom:       "version manquante",
-			manifeste: "nom = \"essai\"\n",
+			manifeste: "name = \"essai\"\n",
 			attendu:   "version manquante",
 		},
 		{
 			nom:       "nom qui ne suit pas le dossier",
-			manifeste: "nom = \"autre\"\nversion = \"1.0.0\"\n",
+			manifeste: "name = \"autre\"\nversion = \"1.0.0\"\n",
 			attendu:   "dossier",
 		},
 		{
 			nom:       "champ inconnu",
-			manifeste: "nom = \"essai\"\nversion = \"1.0.0\"\ncouleur = \"bleu\"\n",
+			manifeste: "name = \"essai\"\nversion = \"1.0.0\"\ncouleur = \"bleu\"\n",
 			attendu:   "champs inconnus",
 		},
 		{
 			nom: "regles fausses avec une capacité",
-			manifeste: `nom = "essai"
+			manifeste: `name = "essai"
 version = "1.0.0"
-version_effets = 1
-regles = false
+effects_version = 2
+rules = false
 
-[capacite.x]
-nom = "X"
-camp = "inspecteurs"
+[ability.x]
+name = "X"
+side = "inspectors"
 `,
-			attendu: "regles = false",
+			attendu: "rules = false",
 		},
 		{
-			nom:       "regles fausses avec un module",
-			manifeste: "nom = \"essai\"\nversion = \"1.0.0\"\nregles = false\nwasm = \"m.wasm\"\n",
+			nom:       "rules fausses avec un module",
+			manifeste: "name = \"essai\"\nversion = \"1.0.0\"\nrules = false\nwasm = \"m.wasm\"\n",
 			attendu:   "module wasm",
 		},
 		{
 			nom: "version d'effets inconnue",
-			manifeste: `nom = "essai"
+			manifeste: `name = "essai"
 version = "1.0.0"
-version_effets = 99
-regles = true
+effects_version = 99
+rules = true
 
-[capacite.x]
-nom = "X"
-camp = "inspecteurs"
+[ability.x]
+name = "X"
+side = "inspectors"
 `,
-			attendu: "version_effets 99",
+			attendu: "effects_version 99",
 		},
 		{
 			nom: "camp inconnu",
-			manifeste: `nom = "essai"
+			manifeste: `name = "essai"
 version = "1.0.0"
-version_effets = 1
-regles = true
+effects_version = 2
+rules = true
 
-[capacite.x]
-nom = "X"
-camp = "arbitres"
+[ability.x]
+name = "X"
+side = "referees"
 `,
 			attendu: "camp",
 		},
 		{
 			nom: "primitive inconnue",
-			manifeste: `nom = "essai"
+			manifeste: `name = "essai"
 version = "1.0.0"
-version_effets = 1
-regles = true
+effects_version = 2
+rules = true
 
-[capacite.x]
-nom = "X"
-camp = "inspecteurs"
+[ability.x]
+name = "X"
+side = "inspectors"
 
-  [[capacite.x.effet]]
+  [[ability.x.effect]]
   type = "faire_pleuvoir"
 `,
 			attendu: "inconnu",
 		},
 		{
 			nom: "differer imbriqué",
-			manifeste: `nom = "essai"
+			manifeste: `name = "essai"
 version = "1.0.0"
-version_effets = 1
-regles = true
+effects_version = 2
+rules = true
 
 [mode.x]
-nom = "X"
-declenchement = "fin_de_tour"
+name = "X"
+trigger = "turn_end"
 
-  [[mode.x.effet]]
-  type = "differer"
-  duree = 1
+  [[mode.x.effect]]
+  type = "defer"
+  duration = 1
 
-    [[mode.x.effet.puis]]
-    type = "differer"
-    duree = 1
+    [[mode.x.effect.then]]
+    type = "defer"
+    duration = 1
 
-      [[mode.x.effet.puis.puis]]
-      type = "fin_partie"
+      [[mode.x.effect.then.then]]
+      type = "end_game"
 `,
 			attendu: "imbrique",
 		},
 		{
 			nom: "differer sans suite",
-			manifeste: `nom = "essai"
+			manifeste: `name = "essai"
 version = "1.0.0"
-version_effets = 1
-regles = true
+effects_version = 2
+rules = true
 
 [mode.x]
-nom = "X"
-declenchement = "fin_de_tour"
+name = "X"
+trigger = "turn_end"
 
-  [[mode.x.effet]]
-  type = "differer"
-  duree = 1
+  [[mode.x.effect]]
+  type = "defer"
+  duration = 1
 `,
 			attendu: "sans puis",
 		},
 		{
 			nom: "un bot et des effets",
-			manifeste: `nom = "essai"
+			manifeste: `name = "essai"
 version = "1.0.0"
-version_effets = 1
-regles = true
+effects_version = 2
+rules = true
 
 [bot]
-camp = "fugitif"
-commande = "mon-bot"
+side = "fugitive"
+command = "mon-bot"
 
-[capacite.x]
-nom = "X"
-camp = "inspecteurs"
+[ability.x]
+name = "X"
+side = "inspectors"
 `,
 			attendu: "bot et des effets",
 		},
@@ -315,7 +315,7 @@ camp = "inspecteurs"
 
 	for _, c := range cas {
 		t.Run(c.nom, func(t *testing.T) {
-			_, err := Load(source(map[string]string{"essai/manifeste.toml": c.manifeste}), "")
+			_, err := Load(source(map[string]string{"essai/manifest.toml": c.manifeste}), "")
 			if err == nil {
 				t.Fatal("accepté sans rien dire")
 			}
@@ -333,7 +333,7 @@ camp = "inspecteurs"
 // n'empêche pas le jeu de démarrer.
 func TestFolderWithoutManifestIgnored(t *testing.T) {
 	r, err := Load(source(map[string]string{
-		"un/manifeste.toml":   manifesteValide("un"),
+		"un/manifest.toml":    manifesteValide("un"),
 		"brouillon/notes.txt": "rien à voir",
 	}), "")
 	if err != nil {
@@ -351,10 +351,10 @@ func TestFolderWithoutManifestIgnored(t *testing.T) {
 // distinguer : cas normal pendant le développement d'un mod, et cas litigieux
 // en réseau.
 func TestFingerprintOverContent(t *testing.T) {
-	un := source(map[string]string{"g/manifeste.toml": manifesteValide("g")})
-	pareil := source(map[string]string{"g/manifeste.toml": manifesteValide("g")})
+	un := source(map[string]string{"g/manifest.toml": manifesteValide("g")})
+	pareil := source(map[string]string{"g/manifest.toml": manifesteValide("g")})
 	autre := source(map[string]string{
-		"g/manifeste.toml": strings.Replace(manifesteValide("g"), "valeur = 1", "valeur = 8", 1),
+		"g/manifest.toml": strings.Replace(manifesteValide("g"), "value = 1", "value = 8", 1),
 	})
 
 	a, err := fingerprint(un, "g")
@@ -385,16 +385,16 @@ func TestFingerprintOverContent(t *testing.T) {
 // ne se charge plus pareil.
 func TestFingerprintCountsNames(t *testing.T) {
 	a, err := fingerprint(source(map[string]string{
-		"g/manifeste.toml": manifesteValide("g"),
-		"g/formes.toml":    "x = 1\n",
+		"g/manifest.toml": manifesteValide("g"),
+		"g/formes.toml":   "x = 1\n",
 	}), "g")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	b, err := fingerprint(source(map[string]string{
-		"g/manifeste.toml": manifesteValide("g"),
-		"g/palette.toml":   "x = 1\n",
+		"g/manifest.toml": manifesteValide("g"),
+		"g/palette.toml":  "x = 1\n",
 	}), "g")
 	if err != nil {
 		t.Fatal(err)
@@ -436,13 +436,13 @@ func TestValidateReturnsEveryFailure(t *testing.T) {
 	if err := os.MkdirAll(dossier, 0o750); err != nil {
 		t.Fatal(err)
 	}
-	writeFile(t, filepath.Join(dossier, ManifestName), `nom = "autre"
-regles = false
+	writeFile(t, filepath.Join(dossier, ManifestName), `name = "autre"
+rules = false
 
-[capacite.x]
-camp = "arbitres"
+[ability.x]
+side = "referees"
 
-  [[capacite.x.effet]]
+  [[ability.x.effect]]
   type = "faire_pleuvoir"
 `)
 
@@ -454,9 +454,9 @@ camp = "arbitres"
 	for _, attendu := range []string{
 		"version manquante",
 		"dossier",
-		"regles = false",
+		"rules = false",
 		"camp",
-		"capacite.x.effet[0]",
+		"ability.x.effect[0]",
 		"inconnu",
 	} {
 		if !strings.Contains(err.Error(), attendu) {
@@ -468,7 +468,7 @@ camp = "arbitres"
 // TestValidateAcceptsShippedContent vérifie que ce que le jeu embarque passe le
 // contrôle qu'il impose aux autres.
 func TestValidateAcceptsShippedContent(t *testing.T) {
-	for _, dossier := range []string{"base", "anglais"} {
+	for _, dossier := range []string{"base", "english"} {
 		t.Run(dossier, func(t *testing.T) {
 			if err := Validate(filepath.Join("..", "..", "plugins", dossier)); err != nil {
 				t.Errorf("le contenu livré ne passe pas son propre contrôle : %v", err)

@@ -12,17 +12,17 @@ import (
 // sont enregistrées avec la partie : une sauvegarde reste rejouable même si les
 // valeurs par défaut changent.
 type Settings struct {
-	Size                int `json:"cote"`
-	Range               int `json:"portee"`
-	Turns               int `json:"tours"`
-	Stamina             int `json:"resistance"`
-	Inspectors          int `json:"inspecteurs"`
-	PiecesPerTurn       int `json:"pions_par_tour"`
-	RevealPeriod        int `json:"periode_revelation"`
+	Size                int `json:"size"`
+	Range               int `json:"range"`
+	Turns               int `json:"turns"`
+	Stamina             int `json:"stamina"`
+	Inspectors          int `json:"inspectors"`
+	PiecesPerTurn       int `json:"pieces_per_turn"`
+	RevealPeriod        int `json:"reveal_period"`
 	Zones               int `json:"zones"`
-	TrailLifetime       int `json:"duree_trace"`
-	StranglingStart     int `json:"debut_etranglement"`
-	PeriodeEtranglement int `json:"periode_etranglement"`
+	TrailLifetime       int `json:"trail_lifetime"`
+	StranglingStart     int `json:"strangling_start"`
+	PeriodeEtranglement int `json:"strangling_period"`
 }
 
 // DefaultSettings correspond au préréglage « Ville ». Les valeurs sont

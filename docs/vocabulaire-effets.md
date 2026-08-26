@@ -1,9 +1,9 @@
 # Vocabulaire d'effets
 
-Version du vocabulaire : **1**
+Version du vocabulaire : **2**
 
 Un plugin qui déclare une capacité, une dépense ou un mode porte
-`version_effets` dans son manifeste. C'est le quatrième numéro de contrat du
+`effects_version` dans son manifeste. C'est le quatrième numéro de contrat du
 projet, indépendant des trois autres : le vocabulaire peut changer sans que le
 contrat de formes ni celui des bots bougent, et l'inverse est vrai aussi.
 
@@ -47,25 +47,25 @@ ajouter une, vérifier que la composition des existantes ne suffit pas.
 
 | Type | Paramètres | Effet |
 |---|---|---|
-| `deplacer` | `cible`, `valeur` (cases) | Déplace un pion, sans consommer son quota de tour |
-| `teleporter` | `cible` | Place un pion sur la case du contexte |
-| `modifier_mobilite` | `cible`, `valeur`, `duree` | Ajoute des cases de déplacement pour la durée |
+| `step` | `target`, `value` (cases) | Déplace un pion, sans consommer son quota de tour |
+| `teleport` | `target` | Place un pion sur la case du contexte |
+| `change_mobility` | `target`, `value`, `duration` | Ajoute des cases de déplacement pour la durée |
 
-`valeur` négative est légale : `modifier_mobilite` à -1 immobilise.
+`value` négative est légale : `change_mobility` à -1 immobilise.
 
 ### Information
 
 | Type | Paramètres | Effet |
 |---|---|---|
-| `modifier_portee` | `cible`, `valeur`, `duree` | Modifie la portée de vue |
-| `reveler_position` | `cible` | Rend une position publique ce tour |
-| `marquer_scene` | `cible` | Inscrit un lieu, durablement et pour les deux camps |
-| `annuler_revelation` | `cible` | Neutralise la prochaine révélation périodique |
-| `partager_vue` | `cible`, `duree` | Un pion voit ce que voit un autre |
-| `reveler_traces` | `cible`, `rayon` | Découvre les traces dans le rayon, en distance de Manhattan |
-| `effacer_traces` | `cible`, `duree` | Supprime les traces plus récentes que `duree` tours |
+| `change_range` | `target`, `value`, `duration` | Modifie la portée de vue |
+| `reveal_position` | `target` | Rend une position publique ce tour |
+| `mark_crime_scene` | `target` | Inscrit un lieu, durablement et pour les deux camps |
+| `cancel_reveal` | `target` | Neutralise la prochaine révélation périodique |
+| `share_view` | `target`, `duration` | Un pion voit ce que voit un autre |
+| `reveal_trails` | `target`, `radius` | Découvre les traces dans le rayon, en distance de Manhattan |
+| `erase_trails` | `target`, `duration` | Supprime les traces plus récentes que `duration` tours |
 
-`reveler_position` et `marquer_scene` sont volontairement distincts, et le
+`reveal_position` et `mark_crime_scene` sont volontairement distincts, et le
 meurtre les compose : le premier ne vaut qu'un tour, le second reste sur le
 plateau. Les fondre en un seul interdirait de révéler sans laisser de marque, ce
 dont toute mécanique de repérage a besoin.
@@ -74,13 +74,13 @@ dont toute mécanique de repérage a besoin.
 
 | Type | Paramètres | Effet |
 |---|---|---|
-| `bloquer_case` | `cible`, `duree` | Ferme une case ; bloque le déplacement **et la vue** |
-| `ouvrir_case` | `cible`, `duree` | Rouvre une case bâtie |
-| `fermer_zone` | `cible`, `zone` | Neutralise un point d'extraction |
-| `ouvrir_zone` | `cible`, `zone` | Le rouvre |
-| `sceller_zone` | `cible`, `zone` | Désigne la zone que le fugitif vise |
+| `block_cell` | `target`, `duration` | Ferme une case ; bloque le déplacement **et la vue** |
+| `open_cell` | `target`, `duration` | Rouvre une case bâtie |
+| `close_zone` | `target`, `zone` | Neutralise un point d'extraction |
+| `open_zone` | `target`, `zone` | Le rouvre |
+| `seal_zone` | `target`, `zone` | Désigne la zone que le fugitif vise |
 
-`sceller_zone` écrit la zone scellée sans permettre de la lire. C'est la seule
+`seal_zone` écrit la zone scellée sans permettre de la lire. C'est la seule
 façon d'exprimer le changement de zone, que la règle facture 2 points, et un
 plugin qui l'emploie ne gagne aucun accès à l'information la plus sensible du
 jeu.
@@ -89,8 +89,8 @@ Un barrage bloque la vue comme un bâtiment. Sans ça, la capacité ne serait
 qu'un mur de déplacement, sans effet sur l'information — ce qui, dans ce jeu,
 revient à n'avoir aucun effet.
 
-**Un barrage l'emporte sur un percement.** Une case visée par `ouvrir_case`
-puis par `bloquer_case` est fermée, et elle l'est aussi dans l'ordre inverse :
+**Un barrage l'emporte sur un percement.** Une case visée par `open_cell`
+puis par `block_cell` est fermée, et elle l'est aussi dans l'ordre inverse :
 sans priorité déclarée, le résultat dépendrait de l'ordre d'application et deux
 rejeux du même journal pourraient diverger.
 
@@ -98,36 +98,36 @@ rejeux du même journal pourraient diverger.
 
 | Type | Paramètres | Effet |
 |---|---|---|
-| `couter_resistance` | `cible`, `valeur` | Retire des points |
-| `rendre_resistance` | `cible`, `valeur` | En rend |
+| `cost_stamina` | `target`, `value` | Retire des points |
+| `restore_stamina` | `target`, `value` | En rend |
 
 ### Contrôle
 
 | Type | Paramètres | Effet |
 |---|---|---|
-| `differer` | `duree`, `annonce`, effets imbriqués | Applique les effets dans `duree` tours |
-| `fin_partie` | `cible` | Termine la partie au profit du camp visé |
+| `defer` | `duration`, `announced`, effets imbriqués | Applique les effets dans `duration` tours |
+| `end_game` | `target` | Termine la partie au profit du camp visé |
 
 ---
 
-## 3. `differer`
+## 3. `defer`
 
 La primitive la plus lourde du vocabulaire, et la seule dont l'ajout demande
 d'être défendu. Deux justifications indépendantes.
 
 **Elle rend déclaratif ce qui est codé en dur.** L'étranglement — les zones
 d'extraction qui se ferment à partir du tour 30, annoncées deux tours à
-l'avance — est aujourd'hui dans le noyau. Il s'exprime avec `differer` :
+l'avance — est aujourd'hui dans le noyau. Il s'exprime avec `defer` :
 
 ```toml
-[[mode.etranglement.effet]]
-type = "differer"
-duree = 2
-annonce = true
+[[mode.strangling.effect]]
+type = "defer"
+duration = 2
+announced = true
 
-  [[mode.etranglement.effet.puis]]
-  type = "fermer_zone"
-  cible = "zone"
+  [[mode.strangling.effect.then]]
+  type = "close_zone"
+  target = "zone"
 ```
 
 **Elle ouvre les plateaux qui se transforment** — la mécanique de blocs qui
@@ -139,11 +139,11 @@ tours à l'avance monte la tension sans que le hasard tranche.
 
 | Champ | Rôle |
 |---|---|
-| `duree` | Nombre de tours avant application. Minimum 1 |
-| `annonce` | Si vrai, l'effet en attente figure dans la `View` des deux camps |
-| `puis` | Les effets à appliquer, mêmes primitives, **jamais un `differer`** |
+| `duration` | Nombre de tours avant application. Minimum 1 |
+| `announced` | Si vrai, l'effet en attente figure dans la `View` des deux camps |
+| `then` | Les effets à appliquer, mêmes primitives, **jamais un `defer`** |
 
-L'imbrication d'un `differer` dans un `differer` est refusée au chargement : ça
+L'imbrication d'un `defer` dans un `defer` est refusée au chargement : ça
 n'ajoute aucune expressivité — deux durées s'additionnent — et ça permettrait
 des chaînes indéfinies qu'aucune annulation ne saurait dérouler.
 
@@ -153,10 +153,10 @@ Une file d'effets en attente dans `Game`, sérialisée avec le reste, résolue e
 fin de tour **avant** le test de fin de partie.
 
 Les effets en attente et annoncés entrent dans `View` — c'est tout leur intérêt.
-Un `differer` non annoncé n'y figure pas.
+Un `defer` non annoncé n'y figure pas.
 
 L'annulation défait la mise en file, pas l'effet : annuler le tour où le
-`differer` a été posé le retire de la file.
+`defer` a été posé le retire de la file.
 
 ---
 
@@ -164,9 +164,9 @@ L'annulation défait la mise en file, pas l'effet : annuler le tour où le
 
 | Cible | Désigne |
 |---|---|
-| `pion_courant` | Le pion qui déclenche |
-| `autre_pion` | Un autre pion du même camp, choisi au déclenchement |
-| `tous_pions` | Tous les pions du camp |
+| `current_piece` | Le pion qui déclenche |
+| `other_piece` | Un autre pion du même camp, choisi au déclenchement |
+| `all_pieces` | Tous les pions du camp |
 | `fugitif` | Le fugitif |
 | `case` | La case portée par le contexte du coup |
 | `zone` | La zone portée par le contexte |
@@ -174,7 +174,7 @@ L'annulation défait la mise en file, pas l'effet : annuler le tour où le
 Une cible incompatible avec le camp déclarant est refusée au chargement : une
 capacité d'inspecteur ne cible pas `fugitif` pour lui rendre de la résistance.
 
-`autre_pion` est la seule cible qui en désigne deux : celui qui déclenche et
+`other_piece` est la seule cible qui en désigne deux : celui qui déclenche et
 celui qui subit. Le Chef, qui voit à travers un coéquipier, en est le seul usage
 livré.
 
@@ -184,12 +184,12 @@ livré.
 
 | Déclenchement | Quand |
 |---|---|
-| `phase_inspecteurs` | Pendant leur phase, au choix du joueur |
-| `phase_fugitif` | Pendant la sienne |
-| `fin_de_tour` | Automatique, à la résolution |
+| `inspectors_phase` | Pendant leur phase, au choix du joueur |
+| `fugitive_phase` | Pendant la sienne |
+| `turn_end` | Automatique, à la résolution |
 | `contact` | Quand le fugitif est adjacent à un inspecteur |
-| `revelation` | Au tour d'une révélation périodique |
-| `etranglement` | Au tour où une zone se ferme — **réservé aux modes** |
+| `reveal` | Au tour d'une révélation périodique |
+| `strangling` | Au tour où une zone se ferme — **réservé aux modes** |
 
 Une capacité `passive = true` n'a pas de déclenchement : elle s'applique en
 permanence, tant que le pion est en jeu.
@@ -204,18 +204,18 @@ dépenses, et elle se lit de la même façon : un nom, un déclenchement, des
 effets.
 
 ```toml
-[mode.etranglement]
-nom = "Étranglement"
-declenchement = "etranglement"
+[mode.strangling]
+name = "Étranglement"
+trigger = "etranglement"
 
-  [[mode.etranglement.effet]]
-  type = "differer"
-  duree = 2
-  annonce = true
+  [[mode.strangling.effect]]
+  type = "defer"
+  duration = 2
+  announced = true
 
-    [[mode.etranglement.effet.puis]]
-    type = "fermer_zone"
-    cible = "zone"
+    [[mode.strangling.effect.then]]
+    type = "close_zone"
+    target = "zone"
 ```
 
 **La cadence n'est pas dans le mode.** À partir de quel tour l'étranglement
@@ -224,10 +224,10 @@ l'interface et enregistrés avec la partie. Le mode dit *ce qui se passe*, le
 paramètre dit *quand* : les écrire tous deux ici donnerait deux sources de
 vérité pour un même réglage, et un préréglage de difficulté cesserait d'agir.
 
-La `duree` du `differer` ci-dessus est le préavis, pas la période. Les deux
+La `duration` du `defer` ci-dessus est le préavis, pas la période. Les deux
 valent 2 dans la règle standard, et ce n'est qu'une coïncidence de chiffres.
 
-`etranglement` n'est ouvert qu'à un mode. Une capacité ne lit pas les
+`strangling` n'est ouvert qu'à un mode. Une capacité ne lit pas les
 paramètres de cadence, elle n'aurait donc aucun moyen de savoir quand se
 déclencher.
 
@@ -248,7 +248,7 @@ résistance initiale, nombre de zones. Ce sont les `Settings`, exposés dans
 l'interface, enregistrés avec la partie.
 
 **Axe 3 — les règles.** Un plugin qui ajoute une capacité, change un coût,
-introduit un plateau mouvant. C'est là que `regles = true` s'applique, et donc
+introduit un plateau mouvant. C'est là que `rules = true` s'applique, et donc
 la poignée de main réseau.
 
 Un préréglage de difficulté nomme une combinaison des trois. Le manifeste des
@@ -282,13 +282,13 @@ un contrat distinct avec sa propre version.
 
 Contrôles appliqués au chargement, plugin local compris :
 
-- type de primitive connu, `version_effets` prise en charge ;
-- `duree` d'un `differer` supérieure à zéro, et `annonce` comme `puis` refusés
+- type de primitive connu, `effects_version` prise en charge ;
+- `duration` d'un `defer` supérieure à zéro, et `announced` comme `then` refusés
   sur toute autre primitive ;
-- `cible` compatible avec le `camp` déclaré ;
+- `target` compatible avec le `camp` déclaré ;
 - champs obligatoires présents pour le type ;
-- `duree` et `rayon` positifs, `valeur` dans les bornes du type ;
-- pas de `differer` imbriqué dans un `differer` ;
+- `duration` et `radius` positifs, `value` dans les bornes du type ;
+- pas de `defer` imbriqué dans un `defer` ;
 - une clé de capacité ou de dépense déjà prise est un **conflit**, jamais un
   écrasement silencieux ;
-- `regles = false` interdit tout effet : la déclaration est vérifiée, pas crue.
+- `rules = false` interdit tout effet : la déclaration est vérifiée, pas crue.

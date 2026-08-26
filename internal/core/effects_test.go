@@ -55,9 +55,9 @@ func testGame() *Game {
 			Stamina:  10,
 		},
 		Inspectors: []Inspector{
-			{Position: Position{Column: 0, Row: 0}, Ability: "guetteur"},
-			{Position: Position{Column: 1, Row: 0}, Ability: "coureur"},
-			{Position: Position{Column: 2, Row: 0}, Ability: "chef"},
+			{Position: Position{Column: 0, Row: 0}, Ability: "lookout"},
+			{Position: Position{Column: 1, Row: 0}, Ability: "runner"},
+			{Position: Position{Column: 2, Row: 0}, Ability: "chief"},
 		},
 		Trails: map[Position]Trail{
 			{Column: 3, Row: 4}: {Turn: 4, Direction: Est},
@@ -250,7 +250,7 @@ func tousLesCas() []casEffet {
 		},
 		{
 			nom:   "effacer_traces",
-			effet: Effect{Type: EffectWipeTrails, Target: TargetFugitive, Duration: 3},
+			effet: Effect{Type: EffectEraseTrails, Target: TargetFugitive, Duration: 3},
 			ctx:   fugitif,
 			verifie: func(t *testing.T, p *Game) {
 				if _, reste := p.Trails[Position{Column: 3, Row: 4}]; reste {

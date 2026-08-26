@@ -187,7 +187,7 @@ func jouerUnePartie(t *testing.T, graine int64) *Game {
 		t.Fatal(err)
 	}
 
-	des := NewRandom(graine, "joueur")
+	des := NewRandom(graine, "player")
 	for coups := 0; coups < 20000; coups++ {
 		if _, fini := p.Outcome(); fini || p.Phase == PhaseOver {
 			return p
@@ -277,7 +277,7 @@ func TestFullGameUndoes(t *testing.T) {
 	}
 	avant := *depart
 
-	des := NewRandom(3, "joueur")
+	des := NewRandom(3, "player")
 	joues := 0
 	for ; joues < 60; joues++ {
 		if _, fini := depart.Outcome(); fini {

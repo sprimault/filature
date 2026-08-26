@@ -15,12 +15,12 @@ import (
 func testRegistry() *Registry {
 	return &Registry{
 		Capacites: map[string]Ability{
-			"barreur": {
+			"blocker": {
 				Name: "Barreur", Camp: SideInspectors, Uses: 1,
 				Trigger: OnInspectorsPhase,
 				Effets:  []Effect{{Type: EffectBlockCell, Target: TargetCell, Duration: 3}},
 			},
-			"guetteur": {
+			"lookout": {
 				Name: "Guetteur", Camp: SideInspectors, Uses: 1,
 				Trigger: OnInspectorsPhase,
 				Effets:  []Effect{{Type: EffectChangeRange, Target: TargetCurrentPiece, Value: 8, Duration: 1}},
@@ -220,8 +220,8 @@ func TestUsesCapped(t *testing.T) {
 func TestOneAbilityPerTurn(t *testing.T) {
 	p := playableGame()
 	p.Phase = PhaseInspectors
-	p.Inspectors[0].Ability = "guetteur"
-	p.Inspectors[1].Ability = "barreur"
+	p.Inspectors[0].Ability = "lookout"
+	p.Inspectors[1].Ability = "blocker"
 
 	c := firstMove(t, p, SideInspectors, MoveAbility)
 	if err := p.Apply(c); err != nil {

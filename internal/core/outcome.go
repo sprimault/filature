@@ -7,9 +7,9 @@ package core
 // d'équilibrage : savoir si les inspecteurs gagnent par épuisement ou par
 // blocage change ce qu'il faut corriger.
 type Outcome struct {
-	Winner Side   `json:"vainqueur"`
-	Reason string `json:"motif"`
-	Turn   int    `json:"tour"`
+	Winner Side   `json:"winner"`
+	Reason string `json:"reason"`
+	Turn   int    `json:"turn"`
 }
 
 // Les motifs de fin. Ils partent dans le journal et dans le message `fin` du
@@ -19,9 +19,9 @@ type Outcome struct {
 // effet fin_partie, dont le noyau ignore la condition.
 const (
 	OutcomeExtraction   = "extraction"
-	OutcomeStaminaSpent = "resistance_epuisee"
-	OutcomeCornered     = "fugitif_bloque"
-	OutcomeTimeUp       = "temps_ecoule"
+	OutcomeStaminaSpent = "stamina_spent"
+	OutcomeCornered     = "fugitive_cornered"
+	OutcomeTimeUp       = "time_up"
 	OutcomePlugin       = "plugin"
 )
 
@@ -171,6 +171,6 @@ func (p *Game) stranglingOrder() []int {
 	for _, z := range zones {
 		numeros = append(numeros, z.Number)
 	}
-	Shuffle(NewRandom(p.Seed, "etranglement"), numeros)
+	Shuffle(NewRandom(p.Seed, "strangling"), numeros)
 	return numeros
 }

@@ -5,132 +5,132 @@
 # chargé par le même code qu'un plugin tiers, ce qui garantit que le chemin de
 # chargement est exercé à chaque partie plutôt qu'une fois de temps en temps.
 
-nom = "base"
+name = "base"
 version = "0.1.0"
-version_effets = 1
-regles = true
-licence = "Apache-2.0"
+effects_version = 2
+rules = true
+license = "Apache-2.0"
 description = "Capacités et dépenses de la règle standard"
 
 # Le français est la langue de repli : un libellé absent d'une traduction est
 # affiché depuis ici. Il vit donc dans le contenu de base plutôt que dans un
 # plugin à part, où son absence rendrait l'interface muette.
-[langue]
+[language]
 code = "fr"
-nom = "Français"
+name = "Français"
 
 # ---------------------------------------------------------------------------
 # Capacités des inspecteurs : une par pion, une seule fois par partie.
 # ---------------------------------------------------------------------------
 
-[capacite.guetteur]
-nom = "Guetteur"
-camp = "inspecteurs"
-usages = 1
-declenchement = "phase_inspecteurs"
+[ability.lookout]
+name = "Guetteur"
+side = "inspectors"
+uses = 1
+trigger = "inspectors_phase"
 
-  [[capacite.guetteur.effet]]
-  type = "modifier_portee"
-  cible = "pion_courant"
-  valeur = 8
-  duree = 1
+  [[ability.lookout.effect]]
+  type = "change_range"
+  target = "current_piece"
+  value = 8
+  duration = 1
 
-[capacite.coureur]
-nom = "Coureur"
-camp = "inspecteurs"
-usages = 1
-declenchement = "phase_inspecteurs"
+[ability.runner]
+name = "Coureur"
+side = "inspectors"
+uses = 1
+trigger = "inspectors_phase"
 
-  [[capacite.coureur.effet]]
-  type = "modifier_mobilite"
-  cible = "pion_courant"
-  valeur = 1
-  duree = 1
+  [[ability.runner.effect]]
+  type = "change_mobility"
+  target = "current_piece"
+  value = 1
+  duration = 1
 
-[capacite.traqueur]
-nom = "Traqueur"
-camp = "inspecteurs"
-usages = 1
+[ability.tracker]
+name = "Traqueur"
+side = "inspectors"
+uses = 1
 passive = true
 
-  [[capacite.traqueur.effet]]
-  type = "reveler_traces"
-  cible = "pion_courant"
-  rayon = 2
+  [[ability.tracker.effect]]
+  type = "reveal_trails"
+  target = "current_piece"
+  radius = 2
 
-[capacite.barreur]
-nom = "Barreur"
-camp = "inspecteurs"
-usages = 1
-declenchement = "phase_inspecteurs"
+[ability.blocker]
+name = "Barreur"
+side = "inspectors"
+uses = 1
+trigger = "inspectors_phase"
 
-  [[capacite.barreur.effet]]
-  type = "bloquer_case"
-  cible = "case"
-  duree = 3
+  [[ability.blocker.effect]]
+  type = "block_cell"
+  target = "cell"
+  duration = 3
 
-[capacite.chef]
-nom = "Chef"
-camp = "inspecteurs"
-usages = 1
-declenchement = "phase_inspecteurs"
+[ability.chief]
+name = "Chef"
+side = "inspectors"
+uses = 1
+trigger = "inspectors_phase"
 
-  [[capacite.chef.effet]]
-  type = "partager_vue"
-  cible = "autre_pion"
-  duree = 2
+  [[ability.chief.effect]]
+  type = "share_view"
+  target = "other_piece"
+  duration = 2
 
 # ---------------------------------------------------------------------------
 # Dépenses de résistance du fugitif. Même format que les capacités : c'est le
 # coût qui change de sens, pas la structure.
 # ---------------------------------------------------------------------------
 
-[depense.double_deplacement]
-nom = "Double déplacement"
-camp = "fugitif"
-cout = 2
-declenchement = "phase_fugitif"
+[expense.double_step]
+name = "Double déplacement"
+side = "fugitive"
+cost = 2
+trigger = "fugitive_phase"
 
-  [[depense.double_deplacement.effet]]
-  type = "modifier_mobilite"
-  cible = "fugitif"
-  valeur = 1
-  duree = 1
+  [[expense.double_step.effect]]
+  type = "change_mobility"
+  target = "fugitive"
+  value = 1
+  duration = 1
 
-[depense.silence]
-nom = "Silence"
-camp = "fugitif"
-cout = 3
-declenchement = "phase_fugitif"
+[expense.silence]
+name = "Silence"
+side = "fugitive"
+cost = 3
+trigger = "fugitive_phase"
 
-  [[depense.silence.effet]]
-  type = "annuler_revelation"
-  cible = "fugitif"
+  [[expense.silence.effect]]
+  type = "cancel_reveal"
+  target = "fugitive"
 
-[depense.effacement]
-nom = "Effacement"
-camp = "fugitif"
-cout = 1
-declenchement = "phase_fugitif"
+[expense.wipe_trails]
+name = "Effacement"
+side = "fugitive"
+cost = 1
+trigger = "fugitive_phase"
 
-  [[depense.effacement.effet]]
-  type = "effacer_traces"
-  cible = "fugitif"
-  duree = 3
+  [[expense.wipe_trails.effect]]
+  type = "erase_trails"
+  target = "fugitive"
+  duration = 3
 
 # Le fugitif ne change pas de zone par confort : l'étranglement peut fermer la
 # sienne et l'y contraindre, et deux points sont alors une amende sur un plan
 # qu'il n'a pas choisi d'abandonner.
 
-[depense.changer_zone]
-nom = "Changement de zone"
-camp = "fugitif"
-cout = 2
-declenchement = "phase_fugitif"
+[expense.change_zone]
+name = "Changement de zone"
+side = "fugitive"
+cost = 2
+trigger = "fugitive_phase"
 
-  [[depense.changer_zone.effet]]
-  type = "sceller_zone"
-  cible = "zone"
+  [[expense.change_zone.effect]]
+  type = "seal_zone"
+  target = "zone"
 
 # Le meurtre se compose : révéler la position, marquer la scène, et payer. Les
 # deux premiers restent distincts parce qu'ils ne durent pas pareil — la
@@ -140,20 +140,20 @@ declenchement = "phase_fugitif"
 # rendre sur la scène. C'est justement ce qui fait du meurtre un pari et non un
 # automatisme.
 
-[depense.meurtre]
-nom = "Meurtre"
-camp = "fugitif"
-cout = 3
-usages = 2
-declenchement = "phase_fugitif"
+[expense.murder]
+name = "Meurtre"
+side = "fugitive"
+cost = 3
+uses = 2
+trigger = "fugitive_phase"
 
-  [[depense.meurtre.effet]]
-  type = "reveler_position"
-  cible = "fugitif"
+  [[expense.murder.effect]]
+  type = "reveal_position"
+  target = "fugitive"
 
-  [[depense.meurtre.effet]]
-  type = "marquer_scene"
-  cible = "fugitif"
+  [[expense.murder.effect]]
+  type = "mark_crime_scene"
+  target = "fugitive"
 
 # ---------------------------------------------------------------------------
 # Modes : ce que le jeu déclenche de lui-même, sans qu'un joueur le choisisse.
@@ -168,15 +168,15 @@ declenchement = "phase_fugitif"
 # donnerait deux sources de vérité, et un préréglage de difficulté n'aurait plus
 # prise dessus.
 
-[mode.etranglement]
-nom = "Étranglement"
-declenchement = "etranglement"
+[mode.strangling]
+name = "Étranglement"
+trigger = "strangling"
 
-  [[mode.etranglement.effet]]
-  type = "differer"
-  duree = 2
-  annonce = true
+  [[mode.strangling.effect]]
+  type = "defer"
+  duration = 2
+  announced = true
 
-    [[mode.etranglement.effet.puis]]
-    type = "fermer_zone"
-    cible = "zone"
+    [[mode.strangling.effect.then]]
+    type = "close_zone"
+    target = "zone"

@@ -15,7 +15,7 @@ import (
 )
 
 // ManifestName est le fichier que tout plugin porte à sa racine.
-const ManifestName = "manifeste.toml"
+const ManifestName = "manifest.toml"
 
 // manifeste est la forme d'un manifeste.toml, telle que
 // schemas/manifeste-plugin.schema.json la décrit.
@@ -24,19 +24,19 @@ const ManifestName = "manifeste.toml"
 // noyau : ce sont les mêmes structures, et les faire transiter par des doubles
 // locaux donnerait deux descriptions du même contrat à tenir d'accord.
 type manifeste struct {
-	Name           string `toml:"nom"`
+	Name           string `toml:"name"`
 	Version        string `toml:"version"`
-	EffectsVersion int    `toml:"version_effets"`
+	EffectsVersion int    `toml:"effects_version"`
 	Description    string `toml:"description"`
-	Regles         bool   `toml:"regles"`
+	Regles         bool   `toml:"rules"`
 	Wasm           string `toml:"wasm"`
-	Licence        string `toml:"licence"`
+	Licence        string `toml:"license"`
 
-	Capacites map[string]core.Ability `toml:"capacite"`
-	Depenses  map[string]core.Ability `toml:"depense"`
+	Capacites map[string]core.Ability `toml:"ability"`
+	Depenses  map[string]core.Ability `toml:"expense"`
 	Modes     map[string]core.Mode    `toml:"mode"`
 
-	Langue *langue `toml:"langue"`
+	Langue *langue `toml:"language"`
 	Bot    *bot    `toml:"bot"`
 }
 
@@ -45,7 +45,7 @@ type manifeste struct {
 // rien.
 type langue struct {
 	Code string `toml:"code"`
-	Name string `toml:"nom"`
+	Name string `toml:"name"`
 }
 
 // bot décrit un adversaire en processus séparé.
@@ -53,10 +53,10 @@ type langue struct {
 // Le déterminisme est déclaré et non vérifié ici : un bot qui ment reste
 // jouable, seule la reproduction d'un défaut en pâtit.
 type bot struct {
-	Camp         core.Side `toml:"camp"`
-	Commande     string    `toml:"commande"`
+	Camp         core.Side `toml:"side"`
+	Commande     string    `toml:"command"`
 	Arguments    []string  `toml:"arguments"`
-	Deterministe bool      `toml:"deterministe"`
+	Deterministe bool      `toml:"deterministic"`
 }
 
 // readManifest décode le manifeste d'un plugin et le valide.
@@ -123,7 +123,7 @@ func (m *manifeste) validate(chemin, dossier string) []error {
 	porteDesEffets := len(m.Capacites) > 0 || len(m.Depenses) > 0 || len(m.Modes) > 0
 
 	if porteDesEffets && m.EffectsVersion != core.EffectsVersion {
-		ajouter("version_effets %d, ce binaire applique la %d",
+		ajouter("effects_version %d, ce binaire applique la %d",
 			m.EffectsVersion, core.EffectsVersion)
 	}
 
@@ -133,10 +133,10 @@ func (m *manifeste) validate(chemin, dossier string) []error {
 	// pas.
 	if !m.Regles {
 		if porteDesEffets {
-			ajouter("regles = false avec des capacites, depenses ou modes")
+			ajouter("rules = false avec des capacites, depenses ou modes")
 		}
 		if m.Wasm != "" {
-			ajouter("regles = false avec un module wasm")
+			ajouter("rules = false avec un module wasm")
 		}
 	}
 
@@ -160,11 +160,11 @@ func (m *manifeste) checkAllEffects(chemin string) []error {
 
 	for _, cle := range sortedKeys(m.Capacites) {
 		manquements = append(manquements,
-			checkAbility(m.Capacites[cle], chemin, "capacite."+cle)...)
+			checkAbility(m.Capacites[cle], chemin, "ability."+cle)...)
 	}
 	for _, cle := range sortedKeys(m.Depenses) {
 		manquements = append(manquements,
-			checkAbility(m.Depenses[cle], chemin, "depense."+cle)...)
+			checkAbility(m.Depenses[cle], chemin, "expense."+cle)...)
 	}
 	for _, cle := range sortedKeys(m.Modes) {
 		mode := m.Modes[cle]
@@ -202,7 +202,7 @@ func checkEffects(effets []core.Effect, chemin, ou string, dansUnDiffere bool) [
 	var manquements []error
 
 	for i, e := range effets {
-		place := fmt.Sprintf("%s.effet[%d]", ou, i)
+		place := fmt.Sprintf("%s.effect[%d]", ou, i)
 		ajouter := func(format string, args ...any) {
 			manquements = append(manquements,
 				fmt.Errorf("%s: %s: "+format, append([]any{chemin, place}, args...)...))
@@ -228,7 +228,7 @@ func checkEffects(effets []core.Effect, chemin, ou string, dansUnDiffere bool) [
 			ajouter("differer sans puis")
 		}
 		manquements = append(manquements,
-			checkEffects(e.Then, chemin, place+".puis", true)...)
+			checkEffects(e.Then, chemin, place+".then", true)...)
 	}
 	return manquements
 }

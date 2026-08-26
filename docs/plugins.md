@@ -51,10 +51,10 @@ chemin est exercé à chaque partie, plutôt qu'une fois de temps en temps.
 
 | Champ | Type | Obligatoire | Rôle |
 |---|---|---|---|
-| `nom` | chaîne | oui | identifiant, qui est aussi le nom du dossier |
+| `name` | chaîne | oui | identifiant, qui est aussi le nom du dossier |
 | `version` | chaîne | oui | la vôtre, libre |
 | `description` | chaîne | non | une phrase, affichée dans l'écran des plugins |
-| `licence` | chaîne | au catalogue | identifiant SPDX |
+| `license` | chaîne | au catalogue | identifiant SPDX |
 
 `nom` suit `^[a-z][a-z0-9-]{1,31}$` : minuscules, chiffres et tirets, de 2 à 32
 caractères.
@@ -64,7 +64,7 @@ est l'empreinte de son contenu, calculée au chargement : deux plugins qui se
 disent tous deux « 1.2.0 » sans être identiques sont détectés comme différents
 lors d'une partie en réseau.
 
-`licence` est une liste fermée — `MIT`, `Apache-2.0`, `CC0-1.0`, `CC-BY-4.0`,
+`license` est une liste fermée — `MIT`, `Apache-2.0`, `CC0-1.0`, `CC-BY-4.0`,
 `CC-BY-SA-4.0`, `BSD-3-Clause`. Un champ libre laisserait passer « à voir » et
 rendrait les entrées du catalogue inexploitables. Facultatif hors catalogue.
 
@@ -72,17 +72,17 @@ rendrait les entrées du catalogue inexploitables. Facultatif hors catalogue.
 
 | Champ | Type | Rôle |
 |---|---|---|
-| `regles` | booléen | vrai si le plugin change les règles |
-| `version_effets` | entier | version du vocabulaire d'effets visée |
+| `rules` | booléen | vrai si le plugin change les règles |
+| `effects_version` | entier | version du vocabulaire d'effets visée |
 | `wasm` | chaîne | chemin d'un module WebAssembly |
 
-`regles` détermine la poignée de main réseau : deux joueurs doivent avoir
+`rules` détermine la poignée de main réseau : deux joueurs doivent avoir
 exactement les mêmes plugins de règles, alors qu'un plugin purement visuel
 n'engage que celui qui l'installe. **La déclaration ne suffit pas, elle est
-vérifiée** : `regles = false` avec une capacité dans le fichier est un refus au
+vérifiée** : `rules = false` avec une capacité dans le fichier est un refus au
 chargement, pas un avertissement.
 
-`version_effets` devient obligatoire dès qu'une `capacite`, une `depense` ou un
+`effects_version` devient obligatoire dès qu'une `ability`, une `expense` ou un
 `mode` est déclaré. Sans lui, un plugin écrit contre une primitive apparue plus
 tard échouerait sur un message de champ inconnu au lieu d'être refusé
 proprement.
@@ -91,18 +91,18 @@ proprement.
 
 | Champ | Rôle |
 |---|---|
-| `capacite` | ce qu'un pion peut déclencher |
-| `depense` | ce que le fugitif peut acheter avec sa résistance |
+| `ability` | ce qu'un pion peut déclencher |
+| `expense` | ce que le fugitif peut acheter avec sa résistance |
 | `mode` | ce que le jeu déclenche de lui-même |
 | `bot` | un adversaire en processus séparé |
-| `langue` | un dictionnaire de libellés |
+| `language` | un dictionnaire de libellés |
 
 Les trois premiers sont des tables indexées par identifiant. La clé est
-l'identifiant, le champ `nom` est le libellé affiché :
+l'identifiant, le champ `name` est le libellé affiché :
 
 ```toml
-[capacite.guetteur]     # « guetteur » est l'identifiant
-nom = "Guetteur"        # « Guetteur » est ce que le joueur lit
+[ability.lookout]     # « lookout » est l'identifiant
+name = "Guetteur"        # « Guetteur » est ce que le joueur lit
 ```
 
 ---
@@ -113,25 +113,25 @@ Même structure : c'est le sens du coût qui change, pas la forme.
 
 | Champ | Type | Rôle |
 |---|---|---|
-| `nom` | chaîne | libellé affiché |
-| `camp` | `fugitif` \| `inspecteurs` | qui peut la déclencher |
-| `usages` | entier | déclenchements par partie ; absent vaut illimité |
-| `cout` | entier | points de résistance prélevés |
+| `name` | chaîne | libellé affiché |
+| `side` | `fugitive` | `inspectors` || `inspecteurs` | qui peut la déclencher |
+| `uses` | entier | déclenchements par partie ; absent vaut illimité |
+| `cost` | entier | points de résistance prélevés |
 | `passive` | booléen | s'applique en permanence, sans déclenchement |
-| `declenchement` | énumération | moment où elle entre en jeu |
-| `effet` | tableau | les primitives appliquées, dans l'ordre |
+| `trigger` | énumération | moment où elle entre en jeu |
+| `effect` | tableau | les primitives appliquées, dans l'ordre |
 
 ```toml
-[capacite.barreur]
-nom = "Barreur"
-camp = "inspecteurs"
-usages = 1
-declenchement = "phase_inspecteurs"
+[ability.blocker]
+name = "Barreur"
+side = "inspectors"
+uses = 1
+trigger = "inspectors_phase"
 
-  [[capacite.barreur.effet]]
-  type = "bloquer_case"
-  cible = "case"
-  duree = 3
+  [[ability.blocker.effect]]
+  type = "block_cell"
+  target = "case"
+  duration = 3
 ```
 
 Les primitives disponibles, leurs paramètres et leurs cibles sont dans
@@ -149,11 +149,11 @@ L'étranglement en est un.
 
 | Champ | Obligatoire | Rôle |
 |---|---|---|
-| `nom` | oui | libellé affiché aux deux joueurs |
-| `declenchement` | oui | moment où le mode agit |
-| `effet` | oui | ce qu'il applique |
+| `name` | oui | libellé affiché aux deux joueurs |
+| `trigger` | oui | moment où le mode agit |
+| `effect` | oui | ce qu'il applique |
 
-Le déclenchement `etranglement` n'est ouvert qu'à un mode : sa cadence vient des
+Le déclenchement `strangling` n'est ouvert qu'à un mode : sa cadence vient des
 paramètres de la partie, qu'une capacité ne lit pas.
 
 **La cadence ne se déclare pas dans le mode.** À partir de quel tour et tous les
@@ -168,8 +168,8 @@ ce qui se passe, le paramètre dit quand.
 l'autre. Un plugin de palette seule est le mod le moins cher qui existe : un
 fichier de quinze lignes, aucune géométrie.
 
-Les deux portent `version_formes`, qui est un numéro distinct de
-`version_effets` : le contrat d'apparence et celui des règles évoluent
+Les deux portent `shapes_version`, qui est un numéro distinct de
+`effects_version` : le contrat d'apparence et celui des règles évoluent
 séparément.
 
 **Un plugin ne déclare que ce qu'il remplace.** Tout le reste retombe sur le
@@ -194,14 +194,14 @@ mes-traductions/
 
 ```toml
 # manifeste.toml
-nom = "filature-de"
+name = "filature-de"
 version = "1.0.0"
-licence = "CC0-1.0"
+license = "CC0-1.0"
 description = "Filature en allemand"
 
-[langue]
+[language]
 code = "de"
-nom = "Deutsch"
+name = "Deutsch"
 ```
 
 `code` est une étiquette BCP 47 — `de`, `pt-BR`, `zh-Hans`. `nom` est le nom de
@@ -211,7 +211,7 @@ sélecteur : quelqu'un qui cherche sa langue y cherche « Deutsch », pas
 
 ```toml
 # langue.toml
-[libelle]
+[label]
 menu_nouvelle_partie = "Neues Spiel"
 camp_fugitif = "Flüchtiger"
 ```
@@ -257,13 +257,13 @@ Un bot ne modifie pas les règles, il joue avec. Il se déclare dans une table
 
 ```toml
 [bot]
-camp = "inspecteurs"
-commande = "traqueur"
+side = "inspectors"
+command = "traqueur"
 arguments = ["--niveau", "3"]
-deterministe = true
+deterministic = true
 ```
 
-`commande` est cherchée dans le dossier du plugin puis dans le `PATH`. Aucun
+`command` est cherchée dans le dossier du plugin puis dans le `PATH`. Aucun
 interpréteur n'est fourni : un bot Python se livre avec son lanceur.
 
 Un plugin qui déclare un bot **et** des effets est refusé. Ce sont deux choses,
@@ -297,12 +297,12 @@ point un plugin veut la liste, pas un aller-retour par erreur.
 
 ```
 $ filature validate mon-plugin/
-mon-plugin/manifeste.toml:23: capacite.guetteur.effet[0].cible
+mon-plugin/manifeste.toml:23: ability.lookout.effect[0].target
     « pion » n'est pas une cible connue
-    attendu : pion_courant, tous_pions, autre_pion, fugitif, case, zone
-mon-plugin/manifeste.toml: version_effets
+    attendu : current_piece, all_pieces, other_piece, fugitive, cell, zone
+mon-plugin/manifeste.toml: effects_version
     obligatoire dès qu'une capacité, une dépense ou un mode est déclaré
-mon-plugin/formes.toml:41: forme.fugitif.trait[2].points[3]
+mon-plugin/formes.toml:41: shape.fugitive.stroke[2].points[3]
     y vaut 48, hors du gabarit du rôle pion (0 à 40)
 
 3 manquements
@@ -310,7 +310,7 @@ mon-plugin/formes.toml:41: forme.fugitif.trait[2].points[3]
 
 **Chaque manquement dit où il est** : le fichier, la ligne quand elle est
 connue, et le chemin complet de la clé fautive. « Cible invalide » sans autre
-précision oblige à relire tout un manifeste ; `capacite.guetteur.effet[0].cible`
+précision oblige à relire tout un manifeste ; `ability.lookout.effect[0].target`
 désigne un seul endroit.
 
 Le chemin de clé est donné même quand la ligne manque — un décodeur ne la
@@ -333,14 +333,14 @@ pourquoi — un plugin simplement absent de la liste laisserait deviner.
 
 ## 9. Ce qui est refusé
 
-- `regles = false` accompagné d'une capacité, d'une dépense, d'un mode ou d'un
+- `rules = false` accompagné d'une capacité, d'une dépense, d'un mode ou d'un
   module exécutable ;
 - une forme qui déborde de son gabarit — au chargement, plugin local compris,
   parce que masquer les cases voisines est un avantage de jeu déguisé en
   habillage ;
 - une couleur en hexadécimal dans une forme : les formes ne référencent que des
   noms de palette ;
-- un `version_formes` ou un `version_effets` que ce binaire ne connaît pas ;
+- un `shapes_version` ou un `effects_version` que ce binaire ne connaît pas ;
 - un plugin qui déclare à la fois un bot et des effets.
 
 Le catalogue ajoute une seule règle, mécanique : **aucun fichier binaire, sous

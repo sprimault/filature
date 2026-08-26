@@ -68,7 +68,7 @@ le journal enregistre ses **coups** et non son état interne.
 ## Le vocabulaire d'effets
 
 Une capacité, une dépense ou un mode de jeu se décrit par composition de
-primitives — `modifier_portee`, `bloquer_case`, `reveler_traces` — et non par du
+primitives — `change_range`, `block_cell`, `reveal_trails` — et non par du
 code.
 
 Les cinq capacités livrées sont écrites dans ce format dès le premier jour :

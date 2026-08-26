@@ -13,23 +13,23 @@ import "sort"
 // position du fugitif dans le trafic réseau ou dans les outils de
 // développement du navigateur, et le jeu n'a plus d'objet.
 type View struct {
-	Side     Side     `json:"acteur"`
-	Turn     int      `json:"tour"`
+	Side     Side     `json:"side"`
+	Turn     int      `json:"turn"`
 	Phase    Phase    `json:"phase"`
-	Settings Settings `json:"parametres"`
+	Settings Settings `json:"settings"`
 
 	// Streets est la portion de plateau connue du client. Sur plateau borné
 	// c'est tout ; sur plateau infini, ce sera ce qui a été exploré.
-	Streets    []Position `json:"rues"`
+	Streets    []Position `json:"streets"`
 	Zones      []Zone     `json:"zones"`
-	Roadblocks []Position `json:"barrages"`
+	Roadblocks []Position `json:"roadblocks"`
 
-	Inspectors []Inspector `json:"inspecteurs"`
+	Inspectors []Inspector `json:"inspectors"`
 
 	// PositionFugitif n'est renseigné que pour le camp fugitif, ou pour les
 	// inspecteurs quand il est visible ou révélé.
-	PositionFugitif *Position `json:"position_fugitif,omitempty"`
-	SealedZone      *int      `json:"zone_scellee,omitempty"`
+	PositionFugitif *Position `json:"fugitive_position,omitempty"`
+	SealedZone      *int      `json:"sealed_zone,omitempty"`
 
 	// Stamina n'est renseignée que pour le fugitif.
 	//
@@ -40,28 +40,28 @@ type View struct {
 	// annonce inutile, et leur livrerait par la bande chaque dépense du
 	// fugitif : une baisse de deux sans contact ne peut être qu'un double
 	// déplacement ou un changement de zone.
-	Stamina *int `json:"resistance,omitempty"`
+	Stamina *int `json:"stamina,omitempty"`
 
 	// TracesConnues ne contient que ce que les inspecteurs ont effectivement
 	// découvert. Le fugitif, lui, voit les siennes.
-	TracesConnues map[string]Trail `json:"traces_connues"`
+	TracesConnues map[string]Trail `json:"known_trails"`
 
 	// CrimeScenes est identique pour les deux camps : un meurtre est public, c'est
 	// ce que le fugitif paie. Ne jamais la filtrer par acteur.
-	CrimeScenes []CrimeScene `json:"scenes"`
+	CrimeScenes []CrimeScene `json:"crime_scenes"`
 
-	CasesVisibles   []Position `json:"cases_visibles"`
-	LegalMoves      []Move     `json:"coups_legaux"`
-	ProchaineReveal int        `json:"prochaine_revelation"`
-	SilencePaye     bool       `json:"silence_paye"`
-	ZonesAnnoncees  []int      `json:"zones_annoncees"`
+	CasesVisibles   []Position `json:"visible_cells"`
+	LegalMoves      []Move     `json:"legal_moves"`
+	ProchaineReveal int        `json:"next_reveal"`
+	SilencePaye     bool       `json:"silence_paid"`
+	ZonesAnnoncees  []int      `json:"announced_zones"`
 
 	// EffetsAnnonces ne porte que les differer déclarés avec annonce, et les
 	// porte à l'identique pour les deux camps. Un differer sans annonce reste
 	// invisible jusqu'à sa résolution, sinon le champ le trahirait.
-	EffetsAnnonces []PendingEffect `json:"effets_annonces"`
+	EffetsAnnonces []PendingEffect `json:"announced_effects"`
 
-	Outcome *Outcome `json:"resultat,omitempty"`
+	Outcome *Outcome `json:"outcome,omitempty"`
 }
 
 // ViewFor projette l'état pour un camp.

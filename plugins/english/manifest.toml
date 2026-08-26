@@ -9,11 +9,11 @@
 # et règles serait refusé — ce sont deux choses, et seules les secondes doivent
 # être identiques des deux côtés d'une partie en réseau.
 
-nom = "anglais"
+name = "english"
 version = "0.1.0"
-licence = "Apache-2.0"
+license = "Apache-2.0"
 description = "Filature in English"
 
-[langue]
+[language]
 code = "en"
-nom = "English"
+name = "English"

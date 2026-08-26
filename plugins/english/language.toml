@@ -1,0 +1,67 @@
+# Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
+# SPDX-License-Identifier: Apache-2.0
+
+# Les clés sont celles de plugins/base/langue.toml, à l'identique. Une clé
+# absente d'ici s'affiche en français ; une clé inventée ici est ignorée.
+
+[label]
+
+# Menus and navigation
+menu_new_game = "New game"
+menu_resume = "Resume"
+menu_join = "Join a game"
+menu_host = "Host"
+menu_preferences = "Preferences"
+menu_quit = "Quit"
+menu_back = "Back"
+
+# Game presets
+preset_district = "District"
+preset_outskirts = "Outskirts"
+preset_city = "City"
+
+# Preferences
+pref_language = "Language"
+pref_display = "Display"
+pref_fullscreen = "Fullscreen"
+pref_plugins = "Plugins"
+pref_arrows_screen = "Arrows follow the screen"
+pref_arrows_board = "Arrows follow the board"
+
+# Sides and pieces
+side_fugitive = "Fugitive"
+side_inspectors = "Inspectors"
+piece_lookout = "Lookout"
+piece_runner = "Runner"
+piece_tracker = "Tracker"
+piece_blocker = "Blocker"
+piece_chief = "Chief"
+
+# Board terms
+term_stamina = "Stamina"
+term_trail = "Trail"
+term_zone = "Extraction zone"
+term_crime_scene = "Crime scene"
+term_roadblock = "Roadblock"
+term_turn = "Turn"
+
+# Fugitive's expenses
+expense_double_step = "Double move"
+expense_silence = "Silence"
+expense_wipe_trails = "Wipe trail"
+expense_murder = "Murder"
+expense_change_zone = "Change zone"
+
+# Flow
+phase_setup = "Setup"
+phase_inspectors = "Inspectors to play"
+phase_fugitive = "Fugitive to play"
+action_pass = "Pass"
+action_end_phase = "End phase"
+action_undo = "Undo"
+
+# Endgame
+end_extraction = "The fugitive got out"
+end_stamina_spent = "The fugitive is spent"
+end_fugitive_cornered = "The fugitive is cornered"
+end_time_up = "Time is up"

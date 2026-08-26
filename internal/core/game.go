@@ -14,8 +14,8 @@ type Side string
 
 // Les deux camps.
 const (
-	SideFugitive   Side = "fugitif"
-	SideInspectors Side = "inspecteurs"
+	SideFugitive   Side = "fugitive"
+	SideInspectors Side = "inspectors"
 )
 
 // Phase découpe le tour. La mise en place est une phase comme une autre pour
@@ -25,18 +25,18 @@ type Phase string
 // Les cinq phases, dans l'ordre où elles s'enchaînent. Les inspecteurs jouent
 // avant le fugitif : c'est ce qui compense leurs trois déplacements contre un.
 const (
-	PhaseFugitiveSetup   Phase = "placement_fugitif"
-	PhaseInspectorsSetup Phase = "placement_inspecteurs"
-	PhaseInspectors      Phase = "inspecteurs"
-	PhaseFugitive        Phase = "fugitif"
-	PhaseOver            Phase = "terminee"
+	PhaseFugitiveSetup   Phase = "fugitive_setup"
+	PhaseInspectorsSetup Phase = "inspectors_setup"
+	PhaseInspectors      Phase = "inspectors"
+	PhaseFugitive        Phase = "fugitive"
+	PhaseOver            Phase = "over"
 )
 
 // Trail est le passage du fugitif sur une case. Elle n'est jamais visible à
 // distance : un inspecteur la découvre en occupant la case ou une case
 // orthogonalement adjacente.
 type Trail struct {
-	Turn      int       `json:"tour"`
+	Turn      int       `json:"turn"`
 	Direction Direction `json:"direction"`
 }
 
@@ -44,16 +44,16 @@ type Trail struct {
 // sensible du jeu : elle ne doit jamais franchir ViewFor côté inspecteurs.
 type Fugitive struct {
 	Position      Position `json:"position"`
-	Stamina       int      `json:"resistance"`
-	Visible       bool     `json:"visible"`
-	SealedZone    int      `json:"zone_scellee"`
-	TurnsInZone   int      `json:"tours_dans_zone"`
-	SilenceBought bool     `json:"silence_achete"`
+	Stamina       int      `json:"stamina"`
+	Visible       bool     `json:"spotted"`
+	SealedZone    int      `json:"sealed_zone"`
+	TurnsInZone   int      `json:"turns_in_zone"`
+	SilenceBought bool     `json:"silence_bought"`
 
 	// StepsTaken est remis à zéro à chaque tour, comme celui des
 	// inspecteurs. Le fugitif n'a pas de quota de pions, mais une mobilité
 	// qu'un double déplacement porte à deux.
-	StepsTaken int `json:"deplacements_faits"`
+	StepsTaken int `json:"steps_taken"`
 }
 
 // CrimeScene est un lieu de meurtre. Contrairement à une trace, elle est connue des
@@ -64,7 +64,7 @@ type Fugitive struct {
 // ça dit de sa destination.
 type CrimeScene struct {
 	Position Position `json:"position"`
-	Turn     int      `json:"tour"`
+	Turn     int      `json:"turn"`
 }
 
 // Inspector porte un pion et sa capacité, utilisable une fois par partie.
@@ -76,13 +76,13 @@ type CrimeScene struct {
 // ranger.
 type Inspector struct {
 	Position    Position `json:"position"`
-	Ability     string   `json:"capacite"`
-	AbilityUsed bool     `json:"capacite_utilisee"`
+	Ability     string   `json:"ability"`
+	AbilityUsed bool     `json:"ability_used"`
 
 	// StepsTaken est remis à zéro à chaque tour. Il tient le quota :
 	// savoir combien de pions ont bougé ne suffit pas, il faut savoir
 	// lesquels, sinon le même pion consomme les trois places.
-	StepsTaken int `json:"deplacements_faits"`
+	StepsTaken int `json:"steps_taken"`
 }
 
 // Game porte l'intégralité de l'état.
@@ -91,46 +91,46 @@ type Inspector struct {
 // est recalculée, jamais stockée : c'est ce qui garantit que rejouer le journal
 // reconstruit exactement le même état.
 type Game struct {
-	Seed       int64       `json:"graine"`
-	Settings   Settings    `json:"parametres"`
+	Seed       int64       `json:"seed"`
+	Settings   Settings    `json:"settings"`
 	Board      Board       `json:"-"`
-	Turn       int         `json:"tour"`
+	Turn       int         `json:"turn"`
 	Phase      Phase       `json:"phase"`
-	Fugitive   Fugitive    `json:"fugitif"`
-	Inspectors []Inspector `json:"inspecteurs"`
+	Fugitive   Fugitive    `json:"fugitive"`
+	Inspectors []Inspector `json:"inspectors"`
 
-	Trails      map[Position]Trail `json:"traces"`
-	CrimeScenes []CrimeScene       `json:"scenes"`
+	Trails      map[Position]Trail `json:"trails"`
+	CrimeScenes []CrimeScene       `json:"crime_scenes"`
 
 	// Roadblocks et Openings sont les deux altérations du terrain, en tours
 	// d'expiration. Le plateau est en lecture seule — c'est la condition du
 	// plateau infini — donc ce qui le modifie vit ici, par-dessus.
-	Roadblocks map[Position]int `json:"barrages"`
-	Openings   map[Position]int `json:"ouvertures"`
+	Roadblocks map[Position]int `json:"roadblocks"`
+	Openings   map[Position]int `json:"openings"`
 
-	ClosedZones []int `json:"zones_fermees"`
+	ClosedZones []int `json:"closed_zones"`
 
 	// AbilityPlayed dit qu'une capacité a déjà été déclenchée ce tour. La
 	// règle en autorise une par tour en plus d'une par pion et par partie :
 	// le drapeau du pion ne suffit donc pas.
-	AbilityPlayed bool `json:"capacite_jouee"`
+	AbilityPlayed bool `json:"ability_played"`
 
 	// ExpenseUses compte les emplois des dépenses plafonnées. Générique
 	// parce que « usages » est un champ du contrat de plugin : le noyau n'a
 	// pas à savoir que celle qui plafonne à deux s'appelle meurtre.
-	ExpenseUses map[Expense]int `json:"usages_depense"`
+	ExpenseUses map[Expense]int `json:"expense_uses"`
 
 	// PendingEffects est la file des differer posés, résolue en fin de tour
 	// avant le test de fin de partie. Elle se sérialise avec le reste : une
 	// reprise qui la perdrait escamoterait un barrage déjà annoncé.
-	PendingEffects []PendingEffect `json:"effets_en_attente"`
+	PendingEffects []PendingEffect `json:"pending_effects"`
 
 	// ActiveEffects porte ce qui modifie temporairement un pion ou le fugitif.
-	ActiveEffects []ActiveEffect `json:"effets_actifs"`
+	ActiveEffects []ActiveEffect `json:"active_effects"`
 
 	// ForcedOutcome est le seul moyen qu'un plugin termine une partie sans que le
 	// noyau connaisse sa condition de victoire. Outcome la consulte d'abord.
-	ForcedOutcome *Outcome `json:"fin_forcee,omitempty"`
+	ForcedOutcome *Outcome `json:"forced_outcome,omitempty"`
 
 	// annulations double le journal, une entrée par coup. Elle ne se sérialise
 	// pas — ce sont des fermetures — donc une partie rechargée ne s'annule
@@ -203,7 +203,7 @@ func fugitiveStart(plateau Board, graine int64, p Settings) (Position, error) {
 	if len(cases) == 0 {
 		return Position{}, errors.New("aucune rue au centre du plateau")
 	}
-	return cases[NewRandom(graine, "placement").Int(len(cases))], nil
+	return cases[NewRandom(graine, "setup").Int(len(cases))], nil
 }
 
 // IsWalkable dit si une case peut être occupée et traversée du regard.
