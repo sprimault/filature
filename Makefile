@@ -49,6 +49,12 @@ vulncheck:
 sec:
 	gosec -exclude-dir=.tmp ./...
 
+# Les licences des dépendances liées au binaire. Un test compare le fichier aux
+# dépendances réelles et échoue quand il vieillit : la cible ne sert qu'à le
+# réécrire, et son diff se relit comme le reste.
+notices:
+	go test -run TestThirdPartyNoticesAreCurrent ./internal/quality/ -maj-notices
+
 cover:
 	go test -coverprofile=$(SORTIE)/couverture.out ./...
 	go tool cover -html=$(SORTIE)/couverture.out

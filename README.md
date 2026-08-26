@@ -2,8 +2,9 @@
 
 Français : [README.fr.md](README.fr.md)
 
-![CI](https://github.com/sprimault/filature/actions/workflows/ci.yml/badge.svg)
-![License](https://img.shields.io/badge/license-Apache%202.0-blue)
+[![CI](https://github.com/sprimault/filature/actions/workflows/ci.yml/badge.svg)](https://github.com/sprimault/filature/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![Third-party notices](https://img.shields.io/badge/third--party-notices-lightgrey)](THIRD-PARTY-NOTICES)
 
 A turn-based board game of hidden movement. One fugitive against five
 inspectors, on a city of streets and buildings.
@@ -124,6 +125,10 @@ both camps at once: you tail, and you are tailed.
 ## License
 
 Apache 2.0 — see [`LICENSE`](LICENSE).
+
+The binary links third-party libraries whose licences require their notices
+to travel with it: [`THIRD-PARTY-NOTICES`](THIRD-PARTY-NOTICES), shipped in
+every archive.
 
 The name Filature, its visual identity and its palette are not covered by that
 license. Forks are welcome under a different name.

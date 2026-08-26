@@ -17,15 +17,21 @@ discussion, not a patch.
 - Determinism is preserved. Nothing reads the clock or system entropy; random
   numbers come from the game's seeded generator. A change that makes a replay
   diverge from its journal is a defect even if every test passes.
+- A new dependency goes through `make notices`: its licence enters
+  `THIRD-PARTY-NOTICES`, which ships with the binary in every archive.
 - Nothing in `internal/core` or `internal/ai` imports the renderer. CI runners
   are headless; a test that needs a window does not belong in the default suite.
 
 ## Language
 
-Identifiers follow the domain, which is French here — `Fugitive`, `Board`,
-`Trail`. Comments and documentation are in French. Commit messages are French
-first, then English, in one text separated by `***`. Never `---`: `git am` treats
-it as a patch separator and truncates everything after it.
+**Identifiers are in English** — directories, files, packages, types, functions,
+fields: `Fugitive`, `Board`, `Trail`. **Documentation is in French**: godoc,
+comments, error messages and logs. The API reads in English because it is code;
+the reasoning reads in French because it is thought.
+
+Commit messages are French first, then English, in one text separated by `***`.
+Never `---`: `git am` treats it as a patch separator and truncates everything
+after it.
 
 Contributions in English are welcome and are not held to the bilingual rule.
 

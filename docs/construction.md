@@ -28,7 +28,8 @@ août 2027.
 
 ## cgo n'est pas uniforme
 
-C'est la particularité du projet, et elle se viole en silence.
+C'est la particularité du projet, et elle se contourne sans bruit : rien
+n'avertit qu'on vient de la perdre.
 
 Le mettre à `0` sur darwin ne produit pas une erreur claire mais un échec de
 linkage obscur. À poser en variable de matrice, jamais en valeur globale.
@@ -76,7 +77,19 @@ perdrait.
 exige à la redistribution, et personne ne télécharge un fichier séparé pour
 accompagner un binaire.
 
-**L'archive ne contient rien d'autre que le binaire et ces deux fichiers.** Le
+`THIRD-PARTY-NOTICES` les accompagne, au titre des licences des bibliothèques
+liées au binaire. La MIT, comme la plupart des licences permissives, exige que
+sa notice suive « toute copie ou partie substantielle » du logiciel — un binaire
+qui la compile en est une.
+
+**Ce fichier se génère, il ne se tient pas à la main** : `make notices` le
+réécrit depuis les dépendances que `go list -deps` trouve dans la commande, donc
+sans l'outillage ni les dépendances de test. Un test le compare aux dépendances
+réelles à chaque exécution de la suite et échoue quand il vieillit, faute de quoi
+une bibliothèque ajoutée entrerait dans les archives sans sa notice, et personne
+ne s'en apercevrait.
+
+**L'archive ne contient rien d'autre que le binaire et ces trois fichiers.** Le
 contenu livré — règles, formes, palette, français et anglais — est embarqué dans
 l'exécutable par `//go:embed` : un binaire déplacé continue de fonctionner, et
 personne ne casse ses règles en éditant un fichier qu'il n'a pas écrit.
