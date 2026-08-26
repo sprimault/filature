@@ -77,7 +77,7 @@ var ErrNoPlayableBoard = errors.New("aucun plateau jouable pour cette graine")
 //
 // Les cinq étapes de docs/regles.md §3, dans l'ordre : grid, îlots, perçages,
 // impasses, zones. Chacune tire sur son propre flux, ce qui permet d'en
-// modifier une sans déplace les tirages des autres.
+// modifier une sans déplacer les tirages des autres.
 func draw(graine int64, p Settings) *BoundedBoard {
 	b := &BoundedBoard{
 		graine: graine,

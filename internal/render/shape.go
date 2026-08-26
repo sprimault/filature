@@ -1,7 +1,7 @@
 // Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
 // SPDX-License-Identifier: Apache-2.0
 
-// Package rendu porte la projection isométrique et le vocabulaire géométrique
+// Package render porte la projection isométrique et le vocabulaire géométrique
 // des plugins d'apparence.
 //
 // C'est le seul paquet qui convertit entre coordonnées de plateau et
@@ -9,31 +9,34 @@
 // coordonnée d'écran apparaît ailleurs, c'est un défaut.
 package render
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 // Dimensions du losange, en unités du contrat de formes. Non modifiables : le
 // rapport 2:1 est la projection, pas un réglage.
 const (
-	LargeurCase = 64
-	HauteurCase = 32
+	TileWidth  = 64
+	TileHeight = 32
 )
 
 // ShapesVersion est la version du contrat que ce binaire sait lire. Un plugin
 // écrit contre une version inconnue est refusé plutôt que lu de travers.
-const ShapesVersion = 2
+const ShapesVersion = 3
 
-// TypeTrait énumère les quatre primitives. Le vocabulaire est volontairement
+// StrokeType énumère les quatre primitives. Le vocabulaire est volontairement
 // pauvre : tout ce qui est livré avec le jeu s'y exprime, et une primitive de
 // plus entre dans le contrat public sans pouvoir en ressortir.
-type TypeTrait string
+type StrokeType string
 
-// Les quatre primitives. TraitPrisme est réservé au rôle bâtiment et ne porte
+// Les quatre primitives. StrokePrism est réservé au rôle bâtiment et ne porte
 // qu'une hauteur : son emprise est le losange de la case, jamais déclarée.
 const (
-	TraitPolygone TypeTrait = "polygone"
-	TraitCercle   TypeTrait = "cercle"
-	TraitSegment  TypeTrait = "segment"
-	TraitPrisme   TypeTrait = "prisme"
+	StrokePolygon StrokeType = "polygon"
+	StrokeCircle  StrokeType = "circle"
+	StrokeSegment StrokeType = "segment"
+	StrokePrism   StrokeType = "prism"
 )
 
 // Point est une coordonnée dans le repère d'une forme : origine au point
@@ -43,23 +46,47 @@ type Point struct {
 	Y int
 }
 
-// Trait est une primitive paramétrée. Les champs inutiles au type restent à
+// UnmarshalTOML lit un point écrit en paire, « [-6, 0] ».
+//
+// Le contrat le veut ainsi : une liste de sommets s'écrit alors
+// « [[-7, 0], [7, 0], [5, 22]] », lisible d'un coup d'œil, là où une suite de
+// tables « {x = -7, y = 0} » noierait la géométrie sous la syntaxe.
+func (p *Point) UnmarshalTOML(v any) error {
+	paire, ok := v.([]any)
+	if !ok || len(paire) != 2 {
+		return fmt.Errorf("point: attendu une paire [x, y], reçu %v", v)
+	}
+
+	for i, brut := range paire {
+		n, ok := brut.(int64)
+		if !ok {
+			return fmt.Errorf("point: %v n'est pas un entier", brut)
+		}
+		if i == 0 {
+			p.X = int(n)
+		} else {
+			p.Y = int(n)
+		}
+	}
+	return nil
+}
+
+// Stroke est une primitive paramétrée. Les champs inutiles au type restent à
 // zéro, comme pour core.Effect et pour la même raison : un enregistrement plat
 // se lit et se valide sans hiérarchie de types.
-type Trait struct {
-	Type             TypeTrait `toml:"type"`
-	Points           []Point   `toml:"points"`
-	Centre           Point     `toml:"center"`
-	Radius           int       `toml:"radius"`
-	De               Point     `toml:"from"`
-	A                Point     `toml:"to"`
-	Epaisseur        int       `toml:"thickness"`
-	Emprise          []Point   `toml:"footprint"`
-	Hauteur          int       `toml:"height"`
-	Couleur          string    `toml:"color"`
-	Contour          string    `toml:"outline"`
-	EpaisseurContour int       `toml:"outline_thickness"`
-	Opacite          int       `toml:"opacity"`
+type Stroke struct {
+	Type             StrokeType `toml:"type"`
+	Points           []Point    `toml:"points"`
+	Center           Point      `toml:"center"`
+	Radius           int        `toml:"radius"`
+	From             Point      `toml:"from"`
+	To               Point      `toml:"to"`
+	Thickness        int        `toml:"thickness"`
+	Height           int        `toml:"height"`
+	Color            string     `toml:"color"`
+	Outline          string     `toml:"outline"`
+	OutlineThickness int        `toml:"outline_thickness"`
+	Opacity          int        `toml:"opacity"`
 }
 
 // Role détermine ce qu'un plugin a le droit de redéfinir.
@@ -77,12 +104,12 @@ type Role string
 // Les trois rôles. Le sol n'en est pas un : rue, zone_ouverte et zone_fermee
 // sont des noms de couleurs, et le losange est tracé par le moteur.
 const (
-	RolePion     Role = "pion"
-	RoleBatiment Role = "batiment"
-	RoleMarqueur Role = "marqueur"
+	RolePiece    Role = "piece"
+	RoleBuilding Role = "building"
+	RoleMarker   Role = "marker"
 )
 
-// Gabarit borne ce qu'une forme a le droit d'occuper.
+// Template borne ce qu'une forme a le droit d'occuper.
 //
 // Vérifié au chargement et pas seulement à la publication : une forme qui
 // déborde masque les cases derrière elle, ce qui est un avantage de jeu déguisé
@@ -90,44 +117,52 @@ const (
 // catalogué.
 //
 // Les bornes portent sur le plan du rôle — celui du sol pour une forme plate et
-// pour l'emprise d'un prisme, le plan vertical pour un pion. HauteurMax est
+// pour l'emprise d'un prisme, le plan vertical pour un pion. MaxHeight est
 // comptée à part parce qu'un prisme mêle les deux : son emprise est au sol, son
 // élévation ne l'est pas.
-type Gabarit struct {
-	Plan       Plan
+type Template struct {
+	Plane      Plane
 	XMin, XMax int
 	YMin, YMax int
-	TraitsMax  int
-	HauteurMax int
+	MaxStrokes int
+	MaxHeight  int
 }
 
-// Plan distingue les deux repères. Les confondre est l'erreur classique du
+// Plane distingue les deux repères. Les confondre est l'erreur classique du
 // contrat : un losange au sol occupe y de -16 à 16, un pion s'élève de 0 à 40,
 // et les deux plages n'ont rien à voir.
-type Plan string
+type Plane string
 
 // Les deux repères.
 const (
-	PlanSol      Plan = "sol"
-	PlanVertical Plan = "vertical"
+	PlaneGround   Plane = "ground"
+	PlaneVertical Plane = "vertical"
 )
 
-// gabarits borne ce que chaque rôle a le droit d'occuper.
-var gabarits = map[Role]Gabarit{
-	RolePion:     {PlanVertical, -24, 24, 0, 40, 24, 0},
-	RoleMarqueur: {PlanSol, -24, 24, -12, 12, 8, 0},
+// templates borne ce que chaque rôle a le droit d'occuper.
+var templates = map[Role]Template{
+	RolePiece:  {PlaneVertical, -24, 24, 0, 40, 24, 0},
+	RoleMarker: {PlaneGround, -24, 24, -12, 12, 8, 0},
 	// Un bâtiment ne déclare qu'une hauteur et une couleur : son emprise est le
 	// losange de la case. Une emprise libre permettrait de déborder sur les
 	// voisines et de masquer ce que l'adversaire doit voir.
-	RoleBatiment: {PlanVertical, 0, 0, 0, 0, 1, 24},
+	RoleBuilding: {PlaneVertical, 0, 0, 0, 0, 1, 24},
 }
 
-// Forme est un dessin nommé, plus ses variantes d'état facultatives.
-type Forme struct {
-	Name      string
-	Role      Role
-	Traits    []Trait
-	Variantes map[string][]Trait
+// Shape est un dessin nommé, plus ses variantes d'état facultatives.
+type Shape struct {
+	// La clé de la table porte le nom : « [shape.fugitive] » nomme la forme,
+	// et le champ le reçoit au chargement.
+	Name string `toml:"-"`
+
+	Role Role `toml:"role"`
+
+	// Les tags sont explicites et non déduits du nom du champ. La déduction
+	// est insensible à la casse mais pas à la langue : elle a laissé passer
+	// des formes vides quand « trait » est devenu « stroke », sans que rien
+	// ne le signale — un TOML dont on ignore une table se décode sans erreur.
+	Strokes  []Stroke            `toml:"stroke"`
+	Variants map[string][]Stroke `toml:"variant"`
 }
 
 // Palette associe des noms à des couleurs. Une forme ne référence que des noms :
@@ -135,20 +170,30 @@ type Forme struct {
 // à une forme tierce de suivre la palette active sans rien savoir d'elle.
 type Palette map[string]string
 
-// CouleursObligatoires est le socle sur lequel toute forme peut compter. Une
+// RequiredColors est le socle sur lequel toute forme peut compter. Une
 // palette qui n'en couvre pas la totalité est refusée : une couleur manquante
 // se verrait à l'écran comme un trou, plusieurs écrans plus loin.
-var CouleursObligatoires = []string{
-	"rue", "batiment", "zone_ouverte", "zone_fermee",
-	"fugitif_principal", "fugitif_detail",
-	"inspecteur_principal", "inspecteur_detail",
-	"trace", "barrage", "scene",
+//
+// Les noms en _detail et marker_outline sont des contours et non des nuances
+// d'accompagnement. Un pion se pose sur des sols dont la luminance va du simple
+// au triple ; aucun remplissage ne se détache des trois, le contour le fait.
+// Une palette qui les remonterait au niveau de son remplissage rendrait les
+// pions illisibles sans qu'aucun contrôle ne s'en aperçoive.
+//
+// backdrop est ce qu'on voit autour du plateau, et n'appartient à aucune forme.
+// Il est dans le socle parce qu'une palette qui le laisserait au niveau du bâti
+// ferait disparaître les blocs du pourtour, et les pièces avec eux.
+var RequiredColors = []string{
+	"street", "building", "zone_open", "zone_closed", "backdrop",
+	"fugitive_main", "fugitive_detail",
+	"inspector_main", "inspector_detail",
+	"marker_outline", "trail", "roadblock", "crime_scene",
 }
 
-// Jeu rassemble les formes et la palette effectivement actives, après
+// ShapeSet rassemble les formes et la palette effectivement actives, après
 // application des surcharges.
-type Jeu struct {
-	Formes  map[string]Forme
+type ShapeSet struct {
+	Shapes  map[string]Shape
 	Palette Palette
 }
 
@@ -157,7 +202,7 @@ type Jeu struct {
 //
 // Renvoie tous les manquements plutôt que le premier : quelqu'un qui met au
 // point un plugin veut la liste, pas un aller-retour par erreur.
-func (j *Jeu) Validate() []error {
+func (j *ShapeSet) Validate() []error {
 	return []error{errors.New("à implémenter : étape 6")}
 }
 
@@ -167,11 +212,97 @@ func (j *Jeu) Validate() []error {
 // livré — sans quoi changer un seul pion obligerait à livrer les quarante
 // formes, et personne ne le ferait. Deux plugins qui redéfinissent la même
 // forme sont un conflit, jamais un écrasement silencieux.
-func (j *Jeu) Merge(nom string, autre *Jeu) error {
+func (j *ShapeSet) Merge(nom string, autre *ShapeSet) error {
 	return errors.New("à implémenter : étape 6")
 }
 
-// AmplitudeGrainSol est l'écart de luminosité appliqué au sol, en pourcents.
+// RimColor est le liseré que le moteur pose sous le contour des pions et des
+// marqueurs. Un plugin n'a rien à en déclarer, et ne peut pas le retirer.
+//
+// Un contour seul ne suffit pas, et c'est contre-intuitif. Il tient contre le
+// sol, qui est clair, mais un pion se dessine par-dessus les cubes situés
+// devant lui : sa moitié supérieure est en permanence sur du bâti sombre, où un
+// contour sombre ne se voit plus — 1,25 sur une face latérale. L'inverse est
+// vrai d'un contour clair, qui meurt sur la rue. Aucune couleur unique ne
+// couvre une plage de fonds qui va de 15 à 210 en luminance.
+//
+// Les deux ensemble la couvrent : quel que soit le fond, l'un des deux traits
+// tranche, et le pire cas remonte de 1,10 à 5,03.
+//
+// Valeur fixe et non nom de palette : c'est de l'éclairage, au même titre que
+// les coefficients de faces d'un prisme. Une palette qui pourrait la déplacer
+// pourrait rendre les pions illisibles, ce que le liseré existe pour empêcher.
+const RimColor = "#e8e2d4"
+
+// RimWidth est l'épaisseur du liseré, en unités de contrat. Comme toute
+// épaisseur de trait, elle est encadrée par StrokeWidth.
+const RimWidth = 2
+
+// MinStrokePixels et MaxStrokeRatio encadrent l'épaisseur de tout trait de
+// contour, celui d'un plugin comme le liseré du moteur.
+//
+// Les deux bornes traitent le même défaut par ses deux bouts, et l'une sans
+// l'autre ne fait que le déplacer. Sans plancher, une épaisseur mise à l'échelle
+// passe sous le pixel au dézoom : l'antialiasing la mêle à ce qu'elle devait
+// séparer, et le contraste réel s'effondre bien avant la valeur calculée. Sans
+// plafond, une épaisseur fixe finit par occuper la forme entière — à 24 pixels
+// par case, la tête d'un pion en fait quatre et demi, et deux pixels de liseré
+// n'en détachent plus rien : ils avalent la couleur, qui est le seul signal
+// d'appartenance à un camp.
+//
+// Le plafond porte sur la plus petite dimension du trait et non sur la case ni
+// sur la forme entière : c'est ce trait-là que le contour doit laisser voir, et
+// un trait long et fin serait avalé si l'on bornait par sa plus grande.
+//
+// Chaque trait est encadré pour lui-même, jamais leur somme : borner le total
+// reviendrait à écraser le liseré dès que le plafond mord, alors que c'est lui
+// qui porte le contraste sur le bâti.
+const (
+	MinStrokePixels = 1
+	MaxStrokeRatio  = 6
+)
+
+// MinRenderScale est le rapport en dessous duquel le rendu ne garantit plus la
+// lisibilité des pions. Vaut 24 pixels par case.
+//
+// Le plancher est un minimum en pixels : il ne dépend pas de la taille du trait
+// mais de l'échelle, et finit donc par commander partout. En dessous d'un
+// quart, la bordure d'un pion l'emporte sur son remplissage — 47 % de noyau à
+// 16 pixels par case — et la couleur cesse de dire à quel camp il appartient.
+//
+// La vue isométrique ne cherche pas à montrer le plateau entier : elle garde
+// une échelle de travail et défile en suivant le jeu, la vue d'ensemble étant
+// portée par la carte à plat affichée à côté d'elle. Ce plancher n'est donc pas
+// un compromis d'affichage mais un garde-fou : l'échelle est bornée par le haut
+// bien avant de l'atteindre, et il ne se déclenche pas en jeu normal.
+//
+// La borne haute est le champ du pion sélectionné, que la vue doit contenir en
+// entier : Span(2*portée+1) donne la place qu'il demande. Elle vaut 55 pixels
+// par case dans le pire cas prévu — une fenêtre de 1280 sur le plus grand
+// préréglage —, soit le double du plancher.
+//
+// Cette portée est la portée **nominale** du préréglage, jamais celle du tour
+// en cours. Une capacité qui double la vue ferait sinon tomber le plafond d'un
+// tiers, donc dézoomerait tout le plateau au moment de son déclenchement pour
+// le rezoomer au tour suivant : une caméra qui bouge seule quand on active une
+// capacité est déroutante, et c'est la carte à plat qui montre ce que la vue
+// isométrique ne peut plus contenir.
+const MinRenderScale = 0.375
+
+// StrokeWidth donne l'épaisseur d'un trait à l'écran, en pixels.
+//
+// unites est l'épaisseur déclarée, echelle le rapport entre la case rendue et
+// ses 64 pixels nominaux, minForme la plus petite dimension de la forme en
+// unités de contrat.
+func StrokeWidth(unites int, echelle float64, minForme int) float64 {
+	e := float64(unites) * echelle
+	if plafond := float64(minForme) * echelle / MaxStrokeRatio; e > plafond {
+		e = plafond
+	}
+	return max(e, MinStrokePixels)
+}
+
+// GroundGrainAmplitude est l'écart de luminosité appliqué au sol, en pourcents.
 //
 // Un plateau de couleurs pleines est plat à l'œil sur seize cents cases. Le
 // grain est dérivé de la position et de la graine, donc stable : le retirer au
@@ -179,11 +310,11 @@ func (j *Jeu) Merge(nom string, autre *Jeu) error {
 //
 // Luminosité seule, jamais la teinte, et le sol seulement — pions et bâtiments
 // gardent leur couleur exacte, qui doit rester identifiable d'un coup d'œil.
-// Moveé en vue de débogage, où l'uniformité aide à lire les surcouches.
-const AmplitudeGrainSol = 5
+// Coupé en vue à plat, où l'uniformité aide à lire les surcouches.
+const GroundGrainAmplitude = 5
 
 // GroundGrain renvoie l'écart de luminosité d'une case, dans
-// [-AmplitudeGrainSol, +AmplitudeGrainSol].
+// [-GroundGrainAmplitude, +GroundGrainAmplitude].
 //
 // Ce n'est pas une primitive du contrat et aucun plugin n'a à en tenir compte :
 // tous en bénéficient, y compris ceux qui ne changent que la palette.
@@ -194,7 +325,18 @@ func GroundGrain(graine int64, colonne, ligne int) int {
 
 // ToScreen projette une case du plateau en coordonnées d'écran.
 func ToScreen(colonne, ligne int) (x, y int) {
-	return (colonne - ligne) * LargeurCase / 2, (colonne + ligne) * HauteurCase / 2
+	return (colonne - ligne) * TileWidth / 2, (colonne + ligne) * TileHeight / 2
+}
+
+// Span donne l'emprise projetée d'un carré de cases, en unités du contrat.
+//
+// À écrire partout où l'on veut savoir quelle place occupe un nombre de cases :
+// dimensionner une fenêtre, tenir un champ de vision, comparer une forme au
+// terrain. Le rapport 2:1 fait qu'un carré de n cases est deux fois plus large
+// que haut, et l'oublier donne un résultat plausible et faux — le facteur écrit
+// à la main s'est trompé trois fois de suite en écrivant ce paquet.
+func Span(cases int) (largeur, hauteur int) {
+	return cases * TileWidth, cases * TileHeight
 }
 
 // ToBoard est la transformation inverse, pour le clic.

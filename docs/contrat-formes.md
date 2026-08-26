@@ -1,6 +1,6 @@
 # Contrat de formes
 
-Version du contrat : **2**
+Version du contrat : **3**
 
 Tout ce qui se dessine sur le plateau — pions, sol, bâtiments, marqueurs — est
 décrit en géométrie, jamais en image. Un plugin d'apparence est un fichier
@@ -38,8 +38,8 @@ couvrent le losange vu en projection. Rien ne s'élève, tout est à plat.
          (0,16)
 ```
 
-**Plan vertical** — pour les formes de rôle `pion` et `marqueur`, et pour la
-`hauteur` d'un prisme. L'origine est le **point d'ancrage au sol**, centre du
+**Plan vertical** — pour les formes de rôle `piece` et `marker`, et pour la
+`height` d'un prisme. L'origine est le **point d'ancrage au sol**, centre du
 losange sur lequel la forme repose. `x` va vers la droite de l'écran, `y` vers
 le haut. Le sol est donc `y = 0`, et une forme s'élève en `y` positif.
 
@@ -57,15 +57,15 @@ le haut. Le sol est donc `y = 0`, et une forme s'élève en `y` positif.
 
 | Rôle | Géométrie | Ce qui reste au moteur |
 |---|---|---|
-| `sol` — rue, zones | **aucune** | le losange, figé |
-| `batiment` | hauteur seule | l'emprise, qui est le losange |
-| `pion` — fugitif, inspecteur | libre, dans le gabarit | rien |
-| `marqueur` — trace, barrage, scène | libre, dans le gabarit | rien |
+| le sol — rue, zones | **aucune** | le losange, figé |
+| `building` | hauteur seule | l'emprise, qui est le losange |
+| `piece` — fugitif, inspecteur | libre, dans le gabarit | rien |
+| `marker` — trace, barrage, scène | libre, dans le gabarit | rien |
 
 **Le sol ne se dessine pas.** Le losange est tracé par le moteur ; un plugin
 n'en change que la couleur, par la palette. Il n'existe donc pas de
-`forme.rue` : `rue`, `zone_ouverte` et `zone_fermee` sont des noms de couleurs,
-pas des formes.
+`shape.street` : `street`, `zone_open` et `zone_closed` sont des noms de
+couleurs, pas des formes.
 
 La raison est mécanique. Un losange identique pour toutes les cases, c'est une
 géométrie construite une fois pour les seize cents, un tri en profondeur qui
@@ -94,6 +94,16 @@ Un bâtiment plus haut serait plus joli et masquerait les cases derrière lui �
 sur un jeu qui porte entièrement sur ce qu'on voit, ce n'est pas un choix
 esthétique. Le plafond de 24 vaut une demi-case.
 
+Le calcul est celui des marqueurs, pas celui des pions. Une case cachée par le
+bâtiment devant elle l'est sur `[0, h]` d'un losange qui va de 0 à 32 : un pion
+dépasse dans tous les cas, mais le sommet d'un marqueur est à 28. À 24 il en
+reste 4 de visible, à 32 plus rien — et selon le préréglage, 64 à 72 % des cases
+de rue ont du bâti juste devant. Trace, barrage et scène y disparaîtraient.
+
+**Tous les bâtiments d'une partie ont la même hauteur, et rien ne s'empile.**
+C'est ce qui rend l'occlusion prévisible : un joueur doit pouvoir dire d'un coup
+d'œil ce qui est caché, sans mesurer.
+
 Le gabarit est vérifié au chargement, pas seulement à la publication : un
 plugin local qui déborde est refusé de la même façon. Une forme qui masque les
 cases voisines est un avantage de jeu déguisé en habillage.
@@ -104,25 +114,25 @@ cases voisines est un avantage de jeu déguisé en habillage.
 
 Les traits sont dessinés dans l'ordre de déclaration, le dernier par-dessus.
 
-### polygone
+### polygon
 
 Surface pleine. De 3 à 32 sommets, fermée automatiquement.
 
 ```toml
-[[forme.fugitif.trait]]
-type = "polygone"
+[[shape.fugitive.stroke]]
+type = "polygon"
 points = [[-14, 0], [14, 0], [12, 10], [6, 10], [3, 16], [-8, 16], [-12, 10]]
-couleur = "fugitif_principal"
+color = "fugitive_main"
 ```
 
-### cercle
+### circle
 
 ```toml
-[[forme.fugitif.trait]]
-type = "cercle"
-centre = [-8, 4]
+[[shape.fugitive.stroke]]
+type = "circle"
+center = [-8, 4]
 radius = 4
-couleur = "fugitif_detail"
+color = "fugitive_detail"
 ```
 
 ### segment
@@ -130,38 +140,126 @@ couleur = "fugitif_detail"
 Trait épais, extrémités arrondies.
 
 ```toml
-[[forme.inspecteur.trait]]
+[[shape.inspector.stroke]]
 type = "segment"
-de = [0, 20]
-a = [0, 34]
-epaisseur = 3
-couleur = "inspecteur_detail"
+from = [0, 20]
+to = [0, 34]
+thickness = 3
+color = "inspector_detail"
 ```
 
-### prisme
+### prism
 
-Le losange de la case, extrudé. Réservé au rôle `batiment`, et seul trait qu'il
+Le losange de la case, extrudé. Réservé au rôle `building`, et seul trait qu'il
 accepte.
 
 ```toml
-[[forme.batiment.trait]]
-type = "prisme"
-hauteur = 12
-couleur = "batiment"
+[[shape.building.stroke]]
+type = "prism"
+height = 12
+color = "building"
 ```
 
-L'emprise n'est pas déclarable : c'est le losange, toujours. Le moteur assombrit
-les faces latérales selon leur orientation à partir de la couleur donnée — un
-plugin ne gère ni l'éclairage, ni l'ordre des faces, ni la forme au sol.
+L'emprise n'est pas déclarable : c'est le losange, toujours. Le moteur dérive
+les trois faces de la couleur donnée — un plugin ne gère ni l'éclairage, ni
+l'ordre des faces, ni la forme au sol.
+
+| Face | Coefficient |
+|---|---|
+| dessus | × 1,50 |
+| droite | × 1,14 |
+| gauche | × 0,72 |
+
+Le coefficient s'applique aux trois canaux, ce qui préserve la teinte. Il est
+écrit ici parce que c'est exactement le genre de détail que deux implémentations
+règlent différemment sans que personne ne s'en aperçoive avant de comparer deux
+captures.
 
 ### Attributs communs
 
 | Clé | Valeur | Par défaut |
 |---|---|---|
-| `couleur` | nom de palette | obligatoire |
-| `contour` | nom de palette | aucun |
-| `epaisseur_contour` | 1 à 4 | 1 |
-| `opacite` | 0 à 100 | 100 |
+| `color` | nom de palette | obligatoire |
+| `outline` | nom de palette | aucun |
+| `outline_thickness` | 1 à 4 | 1 |
+| `opacity` | 0 à 100 | 100 |
+
+**`opacity` se paie.** Une valeur inférieure à 100 compose la couleur avec la
+case en dessous, contour compris : la même forme devient claire sur la rue et
+sombre sur une zone fermée, donc invisible dans les deux cas. C'est pour cette
+raison qu'aucune forme livrée n'en pose. Ce qui tient un marqueur à sa place
+d'indice, c'est sa finesse et le fait qu'il reste au sol, pas son effacement.
+
+### Le liseré, posé par le moteur
+
+Sous le contour de toute forme de rôle `piece` ou `marker`, le moteur pose un
+liseré clair d'une unité. **Rien à déclarer, et rien à retirer.**
+
+Un contour seul ne suffit pas, et c'est le point le moins évident du contrat. Il
+tient contre le sol, qui est clair. Mais un pion se dessine par-dessus les cubes
+situés devant lui : sa moitié supérieure est en permanence sur du bâti sombre,
+où un contour sombre ne se voit plus. L'inverse vaut pour un contour clair, qui
+meurt sur la rue. Les fonds possibles vont de 15 à 210 en luminance ; aucune
+couleur unique ne les couvre.
+
+| Fond | Contour seul | Avec liseré |
+|---|---|---|
+| hors plateau | 1,10 | **14,62** |
+| face latérale d'un bâtiment | 1,25 | **10,69** |
+| dessus d'un bâtiment | 2,65 | **5,03** |
+| zone fermée | 2,21 | **6,01** |
+| rue | 11,41 | 11,41 |
+
+C'est de l'éclairage et non une couleur de plugin, au même titre que les
+coefficients de faces. Une palette qui pourrait le déplacer pourrait rendre les
+pions illisibles, ce que le liseré existe précisément pour empêcher.
+
+**Toute épaisseur de contour est encadrée par deux bornes**, celle d'un plugin
+comme le liseré du moteur : jamais moins d'**un pixel d'écran**, jamais plus
+d'**un sixième de la plus petite dimension de la forme**. Entre les deux, elle
+suit le zoom comme le reste de la géométrie.
+
+Les deux bornes traitent le même défaut par ses deux bouts. Sans plancher, une
+épaisseur mise à l'échelle passe sous le pixel au dézoom : l'antialiasing la mêle
+à ce qu'elle devait séparer, et le contraste réel s'effondre bien avant la valeur
+calculée — or c'est au plateau entier qu'on cherche où sont les pions. Sans
+plafond, une épaisseur fixe finit par occuper la forme entière : à 24 pixels par
+case, la tête d'un pion en fait quatre et demi, et deux pixels de liseré n'en
+détachent plus rien. Ils avalent la couleur, qui est le seul signal
+d'appartenance à un camp.
+
+Le plafond porte sur le trait et non sur la case ni sur la forme entière : c'est
+ce trait-là que le contour doit laisser voir, et un trait long et fin serait
+avalé si l'on bornait par sa plus grande dimension. Chaque trait est encadré
+pour lui-même, jamais leur somme — borner le total reviendrait à écraser le
+liseré dès que le plafond mord, alors que c'est lui qui porte le contraste sur
+le bâti.
+
+Ce que les deux bornes garantissent, c'est qu'**un pion garde un remplissage
+majoritaire** : 64 % de sa tête à 64 et 32 pixels par case, 57 % à 24. C'est la
+couleur qui dit à quel camp il appartient, et elle ne doit pas se faire manger
+par ce qui sert à la détacher.
+
+**La propriété ne vaut que pour le rôle `piece`.** Un marqueur peut être plus
+fin que ses bordures — la trace l'est, à 27 % de son épaisseur à 24 pixels par
+case — et ce n'est pas un défaut : sa lisibilité vient précisément de ses
+bordures, et il ne porte aucune identité de camp.
+
+**En dessous de 24 pixels par case, le rendu ne garantit plus rien.** Le
+plancher étant un minimum en pixels, il ne dépend pas de la taille du trait mais
+de l'échelle, et finit par commander partout : à 16 pixels par case, la tête
+d'un pion tombe à 47 % de remplissage. Le plateau entier tient dans 984 sur 556
+pixels à cette limite ; en dessous, la vue défile plutôt que de continuer à
+réduire.
+
+La marge est mince et il vaut mieux le savoir : le plus grand préréglage fait 41
+cases de côté, ce qui donne 42 pixels par case sur un écran de 1920 de large,
+mais 28 sur un 1280.
+
+Conséquence à connaître avant l'étape 7 : **le halo clair autour d'une pièce est
+désormais pris.** C'est la convention habituelle pour « sélectionné » ou
+« jouable », et elle n'est plus disponible. Les surcouches `cell_visible` et
+`cell_playable` marquent donc le sol, jamais le pourtour d'un pion.
 
 ---
 
@@ -180,25 +278,42 @@ géométrie.
 qualifie le fichier, pas la palette.
 
 ```toml
-shapes_version = 2
+shapes_version = 3
 
 [palette]
-rue = "#d8d2c4"
-batiment = "#3a3f4a"
-zone_ouverte = "#7fa86b"
-zone_fermee = "#6b4a4a"
-fugitif_principal = "#c85a3c"
-fugitif_detail = "#8a3a26"
-inspecteur_principal = "#2f5f8f"
-inspecteur_detail = "#1c3d5c"
-trace = "#a89c84"
-barrage = "#8a7a4a"
+street = "#d8d2c4"
+building = "#3a3f4a"
+zone_open = "#7fa86b"
+zone_closed = "#6b4a4a"
+backdrop = "#0f1116"
+fugitive_main = "#e07a45"
+fugitive_detail = "#2a1a10"
+inspector_main = "#2a5580"
+inspector_detail = "#101c2a"
+marker_outline = "#241d16"
+trail = "#f0e6c8"
+roadblock = "#8a7a4a"
+crime_scene = "#9b2c2c"
 ```
 
+Les noms en `_detail` et `marker_outline` sont des **contours**, pas des nuances
+d'accompagnement, et c'est la contrainte la moins évidente de la palette. Une
+forme se pose indifféremment sur la rue, une zone ouverte ou une zone fermée,
+dont les luminances vont de 210 à 82 : aucun remplissage ne se détache des
+trois. Une palette qui remonterait ses contours au niveau de ses remplissages
+rendrait pions et marqueurs illisibles sur les sols sombres, sans qu'aucun
+contrôle ne puisse le voir.
+
+`backdrop` est ce qu'on voit autour du plateau, et n'appartient à aucune forme.
+Il doit être franchement plus sombre que `building` : à égalité, les blocs du
+pourtour perdent leur silhouette et la ville se dissout sur ses bords, avec les
+pièces qui s'y trouvent.
+
 Les noms ci-dessus sont **obligatoires** : ils constituent le socle sur lequel
-toute forme peut compter. `rue`, `zone_ouverte` et `zone_fermee` n'ont d'ailleurs
-pas d'autre existence — ce sont les seules prises qu'un plugin a sur le sol. Une palette peut en ajouter, et une forme qui
-référence un nom ajouté doit livrer la palette qui le définit.
+toute forme peut compter. `street`, `zone_open` et `zone_closed` n'ont
+d'ailleurs pas d'autre existence — ce sont les seules prises qu'un plugin a sur
+le sol. Une palette peut en ajouter, et une forme qui référence un nom ajouté
+doit livrer la palette qui le définit.
 
 ---
 
@@ -211,12 +326,12 @@ Changer l'allure du fugitif tient donc en un dossier et deux fichiers :
 
 ```
 mes-vehicules/
-  manifeste.toml
-  formes.toml
+  manifest.toml
+  shapes.toml
 ```
 
 ```toml
-# manifeste.toml
+# manifest.toml
 name = "mes-vehicules"
 version = "1.0.0"
 rules = false
@@ -225,26 +340,26 @@ description = "Le fugitif en voiture, les inspecteurs en gyrophare"
 ```
 
 ```toml
-# formes.toml
-shapes_version = 2
+# shapes.toml
+shapes_version = 3
 
-[forme.fugitif]
-[[forme.fugitif.trait]]
-type = "polygone"
+[shape.fugitive]
+[[shape.fugitive.stroke]]
+type = "polygon"
 points = [[-16, 0], [16, 0], [14, 8], [8, 8], [4, 15], [-10, 15], [-14, 8]]
-couleur = "fugitif_principal"
+color = "fugitive_main"
 
-[[forme.fugitif.trait]]
-type = "cercle"
-centre = [-9, 2]
+[[shape.fugitive.stroke]]
+type = "circle"
+center = [-9, 2]
 radius = 3
-couleur = "fugitif_detail"
+color = "fugitive_detail"
 
-[[forme.fugitif.trait]]
-type = "cercle"
-centre = [9, 2]
+[[shape.fugitive.stroke]]
+type = "circle"
+center = [9, 2]
 radius = 3
-couleur = "fugitif_detail"
+color = "fugitive_detail"
 ```
 
 Rien d'autre n'est nécessaire. Le sol, les bâtiments et les inspecteurs restent
@@ -264,7 +379,7 @@ déclarer.**
 Il peut le faire, à titre optionnel, en nommant la variante :
 
 ```toml
-[forme.fugitif.surligne]
+[shape.fugitive.highlighted]
 ```
 
 En son absence, la variante automatique s'applique. C'est le défaut recommandé :
@@ -277,17 +392,17 @@ rendu.
 
 | Nom | Rôle |
 |---|---|
-| `batiment` | case bloquante |
-| `fugitif` | pion du fugitif |
-| `inspecteur` | pion d'inspecteur, teinté par numéro |
-| `inspecteur_1` … `inspecteur_5` | surcharge par pion, facultative |
-| `trace` | passage découvert |
-| `barrage` | case fermée par le Barreur |
-| `scene` | lieu d'un meurtre, connu des deux camps |
-| `case_visible`, `case_jouable` | marqueurs de surcouche |
+| `building` | case bloquante |
+| `fugitive` | pion du fugitif |
+| `inspector` | pion d'inspecteur, teinté par numéro |
+| `inspector_1` … `inspector_5` | surcharge par pion, facultative |
+| `trail` | passage découvert |
+| `roadblock` | case fermée par le Barreur |
+| `crime_scene` | lieu d'un meurtre, connu des deux camps |
+| `cell_visible`, `cell_playable` | marqueurs de surcouche |
 
-`inspecteur_1` à `5` n'existent que pour qui veut distinguer les cinq
-capacités. En leur absence, `inspecteur` sert aux cinq, teinté.
+`inspector_1` à `5` n'existent que pour qui veut distinguer les cinq
+capacités. En leur absence, `inspector` sert aux cinq, teinté.
 
 Les cases de rue et les zones d'extraction n'apparaissent pas : ce sont des
 couleurs, pas des formes.
@@ -301,7 +416,7 @@ Contrôles appliqués au chargement comme à la publication :
 - schéma respecté, `shapes_version` connue ;
 - tout point à l'intérieur du gabarit du rôle ;
 - nombre de traits sous le plafond, polygones de 3 à 32 sommets ;
-- toute `couleur` et tout `contour` résolus dans la palette active ;
+- toute `color` et tout `outline` résolus dans la palette active ;
 - aucune valeur hexadécimale dans une forme ;
 - pour un plugin d'apparence, `rules = false` **et** absence de toute
   capacité, dépense, effet ou module exécutable. La déclaration ne suffit pas,
@@ -338,7 +453,7 @@ bruit :
 - **le sol seulement.** Pions et bâtiments gardent leur couleur exacte, qui doit
   rester identifiable d'un coup d'œil.
 
-Il se coupe entièrement en vue de débogage, où l'uniformité aide à lire les
+Il se coupe entièrement en vue à plat, où l'uniformité aide à lire les
 surcouches.
 
 Conséquence à accepter : deux plateaux de graines différentes n'ont pas le même

@@ -88,7 +88,20 @@ Toujours pas de pixel à l'écran — le contrat se teste sur des fichiers.
 ## 7 — Vue isométrique
 
 Projection, tri en profondeur, caméra, clic, grain du sol, occlusion. Plus la
-vue de débogage 2D, écrite en premier et gardée en permanence.
+vue à plat, écrite en premier.
+
+**Les deux vues sont affichées ensemble**, l'isométrique et la carte à plat dans
+un panneau à côté d'elle. Pas un basculement : ce sont deux vues de jeu, et on a
+besoin des deux en même temps.
+
+L'isométrique ne montre jamais le plateau entier et n'essaie pas. Elle garde une
+échelle de travail confortable et défile en suivant le jeu, y compris sur le
+plus petit préréglage. La carte à plat porte la vue d'ensemble que
+l'isométrique abandonne — c'est là que le fugitif planifie un itinéraire et que
+les inspecteurs répartissent une couverture.
+
+Elle passe par `ViewFor` comme tout le reste : celle des inspecteurs ne montre
+pas le fugitif.
 
 **La fenêtre s'adapte, elle n'impose pas.** Redimensionnement libre, plein
 écran, et mise à l'échelle selon le facteur du moniteur — sur un écran très

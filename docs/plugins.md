@@ -20,10 +20,10 @@ enregistrer.
 filature                l'exécutable, qui se suffit à lui-même
 plugins/
   mes-vehicules/
-    manifeste.toml      obligatoire
-    formes.toml         facultatif
+    manifest.toml      obligatoire
+    shapes.toml         facultatif
     palette.toml        facultatif
-    langue.toml         facultatif
+    language.toml         facultatif
 ```
 
 **Le contenu livré n'est pas dans ce dossier** : règles, formes, palette,
@@ -35,7 +35,7 @@ disque. C'est le chemin d'un traducteur qui part de l'anglais, ou de quiconque
 veut voir comment une capacité est déclarée avant d'écrire la sienne. La
 commande n'écrase jamais un fichier existant.
 
-`manifeste.toml` est le seul fichier obligatoire. Les autres n'existent que si
+`manifest.toml` est le seul fichier obligatoire. Les autres n'existent que si
 le plugin les remplit.
 
 **Le contenu livré passe par le même chemin que le vôtre.** Il vient d'un
@@ -45,7 +45,7 @@ chemin est exercé à chaque partie, plutôt qu'une fois de temps en temps.
 
 ---
 
-## 2. `manifeste.toml`
+## 2. `manifest.toml`
 
 ### Identité
 
@@ -164,7 +164,7 @@ ce qui se passe, le paramètre dit quand.
 
 ## 5. Apparence
 
-`formes.toml` et `palette.toml`, tous deux facultatifs et indépendants l'un de
+`shapes.toml` et `palette.toml`, tous deux facultatifs et indépendants l'un de
 l'autre. Un plugin de palette seule est le mod le moins cher qui existe : un
 fichier de quinze lignes, aucune géométrie.
 
@@ -188,12 +188,12 @@ dictionnaire, et un plugin de langue en fournit un.
 
 ```
 mes-traductions/
-  manifeste.toml
-  langue.toml
+  manifest.toml
+  language.toml
 ```
 
 ```toml
-# manifeste.toml
+# manifest.toml
 name = "filature-de"
 version = "1.0.0"
 license = "CC0-1.0"
@@ -210,7 +210,7 @@ sélecteur : quelqu'un qui cherche sa langue y cherche « Deutsch », pas
 « allemand ».
 
 ```toml
-# langue.toml
+# language.toml
 [label]
 menu_nouvelle_partie = "Neues Spiel"
 camp_fugitif = "Flüchtiger"
@@ -297,12 +297,12 @@ point un plugin veut la liste, pas un aller-retour par erreur.
 
 ```
 $ filature validate mon-plugin/
-mon-plugin/manifeste.toml:23: ability.lookout.effect[0].target
+mon-plugin/manifest.toml:23: ability.lookout.effect[0].target
     « pion » n'est pas une cible connue
     attendu : current_piece, all_pieces, other_piece, fugitive, cell, zone
-mon-plugin/manifeste.toml: effects_version
+mon-plugin/manifest.toml: effects_version
     obligatoire dès qu'une capacité, une dépense ou un mode est déclaré
-mon-plugin/formes.toml:41: shape.fugitive.stroke[2].points[3]
+mon-plugin/shapes.toml:41: shape.fugitive.stroke[2].points[3]
     y vaut 48, hors du gabarit du rôle pion (0 à 40)
 
 3 manquements

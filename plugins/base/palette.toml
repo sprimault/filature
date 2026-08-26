@@ -1,10 +1,16 @@
 # Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
 # SPDX-License-Identifier: Apache-2.0
 
-# Palette livrée. Les noms de CouleursObligatoires doivent tous y figurer : une
-# forme tierce s'appuie dessus sans savoir quelle palette sera active.
+# Palette livrée. Les noms de RequiredColors doivent tous y figurer : une forme
+# tierce s'appuie dessus sans savoir quelle palette sera active.
+#
+# Les valeurs ne sont pas choisies au jugé. Un pion se pose indifféremment sur
+# la rue, une zone ouverte ou une zone fermée, dont les luminances vont de 210 à
+# 82 : aucune couleur de remplissage ne peut se détacher des trois à la fois.
+# C'est le contour qui porte la silhouette, et le remplissage qui ne porte plus
+# que l'identité du camp.
 
-shapes_version = 2
+shapes_version = 3
 
 [palette]
 
@@ -14,19 +20,45 @@ street = "#d8d2c4"
 zone_open = "#7fa86b"
 zone_closed = "#6b4a4a"
 
+# Ce qu'on voit autour du plateau. Bien plus sombre que le bâti, faute de quoi
+# les blocs du pourtour n'ont plus de silhouette et la ville se dissout sur ses
+# bords — avec eux les pièces qui s'y trouvent.
+#
+# Sombre plutôt que clair : un fond clair détacherait mieux le bâti, mais il
+# effacerait les rues de bordure, qui sont claires elles aussi.
+backdrop = "#0f1116"
+
 # Le bâti, nettement plus sombre que la rue : c'est le contraste sol / obstacle
 # qui porte la lecture du plateau, avant toute autre distinction.
 building = "#3a3f4a"
 
-# Les pions. Chaud contre froid, pour que les deux camps se distinguent même
-# sur une capture en niveaux de gris.
-fugitive_main = "#c85a3c"
-fugitive_detail = "#8a3a26"
-inspector_main = "#2f5f8f"
-inspector_detail = "#1c3d5c"
+# Les pions. Chaud contre froid, et surtout clair contre sombre : c'est l'écart
+# de luminance qui sépare les deux camps sur une capture en niveaux de gris ou
+# pour un daltonien, pas la teinte. Soixante-neuf niveaux entre les deux.
+fugitive_main = "#e07a45"
+inspector_main = "#2a5580"
+
+# Les contours. Presque noirs, et c'est le point : un remplissage clair meurt
+# sur la rue, un remplissage sombre meurt sur une zone fermée, mais un contour
+# à ce niveau tient partout — 11,1 sur la rue, 6,2 sur une zone ouverte, 2,2 sur
+# une zone fermée, où le remplissage prend le relais.
+#
+# Teintés plutôt que gris neutres : ils bordent aussi la tête du pion, et un
+# gris franc y ferait une tache morte.
+fugitive_detail = "#2a1a10"
+inspector_detail = "#101c2a"
 
 # Les marqueurs, tenus près du sol pour ne pas concurrencer les pions.
-trail = "#a89c84"
+#
+# La trace est claire là où les autres sont sombres : c'est le seul moyen de la
+# lire sur une zone fermée, où elle a autant de sens qu'ailleurs — le fugitif
+# traverse les zones. Son contour la rattrape sur la rue.
+#
+# Un seul contour pour les quatre : un barrage posé sur une zone ouverte et une
+# scène sur une zone fermée sont aussi peu lisibles que la trace l'était, et le
+# premier cas se produit dès qu'une partie dure.
+marker_outline = "#241d16"
+trail = "#f0e6c8"
 roadblock = "#8a7a4a"
 
 # La scène est la seule exception : un meurtre est public et coûte cher, il se

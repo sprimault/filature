@@ -133,7 +133,7 @@
         },
         "reason": {
           "type": "string",
-          "description": "Le jeu de base en produit quatre : extraction, resistance_epuisee, fugitif_bloque, temps_ecoule. Un greffon de regles peut en produire d'autres, d'ou l'absence de liste fermee ; les greffons actifs sont annonces dans bonjour."
+          "description": "Le jeu de base en produit quatre : extraction, resistance_epuisee, fugitif_bloque, temps_ecoule. Un plugin de regles peut en produire d'autres, d'ou l'absence de liste fermee ; les plugins actifs sont annonces dans bonjour."
         },
         "turn": {
           "type": "integer"

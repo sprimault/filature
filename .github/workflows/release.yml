@@ -135,7 +135,7 @@ jobs:
       # c'est ce qui évite de la réécrire ici, où personne ne la relirait.
       #
       # Une section absente arrête la publication. Une version sans notes ne dit
-      # ni ce qui change, ni ce qu'un auteur de greffon doit reprendre — ce que
+      # ni ce qui change, ni ce qu'un auteur de plugin doit reprendre — ce que
       # les règles du projet exigent en tête.
       - name: Notes de version
         run: |

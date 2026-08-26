@@ -40,8 +40,9 @@ là où l'on écrivait `exemples` et `valide`.
 **Tout passe à l'anglais, contrats publics compris.** Les trois numéros
 l'annoncent, et changent de nom au passage : `version_effets` devient
 `effects_version`, `version_formes` devient `shapes_version`, `protocole`
-devient `protocol` — et tous trois valent 2. Un plugin écrit contre la version 1
-est refusé au chargement plutôt qu'appliqué de travers.
+devient `protocol`. `effects_version` et `protocol` valent 2, `shapes_version`
+vaut 3. Un plugin écrit contre une version antérieure est refusé au chargement
+plutôt qu'appliqué de travers.
 
 Ce qu'un auteur de plugin doit reprendre : les clés de son manifeste — `nom`
 devient `name`, `regles` devient `rules`, `capacite` devient `ability` — et les
@@ -57,6 +58,20 @@ version où ce changement était sans conséquence.
 Le mot « greffon » disparaît du projet au profit de « plugin », partout — code,
 documentation et libellés. Il est exclusivement français, absent de l'usage
 courant, et il ne se cherche pas.
+
+**Ce qu'un auteur de plugin d'apparence doit reprendre.** Deux couleurs entrent
+au socle obligatoire : `backdrop`, ce qu'on voit autour du plateau, et
+`marker_outline`, le contour des quatre marqueurs. Une palette qui ne les
+déclare pas est refusée.
+
+Le moteur pose désormais un liseré clair sous le contour des pions et des
+marqueurs, et encadre toute épaisseur de contour — jamais moins d'un pixel
+d'écran, jamais plus d'un sixième de la plus petite dimension du trait. Rien à
+déclarer, rien à retirer. En dessous de 24 pixels par case, le rendu ne garantit
+plus la lisibilité des pions et la vue défile plutôt que de réduire.
+
+Les faces d'un bâtiment sont dérivées de sa couleur par trois coefficients fixes
+— 1,50 pour le dessus, 1,14 et 0,72 pour les côtés — que le contrat énonce.
 
 ### Ajouté
 - **Le binaire joue.** Lancé sans argument, il donne la main aux inspecteurs
@@ -97,9 +112,10 @@ used to write `exemples` and `valide`.
 
 **Everything moves to English, public contracts included.** The three numbers
 say so, and are renamed on the way: `version_effets` becomes `effects_version`,
-`version_formes` becomes `shapes_version`, `protocole` becomes `protocol` — and
-all three are now 2. A plugin written against version 1 is refused at load
-rather than applied wrongly.
+`version_formes` becomes `shapes_version`, `protocole` becomes `protocol`.
+`effects_version` and `protocol` are now 2, `shapes_version` is 3. A plugin
+written against an earlier version is refused at load rather than applied
+wrongly.
 
 What a plugin author must revisit: their manifest keys — `nom` becomes `name`,
 `regles` becomes `rules`, `capacite` becomes `ability` — and the values written
@@ -114,6 +130,19 @@ existed, but this is the last release where that change came free.
 The word « greffon » is gone from the project in favour of « plugin », everywhere —
 code, documentation and labels. It is exclusively French, absent from common
 usage, and nobody searches for it.
+
+**What an appearance plugin author must revisit.** Two colours join the required
+set: `backdrop`, what surrounds the board, and `marker_outline`, the outline of
+all four markers. A palette that declares neither is refused.
+
+The engine now lays a light rim beneath the outline of pieces and markers, and
+bounds every outline width — never below one screen pixel, never above one sixth
+of the stroke's smallest dimension. Nothing to declare, nothing to remove. Below
+24 pixels per tile, rendering no longer guarantees piece legibility and the view
+scrolls rather than shrinking further.
+
+A building's faces are derived from its colour by three fixed coefficients —
+1.50 for the top, 1.14 and 0.72 for the sides — which the contract states.
 
 ### Added
 - **The binary plays.** Run with no argument, it hands you the inspectors

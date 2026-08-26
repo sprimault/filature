@@ -12,17 +12,17 @@ import (
 // sont enregistrées avec la partie : une sauvegarde reste rejouable même si les
 // valeurs par défaut changent.
 type Settings struct {
-	Size                int `json:"size"`
-	Range               int `json:"range"`
-	Turns               int `json:"turns"`
-	Stamina             int `json:"stamina"`
-	Inspectors          int `json:"inspectors"`
-	PiecesPerTurn       int `json:"pieces_per_turn"`
-	RevealPeriod        int `json:"reveal_period"`
-	Zones               int `json:"zones"`
-	TrailLifetime       int `json:"trail_lifetime"`
-	StranglingStart     int `json:"strangling_start"`
-	PeriodeEtranglement int `json:"strangling_period"`
+	Size             int `json:"size"`
+	Range            int `json:"range"`
+	Turns            int `json:"turns"`
+	Stamina          int `json:"stamina"`
+	Inspectors       int `json:"inspectors"`
+	PiecesPerTurn    int `json:"pieces_per_turn"`
+	RevealPeriod     int `json:"reveal_period"`
+	Zones            int `json:"zones"`
+	TrailLifetime    int `json:"trail_lifetime"`
+	StranglingStart  int `json:"strangling_start"`
+	StranglingPeriod int `json:"strangling_period"`
 }
 
 // DefaultSettings correspond au préréglage « Ville ». Les valeurs sont
@@ -30,17 +30,17 @@ type Settings struct {
 // PiecesPerTurn.
 func DefaultSettings() Settings {
 	return Settings{
-		Size:                41,
-		Range:               8,
-		Turns:               40,
-		Stamina:             10,
-		Inspectors:          5,
-		PiecesPerTurn:       3,
-		RevealPeriod:        4,
-		Zones:               6,
-		TrailLifetime:       6,
-		StranglingStart:     30,
-		PeriodeEtranglement: 2,
+		Size:             41,
+		Range:            8,
+		Turns:            40,
+		Stamina:          10,
+		Inspectors:       5,
+		PiecesPerTurn:    3,
+		RevealPeriod:     4,
+		Zones:            6,
+		TrailLifetime:    6,
+		StranglingStart:  30,
+		StranglingPeriod: 2,
 	}
 }
 
