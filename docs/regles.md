@@ -182,6 +182,10 @@ savent qu'il s'est appauvri.
 **Contact** : 1 point par inspecteur orthogonalement adjacent en fin de tour,
 plafond de 3 par tour. Les diagonales ne comptent pas.
 
+**Une dépense ne peut pas prendre le dernier point.** À zéro le fugitif est
+vaincu sur-le-champ, donc ce qu'il vient d'acheter ne lui sert à rien : il lui
+faut toujours en garder un.
+
 Un fugitif à 2 points est acculé même s'il est encore libre : il n'a plus les
 moyens de percer un barrage. La jauge cesse d'être subie, chaque point devient
 un arbitrage.

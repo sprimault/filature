@@ -18,8 +18,9 @@ deviner.
 
 ## État
 
-**Le binaire ne joue pas encore** : la boucle de jeu est l'étape 5, le rendu
-l'étape 7.
+**Le binaire joue, en texte.** Le rendu isométrique est l'étape 7, le mode
+réseau l'étape 12, et l'adversaire tire encore ses coups au hasard — la véritable
+IA vient aux étapes 9 et 10.
 
 - [`docs/regles.md`](docs/regles.md) — la spécification complète
 - [`ROADMAP.md`](ROADMAP.md) — les étapes, et ce qui est hors périmètre v1
@@ -38,21 +39,26 @@ premier lancement.
 
 ### Les commandes
 
-Deux commandes se lancent depuis un terminal, pas en double-cliquant — leur
+Le jeu et ses commandes se lancent depuis un terminal, pas en double-cliquant — leur
 sortie est du texte, et une fenêtre ouverte par l'explorateur se referme avant
 qu'on ait pu lire quoi que ce soit.
 
 ```
+filature                      joue une partie, en texte
 filature version              le numéro de la version installée
 filature examples <dossier>   écrit les plugins livrés, pour servir de modèle
-filature validate <dossier>     contrôle un plugin et affiche son empreinte
+filature validate <dossier>   contrôle un plugin et affiche son empreinte
 ```
 
-`valide` applique exactement les contrôles du chargement, et liste tout ce qui
+Lancé sans argument, le jeu vous donne le camp des inspecteurs face à un
+adversaire. `--camp fugitive` prend l'autre rôle, `--camp watch` regarde deux
+machines s'affronter. `--preset` choisit la taille, `--graine` la partie.
+
+`validate` applique exactement les contrôles du chargement, et liste tout ce qui
 cloche d'un coup plutôt qu'une faute à la fois. Un plugin qu'il accepte se
 chargera chez ceux à qui vous le donnez.
 
-`exemples` ne peut pas écrire dans le dossier des plugins actifs, et le refuse
+`examples` ne peut pas écrire dans le dossier des plugins actifs, et le refuse
 en le disant : ce qu'il en sort est déjà dans le binaire, l'y remettre le
 déclarerait deux fois. Ce sont des modèles à recopier sous un autre nom.
 

@@ -99,7 +99,7 @@ func readManifest(source fs.FS, dossier string) (*manifeste, error) {
 // validate applique les refus de docs/plugins.md §9 et rend tout ce qui cloche.
 //
 // Tous les manquements, et non le premier : un auteur de plugin qui corrige
-// une ligne pour en découvrir une autre au lancement next y passe la soirée.
+// une ligne pour en découvrir une autre au lancement qui y passe la soirée.
 // C'est aussi ce qui donne son intérêt à « filature valide ».
 //
 // Rien n'est versé dans un registre tant qu'il en reste un : un plugin à

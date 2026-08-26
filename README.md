@@ -17,7 +17,9 @@ have to guess.
 
 ## Status
 
-**The binary does not play yet**: the game loop is step 5, rendering step 7.
+**The binary plays, in text.** Isometric rendering is step 7, network play step
+12, and the opponent still draws its moves at random — the real AI comes with
+steps 9 and 10.
 
 - [`docs/regles.md`](docs/regles.md) — the full specification (French)
 - [`ROADMAP.md`](ROADMAP.md) — the steps, and what is out of scope for v1

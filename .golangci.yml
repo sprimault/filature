@@ -30,14 +30,6 @@ linters:
           - unused
         path: internal/(core|render|loader|ai)/
 
-      # executer ne renvoie pour l'instant qu'une erreur de stub, donc le test
-      # qui suit son appel est toujours vrai et staticcheck le dit. À retirer à
-      # l'étape 5, quand la boucle de jeu pourra rendre la main sans échouer.
-      - linters:
-          - staticcheck
-        text: SA4023
-        path: cmd/filature/main.go
-
 formatters:
   enable:
     - gofmt

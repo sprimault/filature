@@ -5,10 +5,10 @@ package core
 
 import "sort"
 
-// LegalMoves énumère ce que l'acteur peut play dans la phase courante.
+// LegalMoves énumère ce que l'acteur peut jouer dans la phase courante.
 //
 // C'est la seule source de vérité sur la légalité : l'interface s'en sert pour
-// surligner les cases, l'IA pour explorer, le serveur pour validate ce qui
+// surligner les cases, l'IA pour explorer, le serveur pour valider ce qui
 // arrive du réseau. Aucun de ces trois ne réimplémente la règle.
 func (p *Game) LegalMoves(a Side) []Move {
 	switch p.Phase {
@@ -195,6 +195,11 @@ func (p *Game) fugitiveMoves() []Move {
 //
 // Le changement de zone est une dépense comme une autre, mais porte un type de
 // coup distinct : il désigne une zone, que les autres n'ont pas à porter.
+//
+// Il ne peut pas y engager son dernier point. À zéro l'arbitre le déclare
+// vaincu, donc l'effet acheté ne servirait jamais : ce n'est pas une liberté
+// qu'on lui retire mais un piège qu'on referme. Un cerveau qui tire au hasard
+// s'y ruinait en deux tours, ce qu'aucun joueur n'aurait fait.
 func (p *Game) expenseMoves() []Move {
 	if p.Extensions == nil {
 		return nil
@@ -209,7 +214,7 @@ func (p *Game) expenseMoves() []Move {
 	var coups []Move
 	for _, cle := range cles {
 		d := p.Extensions.Expenses[cle]
-		if d.Camp != SideFugitive || d.Cost > p.Fugitive.Stamina {
+		if d.Camp != SideFugitive || d.Cost >= p.Fugitive.Stamina {
 			continue
 		}
 		if d.Uses > 0 && p.ExpenseUses[cle] >= d.Uses {
@@ -232,7 +237,7 @@ func (p *Game) changeZoneMoves() []Move {
 		return nil
 	}
 	d, connue := p.Extensions.Expenses[ExpenseChangeZone]
-	if !connue || d.Cost > p.Fugitive.Stamina {
+	if !connue || d.Cost >= p.Fugitive.Stamina {
 		return nil
 	}
 
