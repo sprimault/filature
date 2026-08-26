@@ -30,6 +30,17 @@ refused at startup.
 - [`docs/regles.md`](docs/regles.md) — the full specification (French)
 - [`ROADMAP.md`](ROADMAP.md) — the steps, and what is out of scope for v1
 
+## How this game is written
+
+*Filature* is also an experiment in method: the game is written alongside an
+assistant, under explicit repository rules versioned with the code.
+
+Design decisions are argued and measured rather than guessed —
+[`docs/regles.md`](docs/regles.md) carries, for each rule, what it rules out and
+what remains to be checked. What this changes for a contribution is in
+[`CONTRIBUTING.md`](CONTRIBUTING.md): nothing substantive, the same checks apply
+to everyone.
+
 ## Install
 
 Download a binary from the releases page, extract, run. No runtime, no system
