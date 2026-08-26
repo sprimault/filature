@@ -48,7 +48,7 @@ func TestStubsMarked(t *testing.T) {
 		}
 		for _, d := range f.Decls {
 			fn, ok := d.(*ast.FuncDecl)
-			if !ok || fn.Body == nil || !corpsTrivial(fn.Body) || marque(f, fn.Body) {
+			if !ok || fn.Body == nil || !trivialBody(fn.Body) || marked(f, fn.Body) {
 				continue
 			}
 			manques = append(manques,
@@ -65,13 +65,13 @@ func TestStubsMarked(t *testing.T) {
 	}
 }
 
-// corpsTrivial dit si un corps ne fait rien : vide, ou un unique return de
+// trivialBody dit si un corps ne fait rien : vide, ou un unique return de
 // valeurs nulles.
 //
 // Une fonction de production qui se réduirait à « return nil » serait signalée
 // à tort. Le cas ne s'est pas présenté ; s'il se présente, l'exception se
 // déclare ici plutôt qu'en désarmant le test.
-func corpsTrivial(b *ast.BlockStmt) bool {
+func trivialBody(b *ast.BlockStmt) bool {
 	switch len(b.List) {
 	case 0:
 		return true
@@ -81,7 +81,7 @@ func corpsTrivial(b *ast.BlockStmt) bool {
 			return false
 		}
 		for _, v := range r.Results {
-			if !valeurNulle(v) {
+			if !zeroValue(v) {
 				return false
 			}
 		}
@@ -91,9 +91,9 @@ func corpsTrivial(b *ast.BlockStmt) bool {
 	}
 }
 
-// valeurNulle reconnaît les littéraux qu'un stub renvoie faute de mieux : nil,
+// zeroValue reconnaît les littéraux qu'un stub renvoie faute de mieux : nil,
 // false, zéro, chaîne vide, et la structure ou la tranche vide.
-func valeurNulle(e ast.Expr) bool {
+func zeroValue(e ast.Expr) bool {
 	switch v := e.(type) {
 	case *ast.Ident:
 		return v.Name == "nil" || v.Name == "false"
@@ -102,15 +102,15 @@ func valeurNulle(e ast.Expr) bool {
 	case *ast.CompositeLit:
 		return len(v.Elts) == 0
 	case *ast.UnaryExpr:
-		return v.Op == token.AND && valeurNulle(v.X)
+		return v.Op == token.AND && zeroValue(v.X)
 	}
 	return false
 }
 
-// marque dit si un corps contient le commentaire d'étape. Le comparer par
+// marked dit si un corps contient le commentaire d'étape. Le compare par
 // position est le seul moyen : l'AST rattache les commentaires au fichier, pas
 // aux blocs.
-func marque(f *ast.File, b *ast.BlockStmt) bool {
+func marked(f *ast.File, b *ast.BlockStmt) bool {
 	for _, g := range f.Comments {
 		if g.Pos() > b.Pos() && g.End() < b.End() && strings.Contains(g.Text(), "à implémenter") {
 			return true

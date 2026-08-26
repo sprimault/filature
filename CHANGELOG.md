@@ -41,7 +41,7 @@ là où l'on écrivait `exemples` et `valide`.
 devient `Game`, `Plateau` devient `Board`, `CoupsLegaux` devient `LegalMoves`.
 Ce que voient les plugins et les bots ne bouge pas d'un caractère — clés JSON,
 valeurs de manifeste et noms de flux d'aléa sont inchangés, et les plateaux de
-référence sont identiques. La documentation, elle, reste en français.
+référence sont identiques.
 
 Le mot « greffon » disparaît du projet au profit de « plugin », partout — code,
 documentation et libellés. Il est exclusivement français, absent de l'usage
@@ -78,7 +78,7 @@ used to write `exemples` and `valide`.
 becomes `Game`, `Plateau` becomes `Board`, `CoupsLegaux` becomes `LegalMoves`.
 What plugins and bots see does not change by a single character — JSON keys,
 manifest values and random-stream names are untouched, and reference boards are
-identical. Documentation stays in French.
+identical.
 
 The word « greffon » is gone from the project in favour of « plugin », everywhere —
 code, documentation and labels. It is exclusively French, absent from common

@@ -50,7 +50,7 @@ func TestGodocComplete(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		manques = append(manques, sansDoc(fset, f)...)
+		manques = append(manques, undocumented(fset, f)...)
 		return nil
 	})
 	if err != nil {
@@ -62,12 +62,12 @@ func TestGodocComplete(t *testing.T) {
 	}
 }
 
-// sansDoc relève les déclarations non documentées d'un fichier.
+// undocumented relève les déclarations non documentées d'un fichier.
 //
 // Un bloc parenthésé est accepté de deux façons : un commentaire sur le bloc,
 // ou un commentaire sur chacune de ses entrées. Les deux se pratiquent, et
 // imposer l'un des deux forcerait à réécrire du code correct.
-func sansDoc(fset *token.FileSet, f *ast.File) []string {
+func undocumented(fset *token.FileSet, f *ast.File) []string {
 	var manques []string
 
 	releve := func(pos token.Pos, quoi, nom string) {

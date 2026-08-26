@@ -30,13 +30,13 @@ func TestEveryPrimitiveExercised(t *testing.T) {
 	fset := token.NewFileSet()
 
 	declarees := constantesDuType(t, fset,
-		filepath.Join(racine, "internal", "core", "effets.go"), "EffectType")
+		filepath.Join(racine, "internal", "core", "effects.go"), "EffectType")
 	if len(declarees) == 0 {
 		t.Fatal("aucune primitive trouvée : le contrôle ne vérifie plus rien")
 	}
 
 	cites := identifiantsDe(t, fset,
-		filepath.Join(racine, "internal", "core", "effets_test.go"))
+		filepath.Join(racine, "internal", "core", "effects_test.go"))
 
 	for _, c := range declarees {
 		if !cites[c.nom] {
@@ -54,23 +54,23 @@ func TestEveryPrimitiveExercised(t *testing.T) {
 // disant qu'elle est inconnue alors qu'elle est écrite juste au-dessus.
 func TestVocabularyFullyEnumerated(t *testing.T) {
 	fset := token.NewFileSet()
-	chemin := filepath.Join(racine, "internal", "core", "effets.go")
+	chemin := filepath.Join(racine, "internal", "core", "effects.go")
 
 	var types []string
 	for _, e := range core.EffectTypes() {
 		types = append(types, string(e))
 	}
-	comparer(t, "EffectTypes", constantesDuType(t, fset, chemin, "EffectType"), types)
+	compare(t, "EffectTypes", constantesDuType(t, fset, chemin, "EffectType"), types)
 
 	var cibles []string
 	for _, c := range core.Targets() {
 		cibles = append(cibles, string(c))
 	}
-	comparer(t, "Targets", constantesDuType(t, fset, chemin, "Target"), cibles)
+	compare(t, "Targets", constantesDuType(t, fset, chemin, "Target"), cibles)
 }
 
-// comparer signale ce qu'une énumération oublie et ce qu'elle invente.
-func comparer(t *testing.T, quoi string, declarees []constante, enumerees []string) {
+// compare signale ce qu'une énumération oublie et ce qu'elle invente.
+func compare(t *testing.T, quoi string, declarees []constante, enumerees []string) {
 	t.Helper()
 
 	connues := map[string]bool{}
