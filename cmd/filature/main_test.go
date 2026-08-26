@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/sprimault/filature/internal/core"
 )
 
 // ailleurs est un dossier de plugins actifs qui n'entre en conflit avec aucune
@@ -176,5 +178,38 @@ func TestCommandVersion(t *testing.T) {
 	}
 	if !strings.Contains(sortie.String(), version) {
 		t.Errorf("sortie %q, attendu qu'elle porte %q", sortie.String(), version)
+	}
+}
+
+// TestSideAcceptsOneSpellingEach vérifie les trois valeurs de --side.
+func TestSideAcceptsOneSpellingEach(t *testing.T) {
+	cas := map[string]core.Side{
+		"fugitive":   core.SideFugitive,
+		"inspectors": core.SideInspectors,
+		"watch":      "",
+		"":           "",
+	}
+
+	for choix, attendu := range cas {
+		got, err := camp(choix)
+		if err != nil {
+			t.Fatalf("--side %q : %v", choix, err)
+		}
+		if got != attendu {
+			t.Errorf("--side %q donne %q, attendu %q", choix, got, attendu)
+		}
+	}
+}
+
+// TestSideRejectsFrenchSpellings vérifie que les anciennes valeurs sont
+// refusées et non silencieusement acceptées.
+//
+// Elles ont existé, et un refus franc vaut mieux qu'une tolérance : une valeur
+// acceptée mais non documentée finit par diverger de celle qui l'est.
+func TestSideRejectsFrenchSpellings(t *testing.T) {
+	for _, choix := range []string{"fugitif", "inspecteurs", "spectateur"} {
+		if _, err := camp(choix); err == nil {
+			t.Errorf("--side %q accepté alors qu'il n'existe plus", choix)
+		}
 	}
 }

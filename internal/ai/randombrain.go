@@ -16,7 +16,7 @@ import (
 // partie, et c'est l'arbitre qui la constate.
 var ErrNoLegalMove = errors.New("aucun coup legal")
 
-// RandomBrain tire un coup au hasard parmi ceux que la règle autorise.
+// RandomBrain choisit au hasard parmi les coups que la règle autorise.
 //
 // C'est le bot minimal de docs/protocole-bot.md §9, écrit en Go. Il ne cherche
 // pas à jouer : il sert d'adversaire tant que l'IA des étapes 9 et 10 n'existe

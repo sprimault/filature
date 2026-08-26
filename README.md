@@ -37,22 +37,37 @@ The Windows binary is not signed: SmartScreen will warn on first launch.
 
 ### Commands
 
-Two commands belong in a terminal, not a double-click — their output is text,
-and a window opened from the file explorer closes before anything can be read.
-
 ```
+filature                      plays a game, in text
 filature version              the installed version number
 filature examples <folder>    writes the shipped plugins, as templates
-filature validate <folder>      checks a plugin and prints its fingerprint
+filature validate <folder>    checks a plugin and prints its fingerprint
 ```
 
-`valide` runs exactly the checks the loader runs, and lists everything wrong at
+The last three belong in a terminal, not a double-click — their output is text,
+and a window opened from the file explorer closes before anything can be read.
+`--version` is accepted as an alias.
+
+`validate` runs exactly the checks the loader runs, and lists everything wrong at
 once rather than one fault at a time. A plugin it accepts will load for whoever
 you give it to.
 
-`exemples` refuses to write into the active plugin folder, and says so: what it
+`examples` refuses to write into the active plugin folder, and says so: what it
 writes out is already inside the binary, and putting it back there would declare
 it twice. These are templates to copy under another name.
+
+### Flags
+
+```
+--side fugitive     play the fugitive; inspectors is the default,
+                    watch lets two machines play
+--preset ville      board size: quartier, faubourg or ville
+--seed 1            the game's seed; the same one replays the same game
+--plugins <folder>  where to look for plugins
+--host              host a network game
+--join <address>    join one
+--game <name>       resume a saved game
+```
 
 The game looks for plugins in a `plugins` folder **next to the executable**,
 not in the current directory — so a shortcut behaves like a direct launch. Use

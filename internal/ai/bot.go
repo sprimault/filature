@@ -72,7 +72,7 @@ func Start(ctx context.Context, command string, args []string, sideName core.Sid
 //
 // Le jeu ne corrige ni n'interprète jamais un coup reçu : un coup illégal
 // interrompt la partie et part au journal tel quel. Un budget dépassé une fois
-// donne un coup légal tiré au sort ; trois fois, la partie s'arrête. Laisser
+// donne un coup légal choisi au sort ; trois fois, la partie s'arrête. Laisser
 // une partie se figer sur un processus tiers est pire qu'un coup au hasard, et
 // le journal garde la trace des deux.
 func (b *Bot) Play(ctx context.Context, v core.View, budgetMs int) (core.Move, error) {

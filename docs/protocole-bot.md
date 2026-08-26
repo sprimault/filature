@@ -143,7 +143,7 @@ message affiché.
 |---|---|
 | Coup absent de `legal_moves` | partie interrompue, coup fautif journalisé |
 | JSON invalide, type inconnu | idem |
-| `budget_ms` dépassé une fois | coup légal tiré au sort, incident journalisé |
+| `budget_ms` dépassé une fois | coup légal choisi au sort, incident journalisé |
 | Budget dépassé trois fois | partie interrompue |
 | Processus mort | partie interrompue |
 | `protocol` inconnu dans `pret` | refus avant le début |
