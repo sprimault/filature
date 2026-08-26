@@ -3,7 +3,10 @@
 
 package noyau
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+)
 
 // Position repère une case du plateau.
 //
@@ -61,6 +64,28 @@ func (p Position) Avance(d Direction) Position {
 // la vue que lisent l'interface, le réseau et les bots.
 func (p Position) Cle() string {
 	return strconv.Itoa(p.Colonne) + "," + strconv.Itoa(p.Ligne)
+}
+
+// PositionDepuisCle relit ce que Cle a écrit, et dit si la chaîne en était une.
+//
+// Sans elle, les tables de la vue indexées par position — les traces — ne se
+// parcourent pas : leurs clés sont du texte, et retrouver la case demanderait à
+// chaque lecteur de refaire le découpage à sa façon.
+func PositionDepuisCle(cle string) (Position, bool) {
+	colonne, ligne, coupee := strings.Cut(cle, ",")
+	if !coupee {
+		return Position{}, false
+	}
+
+	c, err := strconv.Atoi(colonne)
+	if err != nil {
+		return Position{}, false
+	}
+	l, err := strconv.Atoi(ligne)
+	if err != nil {
+		return Position{}, false
+	}
+	return Position{Colonne: c, Ligne: l}, true
 }
 
 // DirectionVers renvoie la direction d'un pas entre deux cases adjacentes, et
