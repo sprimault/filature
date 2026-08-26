@@ -3,7 +3,7 @@
 
 // Package texte rend une vue de partie en caractères, et relit un coup saisi.
 //
-// Il ne connaît que core.Vue, jamais l'état complet : c'est la même contrainte
+// Il ne connaît que core.View, jamais l'état complet : c'est la même contrainte
 // que pour un bot ou pour le réseau, et elle vaut aussi en partie locale. Ce
 // qu'un affichage ne peut pas montrer depuis une vue est un manque du contrat
 // de vue, pas une raison d'aller lire ailleurs.
@@ -32,12 +32,12 @@ const (
 	CarInspecteur = 'A' // A, B, C… selon le rang du pion
 )
 
-// LettrePion nomme un inspecteur par son rang, A pour le premier.
+// PieceLetter nomme un inspecteur par son rang, A pour le premier.
 //
 // Bornée à l'alphabet : un rang au-delà ne peut venir que d'un coup mal formé —
 // d'un bot, par exemple — et le dire en clair vaut mieux qu'un caractère
 // aberrant dont personne ne saura d'où il sort.
-func LettrePion(rang int) string {
+func PieceLetter(rang int) string {
 	const dernier = 'Z' - CarInspecteur
 	if rang < 0 || rang > dernier {
 		return fmt.Sprintf("pion %d", rang)
@@ -45,13 +45,13 @@ func LettrePion(rang int) string {
 	return string(rune(CarInspecteur + rang))
 }
 
-// Plateau dessine le terrain et ce que la vue en montre.
+// Board dessine le terrain et ce que la vue en montre.
 //
 // Les lettres numérotent les inspecteurs dans l'ordre de la vue, qui est celui
-// des coups légaux : « déplacer B » désigne sans ambiguïté le pion que l'écran
+// des coups légaux : « déplace B » désign sans ambiguïté le pion que l'écran
 // montre en B.
-func Plateau(v core.Vue) string {
-	cote := v.Parametres.Cote
+func Board(v core.View) string {
+	cote := v.Settings.Size
 	grille := make([][]rune, cote)
 	for l := range grille {
 		grille[l] = make([]rune, cote)
@@ -61,31 +61,31 @@ func Plateau(v core.Vue) string {
 	}
 
 	poser := func(p core.Position, car rune) {
-		if p.Colonne >= 0 && p.Ligne >= 0 && p.Colonne < cote && p.Ligne < cote {
-			grille[p.Ligne][p.Colonne] = car
+		if p.Column >= 0 && p.Row >= 0 && p.Column < cote && p.Row < cote {
+			grille[p.Row][p.Column] = car
 		}
 	}
 
-	for _, p := range v.Rues {
+	for _, p := range v.Streets {
 		poser(p, CarRue)
 	}
 	for _, z := range v.Zones {
-		for _, c := range z.Cases {
-			poser(c, rune('0'+z.Numero%10))
+		for _, c := range z.Cells {
+			poser(c, rune('0'+z.Number%10))
 		}
 	}
 	for cle := range v.TracesConnues {
-		if p, ok := core.PositionDepuisCle(cle); ok {
+		if p, ok := core.PositionFromKey(cle); ok {
 			poser(p, CarTrace)
 		}
 	}
-	for _, s := range v.Scenes {
+	for _, s := range v.CrimeScenes {
 		poser(s.Position, CarScene)
 	}
-	for _, p := range v.Barrages {
+	for _, p := range v.Roadblocks {
 		poser(p, CarBarrage)
 	}
-	for i, insp := range v.Inspecteurs {
+	for i, insp := range v.Inspectors {
 		poser(insp.Position, CarInspecteur+rune(i))
 	}
 	if v.PositionFugitif != nil {
@@ -93,19 +93,19 @@ func Plateau(v core.Vue) string {
 	}
 
 	var sortie strings.Builder
-	sortie.WriteString(enTete(cote))
+	sortie.WriteString(header(cote))
 	for l, ligne := range grille {
 		fmt.Fprintf(&sortie, "%3d %s\n", l, string(ligne))
 	}
 	return sortie.String()
 }
 
-// enTete écrit les dizaines puis les unités des colonnes.
+// header écrit les dizaines puis les unités des colonnes.
 //
 // Deux lignes plutôt qu'une : au-delà de dix colonnes, un seul chiffre ne situe
 // plus rien, et un plateau de quarante et un de côté se lit à la colonne près
 // quand on cherche pourquoi un coup est refusé.
-func enTete(cote int) string {
+func header(cote int) string {
 	var dizaines, unites strings.Builder
 	dizaines.WriteString("    ")
 	unites.WriteString("    ")
@@ -121,32 +121,32 @@ func enTete(cote int) string {
 	return dizaines.String() + "\n" + unites.String() + "\n"
 }
 
-// Etat résume ce qui ne tient pas sur le plateau.
+// Status résume ce qui ne tient pas sur le plateau.
 //
 // La résistance n'apparaît que si la vue la porte : côté inspecteurs elle est
 // absente, et afficher un zéro dirait que le fugitif est à bout au lieu de dire
 // qu'on n'en sait rien.
-func Etat(v core.Vue) string {
+func Status(v core.View) string {
 	var s strings.Builder
 
-	fmt.Fprintf(&s, "Tour %d", v.Tour)
-	if v.Parametres.Tours > 0 {
-		fmt.Fprintf(&s, "/%d", v.Parametres.Tours)
+	fmt.Fprintf(&s, "Tour %d", v.Turn)
+	if v.Settings.Turns > 0 {
+		fmt.Fprintf(&s, "/%d", v.Settings.Turns)
 	}
-	fmt.Fprintf(&s, " — %s — %s\n", phase(v.Phase), camp(v.Acteur))
+	fmt.Fprintf(&s, " — %s — %s\n", phaseName(v.Phase), sideName(v.Side))
 
-	if v.Resistance != nil {
-		fmt.Fprintf(&s, "Résistance : %d\n", *v.Resistance)
+	if v.Stamina != nil {
+		fmt.Fprintf(&s, "Résistance : %d\n", *v.Stamina)
 	}
-	if v.ZoneScellee != nil {
-		fmt.Fprintf(&s, "Zone scellée : %d\n", *v.ZoneScellee)
+	if v.SealedZone != nil {
+		fmt.Fprintf(&s, "Zone scellée : %d\n", *v.SealedZone)
 	}
 
-	if fermees := zonesFermees(v); fermees != "" {
+	if fermees := closedZones(v); fermees != "" {
 		fmt.Fprintf(&s, "Zones fermées : %s\n", fermees)
 	}
 	if len(v.ZonesAnnoncees) > 0 {
-		fmt.Fprintf(&s, "Zones annoncées : %s\n", nombres(v.ZonesAnnoncees))
+		fmt.Fprintf(&s, "Zones annoncées : %s\n", numbers(v.ZonesAnnoncees))
 	}
 	if v.ProchaineReveal > 0 {
 		fmt.Fprintf(&s, "Révélation dans %d tour(s)\n", v.ProchaineReveal)
@@ -155,11 +155,11 @@ func Etat(v core.Vue) string {
 		s.WriteString("Le fugitif a payé le silence\n")
 	}
 
-	for i, insp := range v.Inspecteurs {
-		fmt.Fprintf(&s, "%s en (%d,%d)", LettrePion(i), insp.Position.Colonne, insp.Position.Ligne)
-		if insp.Capacite != "" {
-			fmt.Fprintf(&s, ", %s", insp.Capacite)
-			if insp.CapaciteUtilisee {
+	for i, insp := range v.Inspectors {
+		fmt.Fprintf(&s, "%s en (%d,%d)", PieceLetter(i), insp.Position.Column, insp.Position.Row)
+		if insp.Ability != "" {
+			fmt.Fprintf(&s, ", %s", insp.Ability)
+			if insp.AbilityUsed {
 				s.WriteString(" (utilisée)")
 			}
 		}
@@ -169,19 +169,19 @@ func Etat(v core.Vue) string {
 	return s.String()
 }
 
-// zonesFermees rend les zones dont la vue dit qu'elles le sont.
-func zonesFermees(v core.Vue) string {
+// closedZones rend les zones dont la vue dit qu'elles le sont.
+func closedZones(v core.View) string {
 	var fermees []int
 	for _, z := range v.Zones {
-		if z.Fermee {
-			fermees = append(fermees, z.Numero)
+		if z.Closed {
+			fermees = append(fermees, z.Number)
 		}
 	}
-	return nombres(fermees)
+	return numbers(fermees)
 }
 
-// nombres joint des entiers par des espaces.
-func nombres(n []int) string {
+// numbers joint des entiers par des espaces.
+func numbers(n []int) string {
 	if len(n) == 0 {
 		return ""
 	}
@@ -192,72 +192,72 @@ func nombres(n []int) string {
 	return strings.Join(textes, " ")
 }
 
-// phase rend le nom d'une phase en français.
-func phase(p core.Phase) string {
+// phaseName rend le nom d'une phaseName en français.
+func phaseName(p core.Phase) string {
 	switch p {
-	case core.PhasePlacementFugitif:
+	case core.PhaseFugitiveSetup:
 		return "le fugitif scelle sa zone"
-	case core.PhasePlacementInspecteurs:
+	case core.PhaseInspectorsSetup:
 		return "placement des inspecteurs"
-	case core.PhaseInspecteurs:
+	case core.PhaseInspectors:
 		return "aux inspecteurs"
-	case core.PhaseFugitif:
+	case core.PhaseFugitive:
 		return "au fugitif"
-	case core.PhaseTerminee:
+	case core.PhaseOver:
 		return "partie terminée"
 	default:
 		return string(p)
 	}
 }
 
-// camp rend le nom d'un camp en français.
-func camp(a core.Acteur) string {
+// sideName rend le nom d'un sideName en français.
+func sideName(a core.Side) string {
 	switch a {
-	case core.CampFugitif:
+	case core.SideFugitive:
 		return "vue du fugitif"
-	case core.CampInspecteurs:
+	case core.SideInspectors:
 		return "vue des inspecteurs"
 	default:
 		return "vue complète"
 	}
 }
 
-// Fin rend le résultat d'une partie.
-func Fin(r core.Resultat) string {
+// Ending rend le résultat d'une partie.
+func Ending(r core.Outcome) string {
 	motifs := map[string]string{
-		core.MotifExtraction:  "le fugitif s'est extrait",
-		core.MotifResistance:  "le fugitif est à bout",
-		core.MotifBlocage:     "le fugitif est pris",
-		core.MotifTempsEcoule: "le temps est écoulé",
-		core.MotifGreffon:     "une règle de plugin y a mis fin",
+		core.OutcomeExtraction:   "le fugitif s'est extrait",
+		core.OutcomeStaminaSpent: "le fugitif est à bout",
+		core.OutcomeCornered:     "le fugitif est pris",
+		core.OutcomeTimeUp:       "le temps est écoulé",
+		core.OutcomePlugin:       "une règle de plugin y a mis fin",
 	}
-	motif := motifs[r.Motif]
+	motif := motifs[r.Reason]
 	if motif == "" {
-		motif = r.Motif
+		motif = r.Reason
 	}
-	return fmt.Sprintf("Tour %d — %s l'emportent : %s", r.Tour, camp(r.Vainqueur), motif)
+	return fmt.Sprintf("Tour %d — %s l'emportent : %s", r.Turn, sideName(r.Winner), motif)
 }
 
-// Fusionner superpose les deux vues d'une même partie, pour qui regarde sans
-// jouer.
+// Merge superpose les deux vues d'une même partie, pour qui regarde sans
+// play.
 //
 // Un spectateur doit voir ce qu'aucun des deux camps ne sait, mais le lui
 // donner depuis l'état complet ouvrirait une porte sur la position cachée. La
 // superposition des vues filtrées y suffit — et si quelque chose y manquait,
 // ce serait un trou dans le contrat de vue, visible à l'écran plutôt que
 // silencieux.
-func Fusionner(fugitif, inspecteurs core.Vue) core.Vue {
+func Merge(fugitif, inspecteurs core.View) core.View {
 	v := inspecteurs
-	v.Acteur = ""
+	v.Side = ""
 
 	v.PositionFugitif = fugitif.PositionFugitif
-	v.ZoneScellee = fugitif.ZoneScellee
-	v.Resistance = fugitif.Resistance
-	v.CoupsLegaux = nil
+	v.SealedZone = fugitif.SealedZone
+	v.Stamina = fugitif.Stamina
+	v.LegalMoves = nil
 
-	// Chaque camp connaît des traces que l'autre ignore : le fugitif les
+	// Chaque sideName connaît des traces que l'autre ignore : le fugitif les
 	// siennes, les inspecteurs celles qu'ils ont découvertes.
-	v.TracesConnues = map[string]core.Trace{}
+	v.TracesConnues = map[string]core.Trail{}
 	for cle, t := range inspecteurs.TracesConnues {
 		v.TracesConnues[cle] = t
 	}
@@ -265,7 +265,7 @@ func Fusionner(fugitif, inspecteurs core.Vue) core.Vue {
 		v.TracesConnues[cle] = t
 	}
 
-	v.Rues = union(inspecteurs.Rues, fugitif.Rues)
+	v.Streets = union(inspecteurs.Streets, fugitif.Streets)
 	return v
 }
 
@@ -281,10 +281,10 @@ func union(a, b []core.Position) []core.Position {
 		toutes = append(toutes, p)
 	}
 	sort.Slice(toutes, func(i, j int) bool {
-		if toutes[i].Ligne != toutes[j].Ligne {
-			return toutes[i].Ligne < toutes[j].Ligne
+		if toutes[i].Row != toutes[j].Row {
+			return toutes[i].Row < toutes[j].Row
 		}
-		return toutes[i].Colonne < toutes[j].Colonne
+		return toutes[i].Column < toutes[j].Column
 	})
 	return toutes
 }

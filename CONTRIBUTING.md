@@ -22,8 +22,8 @@ discussion, not a patch.
 
 ## Language
 
-Identifiers follow the domain, which is French here — `Fugitif`, `Plateau`,
-`Trace`. Comments and documentation are in French. Commit messages are French
+Identifiers follow the domain, which is French here — `Fugitive`, `Board`,
+`Trail`. Comments and documentation are in French. Commit messages are French
 first, then English, in one text separated by `***`. Never `---`: `git am` treats
 it as a patch separator and truncates everything after it.
 

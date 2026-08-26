@@ -26,7 +26,7 @@ La **sortie d'erreur est libre** : le bot y écrit ce qu'il veut, le jeu la
 capture et l'affiche dans son journal. C'est là que va le débogage, jamais sur
 la sortie standard.
 
-Le bot reçoit exactement la même `Vue` que l'interface. Il ne voit donc jamais
+Le bot reçoit exactement la même `View` que l'interface. Il ne voit donc jamais
 la position du fugitif quand celui-ci est caché, ni sa zone d'extraction. Ce
 n'est pas une politesse : c'est la même projection qui protège le mode réseau, et
 elle est appliquée au même endroit.

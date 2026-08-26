@@ -25,8 +25,8 @@ une discussion de conception, pas un correctif.
 
 ## Langue
 
-Les identifiants suivent le domaine, qui est français ici — `Fugitif`,
-`Plateau`, `Trace`. Commentaires et documentation en français. Messages de
+Les identifiants suivent le domaine, qui est français ici — `Fugitive`,
+`Board`, `Trail`. Commentaires et documentation en français. Messages de
 commit en français d'abord, anglais ensuite, dans un seul texte séparé par
 `***`. Jamais `---` : `git am` le traite comme un séparateur de patch et tronque
 tout ce qui suit.

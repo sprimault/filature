@@ -22,15 +22,15 @@ reste est révisable.
 
 ### La vue filtrée
 
-Le noyau expose `VuePour(acteur)` et l'interface ne consomme rien d'autre, **y
+Le noyau expose `ViewFor(side)` et l'interface ne consomme rien d'autre, **y
 compris en partie locale**. Sans ça, un joueur lit la position du fugitif dans
 le trafic réseau ou dans un fichier de sauvegarde, et le jeu n'a plus d'objet.
 
-Règle de relecture : tout champ ajouté à `Partie` doit être explicitement copié
-dans `VuePour`, jamais par recopie de structure. Une omission fait fuiter, un
+Règle de relecture : tout champ ajouté à `Game` doit être explicitement copié
+dans `ViewFor`, jamais par recopie de structure. Une omission fait fuiter, un
 oubli ne fait qu'afficher moins.
 
-Un bot externe reçoit la même `Vue` que l'interface. Ce n'est pas une politesse :
+Un bot externe reçoit la même `View` que l'interface. Ce n'est pas une politesse :
 c'est la même projection, appliquée au même endroit.
 
 ### Le déterminisme
@@ -46,7 +46,7 @@ influence une décision passe par une tranche triée.
 
 ### La réversibilité
 
-`Appliquer` a son `Annuler`, effets de plugins compris. Ce n'est pas un confort
+`Apply` a son `Undo`, effets de plugins compris. Ce n'est pas un confort
 d'interface : c'est ce qui permet à l'IA d'explorer des milliers de positions
 sans copier l'état à chaque nœud.
 
@@ -57,7 +57,7 @@ L'état ne connaît que colonne et ligne. La conversion isométrique vit dans
 
 ## Le journal est la source de vérité
 
-L'instantané n'est qu'un cache de reprise. `Reprendre` rejoue le journal plutôt
+L'instantané n'est qu'un cache de reprise. `Resume` rejoue le journal plutôt
 que de charger l'instantané : c'est ce qui vérifie en continu que le journal
 reste suffisant. Un instantané chargé sans rejeu masquerait le jour où une règle
 cesse d'être reproductible.
@@ -80,9 +80,9 @@ La référence complète du vocabulaire est
 [`vocabulaire-effets.md`](vocabulaire-effets.md), et le format des fichiers qui
 le portent est dans [`plugins.md`](plugins.md).
 
-Un plugin ne touche jamais `*Partie`. Il produit des `Effet` ou des `Coup`, le
+Un plugin ne touche jamais `*Game`. Il produit des `Effect` ou des `Move`, le
 noyau les applique. C'est ce qui fait qu'il ne peut pas lire la zone scellée du
-fugitif, et que `Annuler` reste praticable.
+fugitif, et que `Undo` reste praticable.
 
 ## Le rendu
 

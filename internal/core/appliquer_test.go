@@ -12,121 +12,121 @@ import (
 // registreDEssai reproduit ce que plugins/base déclare, en plus court : de
 // quoi exercer capacités et dépenses sans dépendre du chargeur, qui relève de
 // l'étape 8.
-func registreDEssai() *Registre {
-	return &Registre{
-		Capacites: map[string]Capacite{
+func registreDEssai() *Registry {
+	return &Registry{
+		Capacites: map[string]Ability{
 			"barreur": {
-				Nom: "Barreur", Camp: CampInspecteurs, Usages: 1,
-				Declenchement: SurPhaseInspecteurs,
-				Effets:        []Effet{{Type: EffetBloquerCase, Cible: CibleCase, Duree: 3}},
+				Name: "Barreur", Camp: SideInspectors, Uses: 1,
+				Trigger: OnInspectorsPhase,
+				Effets:  []Effect{{Type: EffectBlockCell, Target: TargetCell, Duration: 3}},
 			},
 			"guetteur": {
-				Nom: "Guetteur", Camp: CampInspecteurs, Usages: 1,
-				Declenchement: SurPhaseInspecteurs,
-				Effets:        []Effet{{Type: EffetModifierPortee, Cible: CiblePionCourant, Valeur: 8, Duree: 1}},
+				Name: "Guetteur", Camp: SideInspectors, Uses: 1,
+				Trigger: OnInspectorsPhase,
+				Effets:  []Effect{{Type: EffectChangeRange, Target: TargetCurrentPiece, Value: 8, Duration: 1}},
 			},
 		},
-		Depenses: map[Depense]Capacite{
-			DepenseSilence: {
-				Nom: "Silence", Camp: CampFugitif, Cout: 3,
-				Declenchement: SurPhaseFugitif,
-				Effets:        []Effet{{Type: EffetAnnulerRevelation, Cible: CibleFugitif}},
+		Depenses: map[Expense]Ability{
+			ExpenseSilence: {
+				Name: "Silence", Camp: SideFugitive, Cost: 3,
+				Trigger: OnFugitivePhase,
+				Effets:  []Effect{{Type: EffectCancelReveal, Target: TargetFugitive}},
 			},
-			DepenseMeurtre: {
-				Nom: "Meurtre", Camp: CampFugitif, Cout: 3, Usages: 2,
-				Declenchement: SurPhaseFugitif,
-				Effets: []Effet{
-					{Type: EffetRevelerPosition, Cible: CibleFugitif},
-					{Type: EffetMarquerScene, Cible: CibleFugitif},
+			ExpenseMurder: {
+				Name: "Meurtre", Camp: SideFugitive, Cost: 3, Uses: 2,
+				Trigger: OnFugitivePhase,
+				Effets: []Effect{
+					{Type: EffectRevealPosition, Target: TargetFugitive},
+					{Type: EffectMarkCrimeScene, Target: TargetFugitive},
 				},
 			},
-			DepenseChangerZone: {
-				Nom: "Changement de zone", Camp: CampFugitif, Cout: 2,
-				Declenchement: SurPhaseFugitif,
-				Effets:        []Effet{{Type: EffetScellerZone, Cible: CibleZone}},
+			ExpenseChangeZone: {
+				Name: "Changement de zone", Camp: SideFugitive, Cost: 2,
+				Trigger: OnFugitivePhase,
+				Effets:  []Effect{{Type: EffectSealZone, Target: TargetZone}},
 			},
 		},
 	}
 }
 
-// partieJouable monte une partie en phase fugitif, registre compris.
-func partieJouable() *Partie {
-	b := trame(".....", ".....", ".....", ".....", ".....")
-	b.zones = []Zone{{Numero: 0}, {Numero: 1}, {Numero: 2}}
-	p := partieSur(b, Position{Colonne: 2, Ligne: 2},
-		Position{Colonne: 0, Ligne: 0}, Position{Colonne: 4, Ligne: 0})
+// partieJouable monte une partie en phaseName fugitif, registre compris.
+func partieJouable() *Game {
+	b := grid(".....", ".....", ".....", ".....", ".....")
+	b.zones = []Zone{{Number: 0}, {Number: 1}, {Number: 2}}
+	p := partieSur(b, Position{Column: 2, Row: 2},
+		Position{Column: 0, Row: 0}, Position{Column: 4, Row: 0})
 	p.Extensions = registreDEssai()
 	return p
 }
 
 // premierCoup rend le premier coup légal du type demandé.
-func premierCoup(t *testing.T, p *Partie, a Acteur, typ TypeCoup) Coup {
+func premierCoup(t *testing.T, p *Game, a Side, typ MoveType) Move {
 	t.Helper()
-	for _, c := range p.CoupsLegaux(a) {
+	for _, c := range p.LegalMoves(a) {
 		if c.Type == typ {
 			return c
 		}
 	}
 	t.Fatalf("aucun coup de type %s", typ)
-	return Coup{}
+	return Move{}
 }
 
-// TestCoupIllegalRefuse vérifie qu'un coup absent de la liste est rejeté, et
+// TestIllegalMoveRejected vérifie qu'un coup absent de la list est rejeté, et
 // qu'il ne laisse aucune trace.
 //
 // C'est ce que le serveur oppose à un bot fautif : le jeu ne corrige ni
 // n'interprète, il refuse.
-func TestCoupIllegalRefuse(t *testing.T) {
+func TestIllegalMoveRejected(t *testing.T) {
 	p := partieJouable()
 	avant := *p
 
-	faux := Coup{Tour: p.Tour, Acteur: CampFugitif, Type: CoupDeplacer,
-		Depart: p.Fugitif.Position, Arrivee: Position{Colonne: 9, Ligne: 9}}
+	faux := Move{Turn: p.Turn, Side: SideFugitive, Type: MoveStep,
+		From: p.Fugitive.Position, To: Position{Column: 9, Row: 9}}
 
-	if err := p.Appliquer(faux); !errors.Is(err, ErrCoupIllegal) {
-		t.Fatalf("erreur %v, attendu ErrCoupIllegal", err)
+	if err := p.Apply(faux); !errors.Is(err, ErrIllegalMove) {
+		t.Fatalf("erreur %v, attendu ErrIllegalMove", err)
 	}
 	if len(p.Journal) != 0 {
 		t.Error("un coup refusé est entré au journal")
 	}
-	if p.Fugitif != avant.Fugitif {
+	if p.Fugitive != avant.Fugitive {
 		t.Error("un coup refusé a modifié l'état")
 	}
 }
 
-// TestCoupPresqueLegalRefuse vérifie que la comparaison est stricte : un coup
+// TestNearlyLegalMoveRejected vérifie que la comparaison est stricte : un coup
 // dont un seul champ diffère est un autre coup.
-func TestCoupPresqueLegalRefuse(t *testing.T) {
+func TestNearlyLegalMoveRejected(t *testing.T) {
 	p := partieJouable()
-	c := premierCoup(t, p, CampFugitif, CoupDeplacer)
-	c.Tour++
+	c := premierCoup(t, p, SideFugitive, MoveStep)
+	c.Turn++
 
-	if err := p.Appliquer(c); !errors.Is(err, ErrCoupIllegal) {
-		t.Fatalf("erreur %v, attendu ErrCoupIllegal", err)
+	if err := p.Apply(c); !errors.Is(err, ErrIllegalMove) {
+		t.Fatalf("erreur %v, attendu ErrIllegalMove", err)
 	}
 }
 
-// TestDeplacementCompteEtSeDefait vérifie qu'un déplacement avance le pion,
+// TestStepCountsAndUndoes vérifie qu'un déplacement avance le pion,
 // consomme sa mobilité, et se défait entièrement.
-func TestDeplacementCompteEtSeDefait(t *testing.T) {
+func TestStepCountsAndUndoes(t *testing.T) {
 	p := partieJouable()
-	depart := p.Fugitif.Position
+	depart := p.Fugitive.Position
 
-	c := premierCoup(t, p, CampFugitif, CoupDeplacer)
-	if err := p.Appliquer(c); err != nil {
+	c := premierCoup(t, p, SideFugitive, MoveStep)
+	if err := p.Apply(c); err != nil {
 		t.Fatal(err)
 	}
-	if p.Fugitif.Position != c.Arrivee {
-		t.Errorf("fugitif en %v, attendu %v", p.Fugitif.Position, c.Arrivee)
+	if p.Fugitive.Position != c.To {
+		t.Errorf("fugitif en %v, attendu %v", p.Fugitive.Position, c.To)
 	}
-	if p.Fugitif.DeplacementsFaits != 1 {
-		t.Errorf("%d déplacements comptés, attendu 1", p.Fugitif.DeplacementsFaits)
+	if p.Fugitive.StepsTaken != 1 {
+		t.Errorf("%d déplacements comptés, attendu 1", p.Fugitive.StepsTaken)
 	}
 
-	if err := p.Annuler(); err != nil {
+	if err := p.Undo(); err != nil {
 		t.Fatal(err)
 	}
-	if p.Fugitif.Position != depart || p.Fugitif.DeplacementsFaits != 0 {
+	if p.Fugitive.Position != depart || p.Fugitive.StepsTaken != 0 {
 		t.Error("l'annulation n'a pas rendu la position ou le compteur")
 	}
 	if len(p.Journal) != 0 {
@@ -134,28 +134,28 @@ func TestDeplacementCompteEtSeDefait(t *testing.T) {
 	}
 }
 
-// TestMobiliteEpuiseeApresUnPas vérifie qu'un fugitif sans bonus ne joue qu'un
+// TestMobilitySpentAfterOneStep vérifie qu'un fugitif sans bonus ne joue qu'un
 // déplacement par tour.
-func TestMobiliteEpuiseeApresUnPas(t *testing.T) {
+func TestMobilitySpentAfterOneStep(t *testing.T) {
 	p := partieJouable()
-	if err := p.Appliquer(premierCoup(t, p, CampFugitif, CoupDeplacer)); err != nil {
+	if err := p.Apply(premierCoup(t, p, SideFugitive, MoveStep)); err != nil {
 		t.Fatal(err)
 	}
-	for _, c := range p.CoupsLegaux(CampFugitif) {
-		if c.Type == CoupDeplacer {
+	for _, c := range p.LegalMoves(SideFugitive) {
+		if c.Type == MoveStep {
 			t.Fatal("un second déplacement est proposé sans bonus de mobilité")
 		}
 	}
 }
 
-// TestDepenseCouteEtSeDefait vérifie le prélèvement, l'effet, et le retour en
+// TestExpenseCostsAndUndoes vérifie le prélèvement, l'effet, et le retour en
 // arrière complet.
-func TestDepenseCouteEtSeDefait(t *testing.T) {
+func TestExpenseCostsAndUndoes(t *testing.T) {
 	p := partieJouable()
 
-	var silence Coup
-	for _, c := range p.CoupsLegaux(CampFugitif) {
-		if c.Type == CoupDepense && c.Depense == DepenseSilence {
+	var silence Move
+	for _, c := range p.LegalMoves(SideFugitive) {
+		if c.Type == MoveExpense && c.Expense == ExpenseSilence {
 			silence = c
 		}
 	}
@@ -163,139 +163,139 @@ func TestDepenseCouteEtSeDefait(t *testing.T) {
 		t.Fatal("le silence n'est pas proposé")
 	}
 
-	if err := p.Appliquer(silence); err != nil {
+	if err := p.Apply(silence); err != nil {
 		t.Fatal(err)
 	}
-	if p.Fugitif.Resistance != 7 {
-		t.Errorf("résistance %d, attendu 7", p.Fugitif.Resistance)
+	if p.Fugitive.Stamina != 7 {
+		t.Errorf("résistance %d, attendu 7", p.Fugitive.Stamina)
 	}
-	if !p.Fugitif.SilenceAchete {
+	if !p.Fugitive.SilenceBought {
 		t.Error("le silence n'a pas pris effet")
 	}
 
-	if err := p.Annuler(); err != nil {
+	if err := p.Undo(); err != nil {
 		t.Fatal(err)
 	}
-	if p.Fugitif.Resistance != 10 || p.Fugitif.SilenceAchete {
+	if p.Fugitive.Stamina != 10 || p.Fugitive.SilenceBought {
 		t.Error("l'annulation n'a pas rendu la résistance ou défait l'effet")
 	}
 }
 
-// TestUsagesPlafonnes vérifie que le compteur d'emplois est générique : le
+// TestUsesCapped vérifie que le compteur d'emplois est générique : le
 // noyau n'a pas à savoir que la dépense plafonnée s'appelle meurtre.
-func TestUsagesPlafonnes(t *testing.T) {
+func TestUsesCapped(t *testing.T) {
 	p := partieJouable()
-	p.Fugitif.Resistance = 20
+	p.Fugitive.Stamina = 20
 
 	for i := 0; i < 2; i++ {
-		var meurtre Coup
-		for _, c := range p.CoupsLegaux(CampFugitif) {
-			if c.Type == CoupDepense && c.Depense == DepenseMeurtre {
+		var meurtre Move
+		for _, c := range p.LegalMoves(SideFugitive) {
+			if c.Type == MoveExpense && c.Expense == ExpenseMurder {
 				meurtre = c
 			}
 		}
 		if meurtre.Type == "" {
 			t.Fatalf("le meurtre n'est plus proposé au %dᵉ emploi", i+1)
 		}
-		if err := p.Appliquer(meurtre); err != nil {
+		if err := p.Apply(meurtre); err != nil {
 			t.Fatal(err)
 		}
 	}
 
-	if p.UsagesDepense[DepenseMeurtre] != 2 {
-		t.Errorf("%d emplois comptés, attendu 2", p.UsagesDepense[DepenseMeurtre])
+	if p.ExpenseUses[ExpenseMurder] != 2 {
+		t.Errorf("%d emplois comptés, attendu 2", p.ExpenseUses[ExpenseMurder])
 	}
-	for _, c := range p.CoupsLegaux(CampFugitif) {
-		if c.Type == CoupDepense && c.Depense == DepenseMeurtre {
+	for _, c := range p.LegalMoves(SideFugitive) {
+		if c.Type == MoveExpense && c.Expense == ExpenseMurder {
 			t.Error("un troisième meurtre est proposé")
 		}
 	}
-	if len(p.Scenes) != 2 {
-		t.Errorf("%d scènes, attendu 2", len(p.Scenes))
+	if len(p.CrimeScenes) != 2 {
+		t.Errorf("%d scènes, attendu 2", len(p.CrimeScenes))
 	}
 }
 
-// TestCapaciteUneSeuleParTour vérifie les deux limites de la règle : une par
+// TestOneAbilityPerTurn vérifie les deux limites de la règle : une par
 // pion et par partie, et une seule par tour tous pions confondus.
-func TestCapaciteUneSeuleParTour(t *testing.T) {
+func TestOneAbilityPerTurn(t *testing.T) {
 	p := partieJouable()
-	p.Phase = PhaseInspecteurs
-	p.Inspecteurs[0].Capacite = "guetteur"
-	p.Inspecteurs[1].Capacite = "barreur"
+	p.Phase = PhaseInspectors
+	p.Inspectors[0].Ability = "guetteur"
+	p.Inspectors[1].Ability = "barreur"
 
-	c := premierCoup(t, p, CampInspecteurs, CoupCapacite)
-	if err := p.Appliquer(c); err != nil {
+	c := premierCoup(t, p, SideInspectors, MoveAbility)
+	if err := p.Apply(c); err != nil {
 		t.Fatal(err)
 	}
-	if !p.CapaciteJouee {
+	if !p.AbilityPlayed {
 		t.Error("la capacité du tour n'est pas marquée")
 	}
-	for _, l := range p.CoupsLegaux(CampInspecteurs) {
-		if l.Type == CoupCapacite {
+	for _, l := range p.LegalMoves(SideInspectors) {
+		if l.Type == MoveAbility {
 			t.Error("une seconde capacité est proposée dans le même tour")
 		}
 	}
 
-	if err := p.Annuler(); err != nil {
+	if err := p.Undo(); err != nil {
 		t.Fatal(err)
 	}
-	if p.CapaciteJouee || p.Inspecteurs[c.Pion].CapaciteUtilisee {
+	if p.AbilityPlayed || p.Inspectors[c.Piece].AbilityUsed {
 		t.Error("l'annulation n'a pas rendu les marques de capacité")
 	}
 }
 
-// TestFinDeTourRouvreLesQuotas vérifie que la résolution remet les compteurs à
+// TestTurnEndResetsQuotas vérifie que la résolution remet les compteurs à
 // zéro, et que l'annulation les rétablit.
-func TestFinDeTourRouvreLesQuotas(t *testing.T) {
+func TestTurnEndResetsQuotas(t *testing.T) {
 	p := partieJouable()
-	p.Phase = PhaseInspecteurs
-	p.Inspecteurs[0].DeplacementsFaits = 1
-	p.CapaciteJouee = true
-	tour := p.Tour
+	p.Phase = PhaseInspectors
+	p.Inspectors[0].StepsTaken = 1
+	p.AbilityPlayed = true
+	tour := p.Turn
 
 	// Les inspecteurs rendent la main, puis le fugitif : le tour se résout.
-	if err := p.Appliquer(premierCoup(t, p, CampInspecteurs, CoupFinDePhase)); err != nil {
+	if err := p.Apply(premierCoup(t, p, SideInspectors, MoveEndPhase)); err != nil {
 		t.Fatal(err)
 	}
-	if p.Phase != PhaseFugitif {
+	if p.Phase != PhaseFugitive {
 		t.Fatalf("phase %s, attendu fugitif", p.Phase)
 	}
-	if p.Tour != tour {
+	if p.Turn != tour {
 		t.Error("le tour a avancé entre les deux phases")
 	}
 
-	if err := p.Appliquer(premierCoup(t, p, CampFugitif, CoupFinDePhase)); err != nil {
+	if err := p.Apply(premierCoup(t, p, SideFugitive, MoveEndPhase)); err != nil {
 		t.Fatal(err)
 	}
-	if p.Tour != tour+1 {
-		t.Errorf("tour %d, attendu %d", p.Tour, tour+1)
+	if p.Turn != tour+1 {
+		t.Errorf("tour %d, attendu %d", p.Turn, tour+1)
 	}
-	if p.Inspecteurs[0].DeplacementsFaits != 0 || p.CapaciteJouee {
+	if p.Inspectors[0].StepsTaken != 0 || p.AbilityPlayed {
 		t.Error("les quotas n'ont pas été rouverts")
 	}
 
-	if err := p.Annuler(); err != nil {
+	if err := p.Undo(); err != nil {
 		t.Fatal(err)
 	}
-	if p.Tour != tour || p.Inspecteurs[0].DeplacementsFaits != 1 || !p.CapaciteJouee {
+	if p.Turn != tour || p.Inspectors[0].StepsTaken != 1 || !p.AbilityPlayed {
 		t.Error("l'annulation de la fin de tour n'a pas tout rendu")
 	}
 }
 
-// TestAnnulerSansCoup vérifie qu'annuler sur une partie vierge le dit.
-func TestAnnulerSansCoup(t *testing.T) {
-	if err := partieJouable().Annuler(); !errors.Is(err, ErrRienAAnnuler) {
+// TestUndoWithNoMove vérifie qu'annuler sur une partie vierge le dit.
+func TestUndoWithNoMove(t *testing.T) {
+	if err := partieJouable().Undo(); !errors.Is(err, ErrRienAAnnuler) {
 		t.Fatalf("erreur %v, attendu ErrRienAAnnuler", err)
 	}
 }
 
-// TestPartieEntiereSeDefait est l'invariant de réversibilité au niveau du coup.
+// TestWholeGameUndoes est l'invariant de réversibilité au niveau du coup.
 //
 // Une suite de coups quelconques, puis autant d'annulations, doit rendre un
 // état identique à l'original. C'est ce dont l'IA dépend pour explorer sans
 // copier l'état, et ce qui casse en silence dès qu'un coup oublie une
 // annulation.
-func TestPartieEntiereSeDefait(t *testing.T) {
+func TestWholeGameUndoes(t *testing.T) {
 	p := partieJouable()
 	avant := partieJouable()
 
@@ -303,26 +303,26 @@ func TestPartieEntiereSeDefait(t *testing.T) {
 	// une résolution de tour.
 	joues := 0
 	for _, choix := range []struct {
-		acteur Acteur
-		typ    TypeCoup
+		acteur Side
+		typ    MoveType
 	}{
-		{CampFugitif, CoupDeplacer},
-		{CampFugitif, CoupDepense},
-		{CampFugitif, CoupFinDePhase},
-		{CampInspecteurs, CoupDeplacer},
-		{CampInspecteurs, CoupFinDePhase},
-		{CampFugitif, CoupDeplacer},
-		{CampFugitif, CoupFinDePhase},
+		{SideFugitive, MoveStep},
+		{SideFugitive, MoveExpense},
+		{SideFugitive, MoveEndPhase},
+		{SideInspectors, MoveStep},
+		{SideInspectors, MoveEndPhase},
+		{SideFugitive, MoveStep},
+		{SideFugitive, MoveEndPhase},
 	} {
 		c := premierCoup(t, p, choix.acteur, choix.typ)
-		if err := p.Appliquer(c); err != nil {
+		if err := p.Apply(c); err != nil {
 			t.Fatalf("coup %d refusé : %v", joues, err)
 		}
 		joues++
 	}
 
 	for i := 0; i < joues; i++ {
-		if err := p.Annuler(); err != nil {
+		if err := p.Undo(); err != nil {
 			t.Fatalf("annulation %d refusée : %v", i, err)
 		}
 	}

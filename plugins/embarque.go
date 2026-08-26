@@ -22,11 +22,11 @@ import (
 //go:embed base anglais
 var embarques embed.FS
 
-// Livres renvoie le contenu livré avec le jeu.
+// Shipped renvoie le contenu livré avec le jeu.
 //
-// Chaque entrée de la racine est un plugin, comme dans le dossier que désigne
+// Chaque entrée de la racine est un plugin, comme dans le dossier que désign
 // --plugins : « base » porte les règles, les formes et le français, « anglais »
 // la traduction.
-func Livres() fs.FS {
+func Shipped() fs.FS {
 	return embarques
 }

@@ -8,23 +8,23 @@ import (
 	"testing"
 )
 
-// TestMemeGraineMemeSuite est l'invariant de déterminisme.
+// TestSameSeedSameSequence est l'invariant de déterminisme.
 //
 // Deux générateurs partis de la même graine et du même flux donnent la même
 // suite, sinon un rejeu diverge de son journal et la reprise, le débogage et
 // l'entraînement de l'IA tombent ensemble.
-func TestMemeGraineMemeSuite(t *testing.T) {
-	a := NouvelAlea(178342119, "plateau")
-	b := NouvelAlea(178342119, "plateau")
+func TestSameSeedSameSequence(t *testing.T) {
+	a := NewRandom(178342119, "plateau")
+	b := NewRandom(178342119, "plateau")
 
 	for i := 0; i < 1000; i++ {
-		if x, y := a.Entier(1000), b.Entier(1000); x != y {
+		if x, y := a.Int(1000), b.Int(1000); x != y {
 			t.Fatalf("tirage %d : %d puis %d", i, x, y)
 		}
 	}
 }
 
-// TestSuiteDeReference fige ce que le générateur doit rendre, pour toujours.
+// TestReferenceSequence fige ce que le générateur doit rendre, pour toujours.
 //
 // Les autres tests vérifient qu'il est cohérent avec lui-même : ils passeraient
 // encore si l'algorithme changeait. Celui-ci est le seul qui s'y oppose, et
@@ -34,7 +34,7 @@ func TestMemeGraineMemeSuite(t *testing.T) {
 // Ces valeurs ont été relevées sous Windows et vérifiées identiques sous
 // Linux/amd64 : le générateur ne dépend ni de la plateforme, ni de la taille
 // d'un int.
-func TestSuiteDeReference(t *testing.T) {
+func TestReferenceSequence(t *testing.T) {
 	cas := []struct {
 		flux    string
 		attendu []int
@@ -45,9 +45,9 @@ func TestSuiteDeReference(t *testing.T) {
 
 	for _, c := range cas {
 		t.Run(c.flux, func(t *testing.T) {
-			a := NouvelAlea(178342119, c.flux)
+			a := NewRandom(178342119, c.flux)
 			for i, attendu := range c.attendu {
-				if got := a.Entier(1000); got != attendu {
+				if got := a.Int(1000); got != attendu {
 					t.Fatalf("tirage %d : %d, attendu %d", i, got, attendu)
 				}
 			}
@@ -55,7 +55,7 @@ func TestSuiteDeReference(t *testing.T) {
 	}
 
 	melange := []int{0, 1, 2, 3, 4, 5}
-	Melanger(NouvelAlea(99, "etranglement"), melange)
+	Shuffle(NewRandom(99, "etranglement"), melange)
 	for i, attendu := range []int{3, 5, 0, 1, 4, 2} {
 		if melange[i] != attendu {
 			t.Fatalf("mélange %v, attendu [3 5 0 1 4 2]", melange)
@@ -63,36 +63,36 @@ func TestSuiteDeReference(t *testing.T) {
 	}
 }
 
-// TestFluxIndependants vérifie ce pour quoi les flux nommés existent.
+// TestStreamsAreIndependent vérifie ce pour quoi les flux nommés existent.
 //
 // Ajouter un tirage dans la génération du plateau ne doit pas décaler ceux de
 // l'IA. Deux flux consommés inégalement continuent donc chacun sur sa suite.
-func TestFluxIndependants(t *testing.T) {
-	plateau := NouvelAlea(42, "plateau")
-	ia := NouvelAlea(42, "ia")
-	temoin := NouvelAlea(42, "ia")
+func TestStreamsAreIndependent(t *testing.T) {
+	plateau := NewRandom(42, "plateau")
+	ia := NewRandom(42, "ia")
+	temoin := NewRandom(42, "ia")
 
 	// Le plateau consomme cent tirages, l'IA aucun.
 	for i := 0; i < 100; i++ {
-		plateau.Entier(6)
+		plateau.Int(6)
 	}
 
 	for i := 0; i < 50; i++ {
-		if x, y := ia.Entier(6), temoin.Entier(6); x != y {
+		if x, y := ia.Int(6), temoin.Int(6); x != y {
 			t.Fatalf("le flux ia a été décalé au tirage %d : %d contre %d", i, x, y)
 		}
 	}
 }
 
-// TestFluxDifferentsDonnentDesSuitesDifferentes vérifie l'autre moitié : deux
+// TestDifferentStreamsDifferentSequences vérifie l'autre moitié : deux
 // noms ne doivent pas retomber sur la même suite.
-func TestFluxDifferentsDonnentDesSuitesDifferentes(t *testing.T) {
-	a := NouvelAlea(7, "plateau")
-	b := NouvelAlea(7, "ia")
+func TestDifferentStreamsDifferentSequences(t *testing.T) {
+	a := NewRandom(7, "plateau")
+	b := NewRandom(7, "ia")
 
 	identiques := 0
 	for i := 0; i < 100; i++ {
-		if a.Entier(1000) == b.Entier(1000) {
+		if a.Int(1000) == b.Int(1000) {
 			identiques++
 		}
 	}
@@ -103,15 +103,15 @@ func TestFluxDifferentsDonnentDesSuitesDifferentes(t *testing.T) {
 	}
 }
 
-// TestGrainesDifferentesDonnentDesSuitesDifferentes vérifie que la graine porte
+// TestDifferentSeedsDifferentSequences vérifie que la graine porte
 // bien la partie.
-func TestGrainesDifferentesDonnentDesSuitesDifferentes(t *testing.T) {
-	a := NouvelAlea(1, "plateau")
-	b := NouvelAlea(2, "plateau")
+func TestDifferentSeedsDifferentSequences(t *testing.T) {
+	a := NewRandom(1, "plateau")
+	b := NewRandom(2, "plateau")
 
 	identiques := 0
 	for i := 0; i < 100; i++ {
-		if a.Entier(1000) == b.Entier(1000) {
+		if a.Int(1000) == b.Int(1000) {
 			identiques++
 		}
 	}
@@ -120,41 +120,41 @@ func TestGrainesDifferentesDonnentDesSuitesDifferentes(t *testing.T) {
 	}
 }
 
-// TestEntierResteDansLesBornes vérifie qu'aucun tirage ne sort de [0, n[.
-func TestEntierResteDansLesBornes(t *testing.T) {
-	a := NouvelAlea(3, "essai")
+// TestIntStaysWithinBounds vérifie qu'aucun tirage ne sort de [0, n[.
+func TestIntStaysWithinBounds(t *testing.T) {
+	a := NewRandom(3, "essai")
 	for _, n := range []int{1, 2, 3, 6, 41, 1000} {
 		for i := 0; i < 5000; i++ {
-			if v := a.Entier(n); v < 0 || v >= n {
+			if v := a.Int(n); v < 0 || v >= n {
 				t.Fatalf("Entier(%d) a rendu %d", n, v)
 			}
 		}
 	}
 }
 
-// TestEntierBorneInvalide vérifie qu'un appel fautif ne fait pas tomber la
+// TestIntWithInvalidBound vérifie qu'un appel fautif ne fait pas tomber la
 // partie. Un plugin ne doit pas pouvoir l'arrêter en demandant un tirage vide.
-func TestEntierBorneInvalide(t *testing.T) {
-	a := NouvelAlea(3, "essai")
+func TestIntWithInvalidBound(t *testing.T) {
+	a := NewRandom(3, "essai")
 	for _, n := range []int{0, -1, math.MinInt} {
-		if v := a.Entier(n); v != 0 {
+		if v := a.Int(n); v != 0 {
 			t.Errorf("Entier(%d) a rendu %d, attendu 0", n, v)
 		}
 	}
 }
 
-// TestRepartitionSansBiais éprouve le rejet du dernier bloc incomplet.
+// TestUnbiasedDistribution éprouve le rejet du dernier bloc incomplet.
 //
 // Un simple reste favoriserait les petites valeurs. Le biais serait minuscule
 // et invisible en jouant, mais l'équilibrage compare des milliers de parties :
 // il s'y verrait, et on le chercherait ailleurs.
-func TestRepartitionSansBiais(t *testing.T) {
+func TestUnbiasedDistribution(t *testing.T) {
 	const faces, tirages = 6, 600000
 	compte := make([]int, faces)
 
-	a := NouvelAlea(20260825, "des")
+	a := NewRandom(20260825, "des")
 	for i := 0; i < tirages; i++ {
-		compte[a.Entier(faces)]++
+		compte[a.Int(faces)]++
 	}
 
 	attendu := float64(tirages) / faces
@@ -166,13 +166,13 @@ func TestRepartitionSansBiais(t *testing.T) {
 	}
 }
 
-// TestMelangerGardeLesElements vérifie qu'un mélange permute sans rien perdre
+// TestShuffleKeepsElements vérifie qu'un mélange permute sans rien perdre
 // ni rien inventer.
-func TestMelangerGardeLesElements(t *testing.T) {
+func TestShuffleKeepsElements(t *testing.T) {
 	depart := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 	melange := append([]int(nil), depart...)
 
-	Melanger(NouvelAlea(5, "essai"), melange)
+	Shuffle(NewRandom(5, "essai"), melange)
 
 	vus := map[int]int{}
 	for _, v := range melange {
@@ -183,14 +183,14 @@ func TestMelangerGardeLesElements(t *testing.T) {
 	}
 }
 
-// TestMelangerEstDeterministe vérifie que deux mélanges de même graine donnent
+// TestShuffleIsDeterministic vérifie que deux mélanges de même graine donnent
 // la même permutation — ce dont dépend l'ordre de fermeture des zones.
-func TestMelangerEstDeterministe(t *testing.T) {
+func TestShuffleIsDeterministic(t *testing.T) {
 	a := []int{0, 1, 2, 3, 4, 5}
 	b := []int{0, 1, 2, 3, 4, 5}
 
-	Melanger(NouvelAlea(99, "etranglement"), a)
-	Melanger(NouvelAlea(99, "etranglement"), b)
+	Shuffle(NewRandom(99, "etranglement"), a)
+	Shuffle(NewRandom(99, "etranglement"), b)
 
 	for i := range a {
 		if a[i] != b[i] {
@@ -199,13 +199,13 @@ func TestMelangerEstDeterministe(t *testing.T) {
 	}
 }
 
-// TestMelangerPermuteVraiment vérifie qu'un mélange ne rend pas l'ordre de
-// départ. Un Melanger vide passerait tous les autres tests.
-func TestMelangerPermuteVraiment(t *testing.T) {
+// TestShuffleActuallyPermutes vérifie qu'un mélange ne rend pas l'ordre de
+// départ. Un Shuffle vide passerait tous les autres tests.
+func TestShuffleActuallyPermutes(t *testing.T) {
 	inchange := 0
 	for graine := int64(0); graine < 20; graine++ {
 		s := []int{0, 1, 2, 3, 4, 5, 6, 7}
-		Melanger(NouvelAlea(graine, "essai"), s)
+		Shuffle(NewRandom(graine, "essai"), s)
 
 		identique := true
 		for i, v := range s {
@@ -223,15 +223,15 @@ func TestMelangerPermuteVraiment(t *testing.T) {
 	}
 }
 
-// TestMelangerSupporteLesTranchesCourtes vérifie qu'une tranche vide ou d'un
+// TestShuffleHandlesShortSlices vérifie qu'une tranche vide ou d'un
 // seul élément ne fait rien de fâcheux.
-func TestMelangerSupporteLesTranchesCourtes(t *testing.T) {
-	a := NouvelAlea(1, "essai")
-	Melanger(a, []int(nil))
-	Melanger(a, []int{7})
+func TestShuffleHandlesShortSlices(t *testing.T) {
+	a := NewRandom(1, "essai")
+	Shuffle(a, []int(nil))
+	Shuffle(a, []int{7})
 
 	seul := []int{7}
-	Melanger(a, seul)
+	Shuffle(a, seul)
 	if seul[0] != 7 {
 		t.Error("une tranche d'un élément a été altérée")
 	}

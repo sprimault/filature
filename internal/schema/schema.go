@@ -50,12 +50,12 @@ type Noeud struct {
 // écrits à la main du dépôt.
 const dialecte = "https://json-schema.org/draft/2020-12/schema"
 
-// Generer rend le schéma d'un type, avec ses types imbriqués en $defs.
+// Generate rend le schéma d'un type, avec ses types imbriqués en $defs.
 //
 // Les structures partagées — une position apparaît une dizaine de fois — ne
 // sont décrites qu'une fois. C'est aussi ce qui permet à un type récursif de
 // tenir : un effet différé contient des effets.
-func Generer(t reflect.Type, id, titre, description, entete string) ([]byte, error) {
+func Generate(t reflect.Type, id, titre, description, entete string) ([]byte, error) {
 	g := &generateur{defs: map[string]*Noeud{}, encours: map[string]bool{}}
 
 	racine := g.noeud(t)
@@ -121,7 +121,7 @@ func (g *generateur) noeud(t reflect.Type) *Noeud {
 	}
 
 	// Une interface ou un canal n'a pas de forme JSON. Le noyau n'en sérialise
-	// pas — Plateau porte json:"-" — et rencontrer le cas signale un champ
+	// pas — Board porte json:"-" — et rencontrer le cas signale un champ
 	// ajouté sans y penser.
 	return &Noeud{Description: "type sans forme JSON : " + t.String()}
 }

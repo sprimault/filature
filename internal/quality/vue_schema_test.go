@@ -24,7 +24,7 @@ var majSchemas = flag.Bool("maj-schemas", false, "réécrire les schémas géné
 // cheminSchemaVue est le contrat que lisent les bots et le mode réseau.
 var cheminSchemaVue = filepath.Join(racine, "schemas", "vue.schema.json")
 
-// TestSchemaVueSuitLaStructure vérifie que le contrat publié correspond au type
+// TestViewSchemaFollowsStruct vérifie que le contrat publié correspond au type
 // Go dont il est tiré.
 //
 // C'est le seul garde-fou contre un contrat qui vieillit : un champ ajouté à la
@@ -34,12 +34,12 @@ var cheminSchemaVue = filepath.Join(racine, "schemas", "vue.schema.json")
 // Un bot conforme au schéma doit pouvoir lire ce que le jeu envoie. Si les deux
 // divergent, c'est le bot qui casse, chez son auteur, sans que rien ici ne
 // l'annonce.
-func TestSchemaVueSuitLaStructure(t *testing.T) {
-	attendu, err := schema.Generer(
-		reflect.TypeOf(core.Vue{}),
+func TestViewSchemaFollowsStruct(t *testing.T) {
+	attendu, err := schema.Generate(
+		reflect.TypeOf(core.View{}),
 		"https://github.com/sprimault/filature/schemas/vue.schema.json",
 		"Vue Filature",
-		"Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis core.Vue : ne pas modifier a la main.",
+		"Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis core.View : ne pas modifier a la main.",
 		"Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>. SPDX-License-Identifier: Apache-2.0",
 	)
 	if err != nil {
@@ -56,28 +56,28 @@ func TestSchemaVueSuitLaStructure(t *testing.T) {
 
 	publie, err := os.ReadFile(cheminSchemaVue)
 	if err != nil {
-		t.Fatalf("%v — lancer « go test ./internal/qualite -maj-schemas » pour l'écrire", err)
+		t.Fatalf("%v — lancer « go test ./internal/quality -maj-schemas » pour l'écrire", err)
 	}
 
 	if string(publie) != string(attendu) {
-		t.Error("schemas/vue.schema.json ne correspond plus à core.Vue — " +
-			"relancer « go test ./internal/qualite -maj-schemas » et relire le diff")
+		t.Error("schemas/vue.schema.json ne correspond plus à core.View — " +
+			"relancer « go test ./internal/quality -maj-schemas » et relire le diff")
 	}
 }
 
-// TestSchemaVueDecritLesSecretsCommeFacultatifs vérifie que le contrat dit ce
+// TestViewSchemaMarksSecretsOptional vérifie que le contrat dit ce
 // que la vue fait.
 //
 // Position, zone scellée et résistance manquent aux inspecteurs : les déclarer
 // obligatoires ferait écrire des bots qui les attendent toujours, et qui
 // tomberaient sur la première vue où ils manquent.
-func TestSchemaVueDecritLesSecretsCommeFacultatifs(t *testing.T) {
+func TestViewSchemaMarksSecretsOptional(t *testing.T) {
 	brut, err := os.ReadFile(cheminSchemaVue)
 	if err != nil {
 		t.Skipf("schéma absent : %v", err)
 	}
 
-	requis := champsRequis(t, brut, "Vue")
+	requis := champsRequis(t, brut, "View")
 	for _, secret := range []string{"position_fugitif", "zone_scellee", "resistance"} {
 		if requis[secret] {
 			t.Errorf("%s est déclaré obligatoire alors qu'il manque aux inspecteurs", secret)
@@ -92,7 +92,7 @@ func TestSchemaVueDecritLesSecretsCommeFacultatifs(t *testing.T) {
 	}
 }
 
-// champsRequis lit la liste des champs obligatoires d'une définition du schéma.
+// champsRequis lit la list des champs obligatoires d'une définition du schéma.
 func champsRequis(t *testing.T, brut []byte, definition string) map[string]bool {
 	t.Helper()
 

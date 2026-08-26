@@ -22,13 +22,13 @@ const racine = "../.."
 // cache de compilation, qui contient du Go tiers.
 var ignores = map[string]bool{".git": true, ".tmp": true, ".idea": true}
 
-// TestGodocComplet échoue sur toute déclaration de haut niveau sans
+// TestGodocComplete échoue sur toute déclaration de haut niveau sans
 // documentation.
 //
 // revive n'a que la règle exported : les fonctions non exportées, main et les
 // variables de paquet lui échappent, alors que la règle du projet ne fait pas
 // cette distinction. Les fichiers de test sont soumis au même contrôle.
-func TestGodocComplet(t *testing.T) {
+func TestGodocComplete(t *testing.T) {
 	fset := token.NewFileSet()
 	var manques []string
 

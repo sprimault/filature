@@ -21,21 +21,21 @@ type Poids struct {
 	Interception float64 `json:"interception"`
 	Dispersion   float64 `json:"dispersion"`
 	GardeZones   float64 `json:"garde_zones"`
-	Barycentre   float64 `json:"barycentre"`
+	Centroid     float64 `json:"barycentre"`
 	Bruit        float64 `json:"bruit"`
 }
 
-// Inspecteurs est l'IA embarquée du camp des poursuivants.
+// Inspectors est l'IA embarquée du sideName des poursuivants.
 //
 // Elle se branche sur la même signature qu'un bot externe : c'est ce qui
 // garantit que le protocole est suffisant, puisque le jeu s'en sert lui-même.
-type Inspecteurs struct {
+type Inspectors struct {
 	poids    Poids
 	croyance *Croyance
 }
 
-// Jouer choisit un coup en minimisant l'espérance de masse résiduelle après
+// Play choisit un coup en minimisant l'espérance de masse résiduelle après
 // déplacement, sous contrainte de couvrir les zones d'extraction.
-func (i *Inspecteurs) Jouer(v core.Vue, a *core.Alea) (core.Coup, error) {
-	return core.Coup{}, errors.New("à implémenter : étape 9")
+func (i *Inspectors) Play(v core.View, a *core.Random) (core.Move, error) {
+	return core.Move{}, errors.New("à implémenter : étape 9")
 }

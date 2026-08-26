@@ -47,7 +47,7 @@ est l'étape 2**, et c'est le plus coûteux à rétablir : tant qu'elle n'est pa
 
 ## 2 — Vue filtrée
 
-`VuePour` et sa sérialisation, plus `schemas/vue.schema.json`, généré depuis le
+`ViewFor` et sa sérialisation, plus `schemas/vue.schema.json`, généré depuis le
 Go et non écrit à la main.
 
 Séparée de l'étape 1 pour une raison : c'est l'invariant le plus facile à
@@ -69,7 +69,7 @@ Table précalculée par le terrain, occlusion des pions et des barrages appliqu�
 
 Séparée de l'étape 3 parce que le blocage de vue entre inspecteurs interdit de
 tout précalculer, et que la distinction Tchebychev / Manhattan est le piège où
-un prototype antérieur s'est fait prendre : un test compare `EstVisible` et
+un prototype antérieur s'est fait prendre : un test compare `IsVisible` et
 l'évaluation du fugitif sur les mêmes positions.
 
 ## 5 — Boucle de jeu
@@ -170,9 +170,9 @@ peut renvoyer à `docs/regles.md`.
 reconnexion par jeton.
 
 Placée tard sans risque : le protocole ne construit rien de neuf, l'hôte fait
-déjà autorité et `VuePour` est en place depuis l'étape 2.
+déjà autorité et `ViewFor` est en place depuis l'étape 2.
 
-**Le retour en arrière s'arrête ici.** `Annuler` existe pour l'IA et se prête à
+**Le retour en arrière s'arrête ici.** `Undo` existe pour l'IA et se prête à
 un bouton en solo, où l'adversaire est une machine. En réseau deux joueurs
 s'affrontent, et défaire un coup reviendrait à rejouer celui d'en face après
 l'avoir vu.
@@ -217,7 +217,7 @@ avant.
 
 ## Hors périmètre v1
 
-**Le plateau infini.** L'interface `Plateau` est conçue pour l'accueillir — la
+**Le plateau infini.** L'interface `Board` est conçue pour l'accueillir — la
 génération par tuiles s'y substitue sans qu'aucune règle change — mais la v1
 est bornée. La mécanique d'extraction est ce qui rendrait l'infini jouable ;
 elle ne le rend pas nécessaire.

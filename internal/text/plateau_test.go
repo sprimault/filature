@@ -15,12 +15,12 @@ import (
 // Écrite à la main plutôt que tirée d'une partie : ce paquet doit se tester
 // sans monter de plateau ni de registre, faute de quoi un défaut de génération
 // ferait échouer un test d'affichage.
-func vueDEssai() core.Vue {
-	v := core.Vue{
-		Acteur:     core.CampFugitif,
-		Tour:       3,
-		Phase:      core.PhaseFugitif,
-		Parametres: core.Parametres{Cote: 5, Tours: 20},
+func vueDEssai() core.View {
+	v := core.View{
+		Side:     core.SideFugitive,
+		Turn:     3,
+		Phase:    core.PhaseFugitive,
+		Settings: core.Settings{Size: 5, Turns: 20},
 	}
 
 	for ligne := 0; ligne < 5; ligne++ {
@@ -28,7 +28,7 @@ func vueDEssai() core.Vue {
 			if colonne == 2 && ligne == 2 {
 				continue // le seul bâtiment
 			}
-			v.Rues = append(v.Rues, core.Position{Colonne: colonne, Ligne: ligne})
+			v.Streets = append(v.Streets, core.Position{Column: colonne, Row: ligne})
 		}
 	}
 	return v
@@ -46,9 +46,9 @@ func ligneDe(t *testing.T, rendu string, ligne int) string {
 	return strings.TrimPrefix(lignes[ligne+2], "  ")[2:]
 }
 
-// TestPlateauDessineLeTerrain vérifie que rue et bâtiment se distinguent.
-func TestPlateauDessineLeTerrain(t *testing.T) {
-	rendu := Plateau(vueDEssai())
+// TestBoardDrawsTerrain vérifie que rue et bâtiment se distinguent.
+func TestBoardDrawsTerrain(t *testing.T) {
+	rendu := Board(vueDEssai())
 
 	if got := ligneDe(t, rendu, 0); got != "....." {
 		t.Errorf("ligne 0 = %q, attendu %q", got, ".....")
@@ -58,161 +58,161 @@ func TestPlateauDessineLeTerrain(t *testing.T) {
 	}
 }
 
-// TestPionsCouvrentLeReste vérifie l'ordre d'empilement des symboles.
+// TestPiecesCoverTheRest vérifie l'ordre d'empilement des symboles.
 //
 // Savoir qu'un inspecteur se tient sur une trace importe plus que la trace :
 // l'inverse cacherait un pion derrière ce qu'il piétine.
-func TestPionsCouvrentLeReste(t *testing.T) {
+func TestPiecesCoverTheRest(t *testing.T) {
 	v := vueDEssai()
-	sur := core.Position{Colonne: 1, Ligne: 1}
+	sur := core.Position{Column: 1, Row: 1}
 
-	v.TracesConnues = map[string]core.Trace{sur.Cle(): {Tour: 2, Direction: core.Est}}
-	v.Scenes = []core.Scene{{Position: sur, Tour: 2}}
-	v.Inspecteurs = []core.Inspecteur{{Position: sur}}
+	v.TracesConnues = map[string]core.Trail{sur.Key(): {Turn: 2, Direction: core.Est}}
+	v.CrimeScenes = []core.CrimeScene{{Position: sur, Turn: 2}}
+	v.Inspectors = []core.Inspector{{Position: sur}}
 
-	if got := ligneDe(t, Plateau(v), 1); got[1] != CarInspecteur {
+	if got := ligneDe(t, Board(v), 1); got[1] != CarInspecteur {
 		t.Errorf("ligne 1 = %q, l'inspecteur devrait couvrir la scène et la trace", got)
 	}
 }
 
-// TestFugitifAbsentDeLaVueDesInspecteurs vérifie que l'affichage ne montre pas
+// TestFugitiveAbsentFromInspectorsView vérifie que l'affichage ne montre pas
 // ce que la vue ne porte pas.
 //
 // C'est la vue qui filtre, jamais le rendu : s'il fallait que l'affichage
 // s'abstienne de montrer un champ rempli, la fuite aurait déjà eu lieu côté
 // réseau.
-func TestFugitifAbsentDeLaVueDesInspecteurs(t *testing.T) {
+func TestFugitiveAbsentFromInspectorsView(t *testing.T) {
 	v := vueDEssai()
-	v.Acteur = core.CampInspecteurs
+	v.Side = core.SideInspectors
 	v.PositionFugitif = nil
 
-	if strings.ContainsRune(Plateau(v), CarFugitif) {
+	if strings.ContainsRune(Board(v), CarFugitif) {
 		t.Error("le fugitif apparaît alors que la vue ne le porte pas")
 	}
 }
 
-// TestEtatTaitCeQuIlIgnore vérifie que la résistance n'est affichée que
+// TestStatusHidesWhatItIgnores vérifie que la résistance n'est affichée que
 // lorsqu'elle est connue.
 //
 // Un zéro affiché par défaut dirait que le fugitif est à bout, c'est-à-dire
 // exactement le contraire de « on n'en sait rien ».
-func TestEtatTaitCeQuIlIgnore(t *testing.T) {
+func TestStatusHidesWhatItIgnores(t *testing.T) {
 	v := vueDEssai()
-	v.Acteur = core.CampInspecteurs
-	v.Resistance = nil
+	v.Side = core.SideInspectors
+	v.Stamina = nil
 
-	if strings.Contains(Etat(v), "Résistance") {
+	if strings.Contains(Status(v), "Résistance") {
 		t.Error("la résistance est affichée alors que la vue ne la porte pas")
 	}
 
 	huit := 8
-	v.Resistance = &huit
-	if !strings.Contains(Etat(v), "Résistance : 8") {
+	v.Stamina = &huit
+	if !strings.Contains(Status(v), "Résistance : 8") {
 		t.Error("la résistance connue n'est pas affichée")
 	}
 }
 
-// TestZonesNumerotees vérifie que chaque zone porte son numéro sur le plateau.
-func TestZonesNumerotees(t *testing.T) {
+// TestZonesNumbered vérifie que chaque zone porte son numéro sur le plateau.
+func TestZonesNumbered(t *testing.T) {
 	v := vueDEssai()
 	v.Zones = []core.Zone{
-		{Numero: 0, Cases: []core.Position{{Colonne: 0, Ligne: 0}}},
-		{Numero: 3, Cases: []core.Position{{Colonne: 4, Ligne: 4}}, Fermee: true},
+		{Number: 0, Cells: []core.Position{{Column: 0, Row: 0}}},
+		{Number: 3, Cells: []core.Position{{Column: 4, Row: 4}}, Closed: true},
 	}
 
-	rendu := Plateau(v)
+	rendu := Board(v)
 	if ligneDe(t, rendu, 0)[0] != '0' {
 		t.Error("la zone 0 n'est pas dessinée")
 	}
 	if ligneDe(t, rendu, 4)[4] != '3' {
 		t.Error("la zone 3 n'est pas dessinée")
 	}
-	if !strings.Contains(Etat(v), "Zones fermées : 3") {
-		t.Errorf("la fermeture n'est pas signalée :\n%s", Etat(v))
+	if !strings.Contains(Status(v), "Zones fermées : 3") {
+		t.Errorf("la fermeture n'est pas signalée :\n%s", Status(v))
 	}
 }
 
-// TestFusionnerDonneAuSpectateurCeQueNulNeSait vérifie que la superposition des
+// TestMergeGivesWatcherWhatNobodyKnows vérifie que la superposition des
 // deux vues suffit à tout montrer.
 //
 // C'est ce qui permet de se passer d'un accès à l'état complet : si un champ
 // manquait aux deux vues, il manquerait aussi au contrat, et le trou se verrait
 // ici plutôt que de rester silencieux.
-func TestFusionnerDonneAuSpectateurCeQueNulNeSait(t *testing.T) {
-	cache := core.Position{Colonne: 3, Ligne: 1}
+func TestMergeGivesWatcherWhatNobodyKnows(t *testing.T) {
+	cache := core.Position{Column: 3, Row: 1}
 	zone := 2
 	resistance := 7
 
 	fugitif := vueDEssai()
 	fugitif.PositionFugitif = &cache
-	fugitif.ZoneScellee = &zone
-	fugitif.Resistance = &resistance
-	fugitif.TracesConnues = map[string]core.Trace{
-		cache.Cle(): {Tour: 2, Direction: core.Nord},
+	fugitif.SealedZone = &zone
+	fugitif.Stamina = &resistance
+	fugitif.TracesConnues = map[string]core.Trail{
+		cache.Key(): {Turn: 2, Direction: core.Nord},
 	}
 
 	inspecteurs := vueDEssai()
-	inspecteurs.Acteur = core.CampInspecteurs
-	inspecteurs.Inspecteurs = []core.Inspecteur{{Position: core.Position{Colonne: 0, Ligne: 4}}}
-	ailleurs := core.Position{Colonne: 4, Ligne: 0}
-	inspecteurs.TracesConnues = map[string]core.Trace{
-		ailleurs.Cle(): {Tour: 1, Direction: core.Sud},
+	inspecteurs.Side = core.SideInspectors
+	inspecteurs.Inspectors = []core.Inspector{{Position: core.Position{Column: 0, Row: 4}}}
+	ailleurs := core.Position{Column: 4, Row: 0}
+	inspecteurs.TracesConnues = map[string]core.Trail{
+		ailleurs.Key(): {Turn: 1, Direction: core.Sud},
 	}
 
-	v := Fusionner(fugitif, inspecteurs)
+	v := Merge(fugitif, inspecteurs)
 
 	if v.PositionFugitif == nil || *v.PositionFugitif != cache {
 		t.Error("le spectateur ne voit pas le fugitif")
 	}
-	if v.ZoneScellee == nil || *v.ZoneScellee != zone {
+	if v.SealedZone == nil || *v.SealedZone != zone {
 		t.Error("le spectateur ne voit pas la zone scellée")
 	}
-	if v.Resistance == nil || *v.Resistance != resistance {
+	if v.Stamina == nil || *v.Stamina != resistance {
 		t.Error("le spectateur ne voit pas la résistance")
 	}
-	if len(v.Inspecteurs) != 1 {
+	if len(v.Inspectors) != 1 {
 		t.Error("le spectateur ne voit pas les inspecteurs")
 	}
 	if len(v.TracesConnues) != 2 {
 		t.Errorf("%d traces, attendu les deux camps réunis", len(v.TracesConnues))
 	}
-	if len(v.CoupsLegaux) != 0 {
+	if len(v.LegalMoves) != 0 {
 		t.Error("un spectateur ne joue pas, il n'a pas à recevoir de coups")
 	}
 
-	rendu := Plateau(v)
+	rendu := Board(v)
 	if !strings.ContainsRune(rendu, CarFugitif) || !strings.ContainsRune(rendu, CarInspecteur) {
 		t.Errorf("la vue fusionnée ne montre pas les deux camps :\n%s", rendu)
 	}
 }
 
-// TestLettrePionBornee vérifie qu'un rang hors alphabet se dit en clair.
+// TestPieceLetterBounded vérifie qu'un rang hors alphabet se dit en clair.
 //
 // Un tel rang ne peut venir que d'un coup mal formé, d'un bot par exemple. Le
 // convertir sans borne produirait un caractère dont personne ne saurait dire
 // d'où il sort.
-func TestLettrePionBornee(t *testing.T) {
+func TestPieceLetterBounded(t *testing.T) {
 	for rang, attendu := range map[int]string{0: "A", 4: "E", 25: "Z"} {
-		if got := LettrePion(rang); got != attendu {
+		if got := PieceLetter(rang); got != attendu {
 			t.Errorf("rang %d rendu %q, attendu %q", rang, got, attendu)
 		}
 	}
 	for _, rang := range []int{-1, 26, 9000} {
-		if got := LettrePion(rang); !strings.Contains(got, "pion") {
+		if got := PieceLetter(rang); !strings.Contains(got, "pion") {
 			t.Errorf("rang %d rendu %q, attendu qu'il se dise en clair", rang, got)
 		}
 	}
 }
 
-// TestFinNommeLeMotif vérifie que chaque fin de partie se lit en français.
-func TestFinNommeLeMotif(t *testing.T) {
+// TestEndingNamesTheReason vérifie que chaque fin de partie se lit en français.
+func TestEndingNamesTheReason(t *testing.T) {
 	for motif, attendu := range map[string]string{
-		core.MotifExtraction:  "extrait",
-		core.MotifResistance:  "à bout",
-		core.MotifBlocage:     "pris",
-		core.MotifTempsEcoule: "écoulé",
+		core.OutcomeExtraction:   "extrait",
+		core.OutcomeStaminaSpent: "à bout",
+		core.OutcomeCornered:     "pris",
+		core.OutcomeTimeUp:       "écoulé",
 	} {
-		rendu := Fin(core.Resultat{Vainqueur: core.CampFugitif, Motif: motif, Tour: 12})
+		rendu := Ending(core.Outcome{Winner: core.SideFugitive, Reason: motif, Turn: 12})
 		if !strings.Contains(rendu, attendu) {
 			t.Errorf("motif %s rendu %q, attendu qu'il contienne %q", motif, rendu, attendu)
 		}

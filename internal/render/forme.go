@@ -18,9 +18,9 @@ const (
 	HauteurCase = 32
 )
 
-// VersionFormes est la version du contrat que ce binaire sait lire. Un plugin
+// ShapesVersion est la version du contrat que ce binaire sait lire. Un plugin
 // écrit contre une version inconnue est refusé plutôt que lu de travers.
-const VersionFormes = 1
+const ShapesVersion = 1
 
 // TypeTrait énumère les quatre primitives. Le vocabulaire est volontairement
 // pauvre : tout ce qui est livré avec le jeu s'y exprime, et une primitive de
@@ -44,13 +44,13 @@ type Point struct {
 }
 
 // Trait est une primitive paramétrée. Les champs inutiles au type restent à
-// zéro, comme pour core.Effet et pour la même raison : un enregistrement plat
+// zéro, comme pour core.Effect et pour la même raison : un enregistrement plat
 // se lit et se valide sans hiérarchie de types.
 type Trait struct {
 	Type             TypeTrait `toml:"type"`
 	Points           []Point   `toml:"points"`
 	Centre           Point     `toml:"centre"`
-	Rayon            int       `toml:"rayon"`
+	Radius           int       `toml:"rayon"`
 	De               Point     `toml:"de"`
 	A                Point     `toml:"a"`
 	Epaisseur        int       `toml:"epaisseur"`
@@ -69,7 +69,7 @@ type Trait struct {
 //
 // La raison est mécanique. Un losange identique partout, c'est une géométrie
 // construite une fois pour toutes les cases, un tri en profondeur qui reste
-// colonne + ligne, et un VersPlateau qui reste une formule fermée. Une tuile de
+// colonne + ligne, et un ToBoard qui reste une formule fermée. Une tuile de
 // forme libre imposerait une boîte englobante par case, un test de survol forme
 // par forme, et invaliderait le tri par ordre de peintre.
 type Role string
@@ -124,7 +124,7 @@ var gabarits = map[Role]Gabarit{
 
 // Forme est un dessin nommé, plus ses variantes d'état facultatives.
 type Forme struct {
-	Nom       string
+	Name      string
 	Role      Role
 	Traits    []Trait
 	Variantes map[string][]Trait
@@ -152,22 +152,22 @@ type Jeu struct {
 	Palette Palette
 }
 
-// Valider applique les contrôles du contrat : gabarit, plafond de traits,
+// Validate applique les contrôles du contrat : gabarit, plafond de traits,
 // nombre de sommets, résolution des couleurs, absence de valeur hexadécimale.
 //
 // Renvoie tous les manquements plutôt que le premier : quelqu'un qui met au
-// point un plugin veut la liste, pas un aller-retour par erreur.
-func (j *Jeu) Valider() []error {
+// point un plugin veut la list, pas un aller-retour par erreur.
+func (j *Jeu) Validate() []error {
 	return []error{errors.New("à implémenter : étape 6")}
 }
 
-// Fusionner applique une surcharge partielle sur le jeu de base.
+// Merge applique une surcharge partielle sur le jeu de base.
 //
 // Un plugin ne déclare que ce qu'il remplace, le reste retombe sur le contenu
 // livré — sans quoi changer un seul pion obligerait à livrer les quarante
 // formes, et personne ne le ferait. Deux plugins qui redéfinissent la même
 // forme sont un conflit, jamais un écrasement silencieux.
-func (j *Jeu) Fusionner(nom string, autre *Jeu) error {
+func (j *Jeu) Merge(nom string, autre *Jeu) error {
 	return errors.New("à implémenter : étape 6")
 }
 
@@ -179,29 +179,29 @@ func (j *Jeu) Fusionner(nom string, autre *Jeu) error {
 //
 // Luminosité seule, jamais la teinte, et le sol seulement — pions et bâtiments
 // gardent leur couleur exacte, qui doit rester identifiable d'un coup d'œil.
-// Coupé en vue de débogage, où l'uniformité aide à lire les surcouches.
+// Moveé en vue de débogage, où l'uniformité aide à lire les surcouches.
 const AmplitudeGrainSol = 5
 
-// GrainSol renvoie l'écart de luminosité d'une case, dans
+// GroundGrain renvoie l'écart de luminosité d'une case, dans
 // [-AmplitudeGrainSol, +AmplitudeGrainSol].
 //
 // Ce n'est pas une primitive du contrat et aucun plugin n'a à en tenir compte :
 // tous en bénéficient, y compris ceux qui ne changent que la palette.
-func GrainSol(graine int64, colonne, ligne int) int {
+func GroundGrain(graine int64, colonne, ligne int) int {
 	// à implémenter : étape 7
 	return 0
 }
 
-// VersEcran projette une case du plateau en coordonnées d'écran.
-func VersEcran(colonne, ligne int) (x, y int) {
+// ToScreen projette une case du plateau en coordonnées d'écran.
+func ToScreen(colonne, ligne int) (x, y int) {
 	return (colonne - ligne) * LargeurCase / 2, (colonne + ligne) * HauteurCase / 2
 }
 
-// VersPlateau est la transformation inverse, pour le clic.
+// ToBoard est la transformation inverse, pour le clic.
 //
 // L'arrondi doit tomber sur la case que l'utilisateur croit viser, y compris
 // près des arêtes du losange où le calcul naïf se trompe d'une case.
-func VersPlateau(x, y int) (colonne, ligne int) {
+func ToBoard(x, y int) (colonne, ligne int) {
 	// à implémenter : étape 7
 	return 0, 0
 }

@@ -37,6 +37,12 @@ l'exécutable cesse d'être lu : le renommer suffit.
 Les deux sous-commandes suivent : `filature examples` et `filature validate`,
 là où l'on écrivait `exemples` et `valide`.
 
+**Le code passe à l'anglais** : paquets, types, fonctions, champs. `Partie`
+devient `Game`, `Plateau` devient `Board`, `CoupsLegaux` devient `LegalMoves`.
+Ce que voient les plugins et les bots ne bouge pas d'un caractère — clés JSON,
+valeurs de manifeste et noms de flux d'aléa sont inchangés, et les plateaux de
+référence sont identiques. La documentation, elle, reste en français.
+
 Le mot « greffon » disparaît du projet au profit de « plugin », partout — code,
 documentation et libellés. Il est exclusivement français, absent de l'usage
 courant, et il ne se cherche pas.
@@ -67,6 +73,12 @@ renaming it is enough.
 
 Both subcommands follow: `filature examples` and `filature validate`, where one
 used to write `exemples` and `valide`.
+
+**The code moves to English**: packages, types, functions, fields. `Partie`
+becomes `Game`, `Plateau` becomes `Board`, `CoupsLegaux` becomes `LegalMoves`.
+What plugins and bots see does not change by a single character — JSON keys,
+manifest values and random-stream names are untouched, and reference boards are
+identical. Documentation stays in French.
 
 The word « greffon » is gone from the project in favour of « plugin », everywhere —
 code, documentation and labels. It is exclusively French, absent from common

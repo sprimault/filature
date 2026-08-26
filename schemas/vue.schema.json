@@ -3,10 +3,57 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/sprimault/filature/schemas/vue.schema.json",
   "title": "Vue Filature",
-  "description": "Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis core.Vue : ne pas modifier a la main.",
-  "$ref": "#/$defs/Vue",
+  "description": "Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis core.View : ne pas modifier a la main.",
+  "$ref": "#/$defs/View",
   "$defs": {
-    "Contexte": {
+    "CrimeScene": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "$ref": "#/$defs/Position"
+        },
+        "tour": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "position",
+        "tour"
+      ]
+    },
+    "Effect": {
+      "type": "object",
+      "properties": {
+        "annonce": {
+          "type": "boolean"
+        },
+        "cible": {
+          "type": "string"
+        },
+        "duree": {
+          "type": "integer"
+        },
+        "puis": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Effect"
+          }
+        },
+        "rayon": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string"
+        },
+        "valeur": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "EffectContext": {
       "type": "object",
       "properties": {
         "acteur": {
@@ -33,7 +80,30 @@
         "zone"
       ]
     },
-    "Coup": {
+    "Inspector": {
+      "type": "object",
+      "properties": {
+        "capacite": {
+          "type": "string"
+        },
+        "capacite_utilisee": {
+          "type": "boolean"
+        },
+        "deplacements_faits": {
+          "type": "integer"
+        },
+        "position": {
+          "$ref": "#/$defs/Position"
+        }
+      },
+      "required": [
+        "capacite",
+        "capacite_utilisee",
+        "deplacements_faits",
+        "position"
+      ]
+    },
+    "Move": {
       "type": "object",
       "properties": {
         "acteur": {
@@ -70,51 +140,38 @@
         "type"
       ]
     },
-    "Effet": {
+    "Outcome": {
       "type": "object",
       "properties": {
-        "annonce": {
-          "type": "boolean"
-        },
-        "cible": {
+        "motif": {
           "type": "string"
         },
-        "duree": {
+        "tour": {
           "type": "integer"
         },
-        "puis": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Effet"
-          }
-        },
-        "rayon": {
-          "type": "integer"
-        },
-        "type": {
+        "vainqueur": {
           "type": "string"
-        },
-        "valeur": {
-          "type": "integer"
         }
       },
       "required": [
-        "type"
+        "motif",
+        "tour",
+        "vainqueur"
       ]
     },
-    "EffetEnAttente": {
+    "PendingEffect": {
       "type": "object",
       "properties": {
         "annonce": {
           "type": "boolean"
         },
         "contexte": {
-          "$ref": "#/$defs/Contexte"
+          "$ref": "#/$defs/EffectContext"
         },
         "effets": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/Effet"
+            "$ref": "#/$defs/Effect"
           }
         },
         "tour": {
@@ -128,30 +185,22 @@
         "tour"
       ]
     },
-    "Inspecteur": {
+    "Position": {
       "type": "object",
       "properties": {
-        "capacite": {
-          "type": "string"
-        },
-        "capacite_utilisee": {
-          "type": "boolean"
-        },
-        "deplacements_faits": {
+        "Column": {
           "type": "integer"
         },
-        "position": {
-          "$ref": "#/$defs/Position"
+        "Row": {
+          "type": "integer"
         }
       },
       "required": [
-        "capacite",
-        "capacite_utilisee",
-        "deplacements_faits",
-        "position"
+        "Column",
+        "Row"
       ]
     },
-    "Parametres": {
+    "Settings": {
       "type": "object",
       "properties": {
         "cote": {
@@ -202,56 +251,7 @@
         "zones"
       ]
     },
-    "Position": {
-      "type": "object",
-      "properties": {
-        "Colonne": {
-          "type": "integer"
-        },
-        "Ligne": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "Colonne",
-        "Ligne"
-      ]
-    },
-    "Resultat": {
-      "type": "object",
-      "properties": {
-        "motif": {
-          "type": "string"
-        },
-        "tour": {
-          "type": "integer"
-        },
-        "vainqueur": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "motif",
-        "tour",
-        "vainqueur"
-      ]
-    },
-    "Scene": {
-      "type": "object",
-      "properties": {
-        "position": {
-          "$ref": "#/$defs/Position"
-        },
-        "tour": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "position",
-        "tour"
-      ]
-    },
-    "Trace": {
+    "Trail": {
       "type": "object",
       "properties": {
         "direction": {
@@ -266,7 +266,7 @@
         "tour"
       ]
     },
-    "Vue": {
+    "View": {
       "type": "object",
       "properties": {
         "acteur": {
@@ -287,23 +287,23 @@
         "coups_legaux": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/Coup"
+            "$ref": "#/$defs/Move"
           }
         },
         "effets_annonces": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/EffetEnAttente"
+            "$ref": "#/$defs/PendingEffect"
           }
         },
         "inspecteurs": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/Inspecteur"
+            "$ref": "#/$defs/Inspector"
           }
         },
         "parametres": {
-          "$ref": "#/$defs/Parametres"
+          "$ref": "#/$defs/Settings"
         },
         "phase": {
           "type": "string"
@@ -318,7 +318,7 @@
           "type": "integer"
         },
         "resultat": {
-          "$ref": "#/$defs/Resultat"
+          "$ref": "#/$defs/Outcome"
         },
         "rues": {
           "type": "array",
@@ -329,7 +329,7 @@
         "scenes": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/Scene"
+            "$ref": "#/$defs/CrimeScene"
           }
         },
         "silence_paye": {
@@ -341,7 +341,7 @@
         "traces_connues": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/$defs/Trace"
+            "$ref": "#/$defs/Trail"
           }
         },
         "zone_scellee": {
@@ -382,23 +382,23 @@
     "Zone": {
       "type": "object",
       "properties": {
-        "Cases": {
+        "Cells": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/Position"
           }
         },
-        "Fermee": {
+        "Closed": {
           "type": "boolean"
         },
-        "Numero": {
+        "Number": {
           "type": "integer"
         }
       },
       "required": [
-        "Cases",
-        "Fermee",
-        "Numero"
+        "Cells",
+        "Closed",
+        "Number"
       ]
     }
   }

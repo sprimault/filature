@@ -5,33 +5,33 @@ package core
 
 import "sort"
 
-// Vue est ce qu'un camp a le droit de savoir. Le noyau n'expose rien d'autre à
+// View est ce qu'un sideName a le droit de savoir. Le noyau n'expose rien d'autre à
 // l'interface, y compris en partie locale.
 //
 // C'est l'invariant le plus coûteux à rétrofiter et le plus facile à poser
 // maintenant : si l'interface consomme l'état complet, un joueur lit la
 // position du fugitif dans le trafic réseau ou dans les outils de
 // développement du navigateur, et le jeu n'a plus d'objet.
-type Vue struct {
-	Acteur     Acteur     `json:"acteur"`
-	Tour       int        `json:"tour"`
-	Phase      Phase      `json:"phase"`
-	Parametres Parametres `json:"parametres"`
+type View struct {
+	Side     Side     `json:"acteur"`
+	Turn     int      `json:"tour"`
+	Phase    Phase    `json:"phase"`
+	Settings Settings `json:"parametres"`
 
-	// Rues est la portion de plateau connue du client. Sur plateau borné
+	// Streets est la portion de plateau connue du client. Sur plateau borné
 	// c'est tout ; sur plateau infini, ce sera ce qui a été exploré.
-	Rues     []Position `json:"rues"`
-	Zones    []Zone     `json:"zones"`
-	Barrages []Position `json:"barrages"`
+	Streets    []Position `json:"rues"`
+	Zones      []Zone     `json:"zones"`
+	Roadblocks []Position `json:"barrages"`
 
-	Inspecteurs []Inspecteur `json:"inspecteurs"`
+	Inspectors []Inspector `json:"inspecteurs"`
 
-	// PositionFugitif n'est renseigné que pour le camp fugitif, ou pour les
+	// PositionFugitif n'est renseigné que pour le sideName fugitif, ou pour les
 	// inspecteurs quand il est visible ou révélé.
 	PositionFugitif *Position `json:"position_fugitif,omitempty"`
-	ZoneScellee     *int      `json:"zone_scellee,omitempty"`
+	SealedZone      *int      `json:"zone_scellee,omitempty"`
 
-	// Resistance n'est renseignée que pour le fugitif.
+	// Stamina n'est renseignée que pour le fugitif.
 	//
 	// Un pointeur et non un entier : à zéro, le champ dirait qu'il est mort au
 	// lieu de dire qu'on n'en sait rien. Les inspecteurs comptent les contacts
@@ -40,18 +40,18 @@ type Vue struct {
 	// annonce inutile, et leur livrerait par la bande chaque dépense du
 	// fugitif : une baisse de deux sans contact ne peut être qu'un double
 	// déplacement ou un changement de zone.
-	Resistance *int `json:"resistance,omitempty"`
+	Stamina *int `json:"resistance,omitempty"`
 
 	// TracesConnues ne contient que ce que les inspecteurs ont effectivement
 	// découvert. Le fugitif, lui, voit les siennes.
-	TracesConnues map[string]Trace `json:"traces_connues"`
+	TracesConnues map[string]Trail `json:"traces_connues"`
 
-	// Scenes est identique pour les deux camps : un meurtre est public, c'est
+	// CrimeScenes est identique pour les deux camps : un meurtre est public, c'est
 	// ce que le fugitif paie. Ne jamais la filtrer par acteur.
-	Scenes []Scene `json:"scenes"`
+	CrimeScenes []CrimeScene `json:"scenes"`
 
 	CasesVisibles   []Position `json:"cases_visibles"`
-	CoupsLegaux     []Coup     `json:"coups_legaux"`
+	LegalMoves      []Move     `json:"coups_legaux"`
 	ProchaineReveal int        `json:"prochaine_revelation"`
 	SilencePaye     bool       `json:"silence_paye"`
 	ZonesAnnoncees  []int      `json:"zones_annoncees"`
@@ -59,14 +59,14 @@ type Vue struct {
 	// EffetsAnnonces ne porte que les differer déclarés avec annonce, et les
 	// porte à l'identique pour les deux camps. Un differer sans annonce reste
 	// invisible jusqu'à sa résolution, sinon le champ le trahirait.
-	EffetsAnnonces []EffetEnAttente `json:"effets_annonces"`
+	EffetsAnnonces []PendingEffect `json:"effets_annonces"`
 
-	Resultat *Resultat `json:"resultat,omitempty"`
+	Outcome *Outcome `json:"resultat,omitempty"`
 }
 
-// VuePour projette l'état pour un camp.
+// ViewFor projette l'état pour un sideName.
 //
-// La règle de relecture : tout champ ajouté à Partie doit être explicitement
+// La règle de relecture : tout champ ajouté à Game doit être explicitement
 // copié ici, jamais par recopie de structure. Une omission fait fuiter, un
 // oubli ne fait qu'afficher moins.
 //
@@ -75,59 +75,59 @@ type Vue struct {
 // de portée. Tout le reste est public, y compris sa résistance — les contacts
 // et les silences payés sont annoncés, la déduire serait un exercice sans
 // intérêt.
-func (p *Partie) VuePour(a Acteur) Vue {
-	v := Vue{
-		Acteur:          a,
-		Tour:            p.Tour,
+func (p *Game) ViewFor(a Side) View {
+	v := View{
+		Side:            a,
+		Turn:            p.Turn,
 		Phase:           p.Phase,
-		Parametres:      p.Parametres,
-		Rues:            liste(p.ruesConnues()),
-		Zones:           liste(p.zonesVues()),
-		Barrages:        liste(p.barrages()),
-		Inspecteurs:     liste(append([]Inspecteur(nil), p.Inspecteurs...)),
-		TracesConnues:   p.tracesPour(a),
-		Scenes:          liste(append([]Scene(nil), p.Scenes...)),
-		CasesVisibles:   liste(p.casesVisiblesPour(a)),
-		CoupsLegaux:     liste(p.CoupsLegaux(a)),
-		ProchaineReveal: p.prochaineRevelation(),
-		SilencePaye:     p.Fugitif.SilenceAchete,
-		EffetsAnnonces:  liste(p.effetsAnnonces()),
+		Settings:        p.Settings,
+		Streets:         list(p.ruesConnues()),
+		Zones:           list(p.seenZones()),
+		Roadblocks:      list(p.barrages()),
+		Inspectors:      list(append([]Inspector(nil), p.Inspectors...)),
+		TracesConnues:   p.trailsFor(a),
+		CrimeScenes:     list(append([]CrimeScene(nil), p.CrimeScenes...)),
+		CasesVisibles:   list(p.visibleCellsFor(a)),
+		LegalMoves:      list(p.LegalMoves(a)),
+		ProchaineReveal: p.nextReveal(),
+		SilencePaye:     p.Fugitive.SilenceBought,
+		EffetsAnnonces:  list(p.announcedEffects()),
 	}
-	v.ZonesAnnoncees = liste(zonesAnnoncees(v.EffetsAnnonces))
+	v.ZonesAnnoncees = list(announcedZones(v.EffetsAnnonces))
 
 	// Le fugitif voit tout de lui-même. Les inspecteurs ne voient sa position
 	// que s'il est repéré ou révélé, et sa zone jamais.
-	if a == CampFugitif {
-		position := p.Fugitif.Position
-		resistance := p.Fugitif.Resistance
+	if a == SideFugitive {
+		position := p.Fugitive.Position
+		resistance := p.Fugitive.Stamina
 		v.PositionFugitif = &position
-		v.Resistance = &resistance
+		v.Stamina = &resistance
 
 		// Tant qu'il n'a pas scellé, le champ reste absent plutôt que de
 		// porter la sentinelle du noyau : « -1 » ne veut rien dire pour qui
 		// lit le JSON, et l'omission dit exactement ce qui est vrai — le
 		// choix n'a pas été fait.
-		if zone := p.Fugitif.ZoneScellee; zone >= 0 {
-			v.ZoneScellee = &zone
+		if zone := p.Fugitive.SealedZone; zone >= 0 {
+			v.SealedZone = &zone
 		}
-	} else if p.Fugitif.Visible {
-		position := p.Fugitif.Position
+	} else if p.Fugitive.Visible {
+		position := p.Fugitive.Position
 		v.PositionFugitif = &position
 	}
 
-	if r, fini := p.Resultat(); fini {
-		v.Resultat = &r
+	if r, fini := p.Outcome(); fini {
+		v.Outcome = &r
 	}
 	return v
 }
 
-// liste garantit une tranche non nulle.
+// list garantit une tranche non nulle.
 //
 // Une tranche vide se sérialise en null, pas en tableau vide : un bot devrait
 // alors traiter les deux formes pour chacune des neuf listes de la vue, et
 // celui qui ne le ferait que pour certaines tomberait sur les autres. Le
 // contrat promet un tableau, il en rend un.
-func liste[T any](s []T) []T {
+func list[T any](s []T) []T {
 	if s == nil {
 		return []T{}
 	}
@@ -139,21 +139,21 @@ func liste[T any](s []T) []T {
 // Tout le plateau borné aujourd'hui. Sur plateau infini, ce sera ce qui a été
 // exploré, et c'est pour cela que le champ existe plutôt que de laisser le
 // client interroger le plateau lui-même.
-func (p *Partie) ruesConnues() []Position {
-	rayon := p.Parametres.Cote / 2
-	return p.Plateau.CasesDans(Position{Colonne: rayon, Ligne: rayon}, rayon)
+func (p *Game) ruesConnues() []Position {
+	rayon := p.Settings.Size / 2
+	return p.Board.CellsWithin(Position{Column: rayon, Row: rayon}, rayon)
 }
 
-// zonesVues rend les zones avec leur état de fermeture.
+// seenZones rend les zones avec leur état de fermeture.
 //
 // Les six sont connues des deux camps dès la mise en place : seul le choix du
 // fugitif est caché, pas les points d'extraction eux-mêmes.
-func (p *Partie) zonesVues() []Zone {
-	zones := append([]Zone(nil), p.Plateau.Zones()...)
+func (p *Game) seenZones() []Zone {
+	zones := append([]Zone(nil), p.Board.Zones()...)
 	for i := range zones {
-		for _, ferme := range p.ZonesFermees {
-			if zones[i].Numero == ferme {
-				zones[i].Fermee = true
+		for _, ferme := range p.ClosedZones {
+			if zones[i].Number == ferme {
+				zones[i].Closed = true
 			}
 		}
 	}
@@ -164,42 +164,42 @@ func (p *Partie) zonesVues() []Zone {
 //
 // Publiques : elles bloquent le déplacement et la vue, un joueur qui les
 // ignorerait jouerait à l'aveugle sur un terrain que l'autre voit.
-func (p *Partie) barrages() []Position {
-	if len(p.Barrages) == 0 {
+func (p *Game) barrages() []Position {
+	if len(p.Roadblocks) == 0 {
 		return nil
 	}
-	cases := make([]Position, 0, len(p.Barrages))
-	for pos := range p.Barrages {
+	cases := make([]Position, 0, len(p.Roadblocks))
+	for pos := range p.Roadblocks {
 		cases = append(cases, pos)
 	}
-	trierPositions(cases)
+	sortPositions(cases)
 	return cases
 }
 
-// tracesPour filtre les traces selon ce que le camp a le droit de savoir.
+// trailsFor filtre les traces selon ce que le sideName a le droit de savoir.
 //
 // Le fugitif voit les siennes, toutes. Un inspecteur ne découvre une trace
 // qu'en occupant sa case ou une case orthogonalement adjacente — donc en
 // distance de Manhattan, jamais de Tchebychev. Les confondre étendrait la
 // détection aux quatre diagonales et doublerait presque la couverture, ce qui
 // est le défaut sur lequel un prototype antérieur s'est fait prendre.
-func (p *Partie) tracesPour(a Acteur) map[string]Trace {
-	if len(p.Traces) == 0 {
-		return map[string]Trace{}
+func (p *Game) trailsFor(a Side) map[string]Trail {
+	if len(p.Trails) == 0 {
+		return map[string]Trail{}
 	}
 
-	connues := make(map[string]Trace, len(p.Traces))
-	if a == CampFugitif {
-		for pos, t := range p.Traces {
-			connues[pos.Cle()] = t
+	connues := make(map[string]Trail, len(p.Trails))
+	if a == SideFugitive {
+		for pos, t := range p.Trails {
+			connues[pos.Key()] = t
 		}
 		return connues
 	}
 
-	for pos, t := range p.Traces {
-		for i := range p.Inspecteurs {
-			if DistanceManhattan(p.Inspecteurs[i].Position, pos) <= p.RayonTracesDe(i) {
-				connues[pos.Cle()] = t
+	for pos, t := range p.Trails {
+		for i := range p.Inspectors {
+			if ManhattanDistance(p.Inspectors[i].Position, pos) <= p.TrailRadiusOf(i) {
+				connues[pos.Key()] = t
 				break
 			}
 		}
@@ -207,34 +207,34 @@ func (p *Partie) tracesPour(a Acteur) map[string]Trace {
 	return connues
 }
 
-// casesVisiblesPour rend ce que le camp voit du terrain.
+// visibleCellsFor rend ce que le sideName voit du terrain.
 //
 // Les inspecteurs voient depuis chacun de leurs pions. Le fugitif n'a pas de
 // vision propre dans les règles : il sait s'il est repéré, pas ce que l'autre
 // couvre.
 //
 // La table du plateau ne connaît que le terrain : elle donne les candidats, et
-// EstVisible tranche. Sans ce second passage, la vue annoncerait des cases
+// IsVisible tranche. Sans ce second passage, la vue annoncerait des cases
 // situées derrière un collègue ou un barrage, qu'au même instant le fugitif ne
 // serait pas repéré d'occuper — deux réponses contradictoires à la même
 // question, dont l'une part sur le réseau.
-func (p *Partie) casesVisiblesPour(a Acteur) []Position {
-	if a == CampFugitif {
+func (p *Game) visibleCellsFor(a Side) []Position {
+	if a == SideFugitive {
 		return nil
 	}
 
-	occupees := p.casesOccupees()
+	occupees := p.occupiedCells()
 	vues := map[Position]bool{}
-	for i := range p.Inspecteurs {
-		depuis, portee := p.Inspecteurs[i].Position, p.PorteeDe(i)
+	for i := range p.Inspectors {
+		depuis, portee := p.Inspectors[i].Position, p.RangeOf(i)
 
 		// Sa propre case, qu'aucune ligne de vue ne contient : elles partent de
 		// lui sans l'inclure. Sans ça, la zone couverte aurait un trou sous
 		// chaque pion.
 		vues[depuis] = true
 
-		for _, c := range p.Plateau.Vision(depuis, portee) {
-			if !vues[c] && EstVisible(p.Plateau, depuis, c, portee, occupees) {
+		for _, c := range p.Board.Sight(depuis, portee) {
+			if !vues[c] && IsVisible(p.Board, depuis, c, portee, occupees) {
 				vues[c] = true
 			}
 		}
@@ -247,62 +247,62 @@ func (p *Partie) casesVisiblesPour(a Acteur) []Position {
 	for c := range vues {
 		cases = append(cases, c)
 	}
-	trierPositions(cases)
+	sortPositions(cases)
 	return cases
 }
 
-// prochaineRevelation rend le nombre de tours avant la prochaine révélation.
-func (p *Partie) prochaineRevelation() int {
-	periode := p.Parametres.PeriodeRevelation
+// nextReveal rend le nombre de tours avant la prochaine révélation.
+func (p *Game) nextReveal() int {
+	periode := p.Settings.RevealPeriod
 	if periode <= 0 {
 		return 0
 	}
-	if reste := p.Tour % periode; reste != 0 {
+	if reste := p.Turn % periode; reste != 0 {
 		return periode - reste
 	}
 	return periode
 }
 
-// effetsAnnonces rend les différés que les deux camps ont le droit de voir.
+// announcedEffects rend les différés que les deux camps ont le droit de voir.
 //
 // Un differer sans annonce n'y figure pas : le champ le trahirait, alors que
 // c'est justement le choix de son auteur de ne pas prévenir.
-func (p *Partie) effetsAnnonces() []EffetEnAttente {
-	var annonces []EffetEnAttente
-	for _, e := range p.EffetsEnAttente {
-		if e.Annonce {
+func (p *Game) announcedEffects() []PendingEffect {
+	var annonces []PendingEffect
+	for _, e := range p.PendingEffects {
+		if e.Announced {
 			annonces = append(annonces, e)
 		}
 	}
 	return annonces
 }
 
-// zonesAnnoncees extrait les zones dont la fermeture est annoncée.
+// announcedZones extrait les zones dont la fermeture est annoncée.
 //
 // Dérivé des effets plutôt que stocké : c'est la même information sous une
-// forme que l'interface consomme sans parcourir des effets imbriqués.
-func zonesAnnoncees(annonces []EffetEnAttente) []int {
+// forme que l'interface consomme sans walk des effets imbriqués.
+func announcedZones(annonces []PendingEffect) []int {
 	var zones []int
 	for _, e := range annonces {
 		for _, effet := range e.Effets {
-			if effet.Type == EffetFermerZone {
-				zones = append(zones, e.Contexte.Zone)
+			if effet.Type == EffectCloseZone {
+				zones = append(zones, e.EffectContext.Zone)
 			}
 		}
 	}
 	return zones
 }
 
-// trierPositions ordonne par ligne puis colonne.
+// sortPositions ordonne par ligne puis colonne.
 //
 // L'ordre d'une map n'est pas stable en Go : sans tri, deux vues du même état
 // différeraient, et le rejeu d'un journal comme la comparaison de deux parties
 // cesseraient d'être fiables.
-func trierPositions(cases []Position) {
+func sortPositions(cases []Position) {
 	sort.Slice(cases, func(i, j int) bool {
-		if cases[i].Ligne != cases[j].Ligne {
-			return cases[i].Ligne < cases[j].Ligne
+		if cases[i].Row != cases[j].Row {
+			return cases[i].Row < cases[j].Row
 		}
-		return cases[i].Colonne < cases[j].Colonne
+		return cases[i].Column < cases[j].Column
 	})
 }
