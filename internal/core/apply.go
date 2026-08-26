@@ -171,7 +171,7 @@ func (p *Game) abilityFor(indice int) string {
 		return ""
 	}
 	var cles []string
-	for cle, c := range p.Extensions.Capacites {
+	for cle, c := range p.Extensions.Abilities {
 		if c.Camp == SideInspectors {
 			cles = append(cles, cle)
 		}
@@ -213,13 +213,13 @@ func targetOf(a Side) Target {
 // Deux marques et non une : le pion ne la rejouera plus de la partie, et le
 // camp ne déclenchera plus rien ce tour-ci. La règle pose les deux limites.
 func (p *Game) triggerAbility(c Move) ([]func(), error) {
-	capacite, connue := p.Extensions.Capacites[c.Ability]
+	capacite, connue := p.Extensions.Abilities[c.Ability]
 	if !connue {
 		return nil, fmt.Errorf("capacite inconnue: %s", c.Ability)
 	}
 
 	ctx := EffectContext{Side: c.Side, Piece: c.Piece, Case: c.To, Zone: c.Zone, AutrePion: c.Piece}
-	defaire, err := p.applyEffects(capacite.Effets, ctx)
+	defaire, err := p.applyEffects(capacite.Effects, ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +240,7 @@ func (p *Game) spend(c Move) ([]func(), error) {
 		cle = ExpenseChangeZone
 	}
 
-	depense, connue := p.Extensions.Depenses[cle]
+	depense, connue := p.Extensions.Expenses[cle]
 	if !connue {
 		return nil, fmt.Errorf("depense inconnue: %s", cle)
 	}
@@ -259,7 +259,7 @@ func (p *Game) spend(c Move) ([]func(), error) {
 	}
 
 	ctx := EffectContext{Side: c.Side, Case: p.Fugitive.Position, Zone: c.Zone}
-	effets, err := p.applyEffects(depense.Effets, ctx)
+	effets, err := p.applyEffects(depense.Effects, ctx)
 	if err != nil {
 		undoAll(faites)
 		return nil, err

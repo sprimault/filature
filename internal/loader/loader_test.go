@@ -59,7 +59,7 @@ func TestLoadsShippedContent(t *testing.T) {
 	}
 
 	for _, cle := range []string{"lookout", "runner", "tracker", "blocker", "chief"} {
-		if _, connue := r.Capacites[cle]; !connue {
+		if _, connue := r.Abilities[cle]; !connue {
 			t.Errorf("la capacité %s manque", cle)
 		}
 	}
@@ -67,7 +67,7 @@ func TestLoadsShippedContent(t *testing.T) {
 		core.ExpenseDoubleStep, core.ExpenseSilence, core.ExpenseWipeTrails,
 		core.ExpenseChangeZone, core.ExpenseMurder,
 	} {
-		if _, connue := r.Depenses[cle]; !connue {
+		if _, connue := r.Expenses[cle]; !connue {
 			t.Errorf("la dépense %s manque", cle)
 		}
 	}
@@ -75,8 +75,8 @@ func TestLoadsShippedContent(t *testing.T) {
 		t.Fatal("l'étranglement manque : aucune zone ne se fermerait jamais")
 	}
 
-	if len(r.Manifeste) != 2 {
-		t.Errorf("%d entrées de manifeste, attendu 2", len(r.Manifeste))
+	if len(r.Manifest) != 2 {
+		t.Errorf("%d entrées de manifeste, attendu 2", len(r.Manifest))
 	}
 }
 
@@ -91,12 +91,12 @@ func TestKeyCarriedFromTable(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for cle, c := range r.Capacites {
+	for cle, c := range r.Abilities {
 		if c.Key != cle {
 			t.Errorf("capacité %s porte la clé %q", cle, c.Key)
 		}
 	}
-	for cle, d := range r.Depenses {
+	for cle, d := range r.Expenses {
 		if core.Expense(d.Key) != cle {
 			t.Errorf("dépense %s porte la clé %q", cle, d.Key)
 		}
@@ -118,14 +118,14 @@ func TestDiskPluginTakesSamePath(t *testing.T) {
 		t.Fatalf("chargement : %v", err)
 	}
 
-	if _, connue := r.Capacites["essai"]; !connue {
+	if _, connue := r.Abilities["essai"]; !connue {
 		t.Error("la capacité du plugin posé sur le disque manque")
 	}
-	if _, connue := r.Capacites["lookout"]; !connue {
+	if _, connue := r.Abilities["lookout"]; !connue {
 		t.Error("le contenu livré a disparu")
 	}
-	if len(r.Manifeste) != 3 {
-		t.Errorf("%d entrées de manifeste, attendu 3", len(r.Manifeste))
+	if len(r.Manifest) != 3 {
+		t.Errorf("%d entrées de manifeste, attendu 3", len(r.Manifest))
 	}
 }
 
@@ -138,7 +138,7 @@ func TestMissingPluginFolder(t *testing.T) {
 	if err != nil {
 		t.Fatalf("un dossier absent fait échouer le chargement : %v", err)
 	}
-	if len(r.Capacites) == 0 {
+	if len(r.Abilities) == 0 {
 		t.Error("le contenu livré n'a pas été chargé")
 	}
 }
@@ -339,8 +339,8 @@ func TestFolderWithoutManifestIgnored(t *testing.T) {
 	if err != nil {
 		t.Fatalf("chargement : %v", err)
 	}
-	if len(r.Manifeste) != 1 {
-		t.Errorf("%d entrées, attendu 1", len(r.Manifeste))
+	if len(r.Manifest) != 1 {
+		t.Errorf("%d entrées, attendu 1", len(r.Manifest))
 	}
 }
 

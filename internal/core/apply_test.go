@@ -14,28 +14,28 @@ import (
 // l'étape 8.
 func testRegistry() *Registry {
 	return &Registry{
-		Capacites: map[string]Ability{
+		Abilities: map[string]Ability{
 			"blocker": {
 				Name: "Barreur", Camp: SideInspectors, Uses: 1,
 				Trigger: OnInspectorsPhase,
-				Effets:  []Effect{{Type: EffectBlockCell, Target: TargetCell, Duration: 3}},
+				Effects: []Effect{{Type: EffectBlockCell, Target: TargetCell, Duration: 3}},
 			},
 			"lookout": {
 				Name: "Guetteur", Camp: SideInspectors, Uses: 1,
 				Trigger: OnInspectorsPhase,
-				Effets:  []Effect{{Type: EffectChangeRange, Target: TargetCurrentPiece, Value: 8, Duration: 1}},
+				Effects: []Effect{{Type: EffectChangeRange, Target: TargetCurrentPiece, Value: 8, Duration: 1}},
 			},
 		},
-		Depenses: map[Expense]Ability{
+		Expenses: map[Expense]Ability{
 			ExpenseSilence: {
 				Name: "Silence", Camp: SideFugitive, Cost: 3,
 				Trigger: OnFugitivePhase,
-				Effets:  []Effect{{Type: EffectCancelReveal, Target: TargetFugitive}},
+				Effects: []Effect{{Type: EffectCancelReveal, Target: TargetFugitive}},
 			},
 			ExpenseMurder: {
 				Name: "Meurtre", Camp: SideFugitive, Cost: 3, Uses: 2,
 				Trigger: OnFugitivePhase,
-				Effets: []Effect{
+				Effects: []Effect{
 					{Type: EffectRevealPosition, Target: TargetFugitive},
 					{Type: EffectMarkCrimeScene, Target: TargetFugitive},
 				},
@@ -43,7 +43,7 @@ func testRegistry() *Registry {
 			ExpenseChangeZone: {
 				Name: "Changement de zone", Camp: SideFugitive, Cost: 2,
 				Trigger: OnFugitivePhase,
-				Effets:  []Effect{{Type: EffectSealZone, Target: TargetZone}},
+				Effects: []Effect{{Type: EffectSealZone, Target: TargetZone}},
 			},
 		},
 	}

@@ -205,7 +205,7 @@ func (p *Game) resolveDeferred() []func() {
 	defaire := []func(){func() { p.PendingEffects = file }}
 
 	for _, e := range arrives {
-		effets, err := p.applyEffects(e.Effets, e.EffectContext)
+		effets, err := p.applyEffects(e.Effects, e.EffectContext)
 		if err != nil {
 			// Un effet différé qui échoue à l'échéance vient d'un plugin
 			// chargé sans validation. Le tour continue plutôt que de s'arrêter
@@ -231,7 +231,7 @@ func (p *Game) strangle() []func() {
 		return nil
 	}
 
-	effets, err := p.applyEffects(mode.Effets, EffectContext{Side: SideInspectors, Zone: zone})
+	effets, err := p.applyEffects(mode.Effects, EffectContext{Side: SideInspectors, Zone: zone})
 	if err != nil {
 		return nil
 	}

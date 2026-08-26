@@ -74,7 +74,7 @@ func Board(v core.View) string {
 			poser(c, rune('0'+z.Number%10))
 		}
 	}
-	for cle := range v.TracesConnues {
+	for cle := range v.KnownTrails {
 		if p, ok := core.PositionFromKey(cle); ok {
 			poser(p, CarTrace)
 		}
@@ -257,12 +257,12 @@ func Merge(fugitif, inspecteurs core.View) core.View {
 
 	// Chaque camp connaît des traces que l'autre ignore : le fugitif les
 	// siennes, les inspecteurs celles qu'ils ont découvertes.
-	v.TracesConnues = map[string]core.Trail{}
-	for cle, t := range inspecteurs.TracesConnues {
-		v.TracesConnues[cle] = t
+	v.KnownTrails = map[string]core.Trail{}
+	for cle, t := range inspecteurs.KnownTrails {
+		v.KnownTrails[cle] = t
 	}
-	for cle, t := range fugitif.TracesConnues {
-		v.TracesConnues[cle] = t
+	for cle, t := range fugitif.KnownTrails {
+		v.KnownTrails[cle] = t
 	}
 
 	v.Streets = union(inspecteurs.Streets, fugitif.Streets)

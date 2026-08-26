@@ -40,7 +40,7 @@ type Ability struct {
 	Cost    int      `toml:"cost" json:"cost"`
 	Trigger Trigger  `toml:"trigger" json:"trigger"`
 	Passive bool     `toml:"passive" json:"passive"`
-	Effets  []Effect `toml:"effect" json:"effects"`
+	Effects []Effect `toml:"effect" json:"effects"`
 }
 
 // Mode est une règle de partie déclarée en effets, que le noyau déclenche sans
@@ -54,50 +54,50 @@ type Mode struct {
 	Key     string   `toml:"-" json:"key"`
 	Name    string   `toml:"name" json:"name"`
 	Trigger Trigger  `toml:"trigger" json:"trigger"`
-	Effets  []Effect `toml:"effect" json:"effects"`
+	Effects []Effect `toml:"effect" json:"effects"`
 }
 
 // Registry rassemble tout ce que les plugins ont apporté, plus le contenu de
 // base. Le noyau ne connaît que le registre, jamais un plugin en particulier.
 type Registry struct {
-	Capacites map[string]Ability
-	Depenses  map[Expense]Ability
+	Abilities map[string]Ability
+	Expenses  map[Expense]Ability
 	Modes     map[string]Mode
 
-	// Generateurs et Cerveaux sont les deux points d'extension qui ne se
+	// Generators et Brains sont les deux points d'extension qui ne se
 	// décrivent pas en données : un générateur de plateau et une IA. Ils
 	// passent par WebAssembly, jamais par du Go chargé dynamiquement.
-	Generateurs map[string]FabriquePlateau
-	Cerveaux    map[string]FabriqueCerveau
+	Generators map[string]BoardFactory
+	Brains     map[string]BrainFactory
 
-	// Manifeste identifie les plugins actifs. Il part en base avec la
+	// Manifest identifie les plugins actifs. Il part en base avec la
 	// partie et se compare à l'établissement d'une connexion réseau : une
 	// sauvegarde ne se recharge pas sans ses plugins, et le jeu le dit
 	// au lieu de rejouer faux.
-	Manifeste []ManifestEntry
+	Manifest []ManifestEntry
 }
 
-// ManifestEntry identifie un plugin de façon vérifiable. L'fingerprint porte
+// ManifestEntry identifie un plugin de façon vérifiable. L'empreinte porte
 // sur le contenu, pas sur le numéro de version : deux plugins qui se disent
 // « 1.2.0 » sans être identiques doivent être détectés.
 type ManifestEntry struct {
 	Name        string `json:"name"`
 	Version     string `json:"version"`
 	Fingerprint string `json:"fingerprint"`
-	Regles      bool   `json:"rules"`
+	Rules       bool   `json:"rules"`
 }
 
 // Les deux signatures qu'un plugin exécutable peut honorer. Elles sont
 // volontairement étroites : tout ce qui passe par elles est déterministe et
 // sans effet de bord.
 type (
-	// FabriquePlateau produit un plateau depuis la graine de la partie.
-	FabriquePlateau func(graine int64, p Settings) (Board, error)
+	// BoardFactory produit un plateau depuis la graine de la partie.
+	BoardFactory func(graine int64, p Settings) (Board, error)
 
-	// FabriqueCerveau choisit un coup. Elle reçoit une View et non *Game : un
+	// BrainFactory choisit un coup. Elle reçoit une View et non *Game : un
 	// plugin ne peut donc lire ni la position cachée du fugitif ni sa zone
 	// scellée.
-	FabriqueCerveau func(v View, a *Random) (Move, error)
+	BrainFactory func(v View, a *Random) (Move, error)
 )
 
 // Le registre se construit dans internal/plugins, jamais ici : le remplir
@@ -117,23 +117,23 @@ func (r *Registry) Merge(nom string, autre *Registry) error {
 		return nil
 	}
 
-	if err := mergeInto(&r.Capacites, autre.Capacites, nom, "capacite"); err != nil {
+	if err := mergeInto(&r.Abilities, autre.Abilities, nom, "capacite"); err != nil {
 		return err
 	}
-	if err := mergeInto(&r.Depenses, autre.Depenses, nom, "depense"); err != nil {
+	if err := mergeInto(&r.Expenses, autre.Expenses, nom, "depense"); err != nil {
 		return err
 	}
 	if err := mergeInto(&r.Modes, autre.Modes, nom, "mode"); err != nil {
 		return err
 	}
-	if err := mergeInto(&r.Generateurs, autre.Generateurs, nom, "generateur"); err != nil {
+	if err := mergeInto(&r.Generators, autre.Generators, nom, "generateur"); err != nil {
 		return err
 	}
-	if err := mergeInto(&r.Cerveaux, autre.Cerveaux, nom, "cerveau"); err != nil {
+	if err := mergeInto(&r.Brains, autre.Brains, nom, "cerveau"); err != nil {
 		return err
 	}
 
-	r.Manifeste = append(r.Manifeste, autre.Manifeste...)
+	r.Manifest = append(r.Manifest, autre.Manifest...)
 	return nil
 }
 

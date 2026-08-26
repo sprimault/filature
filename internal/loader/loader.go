@@ -108,27 +108,27 @@ func pourInto(r *core.Registry, source fs.FS, origine string) error {
 // depuis langue.toml par qui en a besoin.
 func (m *manifeste) versRegistre(somme string) *core.Registry {
 	r := &core.Registry{
-		Manifeste: []core.ManifestEntry{{
+		Manifest: []core.ManifestEntry{{
 			Name:        m.Name,
 			Version:     m.Version,
 			Fingerprint: somme,
-			Regles:      m.Regles,
+			Rules:       m.Rules,
 		}},
 	}
 
-	if len(m.Capacites) > 0 {
-		r.Capacites = make(map[string]core.Ability, len(m.Capacites))
-		for cle, c := range m.Capacites {
+	if len(m.Abilities) > 0 {
+		r.Abilities = make(map[string]core.Ability, len(m.Abilities))
+		for cle, c := range m.Abilities {
 			c.Key = cle
-			r.Capacites[cle] = c
+			r.Abilities[cle] = c
 		}
 	}
 
-	if len(m.Depenses) > 0 {
-		r.Depenses = make(map[core.Expense]core.Ability, len(m.Depenses))
-		for cle, d := range m.Depenses {
+	if len(m.Expenses) > 0 {
+		r.Expenses = make(map[core.Expense]core.Ability, len(m.Expenses))
+		for cle, d := range m.Expenses {
 			d.Key = cle
-			r.Depenses[core.Expense(cle)] = d
+			r.Expenses[core.Expense(cle)] = d
 		}
 	}
 

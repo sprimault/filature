@@ -42,13 +42,13 @@ func Open(ctx context.Context, wasm []byte, alea *core.Random) (*BacASable, erro
 }
 
 // Brain adapte un module invité à la signature d'IA du noyau.
-func (b *BacASable) Brain() core.FabriqueCerveau {
+func (b *BacASable) Brain() core.BrainFactory {
 	// à implémenter : étape 13
 	return nil
 }
 
 // Generator adapte un module invité à la signature de génération de plateau.
-func (b *BacASable) Generator() core.FabriquePlateau {
+func (b *BacASable) Generator() core.BoardFactory {
 	// à implémenter : étape 13
 	return nil
 }

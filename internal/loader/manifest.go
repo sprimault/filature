@@ -28,12 +28,12 @@ type manifeste struct {
 	Version        string `toml:"version"`
 	EffectsVersion int    `toml:"effects_version"`
 	Description    string `toml:"description"`
-	Regles         bool   `toml:"rules"`
+	Rules          bool   `toml:"rules"`
 	Wasm           string `toml:"wasm"`
 	Licence        string `toml:"license"`
 
-	Capacites map[string]core.Ability `toml:"ability"`
-	Depenses  map[string]core.Ability `toml:"expense"`
+	Abilities map[string]core.Ability `toml:"ability"`
+	Expenses  map[string]core.Ability `toml:"expense"`
 	Modes     map[string]core.Mode    `toml:"mode"`
 
 	Langue *langue `toml:"language"`
@@ -120,7 +120,7 @@ func (m *manifeste) validate(chemin, dossier string) []error {
 		ajouter("nom %q dans un dossier %q", m.Name, dossier)
 	}
 
-	porteDesEffets := len(m.Capacites) > 0 || len(m.Depenses) > 0 || len(m.Modes) > 0
+	porteDesEffets := len(m.Abilities) > 0 || len(m.Expenses) > 0 || len(m.Modes) > 0
 
 	if porteDesEffets && m.EffectsVersion != core.EffectsVersion {
 		ajouter("effects_version %d, ce binaire applique la %d",
@@ -131,7 +131,7 @@ func (m *manifeste) validate(chemin, dossier string) []error {
 	// elle qui rend la poignée de main réseau fiable : deux joueurs peuvent
 	// avoir des habillages différents en sachant que la partie ne divergera
 	// pas.
-	if !m.Regles {
+	if !m.Rules {
 		if porteDesEffets {
 			ajouter("rules = false avec des capacites, depenses ou modes")
 		}
@@ -158,13 +158,13 @@ func (m *manifeste) validate(chemin, dossier string) []error {
 func (m *manifeste) checkAllEffects(chemin string) []error {
 	var manquements []error
 
-	for _, cle := range sortedKeys(m.Capacites) {
+	for _, cle := range sortedKeys(m.Abilities) {
 		manquements = append(manquements,
-			checkAbility(m.Capacites[cle], chemin, "ability."+cle)...)
+			checkAbility(m.Abilities[cle], chemin, "ability."+cle)...)
 	}
-	for _, cle := range sortedKeys(m.Depenses) {
+	for _, cle := range sortedKeys(m.Expenses) {
 		manquements = append(manquements,
-			checkAbility(m.Depenses[cle], chemin, "expense."+cle)...)
+			checkAbility(m.Expenses[cle], chemin, "expense."+cle)...)
 	}
 	for _, cle := range sortedKeys(m.Modes) {
 		mode := m.Modes[cle]
@@ -173,7 +173,7 @@ func (m *manifeste) checkAllEffects(chemin string) []error {
 				fmt.Errorf("%s: mode.%s: declenchement manquant", chemin, cle))
 		}
 		manquements = append(manquements,
-			checkEffects(mode.Effets, chemin, "mode."+cle, false)...)
+			checkEffects(mode.Effects, chemin, "mode."+cle, false)...)
 	}
 	return manquements
 }
@@ -190,7 +190,7 @@ func checkAbility(c core.Ability, chemin, ou string) []error {
 		manquements = append(manquements, fmt.Errorf("%s: %s: camp %q, attendu %q ou %q",
 			chemin, ou, c.Camp, core.SideFugitive, core.SideInspectors))
 	}
-	return append(manquements, checkEffects(c.Effets, chemin, ou, false)...)
+	return append(manquements, checkEffects(c.Effects, chemin, ou, false)...)
 }
 
 // checkEffects contrôle une liste d'effets, et refuse un differer imbriqué.

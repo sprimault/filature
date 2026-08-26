@@ -133,7 +133,7 @@ type Effect struct {
 // la mise en file, pas l'effet : annuler le tour où le differer a été posé le
 // retire de la file.
 type PendingEffect struct {
-	Effets        []Effect      `json:"effects"`
+	Effects       []Effect      `json:"effects"`
 	Turn          int           `json:"turn"`
 	Announced     bool          `json:"announced"`
 	EffectContext EffectContext `json:"context"`
@@ -412,7 +412,7 @@ func (p *Game) toggleZone(zone int, fermer bool) func() {
 // encore eu lieu.
 func (p *Game) defer_(e Effect, ctx EffectContext) func() {
 	p.PendingEffects = append(p.PendingEffects, PendingEffect{
-		Effets:        e.Then,
+		Effects:       e.Then,
 		Turn:          p.Turn + e.Duration,
 		Announced:     e.Announced,
 		EffectContext: ctx,

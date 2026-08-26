@@ -82,19 +82,19 @@ func TestShippedEffectsApply(t *testing.T) {
 
 	for cle, c := range livre.Ability {
 		t.Run("capacite/"+cle, func(t *testing.T) {
-			checkEffects(t, c.Effets, inspectorContext())
+			checkEffects(t, c.Effects, inspectorContext())
 		})
 	}
 	for cle, d := range livre.Expense {
 		t.Run("depense/"+cle, func(t *testing.T) {
-			checkEffects(t, d.Effets, fugitiveContext())
+			checkEffects(t, d.Effects, fugitiveContext())
 		})
 	}
 	for cle, m := range livre.Mode {
 		t.Run("mode/"+cle, func(t *testing.T) {
 			// Un mode est déclenché par le jeu : son contexte ne désigne
 			// aucun pion, seulement la zone visée.
-			checkEffects(t, m.Effets, core.EffectContext{Side: core.SideInspectors, Zone: 3})
+			checkEffects(t, m.Effects, core.EffectContext{Side: core.SideInspectors, Zone: 3})
 		})
 	}
 }
