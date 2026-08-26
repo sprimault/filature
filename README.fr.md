@@ -3,11 +3,12 @@
 English: [README.md](README.md)
 
 [![CI](https://github.com/sprimault/filature/actions/workflows/ci.yml/badge.svg)](https://github.com/sprimault/filature/actions/workflows/ci.yml)
-[![Licence](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
-[![Notices de tiers](https://img.shields.io/badge/tiers-notices-lightgrey)](THIRD-PARTY-NOTICES)
 
 Un jeu de plateau au tour par tour, à déplacement caché. Un fugitif contre cinq
 inspecteurs, sur une ville de rues et de bâtiments.
+
+Apache 2.0 — [`LICENSE`](LICENSE), et [`THIRD-PARTY-NOTICES`](THIRD-PARTY-NOTICES)
+pour les bibliothèques liées au binaire.
 
 Le fugitif se déplace dans huit directions, les inspecteurs dans quatre. Il est
 plus rapide, mais seul et invisible la plupart du temps. Ils sont nombreux et
@@ -133,11 +134,9 @@ deux camps à la fois : on file, et on est filé.
 
 ## Licence
 
-Apache 2.0 — voir [`LICENSE`](LICENSE).
+Apache 2.0. **Le nom Filature, son identité visuelle et sa palette n'en font
+pas partie** — un fork est bienvenu sous un autre nom.
 
-Le binaire lie des bibliothèques tierces dont les licences exigent que leurs
-notices le suivent : [`THIRD-PARTY-NOTICES`](THIRD-PARTY-NOTICES), livré dans
-chaque archive.
-
-Le nom Filature, son identité visuelle et sa palette ne sont pas couverts par
-cette licence. Un fork est bienvenu sous un autre nom.
+Le binaire embarque des bibliothèques tierces dont les licences exigent que
+leurs notices l'accompagnent : `THIRD-PARTY-NOTICES` est livré dans chaque
+archive, à côté de `LICENSE`.
