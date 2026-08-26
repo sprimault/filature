@@ -20,14 +20,14 @@ type dictionnaire struct {
 // langueDeBase est le plugin qui porte le français, langue de repli.
 const langueDeBase = "base"
 
-// TestLanguesLivreesCouvrentLesCles vérifie que chaque langue livrée traduit
+// TestShippedLanguagesCoverKeys vérifie que chaque langue livrée traduit
 // toutes les clés du français, et n'en invente aucune.
 //
 // Le repli sur le français rend une traduction partielle jouable, donc muette :
 // rien à l'écran ne distingue un libellé oublié d'un libellé volontairement
 // identique. C'est exactement ce qu'un test doit attraper, puisque personne ne
 // le verra en jouant.
-func TestLanguesLivreesCouvrentLesCles(t *testing.T) {
+func TestShippedLanguagesCoverKeys(t *testing.T) {
 	base := lireDictionnaire(t, langueDeBase)
 	if len(base) == 0 {
 		t.Fatal("le dictionnaire de repli est vide")

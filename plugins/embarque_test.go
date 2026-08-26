@@ -10,14 +10,14 @@ import (
 	"testing"
 )
 
-// TestLivresPortentLeContenuAttendu vérifie que le binaire embarque bien tout
+// TestShippedCarriesExpectedContent vérifie que le binaire embarque bien tout
 // le contenu du dépôt.
 //
 // Un `//go:embed` qui oublie un dossier ne fait pas échouer la compilation : le
 // jeu se construit, et se retrouve sans règles ou sans traduction à
 // l'exécution. Ce test est le seul endroit où l'oubli se voit.
-func TestLivresPortentLeContenuAttendu(t *testing.T) {
-	livres := Livres()
+func TestShippedCarriesExpectedContent(t *testing.T) {
+	livres := Shipped()
 
 	for _, attendu := range []string{
 		"base/manifeste.toml",
@@ -33,12 +33,12 @@ func TestLivresPortentLeContenuAttendu(t *testing.T) {
 	}
 }
 
-// TestEmbarqueSuitLeDepot vérifie que tout plugin du dépôt est embarqué.
+// TestEmbeddedFollowsRepository vérifie que tout plugin du dépôt est embarqué.
 //
 // Sans ce contrôle, ajouter une langue reviendrait à la livrer dans le dépôt
 // sans la livrer dans le binaire — et l'écart ne se verrait qu'après
 // publication.
-func TestEmbarqueSuitLeDepot(t *testing.T) {
+func TestEmbeddedFollowsRepository(t *testing.T) {
 	surDisque, err := os.ReadDir(".")
 	if err != nil {
 		t.Fatal(err)
@@ -48,22 +48,22 @@ func TestEmbarqueSuitLeDepot(t *testing.T) {
 		if !d.IsDir() {
 			continue
 		}
-		if _, err := fs.Stat(Livres(), d.Name()); err != nil {
+		if _, err := fs.Stat(Shipped(), d.Name()); err != nil {
 			t.Errorf("le plugin %s est dans le dépôt mais pas dans le binaire", d.Name())
 		}
 	}
 }
 
-// TestContenuEmbarqueIdentiqueAuDepot compare octet pour octet.
+// TestEmbeddedMatchesRepository compare octet pour octet.
 //
 // Le contenu embarqué est figé à la compilation : une divergence signifierait
 // que le binaire livre autre chose que ce qui est relu en revue de code.
-func TestContenuEmbarqueIdentiqueAuDepot(t *testing.T) {
-	err := fs.WalkDir(Livres(), ".", func(chemin string, e fs.DirEntry, err error) error {
+func TestEmbeddedMatchesRepository(t *testing.T) {
+	err := fs.WalkDir(Shipped(), ".", func(chemin string, e fs.DirEntry, err error) error {
 		if err != nil || e.IsDir() {
 			return err
 		}
-		embarque, err := fs.ReadFile(Livres(), chemin)
+		embarque, err := fs.ReadFile(Shipped(), chemin)
 		if err != nil {
 			return err
 		}

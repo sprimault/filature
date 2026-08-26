@@ -27,7 +27,7 @@ import (
 //
 // Ce qui est délibérément absent des hôtes exposés : l'horloge, l'entropie
 // système, le système de fichiers, les sockets. L'aléatoire disponible est un
-// core.Alea dérivé de la graine de la partie. Un plugin non déterministe
+// core.Random dérivé de la graine de la partie. Un plugin non déterministe
 // casserait le rejeu du journal, donc les sauvegardes, le débogage et
 // l'entraînement de l'IA.
 type BacASable struct {
@@ -36,19 +36,19 @@ type BacASable struct {
 	budget int
 }
 
-// Ouvrir instancie un module et vérifie qu'il expose les fonctions attendues.
-func Ouvrir(ctx context.Context, wasm []byte, alea *core.Alea) (*BacASable, error) {
+// Open instancie un module et vérifie qu'il expose les fonctions attendues.
+func Open(ctx context.Context, wasm []byte, alea *core.Random) (*BacASable, error) {
 	return nil, errors.New("à implémenter : étape 13")
 }
 
-// Cerveau adapte un module invité à la signature d'IA du noyau.
-func (b *BacASable) Cerveau() core.FabriqueCerveau {
+// Brain adapte un module invité à la signature d'IA du noyau.
+func (b *BacASable) Brain() core.FabriqueCerveau {
 	// à implémenter : étape 13
 	return nil
 }
 
-// Generateur adapte un module invité à la signature de génération de plateau.
-func (b *BacASable) Generateur() core.FabriquePlateau {
+// Generator adapte un module invité à la signature de génération de plateau.
+func (b *BacASable) Generator() core.FabriquePlateau {
 	// à implémenter : étape 13
 	return nil
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/sprimault/filature/internal/core"
 )
 
-// TestPrimitivesToutesExercees échoue sur une primitive d'effets que la suite
+// TestEveryPrimitiveExercised échoue sur une primitive d'effets que la suite
 // du noyau n'applique jamais.
 //
 // Le vocabulaire est un contrat public : une primitive y entre pour ne plus en
@@ -24,13 +24,13 @@ import (
 // rang d'origine et n'était vérifiée par personne.
 //
 // Le rapprochement porte sur les identifiants et non sur les valeurs : un cas
-// écrit EffetTeleporter, jamais « teleporter ». Chercher les chaînes ne
+// écrit EffectTeleport, jamais « teleporter ». Chercher les chaînes ne
 // trouverait que les noms de cas, qui ressemblent aux valeurs sans les valoir.
-func TestPrimitivesToutesExercees(t *testing.T) {
+func TestEveryPrimitiveExercised(t *testing.T) {
 	fset := token.NewFileSet()
 
 	declarees := constantesDuType(t, fset,
-		filepath.Join(racine, "internal", "core", "effets.go"), "TypeEffet")
+		filepath.Join(racine, "internal", "core", "effets.go"), "EffectType")
 	if len(declarees) == 0 {
 		t.Fatal("aucune primitive trouvée : le contrôle ne vérifie plus rien")
 	}
@@ -45,28 +45,28 @@ func TestPrimitivesToutesExercees(t *testing.T) {
 	}
 }
 
-// TestVocabulaireEnumereEnEntier vérifie que TypesEffets et Cibles ne
+// TestVocabularyFullyEnumerated vérifie que EffectTypes et Targets ne
 // laissent aucune constante de côté.
 //
 // Le chargeur de plugins s'en sert pour refuser ce qu'il ne sait pas
 // appliquer. Une primitive déclarée mais absente de l'énumération serait donc
 // rejetée à la lecture d'un manifeste parfaitement valide, sur un message
 // disant qu'elle est inconnue alors qu'elle est écrite juste au-dessus.
-func TestVocabulaireEnumereEnEntier(t *testing.T) {
+func TestVocabularyFullyEnumerated(t *testing.T) {
 	fset := token.NewFileSet()
 	chemin := filepath.Join(racine, "internal", "core", "effets.go")
 
 	var types []string
-	for _, e := range core.TypesEffets() {
+	for _, e := range core.EffectTypes() {
 		types = append(types, string(e))
 	}
-	comparer(t, "TypesEffets", constantesDuType(t, fset, chemin, "TypeEffet"), types)
+	comparer(t, "EffectTypes", constantesDuType(t, fset, chemin, "EffectType"), types)
 
 	var cibles []string
-	for _, c := range core.Cibles() {
+	for _, c := range core.Targets() {
 		cibles = append(cibles, string(c))
 	}
-	comparer(t, "Cibles", constantesDuType(t, fset, chemin, "Cible"), cibles)
+	comparer(t, "Targets", constantesDuType(t, fset, chemin, "Target"), cibles)
 }
 
 // comparer signale ce qu'une énumération oublie et ce qu'elle invente.

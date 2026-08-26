@@ -17,16 +17,16 @@ type plateauTrame struct {
 	zones     []Zone
 }
 
-// trame construit un plateau depuis un dessin, « # » pour un bâtiment.
+// grid construit un plateau depuis un dessin, « # » pour un bâtiment.
 //
-// Un dessin vaut mieux qu'une liste de coordonnées : le cas testé se lit d'un
+// Un dessin vaut mieux qu'une list de coordonnées : le cas testé se lit d'un
 // coup d'œil, et une erreur d'index ne passe pas inaperçue.
-func trame(lignes ...string) *plateauTrame {
+func grid(lignes ...string) *plateauTrame {
 	b := &plateauTrame{batiments: map[Position]bool{}}
 	for l, ligne := range lignes {
 		for c, r := range ligne {
 			if r == '#' {
-				b.batiments[Position{Colonne: c, Ligne: l}] = true
+				b.batiments[Position{Column: c, Row: l}] = true
 			}
 		}
 	}
@@ -34,9 +34,9 @@ func trame(lignes ...string) *plateauTrame {
 	return b
 }
 
-// EstRue traite le hors-limites comme du bâti, comme le plateau borné.
-func (b *plateauTrame) EstRue(p Position) bool {
-	if p.Colonne < 0 || p.Ligne < 0 || p.Colonne >= len(b.cote) || p.Ligne >= len(b.cote) {
+// IsStreet traite le hors-limites comme du bâti, comme le plateau borné.
+func (b *plateauTrame) IsStreet(p Position) bool {
+	if p.Column < 0 || p.Row < 0 || p.Column >= len(b.cote) || p.Row >= len(b.cote) {
 		return false
 	}
 	return !b.batiments[p]
@@ -45,18 +45,18 @@ func (b *plateauTrame) EstRue(p Position) bool {
 // Zones renvoie les zones déclarées par le cas de test.
 func (b *plateauTrame) Zones() []Zone { return b.zones }
 
-// Graine est figée : aucun test de ce fichier ne tire au sort.
-func (b *plateauTrame) Graine() int64 { return 1 }
+// Seed est figée : aucun test de ce fichier ne tire au sort.
+func (b *plateauTrame) Seed() int64 { return 1 }
 
-// Vision reste vide : la légalité d'un coup ne dépend pas de ce qu'on voit.
-func (b *plateauTrame) Vision(p Position, portee int) []Position { return nil }
+// Sight reste vide : la légalité d'un coup ne dépend pas de ce qu'on voit.
+func (b *plateauTrame) Sight(p Position, portee int) []Position { return nil }
 
-// CasesDans énumère les rues du carré, ligne par ligne.
-func (b *plateauTrame) CasesDans(centre Position, rayon int) []Position {
+// CellsWithin énumère les rues du carré, ligne par ligne.
+func (b *plateauTrame) CellsWithin(centre Position, rayon int) []Position {
 	var cases []Position
-	for ligne := centre.Ligne - rayon; ligne <= centre.Ligne+rayon; ligne++ {
-		for colonne := centre.Colonne - rayon; colonne <= centre.Colonne+rayon; colonne++ {
-			if p := (Position{Colonne: colonne, Ligne: ligne}); b.EstRue(p) {
+	for ligne := centre.Row - rayon; ligne <= centre.Row+rayon; ligne++ {
+		for colonne := centre.Column - rayon; colonne <= centre.Column+rayon; colonne++ {
+			if p := (Position{Column: colonne, Row: ligne}); b.IsStreet(p) {
 				cases = append(cases, p)
 			}
 		}
@@ -64,93 +64,93 @@ func (b *plateauTrame) CasesDans(centre Position, rayon int) []Position {
 	return cases
 }
 
-// partieSur monte une partie en phase fugitif sur un plateau dessiné.
-func partieSur(b *plateauTrame, fugitif Position, inspecteurs ...Position) *Partie {
-	p := &Partie{
-		Parametres: ParametresDefaut(),
-		Plateau:    b,
-		Tour:       3,
-		Phase:      PhaseFugitif,
-		Fugitif:    Fugitif{Position: fugitif, Resistance: 10},
+// partieSur monte une partie en phaseName fugitif sur un plateau dessiné.
+func partieSur(b *plateauTrame, fugitif Position, inspecteurs ...Position) *Game {
+	p := &Game{
+		Settings: DefaultSettings(),
+		Board:    b,
+		Turn:     3,
+		Phase:    PhaseFugitive,
+		Fugitive: Fugitive{Position: fugitif, Stamina: 10},
 	}
-	p.Parametres.Cote = len(b.cote)
+	p.Settings.Size = len(b.cote)
 	for _, pos := range inspecteurs {
-		p.Inspecteurs = append(p.Inspecteurs, Inspecteur{Position: pos})
+		p.Inspectors = append(p.Inspectors, Inspector{Position: pos})
 	}
 	return p
 }
 
-// arrivees extrait les destinations des déplacements, pour comparer sans se
+// arrivals extrait les destinations des déplacements, pour comparer sans se
 // soucier des autres champs.
-func arrivees(coups []Coup) []Position {
+func arrivals(coups []Move) []Position {
 	var positions []Position
 	for _, c := range coups {
-		if c.Type == CoupDeplacer {
-			positions = append(positions, c.Arrivee)
+		if c.Type == MoveStep {
+			positions = append(positions, c.To)
 		}
 	}
 	return positions
 }
 
-// TestFugitifHuitDirections vérifie qu'en terrain dégagé le fugitif dispose de
+// TestFugitiveEightDirections vérifie qu'en terrain dégagé le fugitif dispose de
 // ses huit directions, là où un inspecteur n'en a que quatre.
-func TestFugitifHuitDirections(t *testing.T) {
-	p := partieSur(trame(
+func TestFugitiveEightDirections(t *testing.T) {
+	p := partieSur(grid(
 		".....",
 		".....",
 		".....",
 		".....",
 		".....",
-	), Position{Colonne: 2, Ligne: 2})
+	), Position{Column: 2, Row: 2})
 
-	if got := len(arrivees(p.CoupsLegaux(CampFugitif))); got != 8 {
+	if got := len(arrivals(p.LegalMoves(SideFugitive))); got != 8 {
 		t.Errorf("%d déplacements, attendu 8", got)
 	}
 }
 
-// TestDiagonaleBloqueeParAngleFerme est le cas limite de docs/regles.md §2.
+// TestDiagonalBlockedByClosedCorner est le cas limite de docs/regles.md §2.
 //
 // Une diagonale exige qu'au moins une des deux cases orthogonales
 // intermédiaires soit une rue. Sans cette règle, on traverse les angles de
 // bâtiments et le bâti ne bloque plus rien.
-func TestDiagonaleBloqueeParAngleFerme(t *testing.T) {
+func TestDiagonalBlockedByClosedCorner(t *testing.T) {
 	// Le coin nord-est du fugitif est fermé par deux bâtiments en équerre, en
 	// (2,1) et (3,2). La case visée (3,1) est libre, et c'est tout l'intérêt :
 	// elle serait atteignable si seule la praticabilité comptait.
-	p := partieSur(trame(
+	p := partieSur(grid(
 		".....",
 		"..#..",
 		"...#.",
 		".....",
 		".....",
-	), Position{Colonne: 2, Ligne: 2})
+	), Position{Column: 2, Row: 2})
 
-	if !p.EstPraticable(Position{Colonne: 3, Ligne: 1}) {
+	if !p.IsWalkable(Position{Column: 3, Row: 1}) {
 		t.Fatal("la case visée doit être libre, sinon le test ne prouve rien")
 	}
 
-	for _, a := range arrivees(p.CoupsLegaux(CampFugitif)) {
-		if a == (Position{Colonne: 3, Ligne: 1}) {
+	for _, a := range arrivals(p.LegalMoves(SideFugitive)) {
+		if a == (Position{Column: 3, Row: 1}) {
 			t.Error("la diagonale traverse un angle fermé")
 		}
 	}
 }
 
-// TestDiagonaleOuverteParUnSeulCote vérifie l'autre moitié de la règle : une
+// TestDiagonalOpenedByOneSide vérifie l'autre moitié de la règle : une
 // seule des deux cases intermédiaires suffit.
-func TestDiagonaleOuverteParUnSeulCote(t *testing.T) {
+func TestDiagonalOpenedByOneSide(t *testing.T) {
 	// Seul (3,2) est bâti ; (2,1) reste libre, et suffit.
-	p := partieSur(trame(
+	p := partieSur(grid(
 		".....",
 		".....",
 		"...#.",
 		".....",
 		".....",
-	), Position{Colonne: 2, Ligne: 2})
+	), Position{Column: 2, Row: 2})
 
 	trouve := false
-	for _, a := range arrivees(p.CoupsLegaux(CampFugitif)) {
-		if a == (Position{Colonne: 3, Ligne: 1}) {
+	for _, a := range arrivals(p.LegalMoves(SideFugitive)) {
+		if a == (Position{Column: 3, Row: 1}) {
 			trouve = true
 		}
 	}
@@ -159,101 +159,101 @@ func TestDiagonaleOuverteParUnSeulCote(t *testing.T) {
 	}
 }
 
-// TestFugitifNEntrePasSurUnInspecteur applique la décision de docs/regles.md
+// TestFugitiveCannotEnterInspector applique la décision de docs/regles.md
 // §5 : il y serait à l'abri de tout contact, l'adjacence n'incluant pas la
 // superposition.
-func TestFugitifNEntrePasSurUnInspecteur(t *testing.T) {
-	p := partieSur(trame(
+func TestFugitiveCannotEnterInspector(t *testing.T) {
+	p := partieSur(grid(
 		".....",
 		".....",
 		".....",
 		".....",
 		".....",
-	), Position{Colonne: 2, Ligne: 2}, Position{Colonne: 3, Ligne: 2})
+	), Position{Column: 2, Row: 2}, Position{Column: 3, Row: 2})
 
-	for _, a := range arrivees(p.CoupsLegaux(CampFugitif)) {
-		if a == (Position{Colonne: 3, Ligne: 2}) {
+	for _, a := range arrivals(p.LegalMoves(SideFugitive)) {
+		if a == (Position{Column: 3, Row: 2}) {
 			t.Error("le fugitif peut se poser sous un inspecteur")
 		}
 	}
 }
 
-// TestFugitifSansDeplacementLegal est le cas limite qui décide d'une fin de
+// TestFugitiveWithNoLegalStep est le cas limite qui décide d'une fin de
 // partie : le fugitif muré ne peut plus bouger.
 //
 // Il lui reste ses dépenses et le passage, mais aucun déplacement — c'est ce
 // que l'arbitre lira pour conclure.
-func TestFugitifSansDeplacementLegal(t *testing.T) {
-	p := partieSur(trame(
+func TestFugitiveWithNoLegalStep(t *testing.T) {
+	p := partieSur(grid(
 		"#####",
 		"#####",
 		"##.##",
 		"#####",
 		"#####",
-	), Position{Colonne: 2, Ligne: 2})
+	), Position{Column: 2, Row: 2})
 
-	if got := arrivees(p.CoupsLegaux(CampFugitif)); got != nil {
+	if got := arrivals(p.LegalMoves(SideFugitive)); got != nil {
 		t.Errorf("%v, attendu aucun déplacement", got)
 	}
 }
 
-// TestQuotaPorteSurDesPionsDistincts vérifie que le quota compte les pions et
+// TestQuotaCountsDistinctPieces vérifie que le quota compte les pions et
 // non les déplacements — ce qu'un simple compteur ne savait pas faire.
-func TestQuotaPorteSurDesPionsDistincts(t *testing.T) {
-	p := partieSur(trame(
+func TestQuotaCountsDistinctPieces(t *testing.T) {
+	p := partieSur(grid(
 		".....",
 		".....",
 		".....",
 		".....",
 		".....",
-	), Position{Colonne: 4, Ligne: 4},
-		Position{Colonne: 0, Ligne: 0},
-		Position{Colonne: 1, Ligne: 0},
-		Position{Colonne: 2, Ligne: 0},
-		Position{Colonne: 3, Ligne: 0})
-	p.Phase = PhaseInspecteurs
-	p.Parametres.PionsParTour = 2
+	), Position{Column: 4, Row: 4},
+		Position{Column: 0, Row: 0},
+		Position{Column: 1, Row: 0},
+		Position{Column: 2, Row: 0},
+		Position{Column: 3, Row: 0})
+	p.Phase = PhaseInspectors
+	p.Settings.PiecesPerTurn = 2
 
 	// Deux pions distincts ont bougé : le quota est atteint, et les deux
 	// autres n'ont plus de coup.
-	p.Inspecteurs[0].DeplacementsFaits = 1
-	p.Inspecteurs[1].DeplacementsFaits = 1
+	p.Inspectors[0].StepsTaken = 1
+	p.Inspectors[1].StepsTaken = 1
 
-	for _, c := range p.CoupsLegaux(CampInspecteurs) {
-		if c.Type == CoupDeplacer && c.Pion >= 2 {
-			t.Errorf("le pion %d bouge alors que le quota est atteint", c.Pion)
+	for _, c := range p.LegalMoves(SideInspectors) {
+		if c.Type == MoveStep && c.Piece >= 2 {
+			t.Errorf("le pion %d bouge alors que le quota est atteint", c.Piece)
 		}
 	}
 }
 
-// TestPionEntameContinueHorsQuota vérifie qu'un pion déjà déplacé poursuit sur
+// TestStartedPieceContinuesOutsideQuota vérifie qu'un pion déjà déplacé poursuit sur
 // sa mobilité propre sans prendre une place de plus.
-func TestPionEntameContinueHorsQuota(t *testing.T) {
-	p := partieSur(trame(
+func TestStartedPieceContinuesOutsideQuota(t *testing.T) {
+	p := partieSur(grid(
 		".....",
 		".....",
 		".....",
 		".....",
 		".....",
-	), Position{Colonne: 4, Ligne: 4},
-		Position{Colonne: 1, Ligne: 1},
-		Position{Colonne: 3, Ligne: 1})
-	p.Phase = PhaseInspecteurs
-	p.Parametres.PionsParTour = 1
+	), Position{Column: 4, Row: 4},
+		Position{Column: 1, Row: 1},
+		Position{Column: 3, Row: 1})
+	p.Phase = PhaseInspectors
+	p.Settings.PiecesPerTurn = 1
 
 	// Le pion 0 a bougé et porte un bonus de mobilité : il lui reste un pas,
 	// alors que le quota d'un seul pion est déjà consommé.
-	p.Inspecteurs[0].DeplacementsFaits = 1
-	p.EffetsActifs = []EffetActif{{
-		Effet:    Effet{Type: EffetModifierMobilite, Cible: CiblePionCourant, Valeur: 1, Duree: 1},
-		Contexte: Contexte{Acteur: CampInspecteurs, Pion: 0},
-		Echeance: p.Tour,
+	p.Inspectors[0].StepsTaken = 1
+	p.ActiveEffects = []ActiveEffect{{
+		Effect:        Effect{Type: EffectChangeMobility, Target: TargetCurrentPiece, Value: 1, Duration: 1},
+		EffectContext: EffectContext{Side: SideInspectors, Piece: 0},
+		Echeance:      p.Turn,
 	}}
 
 	var pions []int
-	for _, c := range p.CoupsLegaux(CampInspecteurs) {
-		if c.Type == CoupDeplacer {
-			pions = append(pions, c.Pion)
+	for _, c := range p.LegalMoves(SideInspectors) {
+		if c.Type == MoveStep {
+			pions = append(pions, c.Piece)
 		}
 	}
 	for _, pion := range pions {
@@ -266,39 +266,39 @@ func TestPionEntameContinueHorsQuota(t *testing.T) {
 	}
 }
 
-// TestInspecteursOrthogonalesSeulement vérifie qu'ils n'ont pas les diagonales.
-func TestInspecteursOrthogonalesSeulement(t *testing.T) {
-	p := partieSur(trame(
+// TestInspectorsOrthogonalOnly vérifie qu'ils n'ont pas les diagonales.
+func TestInspectorsOrthogonalOnly(t *testing.T) {
+	p := partieSur(grid(
 		".....",
 		".....",
 		".....",
 		".....",
 		".....",
-	), Position{Colonne: 4, Ligne: 4}, Position{Colonne: 2, Ligne: 2})
-	p.Phase = PhaseInspecteurs
+	), Position{Column: 4, Row: 4}, Position{Column: 2, Row: 2})
+	p.Phase = PhaseInspectors
 
-	if got := len(arrivees(p.CoupsLegaux(CampInspecteurs))); got != 4 {
+	if got := len(arrivals(p.LegalMoves(SideInspectors))); got != 4 {
 		t.Errorf("%d déplacements, attendu 4", got)
 	}
 }
 
-// TestInspecteursPeuventSEmpiler applique l'autre moitié de la décision : eux
+// TestInspectorsCanStack applique l'autre moitié de la décision : eux
 // n'ont aucune raison d'être séparés, et ils n'y gagnent rien.
-func TestInspecteursPeuventSEmpiler(t *testing.T) {
-	p := partieSur(trame(
+func TestInspectorsCanStack(t *testing.T) {
+	p := partieSur(grid(
 		".....",
 		".....",
 		".....",
 		".....",
 		".....",
-	), Position{Colonne: 4, Ligne: 4},
-		Position{Colonne: 2, Ligne: 2},
-		Position{Colonne: 3, Ligne: 2})
-	p.Phase = PhaseInspecteurs
+	), Position{Column: 4, Row: 4},
+		Position{Column: 2, Row: 2},
+		Position{Column: 3, Row: 2})
+	p.Phase = PhaseInspectors
 
 	trouve := false
-	for _, c := range p.CoupsLegaux(CampInspecteurs) {
-		if c.Type == CoupDeplacer && c.Pion == 0 && c.Arrivee == (Position{Colonne: 3, Ligne: 2}) {
+	for _, c := range p.LegalMoves(SideInspectors) {
+		if c.Type == MoveStep && c.Piece == 0 && c.To == (Position{Column: 3, Row: 2}) {
 			trouve = true
 		}
 	}
@@ -307,65 +307,65 @@ func TestInspecteursPeuventSEmpiler(t *testing.T) {
 	}
 }
 
-// TestPasDeCoupHorsDeSonTour vérifie qu'un camp interrogé pendant la phase de
+// TestNoMoveOutOfTurn vérifie qu'un sideName interrogé pendant la phase de
 // l'autre n'obtient rien. C'est le serveur qui s'en sert pour refuser un coup
 // arrivé trop tôt.
-func TestPasDeCoupHorsDeSonTour(t *testing.T) {
-	p := partieSur(trame(".....", ".....", ".....", ".....", "....."),
-		Position{Colonne: 2, Ligne: 2}, Position{Colonne: 0, Ligne: 0})
+func TestNoMoveOutOfTurn(t *testing.T) {
+	p := partieSur(grid(".....", ".....", ".....", ".....", "....."),
+		Position{Column: 2, Row: 2}, Position{Column: 0, Row: 0})
 
-	if got := p.CoupsLegaux(CampInspecteurs); got != nil {
+	if got := p.LegalMoves(SideInspectors); got != nil {
 		t.Errorf("%d coups pour les inspecteurs pendant la phase du fugitif", len(got))
 	}
 
-	p.Phase = PhaseInspecteurs
-	if got := p.CoupsLegaux(CampFugitif); got != nil {
+	p.Phase = PhaseInspectors
+	if got := p.LegalMoves(SideFugitive); got != nil {
 		t.Errorf("%d coups pour le fugitif pendant la phase des inspecteurs", len(got))
 	}
 
-	p.Phase = PhaseTerminee
-	if got := p.CoupsLegaux(CampFugitif); got != nil {
+	p.Phase = PhaseOver
+	if got := p.LegalMoves(SideFugitive); got != nil {
 		t.Errorf("%d coups sur une partie terminée", len(got))
 	}
 }
 
-// TestScellerUneZone vérifie que la mise en place propose les zones, et non des
+// TestSealAZone vérifie que la mise en place propose les zones, et non des
 // cases : la position de départ du fugitif est tirée au sort, il ne la choisit
 // jamais.
-func TestScellerUneZone(t *testing.T) {
-	b := trame(".....", ".....", ".....", ".....", ".....")
-	b.zones = []Zone{{Numero: 0}, {Numero: 1}, {Numero: 2}}
-	p := partieSur(b, Position{Colonne: 2, Ligne: 2})
-	p.Phase = PhasePlacementFugitif
+func TestSealAZone(t *testing.T) {
+	b := grid(".....", ".....", ".....", ".....", ".....")
+	b.zones = []Zone{{Number: 0}, {Number: 1}, {Number: 2}}
+	p := partieSur(b, Position{Column: 2, Row: 2})
+	p.Phase = PhaseFugitiveSetup
 
-	coups := p.CoupsLegaux(CampFugitif)
+	coups := p.LegalMoves(SideFugitive)
 	if len(coups) != 3 {
 		t.Fatalf("%d coups, attendu une par zone", len(coups))
 	}
 	for _, c := range coups {
-		if c.Type != CoupPlacer {
+		if c.Type != MovePlace {
 			t.Errorf("type %s, attendu placer", c.Type)
 		}
-		if c.Arrivee != (Position{}) {
+		if c.To != (Position{}) {
 			t.Error("sceller une zone ne désigne pas de case")
 		}
 	}
 }
 
-// TestPlacementNExclutPasLaCaseDuFugitif protège l'invariant de la vue filtrée
+// TestSetupDoesNotExcludeFugitiveCell protège l'invariant de la vue filtrée
 // à la mise en place.
 //
-// Retirer sa case de la liste dirait aux inspecteurs où il n'est pas, ce qui
+// Retirer sa case de la list dirait aux inspecteurs où il n'est pas, ce qui
 // est une fuite exactement comme dire où il est.
-func TestPlacementNExclutPasLaCaseDuFugitif(t *testing.T) {
-	cache := Position{Colonne: 2, Ligne: 2}
-	p := partieSur(trame(".....", ".....", ".....", ".....", "....."), cache)
-	p.Phase = PhasePlacementInspecteurs
-	p.Parametres.Inspecteurs = 2
+func TestSetupDoesNotExcludeFugitiveCell(t *testing.T) {
+	cache := Position{Column: 2, Row: 2}
+	p := partieSur(grid(".....", ".....", ".....", ".....", "....."), cache)
+	p.Phase = PhaseInspectorsSetup
+	p.Settings.Inspectors = 2
 
 	trouve := false
-	for _, c := range p.CoupsLegaux(CampInspecteurs) {
-		if c.Arrivee == cache {
+	for _, c := range p.LegalMoves(SideInspectors) {
+		if c.To == cache {
 			trouve = true
 		}
 	}
@@ -374,37 +374,37 @@ func TestPlacementNExclutPasLaCaseDuFugitif(t *testing.T) {
 	}
 }
 
-// TestPlacementSArreteAuCompte vérifie qu'on ne pose pas un sixième pion.
-func TestPlacementSArreteAuCompte(t *testing.T) {
-	p := partieSur(trame(".....", ".....", ".....", ".....", "....."),
-		Position{Colonne: 2, Ligne: 2},
-		Position{Colonne: 0, Ligne: 0}, Position{Colonne: 1, Ligne: 0})
-	p.Phase = PhasePlacementInspecteurs
-	p.Parametres.Inspecteurs = 2
+// TestSetupStopsAtCount vérifie qu'on ne pose pas un sixième pion.
+func TestSetupStopsAtCount(t *testing.T) {
+	p := partieSur(grid(".....", ".....", ".....", ".....", "....."),
+		Position{Column: 2, Row: 2},
+		Position{Column: 0, Row: 0}, Position{Column: 1, Row: 0})
+	p.Phase = PhaseInspectorsSetup
+	p.Settings.Inspectors = 2
 
-	if got := p.CoupsLegaux(CampInspecteurs); got != nil {
+	if got := p.LegalMoves(SideInspectors); got != nil {
 		t.Errorf("%d coups alors que les deux pions sont placés", len(got))
 	}
 }
 
-// TestChangerDeZone vérifie que le fugitif peut resceller ailleurs, et
+// TestChangeZone vérifie que le fugitif peut resceller ailleurs, et
 // seulement ailleurs.
 //
 // La règle le facture 2 points et l'étranglement peut l'y contraindre en
 // fermant sa zone : sans ce coup, une partie se perd sur une règle documentée
 // mais injouable.
-func TestChangerDeZone(t *testing.T) {
-	b := trame(".....", ".....", ".....", ".....", ".....")
-	b.zones = []Zone{{Numero: 0}, {Numero: 1}, {Numero: 2}}
-	p := partieSur(b, Position{Colonne: 2, Ligne: 2})
-	p.Fugitif.ZoneScellee = 1
-	p.Extensions = &Registre{Depenses: map[Depense]Capacite{
-		DepenseChangerZone: {Nom: "Changement de zone", Camp: CampFugitif, Cout: 2},
+func TestChangeZone(t *testing.T) {
+	b := grid(".....", ".....", ".....", ".....", ".....")
+	b.zones = []Zone{{Number: 0}, {Number: 1}, {Number: 2}}
+	p := partieSur(b, Position{Column: 2, Row: 2})
+	p.Fugitive.SealedZone = 1
+	p.Extensions = &Registry{Depenses: map[Expense]Ability{
+		ExpenseChangeZone: {Name: "Changement de zone", Camp: SideFugitive, Cost: 2},
 	}}
 
 	var zones []int
-	for _, c := range p.CoupsLegaux(CampFugitif) {
-		if c.Type == CoupChangerZone {
+	for _, c := range p.LegalMoves(SideFugitive) {
+		if c.Type == MoveChangeZone {
 			zones = append(zones, c.Zone)
 		}
 	}
@@ -413,53 +413,53 @@ func TestChangerDeZone(t *testing.T) {
 	}
 }
 
-// TestChangerDeZoneHorsDePrix vérifie qu'une dépense inabordable n'est pas
+// TestChangeZoneTooExpensive vérifie qu'une dépense inabordable n'est pas
 // proposée. Le fugitif à bout de résistance doit voir ce qu'il ne peut plus
 // faire disparaître de ses coups, pas échouer en le tentant.
-func TestChangerDeZoneHorsDePrix(t *testing.T) {
-	b := trame(".....", ".....", ".....", ".....", ".....")
-	b.zones = []Zone{{Numero: 0}, {Numero: 1}}
-	p := partieSur(b, Position{Colonne: 2, Ligne: 2})
-	p.Fugitif.Resistance = 1
-	p.Extensions = &Registre{Depenses: map[Depense]Capacite{
-		DepenseChangerZone: {Nom: "Changement de zone", Camp: CampFugitif, Cout: 2},
+func TestChangeZoneTooExpensive(t *testing.T) {
+	b := grid(".....", ".....", ".....", ".....", ".....")
+	b.zones = []Zone{{Number: 0}, {Number: 1}}
+	p := partieSur(b, Position{Column: 2, Row: 2})
+	p.Fugitive.Stamina = 1
+	p.Extensions = &Registry{Depenses: map[Expense]Ability{
+		ExpenseChangeZone: {Name: "Changement de zone", Camp: SideFugitive, Cost: 2},
 	}}
 
-	for _, c := range p.CoupsLegaux(CampFugitif) {
-		if c.Type == CoupChangerZone {
+	for _, c := range p.LegalMoves(SideFugitive) {
+		if c.Type == MoveChangeZone {
 			t.Error("une dépense à 2 est proposée avec 1 point de résistance")
 		}
 	}
 }
 
-// TestOrdreStable vérifie que deux appels rendent la même liste dans le même
+// TestStableOrder vérifie que deux appels rendent la même list dans le même
 // ordre.
 //
 // L'ordre des coups légaux décide de ce qu'un rejeu doit retrouver et de ce que
 // l'IA explore en premier. Un parcours de map le rendrait instable sans que
 // rien ne le signale, puisque chaque exécution serait cohérente avec elle-même.
-func TestOrdreStable(t *testing.T) {
-	p := partieSur(trame(".....", ".....", ".....", ".....", "....."),
-		Position{Colonne: 2, Ligne: 2}, Position{Colonne: 0, Ligne: 0})
+func TestStableOrder(t *testing.T) {
+	p := partieSur(grid(".....", ".....", ".....", ".....", "....."),
+		Position{Column: 2, Row: 2}, Position{Column: 0, Row: 0})
 
-	premier := p.CoupsLegaux(CampFugitif)
+	premier := p.LegalMoves(SideFugitive)
 	for i := 0; i < 20; i++ {
-		if got := p.CoupsLegaux(CampFugitif); !reflect.DeepEqual(got, premier) {
+		if got := p.LegalMoves(SideFugitive); !reflect.DeepEqual(got, premier) {
 			t.Fatalf("l'ordre a changé à l'appel %d", i)
 		}
 	}
 }
 
-// TestFinDePhaseToujoursOfferte vérifie qu'un camp peut toujours rendre la
-// main, même sans rien d'autre à jouer. Sans ce coup, une partie où plus rien
+// TestEndPhaseAlwaysOffered vérifie qu'un sideName peut toujours rendre la
+// main, même sans rien d'autre à play. Sans ce coup, une partie où plus rien
 // n'est possible se figerait.
-func TestFinDePhaseToujoursOfferte(t *testing.T) {
-	p := partieSur(trame("#####", "#####", "##.##", "#####", "#####"),
-		Position{Colonne: 2, Ligne: 2})
+func TestEndPhaseAlwaysOffered(t *testing.T) {
+	p := partieSur(grid("#####", "#####", "##.##", "#####", "#####"),
+		Position{Column: 2, Row: 2})
 
 	fin := false
-	for _, c := range p.CoupsLegaux(CampFugitif) {
-		if c.Type == CoupFinDePhase {
+	for _, c := range p.LegalMoves(SideFugitive) {
+		if c.Type == MoveEndPhase {
 			fin = true
 		}
 	}

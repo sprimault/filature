@@ -22,9 +22,9 @@ coder dans le noyau.
 
 ## 1. Trois règles qui gouvernent tout
 
-**Un plugin ne touche jamais `*Partie`.** Il produit des `Effet`, le noyau les
+**Un plugin ne touche jamais `*Game`.** Il produit des `Effect`, le noyau les
 applique. C'est ce qui l'empêche de lire la position cachée du fugitif ou sa
-zone scellée, et ce qui garde `Annuler` praticable.
+zone scellée, et ce qui garde `Undo` praticable.
 
 **Tout effet est réversible.** `Appliquer1Effet` renvoie de quoi se défaire. Un
 effet qui ne sait pas se défaire n'entre pas dans le vocabulaire : sans ça,
@@ -140,7 +140,7 @@ tours à l'avance monte la tension sans que le hasard tranche.
 | Champ | Rôle |
 |---|---|
 | `duree` | Nombre de tours avant application. Minimum 1 |
-| `annonce` | Si vrai, l'effet en attente figure dans la `Vue` des deux camps |
+| `annonce` | Si vrai, l'effet en attente figure dans la `View` des deux camps |
 | `puis` | Les effets à appliquer, mêmes primitives, **jamais un `differer`** |
 
 L'imbrication d'un `differer` dans un `differer` est refusée au chargement : ça
@@ -149,10 +149,10 @@ des chaînes indéfinies qu'aucune annulation ne saurait dérouler.
 
 ### Ce qu'elle impose au noyau
 
-Une file d'effets en attente dans `Partie`, sérialisée avec le reste, résolue en
+Une file d'effets en attente dans `Game`, sérialisée avec le reste, résolue en
 fin de tour **avant** le test de fin de partie.
 
-Les effets en attente et annoncés entrent dans `Vue` — c'est tout leur intérêt.
+Les effets en attente et annoncés entrent dans `View` — c'est tout leur intérêt.
 Un `differer` non annoncé n'y figure pas.
 
 L'annulation défait la mise en file, pas l'effet : annuler le tour où le
@@ -219,7 +219,7 @@ declenchement = "etranglement"
 ```
 
 **La cadence n'est pas dans le mode.** À partir de quel tour l'étranglement
-commence et tous les combien il se répète sont des `Parametres`, réglés dans
+commence et tous les combien il se répète sont des `Settings`, réglés dans
 l'interface et enregistrés avec la partie. Le mode dit *ce qui se passe*, le
 paramètre dit *quand* : les écrire tous deux ici donnerait deux sources de
 vérité pour un même réglage, et un préréglage de difficulté cesserait d'agir.
@@ -244,7 +244,7 @@ décroissant. Ne touche ni aux règles ni aux paramètres. Persisté dans
 `poids_ia`.
 
 **Axe 2 — le cadre.** Portée de vue, nombre de pions déplaçables, durée,
-résistance initiale, nombre de zones. Ce sont les `Parametres`, exposés dans
+résistance initiale, nombre de zones. Ce sont les `Settings`, exposés dans
 l'interface, enregistrés avec la partie.
 
 **Axe 3 — les règles.** Un plugin qui ajoute une capacité, change un coût,

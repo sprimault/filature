@@ -25,7 +25,7 @@ import (
 	"github.com/sprimault/filature/internal/core"
 )
 
-// Charger construit le registre depuis le contenu livré puis le dossier de
+// Load construit le registre depuis le contenu livré puis le dossier de
 // plugins du joueur.
 //
 // Les deux sources sont lues par le même code, et c'est le seul point qui
@@ -44,16 +44,16 @@ import (
 //
 // Un dossier de plugins absent n'est pas une erreur — c'est l'installation
 // ordinaire, personne n'ayant rien ajouté.
-func Charger(livres fs.FS, racine string) (*core.Registre, error) {
-	r := &core.Registre{}
+func Load(livres fs.FS, racine string) (*core.Registry, error) {
+	r := &core.Registry{}
 
-	if err := verser(r, livres, "livré"); err != nil {
+	if err := pourInto(r, livres, "livré"); err != nil {
 		return nil, err
 	}
 
 	if racine != "" {
 		if _, err := os.Stat(racine); err == nil {
-			if err := verser(r, os.DirFS(racine), racine); err != nil {
+			if err := pourInto(r, os.DirFS(racine), racine); err != nil {
 				return nil, err
 			}
 		} else if !errors.Is(err, fs.ErrNotExist) {
@@ -64,12 +64,12 @@ func Charger(livres fs.FS, racine string) (*core.Registre, error) {
 	return r, nil
 }
 
-// verser lit tous les plugins d'une source et les ajoute au registre.
+// pourInto lit tous les plugins d'une source et les ajoute au registre.
 //
 // Un dossier sans manifeste est ignoré sans bruit : c'est ce que produit un
 // dossier de travail laissé à côté, et refuser le démarrage pour ça
 // n'apporterait rien.
-func verser(r *core.Registre, source fs.FS, origine string) error {
+func pourInto(r *core.Registry, source fs.FS, origine string) error {
 	entrees, err := fs.ReadDir(source, ".")
 	if err != nil {
 		return fmt.Errorf("lecture des plugins %s: %w", origine, err)
@@ -80,21 +80,21 @@ func verser(r *core.Registre, source fs.FS, origine string) error {
 			continue
 		}
 		dossier := e.Name()
-		if _, err := fs.Stat(source, path(dossier, NomManifeste)); err != nil {
+		if _, err := fs.Stat(source, path(dossier, ManifestName)); err != nil {
 			continue
 		}
 
-		m, err := lireManifeste(source, dossier)
+		m, err := readManifest(source, dossier)
 		if err != nil {
 			return err
 		}
 
-		somme, err := empreinte(source, dossier)
+		somme, err := fingerprint(source, dossier)
 		if err != nil {
 			return err
 		}
 
-		if err := r.Fusionner(m.Nom, m.versRegistre(somme)); err != nil {
+		if err := r.Merge(m.Name, m.versRegistre(somme)); err != nil {
 			return err
 		}
 	}
@@ -106,36 +106,36 @@ func verser(r *core.Registre, source fs.FS, origine string) error {
 // Les libellés n'y figurent pas : le noyau n'affiche rien, et lui confier un
 // dictionnaire lui donnerait une responsabilité d'interface. Ils se lisent
 // depuis langue.toml par qui en a besoin.
-func (m *manifeste) versRegistre(somme string) *core.Registre {
-	r := &core.Registre{
-		Manifeste: []core.EntreeManifeste{{
-			Nom:       m.Nom,
-			Version:   m.Version,
-			Empreinte: somme,
-			Regles:    m.Regles,
+func (m *manifeste) versRegistre(somme string) *core.Registry {
+	r := &core.Registry{
+		Manifeste: []core.ManifestEntry{{
+			Name:        m.Name,
+			Version:     m.Version,
+			Fingerprint: somme,
+			Regles:      m.Regles,
 		}},
 	}
 
 	if len(m.Capacites) > 0 {
-		r.Capacites = make(map[string]core.Capacite, len(m.Capacites))
+		r.Capacites = make(map[string]core.Ability, len(m.Capacites))
 		for cle, c := range m.Capacites {
-			c.Cle = cle
+			c.Key = cle
 			r.Capacites[cle] = c
 		}
 	}
 
 	if len(m.Depenses) > 0 {
-		r.Depenses = make(map[core.Depense]core.Capacite, len(m.Depenses))
+		r.Depenses = make(map[core.Expense]core.Ability, len(m.Depenses))
 		for cle, d := range m.Depenses {
-			d.Cle = cle
-			r.Depenses[core.Depense(cle)] = d
+			d.Key = cle
+			r.Depenses[core.Expense(cle)] = d
 		}
 	}
 
 	if len(m.Modes) > 0 {
 		r.Modes = make(map[string]core.Mode, len(m.Modes))
 		for cle, mode := range m.Modes {
-			mode.Cle = cle
+			mode.Key = cle
 			r.Modes[cle] = mode
 		}
 	}
@@ -143,43 +143,43 @@ func (m *manifeste) versRegistre(somme string) *core.Registre {
 	return r
 }
 
-// Valider lit un plugin depuis le disque et rend tous ses manquements.
+// Validate lit un plugin depuis le disque et rend tous ses manquements.
 //
 // C'est le même contrôle que celui du chargement, et c'est ce qui en fait la
 // promesse : un plugin accepté ici se chargera chez les autres. Le vérifier
 // avant de publier vaut mieux que d'apprendre le problème par un jeu qui ne
 // démarre plus.
-func Valider(dossier string) error {
+func Validate(dossier string) error {
 	parent, nom := filepathSplit(dossier)
 
-	if _, err := lireManifeste(os.DirFS(parent), nom); err != nil {
+	if _, err := readManifest(os.DirFS(parent), nom); err != nil {
 		return err
 	}
 	return nil
 }
 
-// Empreinte calcule la somme du contenu d'un plugin, manifeste et module
+// Fingerprint calcule la somme du contenu d'un plugin, manifeste et module
 // WebAssembly compris.
 //
 // Elle porte sur le contenu et pas sur le numéro de version, parce que c'est
 // ce qui permet de détecter deux plugins qui se disent identiques sans
 // l'être — cas normal pendant le développement d'un mod, et cas litigieux en
 // réseau.
-func Empreinte(dossier string) (string, error) {
+func Fingerprint(dossier string) (string, error) {
 	parent, nom := filepathSplit(dossier)
-	return empreinte(os.DirFS(parent), nom)
+	return fingerprint(os.DirFS(parent), nom)
 }
 
-// empreinte parcourt un plugin dans l'ordre alphabétique de ses chemins.
+// fingerprint parcourt un plugin dans l'ordre alphabétique de ses chemins.
 //
 // Le nom de chaque fichier entre dans la somme avant son contenu : sans lui,
-// renommer un fichier ou déplacer une ligne d'un fichier à l'autre laisserait
+// renommer un fichier ou déplace une ligne d'un fichier à l'autre laisserait
 // l'empreinte inchangée.
 //
 // Elle garantit que le fichier est celui qui a été relu, pas que son auteur est
 // honnête. Ce n'est pas une signature, et une vraie demanderait une gestion de
 // clés qui ne vaut pas son coût ici.
-func empreinte(source fs.FS, dossier string) (string, error) {
+func fingerprint(source fs.FS, dossier string) (string, error) {
 	var chemins []string
 	err := fs.WalkDir(source, dossier, func(chemin string, e fs.DirEntry, err error) error {
 		if err != nil {

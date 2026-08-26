@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-// TestStubsMarques échoue sur une fonction au corps trivial qui ne porte pas
+// TestStubsMarked échoue sur une fonction au corps trivial qui ne porte pas
 // son marqueur d'étape.
 //
 // Le décompte de `grep -rn "à implémenter"` est la mesure d'avancement de la
@@ -24,7 +24,7 @@ import (
 // Les fichiers de test sont hors du contrôle, contrairement au contrôle de
 // documentation : un double d'essai qui renvoie une valeur nulle est la norme
 // et non un travail en attente, et aucune étape ne se mesure à eux.
-func TestStubsMarques(t *testing.T) {
+func TestStubsMarked(t *testing.T) {
 	fset := token.NewFileSet()
 	var manques []string
 

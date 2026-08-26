@@ -23,34 +23,34 @@ import (
 // cible wasm impossibles.
 type Depot struct{}
 
-// Ouvrir crée le fichier au besoin et applique le schéma.
-func Ouvrir(chemin string) (*Depot, error) {
+// Open crée le fichier au besoin et applique le schéma.
+func Open(chemin string) (*Depot, error) {
 	return nil, errors.New("à implémenter : étape 8")
 }
 
-// Enregistrer écrit l'instantané et les coups nouveaux depuis le dernier appel.
-func (d *Depot) Enregistrer(ctx context.Context, nom string, p *core.Partie) error {
+// Save écrit l'instantané et les coups nouveaux depuis le dernier appel.
+func (d *Depot) Save(ctx context.Context, nom string, p *core.Game) error {
 	return errors.New("à implémenter : étape 8")
 }
 
-// Reprendre reconstruit une partie en rejouant son journal.
+// Resume reconstruit une partie en rejouant son journal.
 //
 // Le rejeu, pas la lecture de l'instantané : c'est ce qui vérifie en continu
 // que le journal reste suffisant. Un instantané chargé sans rejeu masquerait le
 // jour où une règle cesse d'être reproductible.
-func (d *Depot) Reprendre(ctx context.Context, nom string) (*core.Partie, error) {
+func (d *Depot) Resume(ctx context.Context, nom string) (*core.Game, error) {
 	return nil, errors.New("à implémenter : étape 8")
 }
 
-// Lister renvoie les parties enregistrées, la plus récente en tête.
-func (d *Depot) Lister(ctx context.Context) ([]Resume, error) {
+// List renvoie les parties enregistrées, la plus récente en tête.
+func (d *Depot) List(ctx context.Context) ([]Resume, error) {
 	return nil, errors.New("à implémenter : étape 8")
 }
 
 // Resume est ce qu'affiche l'écran de reprise.
 type Resume struct {
-	Nom        string
-	Tour       int
+	Name       string
+	Turn       int
 	Terminee   bool
 	ModifieeLe string
 }

@@ -47,13 +47,13 @@ declenchement = "phase_inspecteurs"
 `
 }
 
-// TestChargeLeContenuLivre vérifie que le jeu démarre avec ses règles.
+// TestLoadsShippedContent vérifie que le jeu démarre avec ses règles.
 //
 // C'est le test qui compte le plus de ce fichier : le contenu livré passe par
 // le même chargeur qu'un plugin tiers, donc s'il se charge, ce chemin est
 // exercé à chaque partie plutôt qu'une fois de temps en temps.
-func TestChargeLeContenuLivre(t *testing.T) {
-	r, err := Charger(plugins.Livres(), "")
+func TestLoadsShippedContent(t *testing.T) {
+	r, err := Load(plugins.Shipped(), "")
 	if err != nil {
 		t.Fatalf("chargement : %v", err)
 	}
@@ -63,9 +63,9 @@ func TestChargeLeContenuLivre(t *testing.T) {
 			t.Errorf("la capacité %s manque", cle)
 		}
 	}
-	for _, cle := range []core.Depense{
-		core.DepenseDoubleDeplacement, core.DepenseSilence, core.DepenseEffacement,
-		core.DepenseChangerZone, core.DepenseMeurtre,
+	for _, cle := range []core.Expense{
+		core.ExpenseDoubleStep, core.ExpenseSilence, core.ExpenseWipeTrails,
+		core.ExpenseChangeZone, core.ExpenseMurder,
 	} {
 		if _, connue := r.Depenses[cle]; !connue {
 			t.Errorf("la dépense %s manque", cle)
@@ -80,40 +80,40 @@ func TestChargeLeContenuLivre(t *testing.T) {
 	}
 }
 
-// TestCleReporteeDepuisLaTable vérifie que chaque entrée connaît sa propre clé.
+// TestKeyCarriedFromTable vérifie que chaque entrée connaît sa propre clé.
 //
 // Elle n'est pas dans le fichier : c'est le nom de la table TOML. Sans report,
-// une capacité ne saurait pas comment on la désigne, et l'interface afficherait
+// une capacité ne saurait pas comment on la désign, et l'interface afficherait
 // une chaîne vide là où le joueur attend un nom.
-func TestCleReporteeDepuisLaTable(t *testing.T) {
-	r, err := Charger(plugins.Livres(), "")
+func TestKeyCarriedFromTable(t *testing.T) {
+	r, err := Load(plugins.Shipped(), "")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for cle, c := range r.Capacites {
-		if c.Cle != cle {
-			t.Errorf("capacité %s porte la clé %q", cle, c.Cle)
+		if c.Key != cle {
+			t.Errorf("capacité %s porte la clé %q", cle, c.Key)
 		}
 	}
 	for cle, d := range r.Depenses {
-		if core.Depense(d.Cle) != cle {
-			t.Errorf("dépense %s porte la clé %q", cle, d.Cle)
+		if core.Expense(d.Key) != cle {
+			t.Errorf("dépense %s porte la clé %q", cle, d.Key)
 		}
 	}
 }
 
-// TestGreffonDuDisquePasseParLeMemeChemin vérifie qu'un plugin posé à la main
+// TestDiskPluginTakesSamePath vérifie qu'un plugin posé à la main
 // s'ajoute à ce qui est livré.
-func TestGreffonDuDisquePasseParLeMemeChemin(t *testing.T) {
+func TestDiskPluginTakesSamePath(t *testing.T) {
 	racine := t.TempDir()
 	dossier := filepath.Join(racine, "essai")
 	if err := os.MkdirAll(dossier, 0o750); err != nil {
 		t.Fatal(err)
 	}
-	ecrire(t, filepath.Join(dossier, NomManifeste), manifesteValide("essai"))
+	ecrire(t, filepath.Join(dossier, ManifestName), manifesteValide("essai"))
 
-	r, err := Charger(plugins.Livres(), racine)
+	r, err := Load(plugins.Shipped(), racine)
 	if err != nil {
 		t.Fatalf("chargement : %v", err)
 	}
@@ -129,12 +129,12 @@ func TestGreffonDuDisquePasseParLeMemeChemin(t *testing.T) {
 	}
 }
 
-// TestDossierDeGreffonsAbsent vérifie que l'installation ordinaire démarre.
+// TestMissingPluginFolder vérifie que l'installation ordinaire démarre.
 //
 // Personne n'a rien ajouté, il n'y a donc pas de dossier : refuser de démarrer
 // pour ça rendrait le binaire inutilisable tel qu'il est livré.
-func TestDossierDeGreffonsAbsent(t *testing.T) {
-	r, err := Charger(plugins.Livres(), filepath.Join(t.TempDir(), "rien"))
+func TestMissingPluginFolder(t *testing.T) {
+	r, err := Load(plugins.Shipped(), filepath.Join(t.TempDir(), "rien"))
 	if err != nil {
 		t.Fatalf("un dossier absent fait échouer le chargement : %v", err)
 	}
@@ -143,13 +143,13 @@ func TestDossierDeGreffonsAbsent(t *testing.T) {
 	}
 }
 
-// TestConflitDeCle vérifie qu'une clé déjà prise arrête le chargement.
+// TestKeyConflict vérifie qu'une clé déjà prise arrête le chargement.
 //
 // Deux plugins qui définissent la même capacité doivent le dire : écraser
 // silencieusement donnerait une partie dont les règles dépendent de l'ordre
 // alphabétique des dossiers.
-func TestConflitDeCle(t *testing.T) {
-	_, err := Charger(source(map[string]string{
+func TestKeyConflict(t *testing.T) {
+	_, err := Load(source(map[string]string{
 		"un/manifeste.toml":   manifesteValide("un"),
 		"deux/manifeste.toml": strings.ReplaceAll(manifesteValide("deux"), "capacite.deux", "capacite.un"),
 	}), "")
@@ -162,12 +162,12 @@ func TestConflitDeCle(t *testing.T) {
 	}
 }
 
-// TestRefus rassemble les manquements de docs/plugins.md §9.
+// TestRejections rassemble les manquements de docs/plugins.md §9.
 //
 // Chacun fait échouer le chargement entier : un plugin à moitié actif est pire
 // qu'un plugin absent, et un manifeste écarté en silence se découvre en
 // partie.
-func TestRefus(t *testing.T) {
+func TestRejections(t *testing.T) {
 	cas := []struct {
 		nom       string
 		manifeste string
@@ -315,24 +315,24 @@ camp = "inspecteurs"
 
 	for _, c := range cas {
 		t.Run(c.nom, func(t *testing.T) {
-			_, err := Charger(source(map[string]string{"essai/manifeste.toml": c.manifeste}), "")
+			_, err := Load(source(map[string]string{"essai/manifeste.toml": c.manifeste}), "")
 			if err == nil {
 				t.Fatal("accepté sans rien dire")
 			}
 			if !strings.Contains(err.Error(), c.attendu) {
 				t.Errorf("message %q, attendu qu'il contienne %q", err, c.attendu)
 			}
-			if !strings.Contains(err.Error(), NomManifeste) {
+			if !strings.Contains(err.Error(), ManifestName) {
 				t.Errorf("le message ne dit pas dans quel fichier : %v", err)
 			}
 		})
 	}
 }
 
-// TestDossierSansManifesteIgnore vérifie qu'un dossier de travail laissé à côté
+// TestFolderWithoutManifestIgnored vérifie qu'un dossier de travail laissé à côté
 // n'empêche pas le jeu de démarrer.
-func TestDossierSansManifesteIgnore(t *testing.T) {
-	r, err := Charger(source(map[string]string{
+func TestFolderWithoutManifestIgnored(t *testing.T) {
+	r, err := Load(source(map[string]string{
 		"un/manifeste.toml":   manifesteValide("un"),
 		"brouillon/notes.txt": "rien à voir",
 	}), "")
@@ -344,28 +344,28 @@ func TestDossierSansManifesteIgnore(t *testing.T) {
 	}
 }
 
-// TestEmpreinteSurLeContenu vérifie ce qui distingue l'empreinte d'un numéro de
+// TestFingerprintOverContent vérifie ce qui distingue l'empreinte d'un numéro de
 // version.
 //
 // Deux plugins qui se disent « 1.0.0 » sans être identiques doivent se
 // distinguer : cas normal pendant le développement d'un mod, et cas litigieux
 // en réseau.
-func TestEmpreinteSurLeContenu(t *testing.T) {
+func TestFingerprintOverContent(t *testing.T) {
 	un := source(map[string]string{"g/manifeste.toml": manifesteValide("g")})
 	pareil := source(map[string]string{"g/manifeste.toml": manifesteValide("g")})
 	autre := source(map[string]string{
 		"g/manifeste.toml": strings.Replace(manifesteValide("g"), "valeur = 1", "valeur = 8", 1),
 	})
 
-	a, err := empreinte(un, "g")
+	a, err := fingerprint(un, "g")
 	if err != nil {
 		t.Fatal(err)
 	}
-	b, err := empreinte(pareil, "g")
+	b, err := fingerprint(pareil, "g")
 	if err != nil {
 		t.Fatal(err)
 	}
-	c, err := empreinte(autre, "g")
+	c, err := fingerprint(autre, "g")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -378,13 +378,13 @@ func TestEmpreinteSurLeContenu(t *testing.T) {
 	}
 }
 
-// TestEmpreinteTientCompteDesNoms vérifie qu'un fichier renommé se voit.
+// TestFingerprintCountsNames vérifie qu'un fichier renommé se voit.
 //
-// Sans le nom dans la somme, déplacer une ligne d'un fichier à l'autre — ou
+// Sans le nom dans la somme, déplace une ligne d'un fichier à l'autre — ou
 // renommer une forme — laisserait l'empreinte inchangée alors que le plugin
 // ne se charge plus pareil.
-func TestEmpreinteTientCompteDesNoms(t *testing.T) {
-	a, err := empreinte(source(map[string]string{
+func TestFingerprintCountsNames(t *testing.T) {
+	a, err := fingerprint(source(map[string]string{
 		"g/manifeste.toml": manifesteValide("g"),
 		"g/formes.toml":    "x = 1\n",
 	}), "g")
@@ -392,7 +392,7 @@ func TestEmpreinteTientCompteDesNoms(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	b, err := empreinte(source(map[string]string{
+	b, err := fingerprint(source(map[string]string{
 		"g/manifeste.toml": manifesteValide("g"),
 		"g/palette.toml":   "x = 1\n",
 	}), "g")
@@ -405,17 +405,17 @@ func TestEmpreinteTientCompteDesNoms(t *testing.T) {
 	}
 }
 
-// TestEmpreintePubliqueLitLeDisque vérifie la commodité offerte à
+// TestPublicFingerprintReadsDisk vérifie la commodité offerte à
 // « filature valide ».
-func TestEmpreintePubliqueLitLeDisque(t *testing.T) {
+func TestPublicFingerprintReadsDisk(t *testing.T) {
 	racine := t.TempDir()
 	dossier := filepath.Join(racine, "essai")
 	if err := os.MkdirAll(dossier, 0o750); err != nil {
 		t.Fatal(err)
 	}
-	ecrire(t, filepath.Join(dossier, NomManifeste), manifesteValide("essai"))
+	ecrire(t, filepath.Join(dossier, ManifestName), manifesteValide("essai"))
 
-	somme, err := Empreinte(dossier)
+	somme, err := Fingerprint(dossier)
 	if err != nil {
 		t.Fatalf("empreinte : %v", err)
 	}
@@ -424,19 +424,19 @@ func TestEmpreintePubliqueLitLeDisque(t *testing.T) {
 	}
 }
 
-// TestValiderRendTousLesManquements vérifie ce que docs/plugins.md attend :
-// une liste, pas un aller-retour par erreur.
+// TestValidateReturnsEveryFailure vérifie ce que docs/plugins.md attend :
+// une list, pas un aller-retour par erreur.
 //
 // Un auteur qui corrige une ligne pour en découvrir une autre au lancement
-// suivant y passe la soirée, et c'est exactement ce que la commande doit lui
+// suivant y passe la soirée, et c'est exactement ce que la command doit lui
 // éviter.
-func TestValiderRendTousLesManquements(t *testing.T) {
+func TestValidateReturnsEveryFailure(t *testing.T) {
 	racine := t.TempDir()
 	dossier := filepath.Join(racine, "casse")
 	if err := os.MkdirAll(dossier, 0o750); err != nil {
 		t.Fatal(err)
 	}
-	ecrire(t, filepath.Join(dossier, NomManifeste), `nom = "autre"
+	ecrire(t, filepath.Join(dossier, ManifestName), `nom = "autre"
 regles = false
 
 [capacite.x]
@@ -446,7 +446,7 @@ camp = "arbitres"
   type = "faire_pleuvoir"
 `)
 
-	err := Valider(dossier)
+	err := Validate(dossier)
 	if err == nil {
 		t.Fatal("un manifeste truffé de fautes est accepté")
 	}
@@ -465,12 +465,12 @@ camp = "arbitres"
 	}
 }
 
-// TestValiderAccepteLeContenuLivre vérifie que ce que le jeu embarque passe le
+// TestValidateAcceptsShippedContent vérifie que ce que le jeu embarque passe le
 // contrôle qu'il impose aux autres.
-func TestValiderAccepteLeContenuLivre(t *testing.T) {
+func TestValidateAcceptsShippedContent(t *testing.T) {
 	for _, dossier := range []string{"base", "anglais"} {
 		t.Run(dossier, func(t *testing.T) {
-			if err := Valider(filepath.Join("..", "..", "plugins", dossier)); err != nil {
+			if err := Validate(filepath.Join("..", "..", "plugins", dossier)); err != nil {
 				t.Errorf("le contenu livré ne passe pas son propre contrôle : %v", err)
 			}
 		})

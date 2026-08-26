@@ -13,9 +13,9 @@ import (
 
 // manifesteLivre est ce que plugins/base déclare, dans les types du noyau.
 type manifesteLivre struct {
-	Capacite map[string]core.Capacite `toml:"capacite"`
-	Depense  map[string]core.Capacite `toml:"depense"`
-	Mode     map[string]core.Mode     `toml:"mode"`
+	Ability map[string]core.Ability `toml:"capacite"`
+	Expense map[string]core.Ability `toml:"depense"`
+	Mode    map[string]core.Mode    `toml:"mode"`
 }
 
 // plateauPlat est un terrain dégagé, de quoi appliquer un effet sans dépendre
@@ -25,32 +25,32 @@ type manifesteLivre struct {
 // dépendance disque : c'est sa définition, et lire un TOML l'enfreindrait.
 type plateauPlat struct{}
 
-// EstRue accepte tout le carré de vingt et une cases de côté.
-func (plateauPlat) EstRue(p core.Position) bool {
-	return p.Colonne >= 0 && p.Ligne >= 0 && p.Colonne < 21 && p.Ligne < 21
+// IsStreet accepte tout le carré de vingt et une cases de côté.
+func (plateauPlat) IsStreet(p core.Position) bool {
+	return p.Column >= 0 && p.Row >= 0 && p.Column < 21 && p.Row < 21
 }
 
 // Zones renvoie six zones, comme la règle standard.
 func (plateauPlat) Zones() []core.Zone {
 	zones := make([]core.Zone, 6)
 	for i := range zones {
-		zones[i] = core.Zone{Numero: i}
+		zones[i] = core.Zone{Number: i}
 	}
 	return zones
 }
 
-// Graine est figée : ce test ne tire rien au sort.
-func (plateauPlat) Graine() int64 { return 1 }
+// Seed est figée : ce test ne tire rien au sort.
+func (plateauPlat) Seed() int64 { return 1 }
 
-// Vision reste vide : ce test applique les effets livrés, il ne regarde rien.
-func (plateauPlat) Vision(p core.Position, portee int) []core.Position { return nil }
+// Sight reste vide : ce test applique les effets livrés, il ne regarde rien.
+func (plateauPlat) Sight(p core.Position, portee int) []core.Position { return nil }
 
-// CasesDans énumère le carré autour du centre.
-func (b plateauPlat) CasesDans(centre core.Position, rayon int) []core.Position {
+// CellsWithin énumère le carré autour du centre.
+func (b plateauPlat) CellsWithin(centre core.Position, rayon int) []core.Position {
 	var cases []core.Position
-	for ligne := centre.Ligne - rayon; ligne <= centre.Ligne+rayon; ligne++ {
-		for colonne := centre.Colonne - rayon; colonne <= centre.Colonne+rayon; colonne++ {
-			if p := (core.Position{Colonne: colonne, Ligne: ligne}); b.EstRue(p) {
+	for ligne := centre.Row - rayon; ligne <= centre.Row+rayon; ligne++ {
+		for colonne := centre.Column - rayon; colonne <= centre.Column+rayon; colonne++ {
+			if p := (core.Position{Column: colonne, Row: ligne}); b.IsStreet(p) {
 				cases = append(cases, p)
 			}
 		}
@@ -58,7 +58,7 @@ func (b plateauPlat) CasesDans(centre core.Position, rayon int) []core.Position 
 	return cases
 }
 
-// TestEffetsLivresSAppliquent vérifie que tout effet déclaré par le contenu
+// TestShippedEffectsApply vérifie que tout effet déclaré par le contenu
 // livré s'applique sans erreur, dans le contexte où le jeu le déclenche.
 //
 // La résolution de fin de tour avale l'erreur d'un effet différé qui échoue :
@@ -70,63 +70,63 @@ func (b plateauPlat) CasesDans(centre core.Position, rayon int) []core.Position 
 // Sa portée s'arrête là : il éprouve les effets livrés dans un contexte
 // plausible, pas toutes les combinaisons qu'un plugin tiers pourrait former.
 // C'est la validation au chargement, à l'étape 8, qui couvrira celles-là.
-func TestEffetsLivresSAppliquent(t *testing.T) {
+func TestShippedEffectsApply(t *testing.T) {
 	var livre manifesteLivre
 	chemin := filepath.Join(racine, "plugins", "base", "manifeste.toml")
 	if _, err := toml.DecodeFile(chemin, &livre); err != nil {
 		t.Fatalf("lecture du manifeste : %v", err)
 	}
-	if len(livre.Capacite) == 0 || len(livre.Depense) == 0 || len(livre.Mode) == 0 {
+	if len(livre.Ability) == 0 || len(livre.Expense) == 0 || len(livre.Mode) == 0 {
 		t.Fatal("le manifeste livré ne déclare plus capacités, dépenses et modes")
 	}
 
-	for cle, c := range livre.Capacite {
+	for cle, c := range livre.Ability {
 		t.Run("capacite/"+cle, func(t *testing.T) {
-			verifierEffets(t, c.Effets, contexteInspecteur())
+			checkEffects(t, c.Effets, inspectorContext())
 		})
 	}
-	for cle, d := range livre.Depense {
+	for cle, d := range livre.Expense {
 		t.Run("depense/"+cle, func(t *testing.T) {
-			verifierEffets(t, d.Effets, contexteFugitif())
+			checkEffects(t, d.Effets, fugitiveContext())
 		})
 	}
 	for cle, m := range livre.Mode {
 		t.Run("mode/"+cle, func(t *testing.T) {
-			// Un mode est déclenché par le jeu : son contexte ne désigne
+			// Un mode est déclenché par le jeu : son contexte ne désign
 			// aucun pion, seulement la zone visée.
-			verifierEffets(t, m.Effets, core.Contexte{Acteur: core.CampInspecteurs, Zone: 3})
+			checkEffects(t, m.Effets, core.EffectContext{Side: core.SideInspectors, Zone: 3})
 		})
 	}
 }
 
-// contexteInspecteur est ce dont dispose une capacité au déclenchement.
-func contexteInspecteur() core.Contexte {
-	return core.Contexte{
-		Acteur:    core.CampInspecteurs,
-		Pion:      0,
+// inspectorContext est ce dont dispose une capacité au déclenchement.
+func inspectorContext() core.EffectContext {
+	return core.EffectContext{
+		Side:      core.SideInspectors,
+		Piece:     0,
 		AutrePion: 1,
-		Case:      core.Position{Colonne: 5, Ligne: 5},
+		Case:      core.Position{Column: 5, Row: 5},
 		Zone:      2,
 	}
 }
 
-// contexteFugitif est ce dont dispose une dépense.
-func contexteFugitif() core.Contexte {
-	return core.Contexte{
-		Acteur: core.CampFugitif,
-		Case:   core.Position{Colonne: 10, Ligne: 10},
-		Zone:   4,
+// fugitiveContext est ce dont dispose une dépense.
+func fugitiveContext() core.EffectContext {
+	return core.EffectContext{
+		Side: core.SideFugitive,
+		Case: core.Position{Column: 10, Row: 10},
+		Zone: 4,
 	}
 }
 
-// verifierEffets applique une suite d'effets et défait tout, en descendant dans
+// checkEffects applique une suite d'effets et défait tout, en descendant dans
 // les effets différés que le jeu appliquera à l'échéance.
-func verifierEffets(t *testing.T, effets []core.Effet, ctx core.Contexte) {
+func checkEffects(t *testing.T, effets []core.Effect, ctx core.EffectContext) {
 	t.Helper()
 	for _, e := range effets {
 		p := partieDEssai()
 
-		defaire, err := p.Appliquer1Effet(e, ctx)
+		defaire, err := p.ApplyOneEffect(e, ctx)
 		if err != nil {
 			t.Errorf("%s refusé : %v", e.Type, err)
 			continue
@@ -139,29 +139,29 @@ func verifierEffets(t *testing.T, effets []core.Effet, ctx core.Contexte) {
 
 		// Les effets d'un differer ne s'appliquent pas tout de suite : ils
 		// partent en file, et c'est à l'échéance qu'ils échoueraient.
-		if len(e.Puis) > 0 {
-			verifierEffets(t, e.Puis, ctx)
+		if len(e.Then) > 0 {
+			checkEffects(t, e.Then, ctx)
 		}
 	}
 }
 
 // partieDEssai monte une partie plausible : cinq inspecteurs posés, un fugitif
 // au centre, de quoi qu'aucun effet ne manque de cible.
-func partieDEssai() *core.Partie {
-	p := &core.Partie{
-		Parametres: core.ParametresDefaut(),
-		Plateau:    plateauPlat{},
-		Tour:       5,
-		Phase:      core.PhaseInspecteurs,
-		Fugitif: core.Fugitif{
-			Position:   core.Position{Colonne: 10, Ligne: 10},
-			Resistance: 10,
+func partieDEssai() *core.Game {
+	p := &core.Game{
+		Settings: core.DefaultSettings(),
+		Board:    plateauPlat{},
+		Turn:     5,
+		Phase:    core.PhaseInspectors,
+		Fugitive: core.Fugitive{
+			Position: core.Position{Column: 10, Row: 10},
+			Stamina:  10,
 		},
 	}
-	p.Parametres.Cote = 21
-	for i := 0; i < p.Parametres.Inspecteurs; i++ {
-		p.Inspecteurs = append(p.Inspecteurs, core.Inspecteur{
-			Position: core.Position{Colonne: i, Ligne: 0},
+	p.Settings.Size = 21
+	for i := 0; i < p.Settings.Inspectors; i++ {
+		p.Inspectors = append(p.Inspectors, core.Inspector{
+			Position: core.Position{Column: i, Row: 0},
 		})
 	}
 	return p

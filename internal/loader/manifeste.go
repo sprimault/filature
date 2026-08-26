@@ -14,8 +14,8 @@ import (
 	"github.com/sprimault/filature/internal/core"
 )
 
-// NomManifeste est le fichier que tout plugin porte à sa racine.
-const NomManifeste = "manifeste.toml"
+// ManifestName est le fichier que tout plugin porte à sa racine.
+const ManifestName = "manifeste.toml"
 
 // manifeste est la forme d'un manifeste.toml, telle que
 // schemas/manifeste-plugin.schema.json la décrit.
@@ -24,17 +24,17 @@ const NomManifeste = "manifeste.toml"
 // noyau : ce sont les mêmes structures, et les faire transiter par des doubles
 // locaux donnerait deux descriptions du même contrat à tenir d'accord.
 type manifeste struct {
-	Nom           string `toml:"nom"`
-	Version       string `toml:"version"`
-	VersionEffets int    `toml:"version_effets"`
-	Description   string `toml:"description"`
-	Regles        bool   `toml:"regles"`
-	Wasm          string `toml:"wasm"`
-	Licence       string `toml:"licence"`
+	Name           string `toml:"nom"`
+	Version        string `toml:"version"`
+	EffectsVersion int    `toml:"version_effets"`
+	Description    string `toml:"description"`
+	Regles         bool   `toml:"regles"`
+	Wasm           string `toml:"wasm"`
+	Licence        string `toml:"licence"`
 
-	Capacites map[string]core.Capacite `toml:"capacite"`
-	Depenses  map[string]core.Capacite `toml:"depense"`
-	Modes     map[string]core.Mode     `toml:"mode"`
+	Capacites map[string]core.Ability `toml:"capacite"`
+	Depenses  map[string]core.Ability `toml:"depense"`
+	Modes     map[string]core.Mode    `toml:"mode"`
 
 	Langue *langue `toml:"langue"`
 	Bot    *bot    `toml:"bot"`
@@ -45,7 +45,7 @@ type manifeste struct {
 // rien.
 type langue struct {
 	Code string `toml:"code"`
-	Nom  string `toml:"nom"`
+	Name string `toml:"nom"`
 }
 
 // bot décrit un adversaire en processus séparé.
@@ -53,19 +53,19 @@ type langue struct {
 // Le déterminisme est déclaré et non vérifié ici : un bot qui ment reste
 // jouable, seule la reproduction d'un défaut en pâtit.
 type bot struct {
-	Camp         core.Acteur `toml:"camp"`
-	Commande     string      `toml:"commande"`
-	Arguments    []string    `toml:"arguments"`
-	Deterministe bool        `toml:"deterministe"`
+	Camp         core.Side `toml:"camp"`
+	Commande     string    `toml:"commande"`
+	Arguments    []string  `toml:"arguments"`
+	Deterministe bool      `toml:"deterministe"`
 }
 
-// lireManifeste décode le manifeste d'un plugin et le valide.
+// readManifest décode le manifeste d'un plugin et le valide.
 //
 // Le nom du dossier l'emporte sur le champ « nom » en cas de désaccord : c'est
 // lui qui sert de clé partout ailleurs, et deux sources pour un identifiant
 // finissent par diverger. Le désaccord est signalé plutôt que rattrapé.
-func lireManifeste(source fs.FS, dossier string) (*manifeste, error) {
-	chemin := path(dossier, NomManifeste)
+func readManifest(source fs.FS, dossier string) (*manifeste, error) {
+	chemin := path(dossier, ManifestName)
 
 	contenu, err := fs.ReadFile(source, chemin)
 	if err != nil {
@@ -90,13 +90,13 @@ func lireManifeste(source fs.FS, dossier string) (*manifeste, error) {
 		return nil, fmt.Errorf("%s: champs inconnus: %s", chemin, strings.Join(cles, ", "))
 	}
 
-	if manquements := m.valider(chemin, dossier); len(manquements) > 0 {
+	if manquements := m.validate(chemin, dossier); len(manquements) > 0 {
 		return nil, errors.Join(manquements...)
 	}
 	return &m, nil
 }
 
-// valider applique les refus de docs/plugins.md §9 et rend tout ce qui cloche.
+// validate applique les refus de docs/plugins.md §9 et rend tout ce qui cloche.
 //
 // Tous les manquements, et non le premier : un auteur de plugin qui corrige
 // une ligne pour en découvrir une autre au lancement suivant y passe la soirée.
@@ -104,27 +104,27 @@ func lireManifeste(source fs.FS, dossier string) (*manifeste, error) {
 //
 // Rien n'est versé dans un registre tant qu'il en reste un : un plugin à
 // moitié actif est pire qu'un plugin absent.
-func (m *manifeste) valider(chemin, dossier string) []error {
+func (m *manifeste) validate(chemin, dossier string) []error {
 	var manquements []error
 	ajouter := func(format string, args ...any) {
 		manquements = append(manquements, fmt.Errorf("%s: "+format, append([]any{chemin}, args...)...))
 	}
 
-	if m.Nom == "" {
+	if m.Name == "" {
 		ajouter("nom manquant")
 	}
 	if m.Version == "" {
 		ajouter("version manquante")
 	}
-	if m.Nom != "" && m.Nom != dossier {
-		ajouter("nom %q dans un dossier %q", m.Nom, dossier)
+	if m.Name != "" && m.Name != dossier {
+		ajouter("nom %q dans un dossier %q", m.Name, dossier)
 	}
 
 	porteDesEffets := len(m.Capacites) > 0 || len(m.Depenses) > 0 || len(m.Modes) > 0
 
-	if porteDesEffets && m.VersionEffets != core.VersionEffets {
+	if porteDesEffets && m.EffectsVersion != core.EffectsVersion {
 		ajouter("version_effets %d, ce binaire applique la %d",
-			m.VersionEffets, core.VersionEffets)
+			m.EffectsVersion, core.EffectsVersion)
 	}
 
 	// La frontière règles / cosmétique n'est pas déclarative sur parole. C'est
@@ -147,58 +147,58 @@ func (m *manifeste) valider(chemin, dossier string) []error {
 		ajouter("un bot et des effets dans le meme plugin")
 	}
 
-	return append(manquements, m.validerLesEffets(chemin)...)
+	return append(manquements, m.checkAllEffects(chemin)...)
 }
 
-// validerLesEffets parcourt capacités, dépenses et modes.
+// checkAllEffects parcourt capacités, dépenses et modes.
 //
 // Le chemin de clé se construit à la descente et non après coup : « capacite
 // guetteur effet[0] cible » situe le manquement dans le fichier, là où « cible
 // invalide » oblige à le chercher.
-func (m *manifeste) validerLesEffets(chemin string) []error {
+func (m *manifeste) checkAllEffects(chemin string) []error {
 	var manquements []error
 
-	for _, cle := range triees(m.Capacites) {
+	for _, cle := range sortedKeys(m.Capacites) {
 		manquements = append(manquements,
-			valideCapacite(m.Capacites[cle], chemin, "capacite."+cle)...)
+			checkAbility(m.Capacites[cle], chemin, "capacite."+cle)...)
 	}
-	for _, cle := range triees(m.Depenses) {
+	for _, cle := range sortedKeys(m.Depenses) {
 		manquements = append(manquements,
-			valideCapacite(m.Depenses[cle], chemin, "depense."+cle)...)
+			checkAbility(m.Depenses[cle], chemin, "depense."+cle)...)
 	}
-	for _, cle := range triees(m.Modes) {
+	for _, cle := range sortedKeys(m.Modes) {
 		mode := m.Modes[cle]
-		if mode.Declenchement == "" {
+		if mode.Trigger == "" {
 			manquements = append(manquements,
 				fmt.Errorf("%s: mode.%s: declenchement manquant", chemin, cle))
 		}
 		manquements = append(manquements,
-			valideEffets(mode.Effets, chemin, "mode."+cle, false)...)
+			checkEffects(mode.Effets, chemin, "mode."+cle, false)...)
 	}
 	return manquements
 }
 
-// valideCapacite contrôle une capacité ou une dépense, qui partagent leur
+// checkAbility contrôle une capacité ou une dépense, qui partagent leur
 // forme.
-func valideCapacite(c core.Capacite, chemin, ou string) []error {
+func checkAbility(c core.Ability, chemin, ou string) []error {
 	var manquements []error
 
-	if c.Nom == "" {
+	if c.Name == "" {
 		manquements = append(manquements, fmt.Errorf("%s: %s: nom manquant", chemin, ou))
 	}
-	if c.Camp != core.CampFugitif && c.Camp != core.CampInspecteurs {
+	if c.Camp != core.SideFugitive && c.Camp != core.SideInspectors {
 		manquements = append(manquements, fmt.Errorf("%s: %s: camp %q, attendu %q ou %q",
-			chemin, ou, c.Camp, core.CampFugitif, core.CampInspecteurs))
+			chemin, ou, c.Camp, core.SideFugitive, core.SideInspectors))
 	}
-	return append(manquements, valideEffets(c.Effets, chemin, ou, false)...)
+	return append(manquements, checkEffects(c.Effets, chemin, ou, false)...)
 }
 
-// valideEffets contrôle une liste d'effets, et refuse un differer imbriqué.
+// checkEffects contrôle une list d'effets, et refuse un differer imbriqué.
 //
 // Deux durées s'additionnent, donc l'imbrication n'ajoute rien ; et elle
 // permettrait des chaînes qu'aucune annulation ne saurait dérouler, ce qui
 // coûterait l'invariant de réversibilité pour rien.
-func valideEffets(effets []core.Effet, chemin, ou string, dansUnDiffere bool) []error {
+func checkEffects(effets []core.Effect, chemin, ou string, dansUnDiffere bool) []error {
 	var manquements []error
 
 	for i, e := range effets {
@@ -208,15 +208,15 @@ func valideEffets(effets []core.Effet, chemin, ou string, dansUnDiffere bool) []
 				fmt.Errorf("%s: %s: "+format, append([]any{chemin, place}, args...)...))
 		}
 
-		if !core.TypeEffetConnu(e.Type) {
+		if !core.EffectTypeKnown(e.Type) {
 			ajouter("type %q inconnu", e.Type)
 		}
-		if e.Cible != "" && !core.CibleConnue(e.Cible) {
-			ajouter("cible %q inconnue", e.Cible)
+		if e.Target != "" && !core.TargetKnown(e.Target) {
+			ajouter("cible %q inconnue", e.Target)
 		}
 
-		if e.Type != core.EffetDifferer {
-			if len(e.Puis) > 0 {
+		if e.Type != core.EffectDefer {
+			if len(e.Then) > 0 {
 				ajouter("puis n'a de sens que sur un differer")
 			}
 			continue
@@ -224,18 +224,18 @@ func valideEffets(effets []core.Effet, chemin, ou string, dansUnDiffere bool) []
 		if dansUnDiffere {
 			ajouter("differer imbrique dans un differer")
 		}
-		if len(e.Puis) == 0 {
+		if len(e.Then) == 0 {
 			ajouter("differer sans puis")
 		}
 		manquements = append(manquements,
-			valideEffets(e.Puis, chemin, place+".puis", true)...)
+			checkEffects(e.Then, chemin, place+".puis", true)...)
 	}
 	return manquements
 }
 
-// triees rend les clés d'une table dans un ordre stable, pour que deux
+// sortedKeys rend les clés d'une table dans un ordre stable, pour que deux
 // chargements du même plugin signalent le même manquement en premier.
-func triees[T any](table map[string]T) []string {
+func sortedKeys[T any](table map[string]T) []string {
 	cles := make([]string, 0, len(table))
 	for cle := range table {
 		cles = append(cles, cle)

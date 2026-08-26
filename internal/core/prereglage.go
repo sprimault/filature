@@ -3,18 +3,18 @@
 
 package core
 
-// Prereglage nomme un jeu de paramètres prêt à jouer.
+// Preset nomme un jeu de paramètres prêt à play.
 //
 // La clé est un identifiant, pas un libellé : l'interface cherche
 // « prereglage_<cle> » dans le dictionnaire actif, et la même partie s'annonce
 // « Quartier » ou « District » selon la langue. Mettre le texte ici le figerait
 // en français jusque dans les sauvegardes.
-type Prereglage struct {
-	Cle        string
-	Parametres Parametres
+type Preset struct {
+	Key      string
+	Settings Settings
 }
 
-// Prereglages rend les jeux de paramètres livrés, du plus petit au plus grand.
+// Presets rend les jeux de paramètres livrés, du plus petit au plus grand.
 //
 // Trois tailles, comme docs/regles.md §11 les annonce. Deux valeurs suivent le
 // côté plutôt que d'être posées : la portée vaut environ un cinquième du
@@ -23,22 +23,22 @@ type Prereglage struct {
 //
 // L'ordre est stable : c'est celui d'un sélecteur, et le voir changer d'un
 // lancement à l'autre serait déroutant.
-func Prereglages() []Prereglage {
-	return []Prereglage{
-		{Cle: "quartier", Parametres: parametresPourCote(21)},
-		{Cle: "faubourg", Parametres: parametresPourCote(31)},
-		{Cle: "ville", Parametres: ParametresDefaut()},
+func Presets() []Preset {
+	return []Preset{
+		{Key: "quartier", Settings: parametresPourCote(21)},
+		{Key: "faubourg", Settings: parametresPourCote(31)},
+		{Key: "ville", Settings: DefaultSettings()},
 	}
 }
 
-// PrereglagePar retrouve un préréglage par sa clé.
-func PrereglagePar(cle string) (Prereglage, bool) {
-	for _, p := range Prereglages() {
-		if p.Cle == cle {
+// PresetByKey retrouve un préréglage par sa clé.
+func PresetByKey(cle string) (Preset, bool) {
+	for _, p := range Presets() {
+		if p.Key == cle {
 			return p, true
 		}
 	}
-	return Prereglage{}, false
+	return Preset{}, false
 }
 
 // parametresPourCote dérive un jeu de paramètres d'une taille de plateau.
@@ -47,15 +47,15 @@ func PrereglagePar(cle string) (Prereglage, bool) {
 // reste — résistance, inspecteurs, zones, quota — ne tient pas à la taille du
 // terrain mais à l'équilibre entre les deux camps, et ne bougera qu'à l'étape
 // d'équilibrage.
-func parametresPourCote(cote int) Parametres {
-	p := ParametresDefaut()
-	p.Cote = cote
-	p.Portee = max(PorteeMin, cote/5)
-	p.Tours = cote
+func parametresPourCote(cote int) Settings {
+	p := DefaultSettings()
+	p.Size = cote
+	p.Range = max(MinRange, cote/5)
+	p.Turns = cote
 
 	// L'étranglement commence aux trois quarts de la partie, comme au tour 30
 	// sur quarante. Plus tôt, il décide de l'issue ; plus tard, il n'a pas le
 	// temps de fermer assez de zones pour peser.
-	p.DebutEtranglement = p.Tours * 3 / 4
+	p.StranglingStart = p.Turns * 3 / 4
 	return p
 }

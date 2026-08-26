@@ -3,51 +3,51 @@
 
 package core
 
-// TypeCoup énumère ce qui peut être joué. Les valeurs partent en base et sur le
+// MoveType énumère ce qui peut être joué. Les valeurs partent en base et sur le
 // réseau : elles ne se renomment pas sans migration.
-type TypeCoup string
+type MoveType string
 
-// CoupFinDePhase est explicite plutôt que déduit du quota : les inspecteurs
+// MoveEndPhase est explicite plutôt que déduit du quota : les inspecteurs
 // peuvent rendre la main avant leurs trois déplacements, et le journal doit
-// distinguer ce choix d'une phase épuisée.
+// distinguer ce choix d'une phaseName épuisée.
 const (
-	CoupPlacer      TypeCoup = "placer"
-	CoupDeplacer    TypeCoup = "deplacer"
-	CoupCapacite    TypeCoup = "capacite"
-	CoupDepense     TypeCoup = "depense"
-	CoupChangerZone TypeCoup = "changer_zone"
-	CoupPasser      TypeCoup = "passer"
-	CoupFinDePhase  TypeCoup = "fin_de_phase"
+	MovePlace      MoveType = "placer"
+	MoveStep       MoveType = "deplacer"
+	MoveAbility    MoveType = "capacite"
+	MoveExpense    MoveType = "depense"
+	MoveChangeZone MoveType = "changer_zone"
+	MovePass       MoveType = "passer"
+	MoveEndPhase   MoveType = "fin_de_phase"
 )
 
-// Depense énumère les usages de la résistance. Le nom d'une dépense est une
+// Expense énumère les usages de la résistance. Le nom d'une dépense est une
 // clé d'effets : un plugin en ajoute une sans toucher au noyau.
-type Depense string
+type Expense string
 
 // Les cinq dépenses de la règle standard. Leurs coûts ne sont pas ici mais
 // dans le manifeste de plugins/base, ce qui permet de les rééquilibrer sans
 // recompiler.
 const (
-	DepenseDoubleDeplacement Depense = "double_deplacement"
-	DepenseSilence           Depense = "silence"
-	DepenseEffacement        Depense = "effacement"
-	DepenseChangerZone       Depense = "changer_zone"
-	DepenseMeurtre           Depense = "meurtre"
+	ExpenseDoubleStep Expense = "double_deplacement"
+	ExpenseSilence    Expense = "silence"
+	ExpenseWipeTrails Expense = "effacement"
+	ExpenseChangeZone Expense = "changer_zone"
+	ExpenseMurder     Expense = "meurtre"
 )
 
-// Coup est volontairement un enregistrement plat plutôt qu'une interface.
+// Move est volontairement un enregistrement plat plutôt qu'une interface.
 //
 // Il doit se sérialiser sans effort pour le journal, le réseau et le rejeu, et
 // se comparer par égalité pour tester qu'un coup proposé figure bien dans
-// CoupsLegaux. Les champs inutilisés restent à zéro.
-type Coup struct {
-	Tour     int      `json:"tour"`
-	Acteur   Acteur   `json:"acteur"`
-	Type     TypeCoup `json:"type"`
-	Pion     int      `json:"pion,omitempty"`
-	Depart   Position `json:"depart,omitempty"`
-	Arrivee  Position `json:"arrivee,omitempty"`
-	Capacite string   `json:"capacite,omitempty"`
-	Depense  Depense  `json:"depense,omitempty"`
-	Zone     int      `json:"zone,omitempty"`
+// LegalMoves. Les champs inutilisés restent à zéro.
+type Move struct {
+	Turn    int      `json:"tour"`
+	Side    Side     `json:"acteur"`
+	Type    MoveType `json:"type"`
+	Piece   int      `json:"pion,omitempty"`
+	From    Position `json:"depart,omitempty"`
+	To      Position `json:"arrivee,omitempty"`
+	Ability string   `json:"capacite,omitempty"`
+	Expense Expense  `json:"depense,omitempty"`
+	Zone    int      `json:"zone,omitempty"`
 }

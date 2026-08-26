@@ -5,129 +5,129 @@ package core
 
 import "sort"
 
-// CoupsLegaux énumère ce que l'acteur peut jouer dans la phase courante.
+// LegalMoves énumère ce que l'acteur peut play dans la phase courante.
 //
 // C'est la seule source de vérité sur la légalité : l'interface s'en sert pour
-// surligner les cases, l'IA pour explorer, le serveur pour valider ce qui
+// surligner les cases, l'IA pour explorer, le serveur pour validate ce qui
 // arrive du réseau. Aucun de ces trois ne réimplémente la règle.
-func (p *Partie) CoupsLegaux(a Acteur) []Coup {
+func (p *Game) LegalMoves(a Side) []Move {
 	switch p.Phase {
-	case PhasePlacementFugitif:
-		if a == CampFugitif {
-			return p.coupsSceller()
+	case PhaseFugitiveSetup:
+		if a == SideFugitive {
+			return p.sealMoves()
 		}
-	case PhasePlacementInspecteurs:
-		if a == CampInspecteurs {
-			return p.coupsPlacer()
+	case PhaseInspectorsSetup:
+		if a == SideInspectors {
+			return p.placeMoves()
 		}
-	case PhaseInspecteurs:
-		if a == CampInspecteurs {
-			return p.coupsInspecteurs()
+	case PhaseInspectors:
+		if a == SideInspectors {
+			return p.inspectorMoves()
 		}
-	case PhaseFugitif:
-		if a == CampFugitif {
-			return p.coupsFugitif()
+	case PhaseFugitive:
+		if a == SideFugitive {
+			return p.fugitiveMoves()
 		}
 	}
 	return nil
 }
 
-// PionsDeplaces compte les inspecteurs qui ont bougé ce tour.
+// PiecesMoved compte les inspecteurs qui ont bougé ce tour.
 //
 // Calculé et non stocké : le total se déduit des pions, et deux sources pour
 // un même chiffre finiraient par se contredire.
-func (p *Partie) PionsDeplaces() int {
+func (p *Game) PiecesMoved() int {
 	n := 0
-	for _, i := range p.Inspecteurs {
-		if i.DeplacementsFaits > 0 {
+	for _, i := range p.Inspectors {
+		if i.StepsTaken > 0 {
 			n++
 		}
 	}
 	return n
 }
 
-// coupsSceller énumère les zones que le fugitif peut choisir à la mise en
+// sealMoves énumère les zones que le fugitif peut choisir à la mise en
 // place. Sa case, elle, est tirée au sort : il ne la choisit jamais.
-func (p *Partie) coupsSceller() []Coup {
-	zones := p.Plateau.Zones()
-	coups := make([]Coup, 0, len(zones))
+func (p *Game) sealMoves() []Move {
+	zones := p.Board.Zones()
+	coups := make([]Move, 0, len(zones))
 	for _, z := range zones {
-		coups = append(coups, Coup{Tour: p.Tour, Acteur: CampFugitif, Type: CoupPlacer, Zone: z.Numero})
+		coups = append(coups, Move{Turn: p.Turn, Side: SideFugitive, Type: MovePlace, Zone: z.Number})
 	}
 	return coups
 }
 
-// coupsPlacer énumère où poser le prochain inspecteur.
+// placeMoves énumère où poser le prochain inspecteur.
 //
-// La case du fugitif n'est pas retirée de la liste, bien qu'il soit déjà sur le
+// La case du fugitif n'est pas retirée de la list, bien qu'il soit déjà sur le
 // plateau : l'en exclure dirait aux inspecteurs où il n'est pas, ce qui est une
 // fuite exactement comme dire où il est. Un pion qui tombe dessus l'a trouvé
 // par hasard, et c'est un résultat de partie, pas un coup illégal.
-func (p *Partie) coupsPlacer() []Coup {
-	if len(p.Inspecteurs) >= p.Parametres.Inspecteurs {
+func (p *Game) placeMoves() []Move {
+	if len(p.Inspectors) >= p.Settings.Inspectors {
 		return nil
 	}
-	rayon := p.Parametres.Cote / 2
-	centre := Position{Colonne: rayon, Ligne: rayon}
+	rayon := p.Settings.Size / 2
+	centre := Position{Column: rayon, Row: rayon}
 
-	cases := p.Plateau.CasesDans(centre, rayon)
-	coups := make([]Coup, 0, len(cases))
+	cases := p.Board.CellsWithin(centre, rayon)
+	coups := make([]Move, 0, len(cases))
 	for _, c := range cases {
-		if !p.EstPraticable(c) {
+		if !p.IsWalkable(c) {
 			continue
 		}
-		coups = append(coups, Coup{
-			Tour:    p.Tour,
-			Acteur:  CampInspecteurs,
-			Type:    CoupPlacer,
-			Pion:    len(p.Inspecteurs),
-			Arrivee: c,
+		coups = append(coups, Move{
+			Turn:  p.Turn,
+			Side:  SideInspectors,
+			Type:  MovePlace,
+			Piece: len(p.Inspectors),
+			To:    c,
 		})
 	}
 	return coups
 }
 
-// coupsInspecteurs énumère déplacements et capacités de la phase.
+// inspectorMoves énumère déplacements et capacités de la phase.
 //
 // Le quota porte sur le nombre de pions distincts, pas sur le nombre de
 // déplacements : un pion déjà entamé continue sur sa mobilité propre sans
 // prendre une place de plus.
-func (p *Partie) coupsInspecteurs() []Coup {
-	var coups []Coup
-	placeLibre := p.PionsDeplaces() < p.Parametres.PionsParTour
+func (p *Game) inspectorMoves() []Move {
+	var coups []Move
+	placeLibre := p.PiecesMoved() < p.Settings.PiecesPerTurn
 
-	for i := range p.Inspecteurs {
-		entame := p.Inspecteurs[i].DeplacementsFaits > 0
+	for i := range p.Inspectors {
+		entame := p.Inspectors[i].StepsTaken > 0
 		if !entame && !placeLibre {
 			continue
 		}
-		if p.Inspecteurs[i].DeplacementsFaits >= p.MobiliteDe(CampInspecteurs, i) {
+		if p.Inspectors[i].StepsTaken >= p.MobilityOf(SideInspectors, i) {
 			continue
 		}
-		depart := p.Inspecteurs[i].Position
+		depart := p.Inspectors[i].Position
 		for _, d := range Orthogonales {
-			arrivee := depart.Avance(d)
-			if !p.EstPraticable(arrivee) {
+			arrivee := depart.Step(d)
+			if !p.IsWalkable(arrivee) {
 				continue
 			}
-			coups = append(coups, Coup{
-				Tour: p.Tour, Acteur: CampInspecteurs, Type: CoupDeplacer,
-				Pion: i, Depart: depart, Arrivee: arrivee,
+			coups = append(coups, Move{
+				Turn: p.Turn, Side: SideInspectors, Type: MoveStep,
+				Piece: i, From: depart, To: arrivee,
 			})
 		}
 	}
 
-	coups = append(coups, p.coupsCapacite()...)
-	return append(coups, Coup{Tour: p.Tour, Acteur: CampInspecteurs, Type: CoupFinDePhase})
+	coups = append(coups, p.abilityMoves()...)
+	return append(coups, Move{Turn: p.Turn, Side: SideInspectors, Type: MoveEndPhase})
 }
 
-// coupsCapacite énumère les capacités déclenchables ce tour.
+// abilityMoves énumère les capacités déclenchables ce tour.
 //
 // Les clés du registre sont triées avant parcours : l'ordre d'une map n'est pas
 // stable en Go, et il déciderait ici de l'ordre des coups légaux — donc de ce
 // qu'un rejeu doit retrouver.
-func (p *Partie) coupsCapacite() []Coup {
-	if p.Extensions == nil || p.CapaciteJouee {
+func (p *Game) abilityMoves() []Move {
+	if p.Extensions == nil || p.AbilityPlayed {
 		return nil
 	}
 
@@ -137,120 +137,120 @@ func (p *Partie) coupsCapacite() []Coup {
 	}
 	sort.Strings(cles)
 
-	var coups []Coup
+	var coups []Move
 	for _, cle := range cles {
 		c := p.Extensions.Capacites[cle]
-		if c.Camp != CampInspecteurs || c.Passive || c.Declenchement != SurPhaseInspecteurs {
+		if c.Camp != SideInspectors || c.Passive || c.Trigger != OnInspectorsPhase {
 			continue
 		}
-		for i := range p.Inspecteurs {
-			if p.Inspecteurs[i].Capacite != cle || p.Inspecteurs[i].CapaciteUtilisee {
+		for i := range p.Inspectors {
+			if p.Inspectors[i].Ability != cle || p.Inspectors[i].AbilityUsed {
 				continue
 			}
-			coups = append(coups, Coup{
-				Tour: p.Tour, Acteur: CampInspecteurs, Type: CoupCapacite,
-				Pion: i, Capacite: cle,
+			coups = append(coups, Move{
+				Turn: p.Turn, Side: SideInspectors, Type: MoveAbility,
+				Piece: i, Ability: cle,
 			})
 		}
 	}
 	return coups
 }
 
-// coupsFugitif énumère déplacements, dépenses et changement de zone.
+// fugitiveMoves énumère déplacements, dépenses et changement de zone.
 //
 // Une case occupée par un inspecteur lui est fermée : il y serait à l'abri de
 // tout contact, l'adjacence n'incluant pas la superposition.
-func (p *Partie) coupsFugitif() []Coup {
-	var coups []Coup
-	depart := p.Fugitif.Position
+func (p *Game) fugitiveMoves() []Move {
+	var coups []Move
+	depart := p.Fugitive.Position
 
-	if p.Fugitif.DeplacementsFaits < p.MobiliteDe(CampFugitif, 0) {
+	if p.Fugitive.StepsTaken < p.MobilityOf(SideFugitive, 0) {
 		for d := Nord; d <= NordOuest; d++ {
-			arrivee := depart.Avance(d)
-			if !p.EstPraticable(arrivee) || p.occupee(arrivee) {
+			arrivee := depart.Step(d)
+			if !p.IsWalkable(arrivee) || p.occupied(arrivee) {
 				continue
 			}
 			// Un angle fermé ne se franchit pas : la diagonale exige qu'au
 			// moins une des deux cases orthogonales intermédiaires soit une
 			// rue, sinon le bâti ne bloque plus rien.
-			if d.EstDiagonale() {
-				a, b := depart.Contournement(d)
-				if !p.EstPraticable(a) && !p.EstPraticable(b) {
+			if d.IsDiagonal() {
+				a, b := depart.CornerCells(d)
+				if !p.IsWalkable(a) && !p.IsWalkable(b) {
 					continue
 				}
 			}
-			coups = append(coups, Coup{
-				Tour: p.Tour, Acteur: CampFugitif, Type: CoupDeplacer,
-				Depart: depart, Arrivee: arrivee,
+			coups = append(coups, Move{
+				Turn: p.Turn, Side: SideFugitive, Type: MoveStep,
+				From: depart, To: arrivee,
 			})
 		}
 	}
 
-	coups = append(coups, p.coupsDepense()...)
-	coups = append(coups, Coup{Tour: p.Tour, Acteur: CampFugitif, Type: CoupPasser})
-	return append(coups, Coup{Tour: p.Tour, Acteur: CampFugitif, Type: CoupFinDePhase})
+	coups = append(coups, p.expenseMoves()...)
+	coups = append(coups, Move{Turn: p.Turn, Side: SideFugitive, Type: MovePass})
+	return append(coups, Move{Turn: p.Turn, Side: SideFugitive, Type: MoveEndPhase})
 }
 
-// coupsDepense énumère ce que le fugitif peut acheter avec sa résistance.
+// expenseMoves énumère ce que le fugitif peut acheter avec sa résistance.
 //
 // Le changement de zone est une dépense comme une autre, mais porte un type de
-// coup distinct : il désigne une zone, que les autres n'ont pas à porter.
-func (p *Partie) coupsDepense() []Coup {
+// coup distinct : il désign une zone, que les autres n'ont pas à porter.
+func (p *Game) expenseMoves() []Move {
 	if p.Extensions == nil {
 		return nil
 	}
 
-	cles := make([]Depense, 0, len(p.Extensions.Depenses))
+	cles := make([]Expense, 0, len(p.Extensions.Depenses))
 	for cle := range p.Extensions.Depenses {
 		cles = append(cles, cle)
 	}
 	sort.Slice(cles, func(i, j int) bool { return cles[i] < cles[j] })
 
-	var coups []Coup
+	var coups []Move
 	for _, cle := range cles {
 		d := p.Extensions.Depenses[cle]
-		if d.Camp != CampFugitif || d.Cout > p.Fugitif.Resistance {
+		if d.Camp != SideFugitive || d.Cost > p.Fugitive.Stamina {
 			continue
 		}
-		if d.Usages > 0 && p.UsagesDepense[cle] >= d.Usages {
+		if d.Uses > 0 && p.ExpenseUses[cle] >= d.Uses {
 			continue
 		}
-		if cle == DepenseSilence && p.Fugitif.SilenceAchete {
+		if cle == ExpenseSilence && p.Fugitive.SilenceBought {
 			continue
 		}
-		coups = append(coups, Coup{
-			Tour: p.Tour, Acteur: CampFugitif, Type: CoupDepense, Depense: cle,
+		coups = append(coups, Move{
+			Turn: p.Turn, Side: SideFugitive, Type: MoveExpense, Expense: cle,
 		})
 	}
 
-	return append(coups, p.coupsChangerZone()...)
+	return append(coups, p.changeZoneMoves()...)
 }
 
-// coupsChangerZone énumère les zones vers lesquelles le fugitif peut resceller.
-func (p *Partie) coupsChangerZone() []Coup {
+// changeZoneMoves énumère les zones vers lesquelles le fugitif peut resceller.
+func (p *Game) changeZoneMoves() []Move {
 	if p.Extensions == nil {
 		return nil
 	}
-	d, connue := p.Extensions.Depenses[DepenseChangerZone]
-	if !connue || d.Cout > p.Fugitif.Resistance {
+	d, connue := p.Extensions.Depenses[ExpenseChangeZone]
+	if !connue || d.Cost > p.Fugitive.Stamina {
 		return nil
 	}
 
-	var coups []Coup
-	for _, z := range p.Plateau.Zones() {
-		if z.Numero == p.Fugitif.ZoneScellee {
+	var coups []Move
+	for _, z := range p.Board.Zones() {
+		if z.Number == p.Fugitive.SealedZone {
 			continue
 		}
-		coups = append(coups, Coup{
-			Tour: p.Tour, Acteur: CampFugitif, Type: CoupChangerZone, Zone: z.Numero,
+		coups = append(coups, Move{
+			Turn: p.Turn, Side: SideFugitive, Type: MoveChangeZone, Zone: z.Number,
 		})
 	}
 	return coups
 }
 
-// occupee dit si un inspecteur tient la case.
-func (p *Partie) occupee(pos Position) bool {
-	for _, i := range p.Inspecteurs {
+// occupied dit si un inspecteur tient la case.
+func (p *Game) occupied(pos Position) bool {
+	for _, i := range p.Inspectors {
 		if i.Position == pos {
 			return true
 		}

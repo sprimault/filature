@@ -8,60 +8,60 @@ import (
 	"sort"
 )
 
-// VersionEffets est la version du vocabulaire que ce binaire sait appliquer.
+// EffectsVersion est la version du vocabulaire que ce binaire sait appliquer.
 //
 // Un plugin écrit contre une version inconnue est refusé plutôt qu'appliqué de
 // travers. Sans ce numéro, un manifeste employant une primitive apparue plus
 // tard échouerait sur un message de champ inconnu.
-const VersionEffets = 1
+const EffectsVersion = 1
 
-// Declenchement dit quand une capacité ou un mode entre en jeu.
-type Declenchement string
+// Trigger dit quand une capacité ou un mode entre en jeu.
+type Trigger string
 
-// Les six moments de déclenchement. SurContact et SurRevelation n'ont aucun
+// Les six moments de déclenchement. OnContact et OnReveal n'ont aucun
 // usage dans le contenu livré : ils existent pour les plugins de règles.
 const (
-	SurPhaseInspecteurs Declenchement = "phase_inspecteurs"
-	SurPhaseFugitif     Declenchement = "phase_fugitif"
-	SurFinDeTour        Declenchement = "fin_de_tour"
-	SurContact          Declenchement = "contact"
-	SurRevelation       Declenchement = "revelation"
-	SurEtranglement     Declenchement = "etranglement"
+	OnInspectorsPhase Trigger = "phase_inspecteurs"
+	OnFugitivePhase   Trigger = "phase_fugitif"
+	OnTurnEnd         Trigger = "fin_de_tour"
+	OnContact         Trigger = "contact"
+	OnReveal          Trigger = "revelation"
+	OnStrangling      Trigger = "etranglement"
 )
 
-// Capacite est une entrée déclarative, chargée depuis un manifeste. Les cinq
+// Ability est une entrée déclarative, chargée depuis un manifeste. Les cinq
 // capacités livrées ne sont pas codées en dur : elles vivent dans
 // plugins/base, au même format que celles d'un tiers.
-type Capacite struct {
-	Cle           string        `toml:"-" json:"cle"`
-	Nom           string        `toml:"nom" json:"nom"`
-	Camp          Acteur        `toml:"camp" json:"camp"`
-	Usages        int           `toml:"usages" json:"usages"`
-	Cout          int           `toml:"cout" json:"cout"`
-	Declenchement Declenchement `toml:"declenchement" json:"declenchement"`
-	Passive       bool          `toml:"passive" json:"passive"`
-	Effets        []Effet       `toml:"effet" json:"effets"`
+type Ability struct {
+	Key     string   `toml:"-" json:"cle"`
+	Name    string   `toml:"nom" json:"nom"`
+	Camp    Side     `toml:"camp" json:"camp"`
+	Uses    int      `toml:"usages" json:"usages"`
+	Cost    int      `toml:"cout" json:"cout"`
+	Trigger Trigger  `toml:"declenchement" json:"declenchement"`
+	Passive bool     `toml:"passive" json:"passive"`
+	Effets  []Effect `toml:"effet" json:"effets"`
 }
 
 // Mode est une règle de partie déclarée en effets, que le noyau déclenche sans
 // qu'un joueur la choisisse.
 //
 // L'étranglement en est un. La cadence — à partir de quel tour, tous les
-// combien — reste dans Parametres, où l'interface l'expose : le mode dit ce qui
+// combien — reste dans Settings, où l'interface l'expose : le mode dit ce qui
 // se passe, le paramètre dit quand. Les inscrire tous deux ici donnerait deux
 // sources de vérité pour un même réglage.
 type Mode struct {
-	Cle           string        `toml:"-" json:"cle"`
-	Nom           string        `toml:"nom" json:"nom"`
-	Declenchement Declenchement `toml:"declenchement" json:"declenchement"`
-	Effets        []Effet       `toml:"effet" json:"effets"`
+	Key     string   `toml:"-" json:"cle"`
+	Name    string   `toml:"nom" json:"nom"`
+	Trigger Trigger  `toml:"declenchement" json:"declenchement"`
+	Effets  []Effect `toml:"effet" json:"effets"`
 }
 
-// Registre rassemble tout ce que les plugins ont apporté, plus le contenu de
+// Registry rassemble tout ce que les plugins ont apporté, plus le contenu de
 // base. Le noyau ne connaît que le registre, jamais un plugin en particulier.
-type Registre struct {
-	Capacites map[string]Capacite
-	Depenses  map[Depense]Capacite
+type Registry struct {
+	Capacites map[string]Ability
+	Depenses  map[Expense]Ability
 	Modes     map[string]Mode
 
 	// Generateurs et Cerveaux sont les deux points d'extension qui ne se
@@ -74,17 +74,17 @@ type Registre struct {
 	// partie et se compare à l'établissement d'une connexion réseau : une
 	// sauvegarde ne se recharge pas sans ses plugins, et le jeu le dit
 	// au lieu de rejouer faux.
-	Manifeste []EntreeManifeste
+	Manifeste []ManifestEntry
 }
 
-// EntreeManifeste identifie un plugin de façon vérifiable. L'empreinte porte
+// ManifestEntry identifie un plugin de façon vérifiable. L'fingerprint porte
 // sur le contenu, pas sur le numéro de version : deux plugins qui se disent
 // « 1.2.0 » sans être identiques doivent être détectés.
-type EntreeManifeste struct {
-	Nom       string `json:"nom"`
-	Version   string `json:"version"`
-	Empreinte string `json:"empreinte"`
-	Regles    bool   `json:"regles"`
+type ManifestEntry struct {
+	Name        string `json:"nom"`
+	Version     string `json:"version"`
+	Fingerprint string `json:"empreinte"`
+	Regles      bool   `json:"regles"`
 }
 
 // Les deux signatures qu'un plugin exécutable peut honorer. Elles sont
@@ -92,12 +92,12 @@ type EntreeManifeste struct {
 // sans effet de bord.
 type (
 	// FabriquePlateau produit un plateau depuis la graine de la partie.
-	FabriquePlateau func(graine int64, p Parametres) (Plateau, error)
+	FabriquePlateau func(graine int64, p Settings) (Board, error)
 
-	// FabriqueCerveau choisit un coup. Elle reçoit une Vue et non *Partie : un
+	// FabriqueCerveau choisit un coup. Elle reçoit une View et non *Game : un
 	// plugin ne peut donc lire ni la position cachée du fugitif ni sa zone
 	// scellée.
-	FabriqueCerveau func(v Vue, a *Alea) (Coup, error)
+	FabriqueCerveau func(v View, a *Random) (Move, error)
 )
 
 // Le registre se construit dans internal/plugins, jamais ici : le remplir
@@ -105,31 +105,31 @@ type (
 // C'est ce qui en fait une feuille du graphe de dépendances, et ce qui garantit
 // qu'aucune règle n'attend un fichier pour s'appliquer.
 
-// Fusionner ajoute un plugin au registre. Une clé déjà prise est un conflit,
+// Merge ajoute un plugin au registre. Une clé déjà prise est un conflit,
 // pas un écrasement silencieux : deux plugins qui redéfinissent la même
 // capacité doivent faire échouer le chargement avec un message lisible.
 //
 // Les clés sont parcourues triées. L'ordre d'une map n'est pas stable en Go, et
 // il déciderait ici duquel de deux conflits l'utilisateur entend parler — donc
 // du message qu'il voit, qui changerait d'un lancement à l'autre.
-func (r *Registre) Fusionner(nom string, autre *Registre) error {
+func (r *Registry) Merge(nom string, autre *Registry) error {
 	if autre == nil {
 		return nil
 	}
 
-	if err := fusionner(&r.Capacites, autre.Capacites, nom, "capacite"); err != nil {
+	if err := mergeInto(&r.Capacites, autre.Capacites, nom, "capacite"); err != nil {
 		return err
 	}
-	if err := fusionner(&r.Depenses, autre.Depenses, nom, "depense"); err != nil {
+	if err := mergeInto(&r.Depenses, autre.Depenses, nom, "depense"); err != nil {
 		return err
 	}
-	if err := fusionner(&r.Modes, autre.Modes, nom, "mode"); err != nil {
+	if err := mergeInto(&r.Modes, autre.Modes, nom, "mode"); err != nil {
 		return err
 	}
-	if err := fusionner(&r.Generateurs, autre.Generateurs, nom, "generateur"); err != nil {
+	if err := mergeInto(&r.Generateurs, autre.Generateurs, nom, "generateur"); err != nil {
 		return err
 	}
-	if err := fusionner(&r.Cerveaux, autre.Cerveaux, nom, "cerveau"); err != nil {
+	if err := mergeInto(&r.Cerveaux, autre.Cerveaux, nom, "cerveau"); err != nil {
 		return err
 	}
 
@@ -137,13 +137,13 @@ func (r *Registre) Fusionner(nom string, autre *Registre) error {
 	return nil
 }
 
-// fusionner verse une table dans une autre en refusant les clés déjà prises.
+// mergeInto verse une table dans une autre en refusant les clés déjà prises.
 //
 // La destination est un pointeur : un registre neuf a ses tables à nil, et les
 // initialiser au premier ajout évite de les construire pour les plugins qui
 // n'apportent rien de ce genre — la plupart, un dictionnaire n'ayant ni
 // capacité ni mode.
-func fusionner[T any, C comparable](vers *map[C]T, depuis map[C]T, plugin, genre string) error {
+func mergeInto[T any, C comparable](vers *map[C]T, depuis map[C]T, plugin, genre string) error {
 	if len(depuis) == 0 {
 		return nil
 	}

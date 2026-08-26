@@ -12,28 +12,28 @@ import (
 // dépendre de la génération, qui relève de l'étape 3.
 type plateauNu struct{ cote int }
 
-// EstRue accepte toute case dans les bornes.
-func (b plateauNu) EstRue(p Position) bool {
-	return p.Colonne >= 0 && p.Ligne >= 0 && p.Colonne < b.cote && p.Ligne < b.cote
+// IsStreet accepte toute case dans les bornes.
+func (b plateauNu) IsStreet(p Position) bool {
+	return p.Column >= 0 && p.Row >= 0 && p.Column < b.cote && p.Row < b.cote
 }
 
 // Zones renvoie une unique zone, suffisante pour les bascules.
 func (b plateauNu) Zones() []Zone {
-	return []Zone{{Numero: 0, Cases: []Position{{Colonne: 1, Ligne: 1}}}}
+	return []Zone{{Number: 0, Cells: []Position{{Column: 1, Row: 1}}}}
 }
 
-// Graine est figée : aucun test de ce fichier ne tire au sort.
-func (b plateauNu) Graine() int64 { return 1 }
+// Seed est figée : aucun test de ce fichier ne tire au sort.
+func (b plateauNu) Seed() int64 { return 1 }
 
-// Vision reste vide : ce sont les effets qu'on applique ici, pas la vue.
-func (b plateauNu) Vision(p Position, portee int) []Position { return nil }
+// Sight reste vide : ce sont les effets qu'on applique ici, pas la vue.
+func (b plateauNu) Sight(p Position, portee int) []Position { return nil }
 
-// CasesDans énumère les cases du carré, dans l'ordre du plateau borné.
-func (b plateauNu) CasesDans(centre Position, rayon int) []Position {
+// CellsWithin énumère les cases du carré, dans l'ordre du plateau borné.
+func (b plateauNu) CellsWithin(centre Position, rayon int) []Position {
 	var cases []Position
-	for ligne := centre.Ligne - rayon; ligne <= centre.Ligne+rayon; ligne++ {
-		for colonne := centre.Colonne - rayon; colonne <= centre.Colonne+rayon; colonne++ {
-			if p := (Position{Colonne: colonne, Ligne: ligne}); b.EstRue(p) {
+	for ligne := centre.Row - rayon; ligne <= centre.Row+rayon; ligne++ {
+		for colonne := centre.Column - rayon; colonne <= centre.Column+rayon; colonne++ {
+			if p := (Position{Column: colonne, Row: ligne}); b.IsStreet(p) {
 				cases = append(cases, p)
 			}
 		}
@@ -43,28 +43,28 @@ func (b plateauNu) CasesDans(centre Position, rayon int) []Position {
 
 // partieDEssai monte une partie au tour 5, avec trois inspecteurs et un
 // fugitif, de quoi appliquer n'importe quelle primitive.
-func partieDEssai() *Partie {
-	return &Partie{
-		Graine:     1,
-		Parametres: ParametresDefaut(),
-		Plateau:    plateauNu{cote: 9},
-		Tour:       5,
-		Phase:      PhaseInspecteurs,
-		Fugitif: Fugitif{
-			Position:   Position{Colonne: 4, Ligne: 4},
-			Resistance: 10,
+func partieDEssai() *Game {
+	return &Game{
+		Seed:     1,
+		Settings: DefaultSettings(),
+		Board:    plateauNu{cote: 9},
+		Turn:     5,
+		Phase:    PhaseInspectors,
+		Fugitive: Fugitive{
+			Position: Position{Column: 4, Row: 4},
+			Stamina:  10,
 		},
-		Inspecteurs: []Inspecteur{
-			{Position: Position{Colonne: 0, Ligne: 0}, Capacite: "guetteur"},
-			{Position: Position{Colonne: 1, Ligne: 0}, Capacite: "coureur"},
-			{Position: Position{Colonne: 2, Ligne: 0}, Capacite: "chef"},
+		Inspectors: []Inspector{
+			{Position: Position{Column: 0, Row: 0}, Ability: "guetteur"},
+			{Position: Position{Column: 1, Row: 0}, Ability: "coureur"},
+			{Position: Position{Column: 2, Row: 0}, Ability: "chef"},
 		},
-		Traces: map[Position]Trace{
-			{Colonne: 3, Ligne: 4}: {Tour: 4, Direction: Est},
-			{Colonne: 2, Ligne: 4}: {Tour: 1, Direction: Est},
+		Trails: map[Position]Trail{
+			{Column: 3, Row: 4}: {Turn: 4, Direction: Est},
+			{Column: 2, Row: 4}: {Turn: 1, Direction: Est},
 		},
-		Barrages:   map[Position]int{},
-		Ouvertures: map[Position]int{},
+		Roadblocks: map[Position]int{},
+		Openings:   map[Position]int{},
 	}
 }
 
@@ -75,15 +75,15 @@ type casEffet struct {
 	// prepare pose l'état que la primitive exige pour agir. Une primitive qui
 	// n'a rien à défaire sort par une branche vide et ne prouve rien : c'est
 	// exactement ce qui a laissé ouvrir_zone sans couverture.
-	prepare func(*Partie)
+	prepare func(*Game)
 
-	effet   Effet
-	ctx     Contexte
-	verifie func(*testing.T, *Partie)
+	effet   Effect
+	ctx     EffectContext
+	verifie func(*testing.T, *Game)
 }
 
 // partiePour monte une partie d'essai dans l'état qu'un cas réclame.
-func (c casEffet) partiePour() *Partie {
+func (c casEffet) partiePour() *Game {
 	p := partieDEssai()
 	if c.prepare != nil {
 		c.prepare(p)
@@ -93,7 +93,7 @@ func (c casEffet) partiePour() *Partie {
 
 // partieAvecPreparations monte une partie qui satisfait tous les cas à la fois,
 // pour ceux qui les enchaînent sur un même état.
-func partieAvecPreparations() *Partie {
+func partieAvecPreparations() *Game {
 	p := partieDEssai()
 	for _, c := range tousLesCas() {
 		if c.prepare != nil {
@@ -106,168 +106,168 @@ func partieAvecPreparations() *Partie {
 // tousLesCas couvre les dix-neuf primitives du vocabulaire. Une primitive
 // absente d'ici est une primitive dont personne ne vérifie qu'elle se défait.
 func tousLesCas() []casEffet {
-	inspecteur := Contexte{Acteur: CampInspecteurs, Pion: 1}
-	fugitif := Contexte{Acteur: CampFugitif}
-	uneCase := Position{Colonne: 6, Ligne: 6}
+	inspecteur := EffectContext{Side: SideInspectors, Piece: 1}
+	fugitif := EffectContext{Side: SideFugitive}
+	uneCase := Position{Column: 6, Row: 6}
 
 	return []casEffet{
 		{
 			nom:   "deplacer",
-			effet: Effet{Type: EffetDeplacer, Cible: CiblePionCourant},
-			ctx:   Contexte{Acteur: CampInspecteurs, Pion: 1, Case: uneCase},
-			verifie: func(t *testing.T, p *Partie) {
-				if p.Inspecteurs[1].Position != uneCase {
-					t.Errorf("pion en %v, attendu %v", p.Inspecteurs[1].Position, uneCase)
+			effet: Effect{Type: EffectMove, Target: TargetCurrentPiece},
+			ctx:   EffectContext{Side: SideInspectors, Piece: 1, Case: uneCase},
+			verifie: func(t *testing.T, p *Game) {
+				if p.Inspectors[1].Position != uneCase {
+					t.Errorf("pion en %v, attendu %v", p.Inspectors[1].Position, uneCase)
 				}
 			},
 		},
 		{
 			nom:   "teleporter le fugitif",
-			effet: Effet{Type: EffetTeleporter, Cible: CibleFugitif},
-			ctx:   Contexte{Acteur: CampFugitif, Case: uneCase},
-			verifie: func(t *testing.T, p *Partie) {
-				if p.Fugitif.Position != uneCase {
-					t.Errorf("fugitif en %v, attendu %v", p.Fugitif.Position, uneCase)
+			effet: Effect{Type: EffectTeleport, Target: TargetFugitive},
+			ctx:   EffectContext{Side: SideFugitive, Case: uneCase},
+			verifie: func(t *testing.T, p *Game) {
+				if p.Fugitive.Position != uneCase {
+					t.Errorf("fugitif en %v, attendu %v", p.Fugitive.Position, uneCase)
 				}
 			},
 		},
 		{
 			nom:   "modifier_portee",
-			effet: Effet{Type: EffetModifierPortee, Cible: CiblePionCourant, Valeur: 8, Duree: 1},
+			effet: Effect{Type: EffectChangeRange, Target: TargetCurrentPiece, Value: 8, Duration: 1},
 			ctx:   inspecteur,
-			verifie: func(t *testing.T, p *Partie) {
-				if got := p.PorteeDe(1); got != p.Parametres.Portee+8 {
-					t.Errorf("portée du pion visé %d, attendu %d", got, p.Parametres.Portee+8)
+			verifie: func(t *testing.T, p *Game) {
+				if got := p.RangeOf(1); got != p.Settings.Range+8 {
+					t.Errorf("portée du pion visé %d, attendu %d", got, p.Settings.Range+8)
 				}
-				if got := p.PorteeDe(0); got != p.Parametres.Portee {
-					t.Errorf("portée d'un autre pion %d, attendu %d", got, p.Parametres.Portee)
+				if got := p.RangeOf(0); got != p.Settings.Range {
+					t.Errorf("portée d'un autre pion %d, attendu %d", got, p.Settings.Range)
 				}
 			},
 		},
 		{
 			nom:   "modifier_mobilite",
-			effet: Effet{Type: EffetModifierMobilite, Cible: CibleFugitif, Valeur: 1, Duree: 1},
+			effet: Effect{Type: EffectChangeMobility, Target: TargetFugitive, Value: 1, Duration: 1},
 			ctx:   fugitif,
-			verifie: func(t *testing.T, p *Partie) {
-				if got := p.MobiliteDe(CampFugitif, 0); got != 2 {
+			verifie: func(t *testing.T, p *Game) {
+				if got := p.MobilityOf(SideFugitive, 0); got != 2 {
 					t.Errorf("mobilité du fugitif %d, attendu 2", got)
 				}
 			},
 		},
 		{
 			nom:   "bloquer_case",
-			effet: Effet{Type: EffetBloquerCase, Cible: CibleCase, Duree: 3},
-			ctx:   Contexte{Acteur: CampInspecteurs, Pion: 1, Case: uneCase},
-			verifie: func(t *testing.T, p *Partie) {
-				if p.EstPraticable(uneCase) {
+			effet: Effect{Type: EffectBlockCell, Target: TargetCell, Duration: 3},
+			ctx:   EffectContext{Side: SideInspectors, Piece: 1, Case: uneCase},
+			verifie: func(t *testing.T, p *Game) {
+				if p.IsWalkable(uneCase) {
 					t.Error("la case barrée reste praticable")
 				}
 			},
 		},
 		{
 			nom:   "ouvrir_case",
-			effet: Effet{Type: EffetOuvrirCase, Cible: CibleCase, Duree: 3},
-			ctx:   Contexte{Acteur: CampInspecteurs, Pion: 1, Case: Position{Colonne: 99, Ligne: 99}},
-			verifie: func(t *testing.T, p *Partie) {
-				if !p.EstPraticable(Position{Colonne: 99, Ligne: 99}) {
+			effet: Effect{Type: EffectOpenCell, Target: TargetCell, Duration: 3},
+			ctx:   EffectContext{Side: SideInspectors, Piece: 1, Case: Position{Column: 99, Row: 99}},
+			verifie: func(t *testing.T, p *Game) {
+				if !p.IsWalkable(Position{Column: 99, Row: 99}) {
 					t.Error("la case percée reste impraticable")
 				}
 			},
 		},
 		{
 			nom:   "reveler_traces",
-			effet: Effet{Type: EffetRevelerTraces, Cible: CiblePionCourant, Rayon: 2},
+			effet: Effect{Type: EffectRevealTrails, Target: TargetCurrentPiece, Radius: 2},
 			ctx:   inspecteur,
-			verifie: func(t *testing.T, p *Partie) {
-				if got := p.RayonTracesDe(1); got != 2 {
+			verifie: func(t *testing.T, p *Game) {
+				if got := p.TrailRadiusOf(1); got != 2 {
 					t.Errorf("rayon du Traqueur %d, attendu 2", got)
 				}
-				if got := p.RayonTracesDe(0); got != 1 {
+				if got := p.TrailRadiusOf(0); got != 1 {
 					t.Errorf("rayon d'un autre pion %d, attendu 1", got)
 				}
 			},
 		},
 		{
 			nom:   "reveler_position",
-			effet: Effet{Type: EffetRevelerPosition, Cible: CibleFugitif},
+			effet: Effect{Type: EffectRevealPosition, Target: TargetFugitive},
 			ctx:   fugitif,
-			verifie: func(t *testing.T, p *Partie) {
-				if !p.Fugitif.Visible {
+			verifie: func(t *testing.T, p *Game) {
+				if !p.Fugitive.Visible {
 					t.Error("le fugitif reste caché après révélation")
 				}
 			},
 		},
 		{
 			nom:   "marquer_scene",
-			effet: Effet{Type: EffetMarquerScene, Cible: CibleFugitif},
+			effet: Effect{Type: EffectMarkCrimeScene, Target: TargetFugitive},
 			ctx:   fugitif,
-			verifie: func(t *testing.T, p *Partie) {
-				attendue := Scene{Position: Position{Colonne: 4, Ligne: 4}, Tour: 5}
-				if !reflect.DeepEqual(p.Scenes, []Scene{attendue}) {
-					t.Errorf("scènes %v, attendu [%v]", p.Scenes, attendue)
+			verifie: func(t *testing.T, p *Game) {
+				attendue := CrimeScene{Position: Position{Column: 4, Row: 4}, Turn: 5}
+				if !reflect.DeepEqual(p.CrimeScenes, []CrimeScene{attendue}) {
+					t.Errorf("scènes %v, attendu [%v]", p.CrimeScenes, attendue)
 				}
 			},
 		},
 		{
 			nom:   "annuler_revelation",
-			effet: Effet{Type: EffetAnnulerRevelation, Cible: CibleFugitif},
+			effet: Effect{Type: EffectCancelReveal, Target: TargetFugitive},
 			ctx:   fugitif,
-			verifie: func(t *testing.T, p *Partie) {
-				if !p.Fugitif.SilenceAchete {
+			verifie: func(t *testing.T, p *Game) {
+				if !p.Fugitive.SilenceBought {
 					t.Error("le silence n'est pas enregistré")
 				}
 			},
 		},
 		{
 			nom:   "partager_vue",
-			effet: Effet{Type: EffetPartagerVue, Cible: CibleAutrePion, Duree: 2},
-			ctx:   Contexte{Acteur: CampInspecteurs, Pion: 2, AutrePion: 0},
-			verifie: func(t *testing.T, p *Partie) {
-				if got := p.VuePartageeDe(2); !reflect.DeepEqual(got, []int{0}) {
+			effet: Effect{Type: EffectShareView, Target: TargetOtherPiece, Duration: 2},
+			ctx:   EffectContext{Side: SideInspectors, Piece: 2, AutrePion: 0},
+			verifie: func(t *testing.T, p *Game) {
+				if got := p.SharedViewOf(2); !reflect.DeepEqual(got, []int{0}) {
 					t.Errorf("vue partagée %v, attendu [0]", got)
 				}
 			},
 		},
 		{
 			nom:   "couter_resistance",
-			effet: Effet{Type: EffetCouterResistance, Cible: CibleFugitif, Valeur: 3},
+			effet: Effect{Type: EffectCostStamina, Target: TargetFugitive, Value: 3},
 			ctx:   fugitif,
-			verifie: func(t *testing.T, p *Partie) {
-				if p.Fugitif.Resistance != 7 {
-					t.Errorf("résistance %d, attendu 7", p.Fugitif.Resistance)
+			verifie: func(t *testing.T, p *Game) {
+				if p.Fugitive.Stamina != 7 {
+					t.Errorf("résistance %d, attendu 7", p.Fugitive.Stamina)
 				}
 			},
 		},
 		{
 			nom:   "rendre_resistance",
-			effet: Effet{Type: EffetRendreResistance, Cible: CibleFugitif, Valeur: 2},
+			effet: Effect{Type: EffectRestoreStamina, Target: TargetFugitive, Value: 2},
 			ctx:   fugitif,
-			verifie: func(t *testing.T, p *Partie) {
-				if p.Fugitif.Resistance != 12 {
-					t.Errorf("résistance %d, attendu 12", p.Fugitif.Resistance)
+			verifie: func(t *testing.T, p *Game) {
+				if p.Fugitive.Stamina != 12 {
+					t.Errorf("résistance %d, attendu 12", p.Fugitive.Stamina)
 				}
 			},
 		},
 		{
 			nom:   "effacer_traces",
-			effet: Effet{Type: EffetEffacerTraces, Cible: CibleFugitif, Duree: 3},
+			effet: Effect{Type: EffectWipeTrails, Target: TargetFugitive, Duration: 3},
 			ctx:   fugitif,
-			verifie: func(t *testing.T, p *Partie) {
-				if _, reste := p.Traces[Position{Colonne: 3, Ligne: 4}]; reste {
+			verifie: func(t *testing.T, p *Game) {
+				if _, reste := p.Trails[Position{Column: 3, Row: 4}]; reste {
 					t.Error("la trace du tour 4 devait être effacée")
 				}
-				if _, reste := p.Traces[Position{Colonne: 2, Ligne: 4}]; !reste {
+				if _, reste := p.Trails[Position{Column: 2, Row: 4}]; !reste {
 					t.Error("la trace du tour 1 est trop vieille pour être effacée")
 				}
 			},
 		},
 		{
 			nom:   "fermer_zone",
-			effet: Effet{Type: EffetFermerZone, Cible: CibleZone},
-			ctx:   Contexte{Acteur: CampInspecteurs, Pion: 1, Zone: 3},
-			verifie: func(t *testing.T, p *Partie) {
-				if !reflect.DeepEqual(p.ZonesFermees, []int{3}) {
-					t.Errorf("zones fermées %v, attendu [3]", p.ZonesFermees)
+			effet: Effect{Type: EffectCloseZone, Target: TargetZone},
+			ctx:   EffectContext{Side: SideInspectors, Piece: 1, Zone: 3},
+			verifie: func(t *testing.T, p *Game) {
+				if !reflect.DeepEqual(p.ClosedZones, []int{3}) {
+					t.Errorf("zones fermées %v, attendu [3]", p.ClosedZones)
 				}
 			},
 		},
@@ -277,51 +277,51 @@ func tousLesCas() []casEffet {
 			// rang qui compte. L'annulation doit la remettre entre 5 et 2, pas
 			// au bout — cet ordre part dans le journal, et un rejeu qui le
 			// retrouve différent n'est plus le même octet pour octet.
-			prepare: func(p *Partie) { p.ZonesFermees = []int{5, 1, 2} },
-			effet:   Effet{Type: EffetOuvrirZone, Cible: CibleZone},
-			ctx:     Contexte{Acteur: CampInspecteurs, Pion: 1, Zone: 1},
-			verifie: func(t *testing.T, p *Partie) {
-				if !reflect.DeepEqual(p.ZonesFermees, []int{5, 2}) {
-					t.Errorf("zones fermées %v, attendu [5 2]", p.ZonesFermees)
+			prepare: func(p *Game) { p.ClosedZones = []int{5, 1, 2} },
+			effet:   Effect{Type: EffectOpenZone, Target: TargetZone},
+			ctx:     EffectContext{Side: SideInspectors, Piece: 1, Zone: 1},
+			verifie: func(t *testing.T, p *Game) {
+				if !reflect.DeepEqual(p.ClosedZones, []int{5, 2}) {
+					t.Errorf("zones fermées %v, attendu [5 2]", p.ClosedZones)
 				}
 			},
 		},
 		{
 			nom:   "sceller_zone",
-			effet: Effet{Type: EffetScellerZone, Cible: CibleZone},
-			ctx:   Contexte{Acteur: CampFugitif, Zone: 4},
-			verifie: func(t *testing.T, p *Partie) {
-				if p.Fugitif.ZoneScellee != 4 {
-					t.Errorf("zone scellée %d, attendu 4", p.Fugitif.ZoneScellee)
+			effet: Effect{Type: EffectSealZone, Target: TargetZone},
+			ctx:   EffectContext{Side: SideFugitive, Zone: 4},
+			verifie: func(t *testing.T, p *Game) {
+				if p.Fugitive.SealedZone != 4 {
+					t.Errorf("zone scellée %d, attendu 4", p.Fugitive.SealedZone)
 				}
 			},
 		},
 		{
 			nom:   "differer",
-			effet: Effet{Type: EffetDifferer, Duree: 2, Annonce: true, Puis: []Effet{{Type: EffetFermerZone, Cible: CibleZone}}},
-			ctx:   Contexte{Acteur: CampInspecteurs, Pion: 1, Zone: 2},
-			verifie: func(t *testing.T, p *Partie) {
-				if len(p.EffetsEnAttente) != 1 {
-					t.Fatalf("%d effets en attente, attendu 1", len(p.EffetsEnAttente))
+			effet: Effect{Type: EffectDefer, Duration: 2, Announced: true, Then: []Effect{{Type: EffectCloseZone, Target: TargetZone}}},
+			ctx:   EffectContext{Side: SideInspectors, Piece: 1, Zone: 2},
+			verifie: func(t *testing.T, p *Game) {
+				if len(p.PendingEffects) != 1 {
+					t.Fatalf("%d effets en attente, attendu 1", len(p.PendingEffects))
 				}
-				if got := p.EffetsEnAttente[0].Tour; got != 7 {
+				if got := p.PendingEffects[0].Turn; got != 7 {
 					t.Errorf("échéance au tour %d, attendu 7", got)
 				}
-				if !p.EffetsEnAttente[0].Annonce {
+				if !p.PendingEffects[0].Announced {
 					t.Error("l'annonce n'est pas conservée")
 				}
 			},
 		},
 		{
 			nom:   "fin_partie",
-			effet: Effet{Type: EffetFinPartie, Cible: CibleFugitif},
+			effet: Effect{Type: EffectEndGame, Target: TargetFugitive},
 			ctx:   fugitif,
-			verifie: func(t *testing.T, p *Partie) {
-				r, fini := p.Resultat()
+			verifie: func(t *testing.T, p *Game) {
+				r, fini := p.Outcome()
 				if !fini {
 					t.Fatal("la partie devait être terminée")
 				}
-				if r.Vainqueur != CampFugitif || r.Motif != MotifGreffon {
+				if r.Winner != SideFugitive || r.Reason != OutcomePlugin {
 					t.Errorf("résultat %+v, attendu fugitif/plugin", r)
 				}
 			},
@@ -329,12 +329,12 @@ func tousLesCas() []casEffet {
 	}
 }
 
-// TestAppliquerEffets vérifie que chaque primitive produit ce qu'elle annonce.
-func TestAppliquerEffets(t *testing.T) {
+// TestApplyEffects vérifie que chaque primitive produit ce qu'elle annonce.
+func TestApplyEffects(t *testing.T) {
 	for _, cas := range tousLesCas() {
 		t.Run(cas.nom, func(t *testing.T) {
 			p := cas.partiePour()
-			annuler, err := p.Appliquer1Effet(cas.effet, cas.ctx)
+			annuler, err := p.ApplyOneEffect(cas.effet, cas.ctx)
 			if err != nil {
 				t.Fatalf("application refusée : %v", err)
 			}
@@ -346,19 +346,19 @@ func TestAppliquerEffets(t *testing.T) {
 	}
 }
 
-// TestAnnulerRendLEtatIdentique est l'invariant de réversibilité.
+// TestUndoRestoresState est l'invariant de réversibilité.
 //
 // Ce n'est pas un confort d'interface : l'IA explore des milliers de positions
 // en appliquant puis défaisant, sans copier l'état. Un effet qui laisse la
 // moindre trace après annulation fait diverger l'exploration, puis le rejeu du
 // journal.
-func TestAnnulerRendLEtatIdentique(t *testing.T) {
+func TestUndoRestoresState(t *testing.T) {
 	for _, cas := range tousLesCas() {
 		t.Run(cas.nom, func(t *testing.T) {
 			p := cas.partiePour()
 			avant := cas.partiePour()
 
-			annuler, err := p.Appliquer1Effet(cas.effet, cas.ctx)
+			annuler, err := p.ApplyOneEffect(cas.effet, cas.ctx)
 			if err != nil {
 				t.Fatalf("application refusée : %v", err)
 			}
@@ -371,9 +371,9 @@ func TestAnnulerRendLEtatIdentique(t *testing.T) {
 	}
 }
 
-// TestAnnulerEnChaine vérifie que plusieurs effets se défont dans l'ordre
+// TestUndoInSequence vérifie que plusieurs effets se défont dans l'ordre
 // inverse, ce dont les annulations qui tronquent une tranche dépendent.
-func TestAnnulerEnChaine(t *testing.T) {
+func TestUndoInSequence(t *testing.T) {
 	// Les préparations sont posées toutes ensemble avant la chaîne : appliquée
 	// entre deux effets, une préparation modifierait l'état sans annulation
 	// correspondante, et la comparaison finale échouerait sans qu'aucun effet
@@ -383,7 +383,7 @@ func TestAnnulerEnChaine(t *testing.T) {
 
 	var annulations []func()
 	for _, cas := range tousLesCas() {
-		annuler, err := p.Appliquer1Effet(cas.effet, cas.ctx)
+		annuler, err := p.ApplyOneEffect(cas.effet, cas.ctx)
 		if err != nil {
 			t.Fatalf("%s refusé : %v", cas.nom, err)
 		}
@@ -399,99 +399,99 @@ func TestAnnulerEnChaine(t *testing.T) {
 	}
 }
 
-// TestEffetInconnuEchoue vérifie qu'un type hors vocabulaire est refusé plutôt
+// TestUnknownEffectFails vérifie qu'un type hors vocabulaire est refusé plutôt
 // qu'ignoré : un plugin entré sans validation doit s'entendre dire non.
-func TestEffetInconnuEchoue(t *testing.T) {
+func TestUnknownEffectFails(t *testing.T) {
 	p := partieDEssai()
-	if _, err := p.Appliquer1Effet(Effet{Type: "voler"}, Contexte{Acteur: CampFugitif}); err == nil {
+	if _, err := p.ApplyOneEffect(Effect{Type: "voler"}, EffectContext{Side: SideFugitive}); err == nil {
 		t.Fatal("un effet inconnu a été accepté")
 	}
 }
 
-// TestPionHorsBornesEchoue vérifie qu'un index de pion invalide est refusé.
+// TestPieceOutOfBoundsFails vérifie qu'un index de pion invalide est refusé.
 // Sans ce contrôle, un contexte mal formé ferait paniquer le noyau.
-func TestPionHorsBornesEchoue(t *testing.T) {
+func TestPieceOutOfBoundsFails(t *testing.T) {
 	p := partieDEssai()
-	ctx := Contexte{Acteur: CampInspecteurs, Pion: 9}
-	if _, err := p.Appliquer1Effet(Effet{Type: EffetDeplacer}, ctx); err == nil {
+	ctx := EffectContext{Side: SideInspectors, Piece: 9}
+	if _, err := p.ApplyOneEffect(Effect{Type: EffectMove}, ctx); err == nil {
 		t.Fatal("un pion hors bornes a été accepté")
 	}
 }
 
-// TestEffetExpire vérifie qu'un effet à durée cesse de compter passé son
+// TestEffectExpires vérifie qu'un effet à durée cesse de compter passé son
 // échéance, et qu'un effet sans durée ne cesse jamais.
-func TestEffetExpire(t *testing.T) {
+func TestEffectExpires(t *testing.T) {
 	p := partieDEssai()
-	ctx := Contexte{Acteur: CampInspecteurs, Pion: 0}
+	ctx := EffectContext{Side: SideInspectors, Piece: 0}
 
-	if _, err := p.Appliquer1Effet(Effet{Type: EffetModifierPortee, Cible: CiblePionCourant, Valeur: 8, Duree: 1}, ctx); err != nil {
+	if _, err := p.ApplyOneEffect(Effect{Type: EffectChangeRange, Target: TargetCurrentPiece, Value: 8, Duration: 1}, ctx); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := p.Appliquer1Effet(Effet{Type: EffetRevelerTraces, Cible: CiblePionCourant, Rayon: 2}, ctx); err != nil {
+	if _, err := p.ApplyOneEffect(Effect{Type: EffectRevealTrails, Target: TargetCurrentPiece, Radius: 2}, ctx); err != nil {
 		t.Fatal(err)
 	}
 
-	if got := p.PorteeDe(0); got != p.Parametres.Portee+8 {
+	if got := p.RangeOf(0); got != p.Settings.Range+8 {
 		t.Errorf("au tour du déclenchement, portée %d", got)
 	}
 
-	p.Tour++
-	if got := p.PorteeDe(0); got != p.Parametres.Portee {
-		t.Errorf("au tour suivant, portée %d, attendu %d", got, p.Parametres.Portee)
+	p.Turn++
+	if got := p.RangeOf(0); got != p.Settings.Range {
+		t.Errorf("au tour suivant, portée %d, attendu %d", got, p.Settings.Range)
 	}
-	if got := p.RayonTracesDe(0); got != 2 {
+	if got := p.TrailRadiusOf(0); got != 2 {
 		t.Errorf("un effet sans durée a expiré : rayon %d, attendu 2", got)
 	}
 }
 
-// TestMobiliteNegativeImmobilise vérifie que le vocabulaire tient sa promesse :
+// TestNegativeMobilityImmobilises vérifie que le vocabulaire tient sa promesse :
 // une valeur négative est légale, et modifier_mobilite à -1 cloue le pion.
-func TestMobiliteNegativeImmobilise(t *testing.T) {
+func TestNegativeMobilityImmobilises(t *testing.T) {
 	p := partieDEssai()
-	ctx := Contexte{Acteur: CampInspecteurs, Pion: 0}
+	ctx := EffectContext{Side: SideInspectors, Piece: 0}
 
-	if _, err := p.Appliquer1Effet(Effet{Type: EffetModifierMobilite, Cible: CiblePionCourant, Valeur: -1, Duree: 1}, ctx); err != nil {
+	if _, err := p.ApplyOneEffect(Effect{Type: EffectChangeMobility, Target: TargetCurrentPiece, Value: -1, Duration: 1}, ctx); err != nil {
 		t.Fatal(err)
 	}
-	if got := p.MobiliteDe(CampInspecteurs, 0); got != 0 {
+	if got := p.MobilityOf(SideInspectors, 0); got != 0 {
 		t.Errorf("mobilité %d, attendu 0", got)
 	}
 }
 
-// TestResistancePlancher vérifie que la résistance ne passe pas sous zéro, et
+// TestStaminaFloor vérifie que la résistance ne passe pas sous zéro, et
 // que l'annulation rend la valeur d'origine malgré ce plafonnement.
-func TestResistancePlancher(t *testing.T) {
+func TestStaminaFloor(t *testing.T) {
 	p := partieDEssai()
-	annuler, err := p.Appliquer1Effet(
-		Effet{Type: EffetCouterResistance, Cible: CibleFugitif, Valeur: 99},
-		Contexte{Acteur: CampFugitif})
+	annuler, err := p.ApplyOneEffect(
+		Effect{Type: EffectCostStamina, Target: TargetFugitive, Value: 99},
+		EffectContext{Side: SideFugitive})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if p.Fugitif.Resistance != 0 {
-		t.Errorf("résistance %d, attendu 0", p.Fugitif.Resistance)
+	if p.Fugitive.Stamina != 0 {
+		t.Errorf("résistance %d, attendu 0", p.Fugitive.Stamina)
 	}
 	annuler()
-	if p.Fugitif.Resistance != 10 {
-		t.Errorf("après annulation, résistance %d, attendu 10", p.Fugitif.Resistance)
+	if p.Fugitive.Stamina != 10 {
+		t.Errorf("après annulation, résistance %d, attendu 10", p.Fugitive.Stamina)
 	}
 }
 
-// TestBarrageLEmporteSurOuverture fixe l'ordre des couches de terrain. Sans
+// TestRoadblockBeatsOpening fixe l'ordre des couches de terrain. Sans
 // priorité déclarée, le résultat dépendrait de l'ordre d'application et le
 // rejeu du journal cesserait d'être reproductible.
-func TestBarrageLEmporteSurOuverture(t *testing.T) {
+func TestRoadblockBeatsOpening(t *testing.T) {
 	p := partieDEssai()
-	pos := Position{Colonne: 3, Ligne: 3}
-	ctx := Contexte{Acteur: CampInspecteurs, Pion: 0, Case: pos}
+	pos := Position{Column: 3, Row: 3}
+	ctx := EffectContext{Side: SideInspectors, Piece: 0, Case: pos}
 
-	if _, err := p.Appliquer1Effet(Effet{Type: EffetOuvrirCase, Cible: CibleCase, Duree: 3}, ctx); err != nil {
+	if _, err := p.ApplyOneEffect(Effect{Type: EffectOpenCell, Target: TargetCell, Duration: 3}, ctx); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := p.Appliquer1Effet(Effet{Type: EffetBloquerCase, Cible: CibleCase, Duree: 3}, ctx); err != nil {
+	if _, err := p.ApplyOneEffect(Effect{Type: EffectBlockCell, Target: TargetCell, Duration: 3}, ctx); err != nil {
 		t.Fatal(err)
 	}
-	if p.EstPraticable(pos) {
+	if p.IsWalkable(pos) {
 		t.Error("le barrage doit l'emporter sur le percement")
 	}
 }

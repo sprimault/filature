@@ -14,11 +14,11 @@ import (
 // destination d'essai.
 const ailleurs = "/un/dossier/qui/n/est/pas/la/destination"
 
-// TestExtraireEcritLesPluginsLivres vérifie que la commande rend le contenu
+// TestExtractWritesShippedPlugins vérifie que la command rend le contenu
 // embarqué recopiable.
-func TestExtraireEcritLesPluginsLivres(t *testing.T) {
+func TestExtractWritesShippedPlugins(t *testing.T) {
 	dossier := t.TempDir()
-	if err := extraire(dossier, ailleurs); err != nil {
+	if err := extract(dossier, ailleurs); err != nil {
 		t.Fatalf("extraction refusée : %v", err)
 	}
 
@@ -32,13 +32,13 @@ func TestExtraireEcritLesPluginsLivres(t *testing.T) {
 	}
 }
 
-// TestExtraireNEcrasePas vérifie qu'un fichier existant arrête la commande.
+// TestExtractDoesNotOverwrite vérifie qu'un fichier existant arrête la command.
 //
 // Un traducteur qui relance l'extraction sur son dossier de travail perdrait
-// ses libellés. Le refus est ce qui rend la commande sûre à relancer.
-func TestExtraireNEcrasePas(t *testing.T) {
+// ses libellés. Le refus est ce qui rend la command sûre à relancer.
+func TestExtractDoesNotOverwrite(t *testing.T) {
 	dossier := t.TempDir()
-	if err := extraire(dossier, ailleurs); err != nil {
+	if err := extract(dossier, ailleurs); err != nil {
 		t.Fatalf("première extraction refusée : %v", err)
 	}
 
@@ -47,7 +47,7 @@ func TestExtraireNEcrasePas(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := extraire(dossier, ailleurs); err == nil {
+	if err := extract(dossier, ailleurs); err == nil {
 		t.Fatal("la seconde extraction aurait dû échouer")
 	}
 
@@ -60,24 +60,24 @@ func TestExtraireNEcrasePas(t *testing.T) {
 	}
 }
 
-// TestExtraireSansDossier vérifie que la commande dit son usage plutôt que
+// TestExtractWithoutFolder vérifie que la command dit son usage plutôt que
 // d'écrire dans le répertoire courant.
-func TestExtraireSansDossier(t *testing.T) {
-	if err := extraire("", ailleurs); err == nil {
+func TestExtractWithoutFolder(t *testing.T) {
+	if err := extract("", ailleurs); err == nil {
 		t.Fatal("un dossier vide a été accepté")
 	}
 }
 
-// TestExtraireRefuseLeDossierActif ferme le piège que la commande tendait.
+// TestExtractRejectsActiveFolder ferme le piège que la command tendait.
 //
 // Extraire le contenu livré là où le jeu charge le déclarerait deux fois : une
 // fois depuis le binaire, une fois depuis le disque. Deux plugins qui
 // définissent la même clé sont un conflit, donc suivre l'invitation cassait le
 // chargement.
-func TestExtraireRefuseLeDossierActif(t *testing.T) {
+func TestExtractRejectsActiveFolder(t *testing.T) {
 	actif := t.TempDir()
 
-	if err := extraire(actif, actif); err == nil {
+	if err := extract(actif, actif); err == nil {
 		t.Fatal("extraction acceptée dans le dossier des plugins actifs")
 	}
 
@@ -92,26 +92,26 @@ func TestExtraireRefuseLeDossierActif(t *testing.T) {
 	}
 }
 
-// TestExtraireRefuseMemeAvecUneCasseDifferente vérifie que le refus tient sous
+// TestExtractRejectsDifferentCase vérifie que le refus tient sous
 // Windows, où « Plugins » et « plugins » désignent le même dossier.
-func TestExtraireRefuseMemeAvecUneCasseDifferente(t *testing.T) {
+func TestExtractRejectsDifferentCase(t *testing.T) {
 	actif := filepath.Join(t.TempDir(), "plugins")
 	if err := os.MkdirAll(actif, 0o750); err != nil {
 		t.Fatal(err)
 	}
 
 	autreCasse := filepath.Join(filepath.Dir(actif), "GREFFONS")
-	if err := extraire(autreCasse, actif); err == nil {
+	if err := extract(autreCasse, actif); err == nil {
 		t.Skip("système sensible à la casse : les deux chemins sont bien distincts")
 	}
 }
 
-// TestPluginsParDefautSuitLExecutable vérifie que le dossier ne dépend pas du
+// TestDefaultPluginsFollowExecutable vérifie que le dossier ne dépend pas du
 // répertoire courant.
 //
 // Sans cela, un raccourci sur le bureau ferait chercher les plugins ailleurs,
 // et ceux qui sont installés seraient ignorés sans un mot.
-func TestPluginsParDefautSuitLExecutable(t *testing.T) {
+func TestDefaultPluginsFollowExecutable(t *testing.T) {
 	defaut := pluginsParDefaut()
 
 	if !filepath.IsAbs(defaut) {
@@ -133,16 +133,16 @@ func TestPluginsParDefautSuitLExecutable(t *testing.T) {
 	}
 }
 
-// TestCommandeRefuseUnMotInconnu vérifie qu'un mot qui n'est pas une commande
+// TestCommandRejectsUnknownWord vérifie qu'un mot qui n'est pas une command
 // ne lance pas de partie.
 //
 // Le cas n'est pas théorique : « exemples » et « valide » ont existé sous ces
 // noms jusqu'à ce lot. Sans ce refus, quelqu'un qui garde l'ancien réflexe
-// lancerait une partie en croyant valider un plugin.
-func TestCommandeRefuseUnMotInconnu(t *testing.T) {
+// lancerait une partie en croyant validate un plugin.
+func TestCommandRejectsUnknownWord(t *testing.T) {
 	for _, nom := range []string{"exemples", "valide", "n'importe quoi"} {
 		t.Run(nom, func(t *testing.T) {
-			traitee, err := commande(&strings.Builder{}, nom, "", t.TempDir())
+			traitee, err := command(&strings.Builder{}, nom, "", t.TempDir())
 
 			if !traitee {
 				t.Error("le mot est passé à la boucle de jeu au lieu d'être refusé")
@@ -157,9 +157,9 @@ func TestCommandeRefuseUnMotInconnu(t *testing.T) {
 	}
 }
 
-// TestCommandeVideLaisseJouer vérifie que le double-clic ordinaire passe.
-func TestCommandeVideLaisseJouer(t *testing.T) {
-	traitee, err := commande(&strings.Builder{}, "", "", t.TempDir())
+// TestEmptyCommandLetsPlay vérifie que le double-clic ordinaire passe.
+func TestEmptyCommandLetsPlay(t *testing.T) {
+	traitee, err := command(&strings.Builder{}, "", "", t.TempDir())
 	if err != nil {
 		t.Fatalf("sans argument : %v", err)
 	}
@@ -168,10 +168,10 @@ func TestCommandeVideLaisseJouer(t *testing.T) {
 	}
 }
 
-// TestCommandeVersion vérifie que le numéro sort sur la sortie qu'on lui donne.
-func TestCommandeVersion(t *testing.T) {
+// TestCommandVersion vérifie que le numéro sort sur la sortie qu'on lui donne.
+func TestCommandVersion(t *testing.T) {
 	var sortie strings.Builder
-	if _, err := commande(&sortie, "version", "", t.TempDir()); err != nil {
+	if _, err := command(&sortie, "version", "", t.TempDir()); err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(sortie.String(), version) {
