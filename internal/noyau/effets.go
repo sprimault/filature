@@ -43,6 +43,34 @@ const (
 	EffetFinPartie         TypeEffet = "fin_partie"
 )
 
+// TypesEffets énumère le vocabulaire, dans l'ordre de sa déclaration.
+//
+// Le chargeur de greffons en a besoin pour refuser une primitive qu'il ne sait
+// pas appliquer. La liste vit ici et pas là-bas : une seconde énumération dans
+// un autre paquet se désynchroniserait au premier ajout, et un manifeste
+// parfaitement valide serait refusé sans qu'on comprenne pourquoi. Un test de
+// internal/qualite la compare aux constantes déclarées.
+func TypesEffets() []TypeEffet {
+	return []TypeEffet{
+		EffetDeplacer, EffetModifierPortee, EffetModifierMobilite,
+		EffetBloquerCase, EffetOuvrirCase, EffetRevelerTraces,
+		EffetRevelerPosition, EffetMarquerScene, EffetAnnulerRevelation,
+		EffetPartagerVue, EffetCouterResistance, EffetRendreResistance,
+		EffetEffacerTraces, EffetFermerZone, EffetOuvrirZone,
+		EffetScellerZone, EffetTeleporter, EffetDifferer, EffetFinPartie,
+	}
+}
+
+// TypeEffetConnu dit si une primitive fait partie du vocabulaire.
+func TypeEffetConnu(t TypeEffet) bool {
+	for _, connu := range TypesEffets() {
+		if connu == t {
+			return true
+		}
+	}
+	return false
+}
+
 // Cible désigne ce sur quoi un effet s'applique.
 type Cible string
 
@@ -56,6 +84,25 @@ const (
 	CibleCase        Cible = "case"
 	CibleZone        Cible = "zone"
 )
+
+// Cibles énumère les cibles du vocabulaire, pour la même raison que
+// TypesEffets.
+func Cibles() []Cible {
+	return []Cible{
+		CiblePionCourant, CibleTousPions, CibleAutrePion,
+		CibleFugitif, CibleCase, CibleZone,
+	}
+}
+
+// CibleConnue dit si une cible fait partie du vocabulaire.
+func CibleConnue(c Cible) bool {
+	for _, connue := range Cibles() {
+		if connue == c {
+			return true
+		}
+	}
+	return false
+}
 
 // Effet est une primitive paramétrée. Les champs inutiles restent à zéro : un
 // enregistrement plat se sérialise et se journalise sans effort, contrairement

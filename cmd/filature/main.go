@@ -16,7 +16,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sprimault/filature/greffons"
+	livres "github.com/sprimault/filature/greffons"
+	"github.com/sprimault/filature/internal/greffons"
 )
 
 // version est injectée à la compilation par -ldflags.
@@ -37,6 +38,12 @@ func main() {
 		return
 	case "exemples":
 		if err := extraire(flag.Arg(1), *dossierGreffons); err != nil {
+			fmt.Fprintln(os.Stderr, "filature:", err)
+			os.Exit(1)
+		}
+		return
+	case "valide":
+		if err := valider(flag.Arg(1)); err != nil {
 			fmt.Fprintln(os.Stderr, "filature:", err)
 			os.Exit(1)
 		}
@@ -87,6 +94,28 @@ func greffonsParDefaut() string {
 	return filepath.Join(filepath.Dir(exe), "greffons")
 }
 
+// valider contrôle un greffon avant qu'il soit installé, et affiche son
+// empreinte quand il tient.
+//
+// L'empreinte est ce qu'un auteur publie à côté de son greffon : elle porte sur
+// le contenu et pas sur le numéro de version, donc elle distingue deux
+// « 1.2.0 » qui ne sont pas le même fichier.
+func valider(dossier string) error {
+	if dossier == "" {
+		return errors.New("usage: filature valide <dossier>")
+	}
+	if err := greffons.Valider(dossier); err != nil {
+		return err
+	}
+
+	somme, err := greffons.Empreinte(dossier)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%s: valide\nempreinte: %s\n", dossier, somme)
+	return nil
+}
+
 // executer assemble les dépendances et lance la boucle de jeu.
 func executer(heberger bool, rejoindre, greffons, partie string) error {
 	return fmt.Errorf("à implémenter : étape 5")
@@ -115,7 +144,7 @@ func extraire(dossier, actifs string) error {
 		return fmt.Errorf("%s est le dossier des greffons actifs : le contenu livré y serait déclaré deux fois", dossier)
 	}
 
-	return fs.WalkDir(greffons.Livres(), ".", func(chemin string, e fs.DirEntry, err error) error {
+	return fs.WalkDir(livres.Livres(), ".", func(chemin string, e fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -127,7 +156,7 @@ func extraire(dossier, actifs string) error {
 			return fmt.Errorf("%s existe deja", cible)
 		}
 
-		contenu, err := fs.ReadFile(greffons.Livres(), chemin)
+		contenu, err := fs.ReadFile(livres.Livres(), chemin)
 		if err != nil {
 			return err
 		}

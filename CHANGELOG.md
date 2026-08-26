@@ -28,6 +28,38 @@ de version sont ce que lit un auteur de greffon étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
+## [Non publié]
+
+### Ajouté
+- Chargement des greffons : capacités, dépenses et modes entrent au registre
+  depuis les manifestes. Le contenu livré emprunte le même chemin qu'un greffon
+  posé sur le disque, si bien qu'il est exercé à chaque démarrage.
+- Les refus de `docs/greffons.md` §9 sont appliqués : un champ inconnu, une
+  primitive que ce binaire ne sait pas appliquer, `regles = false` accompagné
+  d'une capacité, un `differer` imbriqué, un bot mêlé à des effets. Chacun
+  arrête le chargement entier en nommant le fichier et la clé fautive.
+- Empreinte de contenu par greffon, qui distingue deux greffons se disant
+  identiques sans l'être.
+- `filature valide <dossier>`, annoncée à la version 0.2.0 : le même contrôle
+  que le chargement, tous les manquements listés d'un coup avec leur fichier et
+  leur chemin de clé, et l'empreinte quand le greffon tient.
+
+***
+
+### Added
+- Plugin loading: abilities, expenses and modes now enter the registry from
+  manifests. Shipped content takes the same path as a plugin dropped on disk,
+  so that path is exercised on every start.
+- The refusals in `docs/greffons.md` §9 are enforced: an unknown field, a
+  primitive this binary cannot apply, `regles = false` alongside an ability, a
+  nested `differer`, a bot mixed with effects. Each aborts the whole load,
+  naming the file and the offending key.
+- Per-plugin content fingerprint, telling apart two plugins that claim to be
+  identical without being so.
+- `filature valide <folder>`, announced back in 0.2.0: the same checks the
+  loader runs, every failure listed at once with its file and key path, and the
+  fingerprint when the plugin holds.
+
 ## [0.4.0] — 2026-08-26 — La vision
 
 Étape 4 de la feuille de route. Le fugitif peut désormais être repéré : jusqu'à

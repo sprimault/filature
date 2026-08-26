@@ -3,7 +3,10 @@
 
 package noyau
 
-import "errors"
+import (
+	"fmt"
+	"sort"
+)
 
 // VersionEffets est la version du vocabulaire que ce binaire sait appliquer.
 //
@@ -105,6 +108,62 @@ type (
 // Fusionner ajoute un greffon au registre. Une clé déjà prise est un conflit,
 // pas un écrasement silencieux : deux greffons qui redéfinissent la même
 // capacité doivent faire échouer le chargement avec un message lisible.
+//
+// Les clés sont parcourues triées. L'ordre d'une map n'est pas stable en Go, et
+// il déciderait ici duquel de deux conflits l'utilisateur entend parler — donc
+// du message qu'il voit, qui changerait d'un lancement à l'autre.
 func (r *Registre) Fusionner(nom string, autre *Registre) error {
-	return errors.New("à implémenter : étape 8")
+	if autre == nil {
+		return nil
+	}
+
+	if err := fusionner(&r.Capacites, autre.Capacites, nom, "capacite"); err != nil {
+		return err
+	}
+	if err := fusionner(&r.Depenses, autre.Depenses, nom, "depense"); err != nil {
+		return err
+	}
+	if err := fusionner(&r.Modes, autre.Modes, nom, "mode"); err != nil {
+		return err
+	}
+	if err := fusionner(&r.Generateurs, autre.Generateurs, nom, "generateur"); err != nil {
+		return err
+	}
+	if err := fusionner(&r.Cerveaux, autre.Cerveaux, nom, "cerveau"); err != nil {
+		return err
+	}
+
+	r.Manifeste = append(r.Manifeste, autre.Manifeste...)
+	return nil
+}
+
+// fusionner verse une table dans une autre en refusant les clés déjà prises.
+//
+// La destination est un pointeur : un registre neuf a ses tables à nil, et les
+// initialiser au premier ajout évite de les construire pour les greffons qui
+// n'apportent rien de ce genre — la plupart, un dictionnaire n'ayant ni
+// capacité ni mode.
+func fusionner[T any, C comparable](vers *map[C]T, depuis map[C]T, greffon, genre string) error {
+	if len(depuis) == 0 {
+		return nil
+	}
+	if *vers == nil {
+		*vers = make(map[C]T, len(depuis))
+	}
+
+	cles := make([]C, 0, len(depuis))
+	for cle := range depuis {
+		cles = append(cles, cle)
+	}
+	sort.Slice(cles, func(i, j int) bool {
+		return fmt.Sprint(cles[i]) < fmt.Sprint(cles[j])
+	})
+
+	for _, cle := range cles {
+		if _, pris := (*vers)[cle]; pris {
+			return fmt.Errorf("greffon %s: la %s %v est deja definie", greffon, genre, cle)
+		}
+		(*vers)[cle] = depuis[cle]
+	}
+	return nil
 }
