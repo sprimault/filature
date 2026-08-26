@@ -105,6 +105,22 @@ func TestVueFugitifVoitTout(t *testing.T) {
 	}
 }
 
+// TestZoneNonScelleeResteAbsente vérifie que la sentinelle du noyau ne franchit
+// pas la vue.
+//
+// ZoneScellee vaut -1 tant que le fugitif n'a pas choisi. Le champ étant un
+// pointeur, l'omettre dit « pas encore choisie » ; le renseigner à -1 forcerait
+// chaque lecteur du JSON à connaître une valeur magique pour comprendre la
+// même chose.
+func TestZoneNonScelleeResteAbsente(t *testing.T) {
+	p := partieCachee()
+	p.Fugitif.ZoneScellee = -1
+
+	if v := p.VuePour(CampFugitif); v.ZoneScellee != nil {
+		t.Errorf("zone scellée %d alors qu'aucune ne l'est", *v.ZoneScellee)
+	}
+}
+
 // TestVueMontreLeFugitifRepere vérifie que la position sort quand il est vu.
 //
 // C'est ce qui distingue « caché » de « invisible » : le repérage a un effet

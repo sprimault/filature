@@ -99,11 +99,17 @@ func (p *Partie) VuePour(a Acteur) Vue {
 	// que s'il est repéré ou révélé, et sa zone jamais.
 	if a == CampFugitif {
 		position := p.Fugitif.Position
-		zone := p.Fugitif.ZoneScellee
 		resistance := p.Fugitif.Resistance
 		v.PositionFugitif = &position
-		v.ZoneScellee = &zone
 		v.Resistance = &resistance
+
+		// Tant qu'il n'a pas scellé, le champ reste absent plutôt que de
+		// porter la sentinelle du noyau : « -1 » ne veut rien dire pour qui
+		// lit le JSON, et l'omission dit exactement ce qui est vrai — le
+		// choix n'a pas été fait.
+		if zone := p.Fugitif.ZoneScellee; zone >= 0 {
+			v.ZoneScellee = &zone
+		}
 	} else if p.Fugitif.Visible {
 		position := p.Fugitif.Position
 		v.PositionFugitif = &position

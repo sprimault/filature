@@ -44,6 +44,10 @@ publié, et explique les conventions du dépôt à qui y contribue.
   que le chargement, tous les manquements listés d'un coup avec leur fichier et
   leur chemin de clé, et l'empreinte quand le greffon tient.
 
+### Corrigé
+- La vue du fugitif annonçait une zone scellée numéro -1 tant qu'il n'avait pas
+  choisi. Le champ reste maintenant absent, ce qui est ce qu'il faut lire.
+
 ***
 
 ### Added
@@ -59,6 +63,10 @@ publié, et explique les conventions du dépôt à qui y contribue.
 - `filature valide <folder>`, announced back in 0.2.0: the same checks the
   loader runs, every failure listed at once with its file and key path, and the
   fingerprint when the plugin holds.
+
+### Fixed
+- The fugitive's view reported a sealed zone numbered -1 until he had chosen
+  one. The field is now simply absent, which is what should be read.
 
 ## [0.4.0] — 2026-08-26 — La vision
 
