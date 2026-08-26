@@ -28,7 +28,31 @@ de version sont ce que lit un auteur de plugin étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
-## [Non publié]
+## [0.5.0] — 2026-08-26 — La boucle de jeu
+
+Étape 5 de la feuille de route. **Le binaire joue** : une partie se déroule
+entièrement en texte, du placement à la fin, contre un adversaire qui choisit au
+hasard parmi les coups légaux. Jusqu'ici le jeu se vérifiait en test ; il se
+vérifie maintenant en jouant, et une règle a déjà bougé pour cette raison.
+
+**`shapes_version` passe à 3 : les plugins d'apparence publiés sont à
+reprendre.** Deux couleurs entrent au socle obligatoire — `backdrop`, ce qu'on
+voit autour du plateau, et `marker_outline`, le contour des quatre marqueurs.
+Une palette qui ne les déclare pas est refusée.
+
+Le moteur pose désormais un liseré clair sous le contour des pions et des
+marqueurs, et encadre toute épaisseur de contour — jamais moins d'un pixel
+d'écran, jamais plus d'un sixième de la plus petite dimension du trait. Rien à
+déclarer, rien à retirer. En dessous de 24 pixels par case, le rendu ne garantit
+plus la lisibilité des pions et la vue défile plutôt que de réduire.
+
+Les faces d'un bâtiment sont dérivées de sa couleur par trois coefficients fixes
+— 1,50 pour le dessus, 1,14 et 0,72 pour les côtés — que le contrat énonce.
+
+**La validation de ce contrat n'est pas encore écrite** : `Validate` et `Merge`
+sont l'étape 6. Un plugin d'apparence peut donc être accepté aujourd'hui et
+refusé demain — `docs/contrat-formes.md` fait foi, pas ce que le binaire laisse
+passer.
 
 **Le jeu cherche ses extensions dans un dossier `plugins`**, à côté de
 l'exécutable, et non plus dans `greffons` — le renommer suffit. Le drapeau
@@ -103,6 +127,30 @@ Les faces d'un bâtiment sont dérivées de sa couleur par trois coefficients fi
   garder un.
 
 ***
+
+Step 5 of the roadmap. **The binary plays**: a game runs through entirely in
+text, from setup to the end, against an opponent picking at random among the
+legal moves. Until now the game was checked in tests; it is now checked by
+playing, and one rule has already moved because of it.
+
+**`shapes_version` goes to 3: published appearance plugins must be revisited.**
+Two colours join the required set — `backdrop`, what surrounds the board, and
+`marker_outline`, the outline of all four markers. A palette declaring neither
+is refused.
+
+The engine now lays a light rim beneath the outline of pieces and markers, and
+bounds every outline width — never below one screen pixel, never above one sixth
+of the stroke's smallest dimension. Nothing to declare, nothing to remove. Below
+24 pixels per tile, rendering no longer guarantees piece legibility and the view
+scrolls rather than shrinking further.
+
+A building's faces are derived from its colour by three fixed coefficients —
+1.50 for the top, 1.14 and 0.72 for the sides — which the contract states.
+
+**Validation of that contract is not written yet**: `Validate` and `Merge` are
+step 6. An appearance plugin may therefore be accepted today and refused
+tomorrow — `docs/contrat-formes.md` is what holds, not what the binary lets
+through.
 
 **The game looks for extensions in a `plugins` folder**, next to the executable,
 rather than in `greffons` — renaming it is enough. The `--plugins` flag replaces
