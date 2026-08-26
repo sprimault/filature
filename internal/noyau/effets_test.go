@@ -70,13 +70,40 @@ func partieDEssai() *Partie {
 
 // casEffet décrit une primitive à appliquer et ce qu'elle doit produire.
 type casEffet struct {
-	nom     string
+	nom string
+
+	// prepare pose l'état que la primitive exige pour agir. Une primitive qui
+	// n'a rien à défaire sort par une branche vide et ne prouve rien : c'est
+	// exactement ce qui a laissé ouvrir_zone sans couverture.
+	prepare func(*Partie)
+
 	effet   Effet
 	ctx     Contexte
 	verifie func(*testing.T, *Partie)
 }
 
-// tousLesCas couvre les dix-sept primitives du vocabulaire. Une primitive
+// partiePour monte une partie d'essai dans l'état qu'un cas réclame.
+func (c casEffet) partiePour() *Partie {
+	p := partieDEssai()
+	if c.prepare != nil {
+		c.prepare(p)
+	}
+	return p
+}
+
+// partieAvecPreparations monte une partie qui satisfait tous les cas à la fois,
+// pour ceux qui les enchaînent sur un même état.
+func partieAvecPreparations() *Partie {
+	p := partieDEssai()
+	for _, c := range tousLesCas() {
+		if c.prepare != nil {
+			c.prepare(p)
+		}
+	}
+	return p
+}
+
+// tousLesCas couvre les dix-neuf primitives du vocabulaire. Une primitive
 // absente d'ici est une primitive dont personne ne vérifie qu'elle se défait.
 func tousLesCas() []casEffet {
 	inspecteur := Contexte{Acteur: CampInspecteurs, Pion: 1}
@@ -245,6 +272,21 @@ func tousLesCas() []casEffet {
 			},
 		},
 		{
+			nom: "ouvrir_zone",
+			// Trois zones fermées et celle qu'on rouvre au milieu : c'est son
+			// rang qui compte. L'annulation doit la remettre entre 5 et 2, pas
+			// au bout — cet ordre part dans le journal, et un rejeu qui le
+			// retrouve différent n'est plus le même octet pour octet.
+			prepare: func(p *Partie) { p.ZonesFermees = []int{5, 1, 2} },
+			effet:   Effet{Type: EffetOuvrirZone, Cible: CibleZone},
+			ctx:     Contexte{Acteur: CampInspecteurs, Pion: 1, Zone: 1},
+			verifie: func(t *testing.T, p *Partie) {
+				if !reflect.DeepEqual(p.ZonesFermees, []int{5, 2}) {
+					t.Errorf("zones fermées %v, attendu [5 2]", p.ZonesFermees)
+				}
+			},
+		},
+		{
 			nom:   "sceller_zone",
 			effet: Effet{Type: EffetScellerZone, Cible: CibleZone},
 			ctx:   Contexte{Acteur: CampFugitif, Zone: 4},
@@ -291,7 +333,7 @@ func tousLesCas() []casEffet {
 func TestAppliquerEffets(t *testing.T) {
 	for _, cas := range tousLesCas() {
 		t.Run(cas.nom, func(t *testing.T) {
-			p := partieDEssai()
+			p := cas.partiePour()
 			annuler, err := p.Appliquer1Effet(cas.effet, cas.ctx)
 			if err != nil {
 				t.Fatalf("application refusée : %v", err)
@@ -313,8 +355,8 @@ func TestAppliquerEffets(t *testing.T) {
 func TestAnnulerRendLEtatIdentique(t *testing.T) {
 	for _, cas := range tousLesCas() {
 		t.Run(cas.nom, func(t *testing.T) {
-			p := partieDEssai()
-			avant := partieDEssai()
+			p := cas.partiePour()
+			avant := cas.partiePour()
 
 			annuler, err := p.Appliquer1Effet(cas.effet, cas.ctx)
 			if err != nil {
@@ -332,8 +374,12 @@ func TestAnnulerRendLEtatIdentique(t *testing.T) {
 // TestAnnulerEnChaine vérifie que plusieurs effets se défont dans l'ordre
 // inverse, ce dont les annulations qui tronquent une tranche dépendent.
 func TestAnnulerEnChaine(t *testing.T) {
-	p := partieDEssai()
-	avant := partieDEssai()
+	// Les préparations sont posées toutes ensemble avant la chaîne : appliquée
+	// entre deux effets, une préparation modifierait l'état sans annulation
+	// correspondante, et la comparaison finale échouerait sans qu'aucun effet
+	// soit en cause.
+	p := partieAvecPreparations()
+	avant := partieAvecPreparations()
 
 	var annulations []func()
 	for _, cas := range tousLesCas() {
