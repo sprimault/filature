@@ -22,6 +22,9 @@ type Settings struct {
 	RevealPeriod     int `json:"reveal_period"`
 	Zones            int `json:"zones"`
 	TrailLifetime    int `json:"trail_lifetime"`
+	Shelters         int `json:"shelters"`
+	ShelterGain      int `json:"shelter_gain"`
+	ShelterRecharge  int `json:"shelter_recharge"`
 	StranglingStart  int `json:"strangling_start"`
 	StranglingPeriod int `json:"strangling_period"`
 	ZonesLeftOpen    int `json:"zones_left_open"`
@@ -32,16 +35,24 @@ type Settings struct {
 // PiecesPerTurn.
 func DefaultSettings() Settings {
 	return Settings{
-		Size:             41,
-		Range:            8,
-		Turns:            40,
-		CentreRadius:     10,
-		Stamina:          10,
-		Inspectors:       5,
-		PiecesPerTurn:    3,
-		RevealPeriod:     4,
-		Zones:            6,
-		TrailLifetime:    6,
+		Size:          41,
+		Range:         8,
+		Turns:         40,
+		CentreRadius:  10,
+		Stamina:       10,
+		Inspectors:    5,
+		PiecesPerTurn: 3,
+		RevealPeriod:  4,
+		Zones:         6,
+		TrailLifetime: 6,
+		Shelters:      4,
+		ShelterGain:   2,
+
+		// Ne suit pas la taille du plateau, contrairement à la portée et à la
+		// durée : le nombre d'occasions de se ressourcer est déjà proportionnel
+		// à la durée par construction, et faire dériver le délai le rendrait
+		// constant. L'économie du fugitif est un système fermé.
+		ShelterRecharge:  8,
 		StranglingStart:  30,
 		StranglingPeriod: 4,
 		ZonesLeftOpen:    3,
@@ -118,6 +129,7 @@ type BoundedBoard struct {
 	cote   int
 	rues   []bool
 	zones  []Zone
+	abris  []Shelter
 	vues   map[Position][]Position
 }
 
@@ -150,8 +162,17 @@ func (b *BoundedBoard) validate(p Settings) error {
 	}
 
 	for _, z := range b.zones {
-		if !b.zoneReachable(z, atteintes) {
+		if !b.blockReachable(z.Cells, atteintes) {
 			return fmt.Errorf("la zone %d n'a aucune case praticable atteignable", z.Number)
+		}
+	}
+
+	// Les lieux au même titre que les zones : un lieu qu'on ne peut pas
+	// rejoindre est une source de résistance qui n'existe que sur le papier, et
+	// une case que les inspecteurs couvriraient pour rien.
+	for _, s := range b.abris {
+		if !b.blockReachable(s.Cells, atteintes) {
+			return fmt.Errorf("le lieu %d n'a aucune case praticable atteignable", s.Number)
 		}
 	}
 
@@ -224,12 +245,12 @@ func (b *BoundedBoard) firstStreet() (Position, bool) {
 	return Position{}, false
 }
 
-// zoneReachable dit si l'on peut entrer dans une zone.
+// blockReachable dit si l'on peut entrer dans un bloc, zone ou lieu.
 //
-// Une seule case suffit : le fugitif doit pouvoir s'y tenir, pas la walk
+// Une seule case suffit : le fugitif doit pouvoir s'y tenir, pas la parcourir
 // entière.
-func (b *BoundedBoard) zoneReachable(z Zone, atteintes map[Position]bool) bool {
-	for _, c := range z.Cells {
+func (b *BoundedBoard) blockReachable(cases []Position, atteintes map[Position]bool) bool {
+	for _, c := range cases {
 		if atteintes[c] {
 			return true
 		}
@@ -268,6 +289,10 @@ func (b *BoundedBoard) CellsWithin(centre Position, rayon int) []Position {
 
 // Zones renvoie les zones d'extraction, connues des deux camps dès le début.
 func (b *BoundedBoard) Zones() []Zone { return b.zones }
+
+// Shelters renvoie les lieux de ressourcement, connus des deux camps dès le
+// début : les inspecteurs doivent pouvoir les couvrir.
+func (b *BoundedBoard) Shelters() []Shelter { return b.abris }
 
 // Seed renvoie la graine dont ce plateau est issu.
 func (b *BoundedBoard) Seed() int64 { return b.graine }

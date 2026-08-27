@@ -30,6 +30,16 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**La résistance se récupère, sur quatre lieux du plateau.** Un lieu de
+ressourcement est un bloc au même format qu'une zone d'extraction, posé dans la
+couronne entre le noyau de départ et les sorties. Le fugitif y regagne deux
+points en fin de tour, et le lieu entier passe en recharge pour huit tours — les
+deux camps voyant lequel a servi et quand il revient. Il paie donc ses points en
+information, comme pour ses autres dépenses.
+
+**La trame de rues ne se resserre plus sur le dernier îlot.** Le quatrième bord
+était ajouté comme avenue sans regarder la distance au dernier axe tiré.
+
 **La capture entre dans le jeu.** Un inspecteur qui reste au contact du fugitif
 deux résolutions de suite le rattrape. En terrain ouvert celui-ci rompt le
 contact d'une diagonale ; dans un couloir d'une case il ne le peut pas, et le
@@ -83,6 +93,16 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Stamina can be recovered, at four places on the board.** A respite is a block
+in the same format as an extraction zone, set in the ring between the starting
+core and the exits. The fugitive regains two points there at the end of a turn,
+and the whole place goes into an eight-turn cooldown — both sides seeing which
+one was used and when it returns. He therefore pays for those points in
+information, as he does for every other expense.
+
+**The street grid no longer tightens on the last block.** The fourth edge was
+added as an avenue without checking its distance to the last drawn axis.
 
 **Capture enters the game.** An inspector who stays in contact with the fugitive
 across two resolutions catches him. In open ground the fugitive breaks contact

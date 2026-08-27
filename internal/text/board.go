@@ -30,6 +30,13 @@ const (
 	CarScene      = '!'
 	CarTrace      = '+'
 	CarInspecteur = 'A' // A, B, C… selon le rang du pion
+
+	// Un lieu de ressourcement se lit à la casse : disponible en majuscule,
+	// en recharge en minuscule. Il reste visible dans les deux états, parce
+	// que savoir où il est et quand il revient est ce que le fugitif paie en
+	// s'y arrêtant.
+	CarAbriActif      = 'R'
+	CarAbriEnRecharge = 'r'
 )
 
 // PieceLetter nomme un inspecteur par son rang, A pour le premier.
@@ -72,6 +79,21 @@ func Board(v core.View) string {
 	for _, z := range v.Zones {
 		for _, c := range z.Cells {
 			poser(c, rune('0'+z.Number%10))
+		}
+	}
+
+	// Les lieux après les zones, et sans risque de se marcher dessus : le
+	// générateur les pose dans la couronne intermédiaire, jamais sur l'anneau
+	// des zones. Actif ou en recharge se distingue à la casse, comme un feu
+	// qu'on voit éteint sans cesser de savoir où il est.
+	for i, s := range v.Shelters {
+		car := CarAbriActif
+		if i < len(v.ShelterReady) && v.ShelterReady[i] != core.ShelterActive &&
+			v.Turn < v.ShelterReady[i] {
+			car = CarAbriEnRecharge
+		}
+		for _, c := range s.Cells {
+			poser(c, car)
 		}
 	}
 	for cle := range v.KnownTrails {

@@ -186,6 +186,20 @@ func releve(p *core.Game) occupation {
 		}
 	}
 
+	// Les lieux après les zones : le générateur ne les fait pas se chevaucher,
+	// mais l'ordre décide si jamais un plugin de génération en décidait
+	// autrement.
+	for i, abri := range p.Board.Shelters() {
+		nom := "shelter_open"
+		if i < len(p.ShelterReady) && p.ShelterReady[i] != core.ShelterActive &&
+			p.Turn < p.ShelterReady[i] {
+			nom = "shelter_used"
+		}
+		for _, c := range abri.Cells {
+			o.sol[c] = nom
+		}
+	}
+
 	cote := p.Settings.Size
 	for c := range cote {
 		for r := range cote {

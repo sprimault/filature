@@ -22,6 +22,9 @@ func (b plateauNu) Zones() []Zone {
 	return []Zone{{Number: 0, Cells: []Position{{Column: 1, Row: 1}}}}
 }
 
+// Shelters reste vide : les effets se testent sans ressourcement.
+func (b plateauNu) Shelters() []Shelter { return nil }
+
 // Seed est figée : aucun test de ce fichier ne tire au sort.
 func (b plateauNu) Seed() int64 { return 1 }
 

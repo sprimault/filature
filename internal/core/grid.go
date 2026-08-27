@@ -89,7 +89,38 @@ func draw(graine int64, p Settings) *BoundedBoard {
 	b.punchCourtyards(NewRandom(graine, "courtyards"))
 	b.carveDeadEnds(NewRandom(graine, "deadends"))
 	b.placeZones(p.Zones)
+	b.placeShelters(p)
 	return b
+}
+
+// placeShelters pose les lieux de ressourcement, un par quadrant.
+//
+// Sur les diagonales et non sur les axes : les zones se répartissent
+// angulairement sur le périmètre, et deux des six tombent près des axes. Le
+// rayon vise le milieu de la couronne entre le noyau et l'anneau des zones,
+// avec un plancher juste au-dessus du noyau — sur le plus petit préréglage, la
+// couronne n'a qu'un rayon de libre, et c'est lui.
+//
+// Aucun tirage : comme pour les zones, la position se déduit de la géométrie et
+// le percement suit l'ordre de parcours. Un lieu placé au sort décalerait tous
+// les flux qui le suivent.
+func (b *BoundedBoard) placeShelters(p Settings) {
+	milieu := b.cote / 2
+	centre := Position{Column: milieu, Row: milieu}
+	rayon := max(p.CentreRadius+1, (p.CentreRadius+milieu-2)/2)
+
+	quadrants := []Position{
+		{Column: centre.Column + rayon, Row: centre.Row + rayon},
+		{Column: centre.Column + rayon, Row: centre.Row - rayon},
+		{Column: centre.Column - rayon, Row: centre.Row + rayon},
+		{Column: centre.Column - rayon, Row: centre.Row - rayon},
+	}
+
+	b.abris = make([]Shelter, 0, p.Shelters)
+	for i := 0; i < p.Shelters && i < len(quadrants); i++ {
+		coin := b.pullInside(quadrants[i])
+		b.abris = append(b.abris, Shelter{Number: i, Cells: b.carveBlock(coin)})
+	}
 }
 
 // traceAvenues ouvre des rues orthogonales à intervalle irrégulier.
@@ -308,14 +339,27 @@ func (b *BoundedBoard) pullInside(p Position) Position {
 // une zone est un lieu du plateau, et deux rejeux de la même graine doivent la
 // trouver identique.
 func (b *BoundedBoard) carveZone(numero int, centre Position) Zone {
+	return Zone{Number: numero, Cells: b.carveBlock(centre)}
+}
+
+// carveBlock découpe un bloc et l'ouvre assez pour qu'on puisse s'y tenir.
+//
+// Partagé par les zones et les lieux de ressourcement, et il le faut : deux
+// fonctions de percement finiraient par diverger sur le seuil, et c'est
+// l'identité de format qui fait qu'un joueur n'a rien de neuf à apprendre.
+//
+// Les cases sont ouvertes dans l'ordre de parcours du bloc, jamais au hasard :
+// un bloc est un lieu du plateau, et deux rejeux de la même graine doivent le
+// trouver identique.
+func (b *BoundedBoard) carveBlock(centre Position) []Position {
 	marge := ZoneSize / 2
-	zone := Zone{Number: numero, Cells: make([]Position, 0, ZoneSize*ZoneSize)}
+	cases := make([]Position, 0, ZoneSize*ZoneSize)
 
 	ouvertes := 0
 	for ligne := centre.Row - marge; ligne <= centre.Row+marge; ligne++ {
 		for colonne := centre.Column - marge; colonne <= centre.Column+marge; colonne++ {
 			c := Position{Column: colonne, Row: ligne}
-			zone.Cells = append(zone.Cells, c)
+			cases = append(cases, c)
 
 			if b.IsStreet(c) {
 				ouvertes++
@@ -327,7 +371,7 @@ func (b *BoundedBoard) carveZone(numero int, centre Position) Zone {
 			}
 		}
 	}
-	return zone
+	return cases
 }
 
 // open rend une case praticable, en ignorant ce qui est hors du plateau.

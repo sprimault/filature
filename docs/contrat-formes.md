@@ -296,6 +296,24 @@ roadblock = "#8a7a4a"
 crime_scene = "#9b2c2c"
 ```
 
+**Deux sols se distinguent d'abord par la luminance, la teinte ne vient
+qu'ensuite.** C'est la contrainte la plus facile à enfreindre de bonne foi :
+deux bruns qu'un écran calibré sépare très bien deviennent une seule couleur en
+niveaux de gris, sur un écran mal réglé, ou pour qui distingue mal les rouges et
+les verts. Un plateau se lit en balayant, jamais en comparant deux cases côte à
+côte — et c'est la luminance qui survit à ce balayage.
+
+La règle vaut d'autant plus que les sols sont nombreux. Une palette qui les
+range tous dans le tiers sombre de l'échelle les rend interchangeables, quelles
+que soient leurs teintes ; les écarter en luminosité coûte moins qu'un jeu de
+teintes savant, et se vérifie sur une capture désaturée.
+
+**L'écart se juge après le grain, pas sur les valeurs déclarées.** Le moteur
+déplace chaque case de sol de quelques pourcents (§8), donc deux couleurs
+séparées de douze niveaux de gris se recouvrent partiellement une fois posées
+sur le plateau. Lire la palette ne suffit pas : c'est le rendu qu'il faut
+regarder, ce que `filature preview` donne sans lancer le jeu.
+
 Les noms en `_detail` et `marker_outline` sont des **contours**, pas des nuances
 d'accompagnement, et c'est la contrainte la moins évidente de la palette. Une
 forme se pose indifféremment sur la rue, une zone ouverte ou une zone fermée,

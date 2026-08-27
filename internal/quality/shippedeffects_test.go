@@ -39,6 +39,9 @@ func (plateauPlat) Zones() []core.Zone {
 	return zones
 }
 
+// Shelters reste vide : ce sont les effets livrés qu'on exerce ici.
+func (plateauPlat) Shelters() []core.Shelter { return nil }
+
 // Seed est figée : ce test ne tire rien au sort.
 func (plateauPlat) Seed() int64 { return 1 }
 

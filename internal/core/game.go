@@ -111,6 +111,19 @@ type Game struct {
 
 	ClosedZones []int `json:"closed_zones"`
 
+	// ShelterReady dit, pour chaque lieu de ressourcement, le tour où il
+	// redevient actif — ShelterActive quand il l'est déjà.
+	//
+	// Une tranche indexée par numéro de lieu et non une map : leur nombre est
+	// fixe et connu à la génération, donc aucune entrée ne peut manquer, et le
+	// parcours d'une map n'a pas d'ordre stable en Go.
+	//
+	// Un tour de réactivation plutôt qu'un compteur qui décroît : il ne s'écrit
+	// qu'une fois, à la consommation, au lieu d'être décrémenté à chaque
+	// résolution — donc moins d'écritures à défaire. Et il s'affiche tel quel,
+	// puisque les deux camps voient quand le lieu revient.
+	ShelterReady []int `json:"shelter_ready"`
+
 	// LastContacts porte les pions qui étaient au contact du fugitif à la
 	// résolution précédente. C'est ce qui rend la capture possible : elle
 	// demande le même inspecteur deux fois de suite, et cette information ne se
@@ -155,6 +168,13 @@ type Game struct {
 	alea       *Random
 }
 
+// ShelterActive marque un lieu de ressourcement disponible.
+//
+// Une constante nommée plutôt que zéro : un numéro de tour vaut zéro avant que
+// la partie commence, et confondre les deux rendrait tous les lieux actifs au
+// tour où on ne les regarde pas encore.
+const ShelterActive = -1
+
 // NewGame prépare une partie au premier coup de placement.
 //
 // Le plateau est reçu, pas fabriqué. Le noyau applique des règles à un terrain,
@@ -180,6 +200,11 @@ func NewGame(plateau Board, graine int64, p Settings, r *Registry) (*Game, error
 		return nil, err
 	}
 
+	abris := make([]int, len(plateau.Shelters()))
+	for i := range abris {
+		abris[i] = ShelterActive
+	}
+
 	return &Game{
 		Seed:     graine,
 		Settings: p,
@@ -190,7 +215,8 @@ func NewGame(plateau Board, graine int64, p Settings, r *Registry) (*Game, error
 			Stamina:    p.Stamina,
 			SealedZone: -1,
 		},
-		Extensions: r,
+		ShelterReady: abris,
+		Extensions:   r,
 	}, nil
 }
 

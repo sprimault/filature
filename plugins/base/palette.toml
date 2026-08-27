@@ -14,11 +14,25 @@ shapes_version = 3
 
 [palette]
 
-# Le sol. Ces trois noms n'ont pas d'autre existence : rue et zones ne sont pas
+# Le sol. Ces noms n'ont pas d'autre existence : rue, zones et lieux ne sont pas
 # des formes, ce sont les seules prises qu'un plugin a sur le losange.
 street = "#d8d2c4"
 zone_open = "#7fa86b"
 zone_closed = "#6b4a4a"
+
+# Les lieux de ressourcement, sur le même couple clair / éteint que les zones,
+# dans une teinte brune : rien de neuf à apprendre pour un joueur qui sait déjà
+# lire une zone fermée.
+#
+# **shelter_used est à reprendre.** Il partage la luminosité de zone_closed à
+# neuf niveaux de gris près, donc les deux sont indiscernables en niveaux de
+# gris comme pour un daltonien — alors qu'ils disent le contraire l'un de
+# l'autre : une zone fermée est perdue, un lieu en recharge revient. La sortie
+# n'est pas dans la teinte, qui bute sur roadblock dès qu'on s'écarte, mais dans
+# la luminance : quatre sols sombres s'entassent entre 84 et 121 pendant que la
+# moitié haute de l'échelle est vide.
+shelter_open = "#b5895a"
+shelter_used = "#6b5a4a"
 
 # Ce qu'on voit autour du plateau. Bien plus sombre que le bâti, faute de quoi
 # les blocs du pourtour n'ont plus de silhouette et la ville se dissout sur ses

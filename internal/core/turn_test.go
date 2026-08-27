@@ -55,6 +55,89 @@ func TestContactsCapped(t *testing.T) {
 	}
 }
 
+// gameWithShelter monte une partie dont un lieu de ressourcement occupe le coin
+// haut-gauche, le fugitif posé où le cas le demande.
+func gameWithShelter(fugitif Position, inspecteurs ...Position) *Game {
+	b := grid(".....", ".....", ".....", ".....", ".....")
+	b.abris = []Shelter{{Number: 0, Cells: []Position{
+		{Column: 0, Row: 0}, {Column: 1, Row: 0}, {Column: 0, Row: 1},
+	}}}
+
+	p := gameOn(b, fugitif, inspecteurs...)
+	p.Extensions = testRegistry()
+	p.ShelterReady = []int{ShelterActive}
+	p.Fugitive.Stamina = 5
+
+	// Une partie assez longue pour qu'un lieu ait le temps de revenir : le
+	// préréglage d'un plateau de cinq cases ne dure que cinq tours, moins que
+	// la recharge.
+	p.Settings.Turns = 3 * p.Settings.ShelterRecharge
+	return p
+}
+
+// TestShelterRestoresThenRecharges vérifie qu'un lieu rend ses points une fois,
+// puis se tait le temps de sa recharge.
+func TestShelterRestoresThenRecharges(t *testing.T) {
+	p := gameWithShelter(Position{Column: 0, Row: 0})
+	depart := p.Turn
+
+	endTurn(t, p)
+	if p.Fugitive.Stamina != 5+p.Settings.ShelterGain {
+		t.Fatalf("résistance %d, attendu %d", p.Fugitive.Stamina, 5+p.Settings.ShelterGain)
+	}
+	if attendu := depart + p.Settings.ShelterRecharge; p.ShelterReady[0] != attendu {
+		t.Fatalf("recharge jusqu'au tour %d, attendu %d", p.ShelterReady[0], attendu)
+	}
+
+	// Le fugitif n'a pas bougé : le lieu ne doit plus rien rendre.
+	avant := p.Fugitive.Stamina
+	endTurn(t, p)
+	if p.Fugitive.Stamina != avant {
+		t.Errorf("résistance %d, attendu %d : un lieu en recharge rend encore",
+			p.Fugitive.Stamina, avant)
+	}
+}
+
+// TestShelterComesBack vérifie qu'un lieu redevient actif au tour dit.
+//
+// C'est ce qui distingue la recharge de l'usage unique, et ce qui rend la
+// ressource disponible pour la percée finale plutôt que consommée trop tôt.
+func TestShelterComesBack(t *testing.T) {
+	p := gameWithShelter(Position{Column: 0, Row: 0})
+	endTurn(t, p)
+
+	avant := p.Fugitive.Stamina
+	p.Turn = p.ShelterReady[0]
+	endTurn(t, p)
+
+	if p.Fugitive.Stamina != avant+p.Settings.ShelterGain {
+		t.Errorf("résistance %d, attendu %d : le lieu n'est pas revenu",
+			p.Fugitive.Stamina, avant+p.Settings.ShelterGain)
+	}
+}
+
+// TestShelterIsNoSanctuary vérifie qu'un fugitif mis à zéro sur un lieu ne s'y
+// relève pas.
+//
+// Le ressourcement passe après les contacts, et il le faut : des inspecteurs
+// qui l'acculent dessus l'emportent, sans quoi le lieu serait un refuge où la
+// capture et l'épuisement n'ont plus de prise.
+func TestShelterIsNoSanctuary(t *testing.T) {
+	p := gameWithShelter(Position{Column: 0, Row: 0},
+		Position{Column: 1, Row: 0}, Position{Column: 0, Row: 1})
+	p.Fugitive.Stamina = 2
+
+	endTurn(t, p)
+
+	if p.Fugitive.Stamina > 0 {
+		t.Errorf("résistance %d, attendu au plus 0 : le lieu a servi de refuge",
+			p.Fugitive.Stamina)
+	}
+	if _, fini := p.Outcome(); !fini {
+		t.Error("la partie continue alors que la résistance est épuisée")
+	}
+}
+
 // TestSharedCellIsContact vérifie qu'un inspecteur sur la case du fugitif est
 // au contact.
 //

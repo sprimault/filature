@@ -15,6 +15,7 @@ type plateauTrame struct {
 	cote      string
 	batiments map[Position]bool
 	zones     []Zone
+	abris     []Shelter
 }
 
 // grid construit un plateau depuis un dessin, « # » pour un bâtiment.
@@ -44,6 +45,9 @@ func (b *plateauTrame) IsStreet(p Position) bool {
 
 // Zones renvoie les zones déclarées par le cas de test.
 func (b *plateauTrame) Zones() []Zone { return b.zones }
+
+// Shelters rend les lieux posés par le test, aucun par défaut.
+func (b *plateauTrame) Shelters() []Shelter { return b.abris }
 
 // Seed est figée : aucun test de ce fichier ne tire au sort.
 func (b *plateauTrame) Seed() int64 { return 1 }
