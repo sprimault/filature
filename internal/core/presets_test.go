@@ -102,6 +102,32 @@ func TestPresetRangeAndLengthFollowSize(t *testing.T) {
 	}
 }
 
+// TestStranglingFitsInTheEndgame vérifie que les fermetures tiennent dans ce
+// qui reste de la partie, sur chaque préréglage.
+//
+// Une période figée épuiserait la pression à mi-chemin sur une longue partie et
+// déborderait la fin sur une courte : l'entonnoir doit pousser jusqu'au bout
+// sans mordre sur les tours qui restent pour conclure.
+func TestStranglingFitsInTheEndgame(t *testing.T) {
+	for _, p := range Presets() {
+		s := p.Settings
+		fermetures := s.Zones - s.ZonesLeftOpen
+		if fermetures < 1 {
+			t.Fatalf("%s : %d zones pour %d laissées ouvertes", p.Key, s.Zones, s.ZonesLeftOpen)
+		}
+
+		derniere := s.StranglingStart + (fermetures-1)*s.StranglingPeriod
+		if derniere > s.Turns-2 {
+			t.Errorf("%s : dernière fermeture au tour %d pour %d tours de jeu, "+
+				"il n'en reste pas assez pour conclure", p.Key, derniere, s.Turns)
+		}
+		if derniere <= s.StranglingStart {
+			t.Errorf("%s : les %d fermetures tombent toutes au tour %d",
+				p.Key, fermetures, derniere)
+		}
+	}
+}
+
 // TestValidateRejectsOversizedCentre vérifie qu'un noyau trop large est refusé
 // à la lecture du réglage plutôt qu'au premier placement impossible.
 //

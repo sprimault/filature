@@ -227,7 +227,7 @@ func TestFullGamePlaysOut(t *testing.T) {
 			t.Fatalf("graine %d : la partie s'arrête sans résultat", graine)
 		}
 		switch r.Reason {
-		case OutcomeExtraction, OutcomeStaminaSpent, OutcomeCornered, OutcomeTimeUp:
+		case OutcomeExtraction, OutcomeCaptured, OutcomeStaminaSpent, OutcomeCornered, OutcomeTimeUp:
 			motifs[r.Reason]++
 		default:
 			t.Errorf("graine %d : motif inattendu %q", graine, r.Reason)

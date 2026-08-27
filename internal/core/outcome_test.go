@@ -44,12 +44,42 @@ func TestExtractionTakesTwoTurns(t *testing.T) {
 	}
 }
 
-// TestInspectorNeutralisesZone est le cas limite de tests.md : extraction
-// interrompue par un inspecteur arrivant sur la zone.
+// TestExtractionBeatsCapture vérifie la règle de simultanéité : quand les deux
+// conditions tombent à la même résolution, celle du fugitif l'emporte.
 //
-// Camper est une stratégie valide — mais un inspecteur assis sur une zone est
-// un inspecteur qui ne cherche pas.
-func TestInspectorNeutralisesZone(t *testing.T) {
+// Les inspecteurs disposent de quatre voies de conclusion contre une seule au
+// fugitif. Faire tomber les égalités du côté des quatre refermerait l'unique
+// sans que personne l'ait décidé, et le fugitif n'aurait plus de raison de
+// tenter une zone tenue.
+func TestExtractionBeatsCapture(t *testing.T) {
+	p := gameWithZone(Position{Column: 4, Row: 4}, Position{Column: 4, Row: 3})
+
+	endTurn(t, p)
+	endTurn(t, p)
+
+	if !p.Fugitive.Captured {
+		t.Fatal("le contact tenu deux résolutions ne capture pas : le cas n'est plus simultané")
+	}
+	if p.Fugitive.TurnsInZone < TurnsToExtract {
+		t.Fatalf("compte d'extraction à %d, attendu %d : le cas n'est plus simultané",
+			p.Fugitive.TurnsInZone, TurnsToExtract)
+	}
+
+	r, fini := p.Outcome()
+	if !fini || r.Winner != SideFugitive || r.Reason != OutcomeExtraction {
+		t.Errorf("résultat %+v, attendu fugitif/extraction", r)
+	}
+}
+
+// TestOccupiedCellDoesNotNeutraliseZone vérifie qu'un inspecteur posté sur une
+// zone n'en retire qu'une case d'entrée.
+//
+// C'est l'inverse de ce que le jeu faisait : neutraliser la zone entière
+// donnait au camp le moyen de verrouiller les dernières sorties en fin de
+// partie, au moment précis où couvrir ne coûte plus rien puisqu'il n'y a plus
+// rien à chercher. Fermer une zone demande maintenant autant de pions qu'elle a
+// de cases de rue.
+func TestOccupiedCellDoesNotNeutraliseZone(t *testing.T) {
 	p := gameWithZone(Position{Column: 4, Row: 4}, Position{Column: 0, Row: 4})
 
 	endTurn(t, p)
@@ -57,15 +87,18 @@ func TestInspectorNeutralisesZone(t *testing.T) {
 		t.Fatalf("compte à %d, attendu 1", p.Fugitive.TurnsInZone)
 	}
 
-	// L'inspecteur se pose sur l'autre case de la zone scellée.
-	p.Inspectors[0].Position = Position{Column: 3, Row: 4}
+	// L'inspecteur se pose sur une autre case de la zone scellée, hors de
+	// portée de contact pour que seule l'occupation soit en cause.
+	p.Inspectors[0].Position = Position{Column: 2, Row: 4}
 	endTurn(t, p)
 
-	if p.Fugitive.TurnsInZone != 0 {
-		t.Errorf("compte à %d, attendu 0 : la zone est neutralisée", p.Fugitive.TurnsInZone)
+	if p.Fugitive.TurnsInZone != 2 {
+		t.Errorf("compte à %d, attendu 2 : une case occupée ne neutralise pas la zone",
+			p.Fugitive.TurnsInZone)
 	}
-	if _, fini := p.Outcome(); fini {
-		t.Error("la partie s'achève alors que la zone est occupée")
+	r, fini := p.Outcome()
+	if !fini || r.Reason != OutcomeExtraction {
+		t.Errorf("résultat %+v, attendu une extraction", r)
 	}
 }
 

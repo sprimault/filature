@@ -3,6 +3,8 @@
 
 package core
 
+import "slices"
+
 // Outcome clôt la partie. Reason sert à l'affichage et aux statistiques
 // d'équilibrage : savoir si les inspecteurs gagnent par épuisement ou par
 // blocage change ce qu'il faut corriger.
@@ -19,6 +21,7 @@ type Outcome struct {
 // effet fin_partie, dont le noyau ignore la condition.
 const (
 	OutcomeExtraction   = "extraction"
+	OutcomeCaptured     = "captured"
 	OutcomeStaminaSpent = "stamina_spent"
 	OutcomeCornered     = "fugitive_cornered"
 	OutcomeTimeUp       = "time_up"
@@ -37,9 +40,16 @@ const TurnsToExtract = 2
 // Outcome teste les conditions de fin. Le second retour distingue « partie en
 // cours » de « match nul », qui n'existe pas ici.
 //
-// L'ordre des tests est celui de la règle, et il compte : une extraction
-// achevée le tour où le temps s'épuise est une victoire du fugitif, pas un
-// temps écoulé.
+// **L'extraction se teste en premier, et c'est une règle et non un détail
+// d'implémentation** : les inspecteurs disposent de quatre voies de conclusion
+// contre une seule au fugitif, et faire tomber les égalités du côté des quatre
+// refermerait l'unique sans que personne l'ait décidé. Une extraction achevée
+// le tour où il est capturé, épuisé ou où le temps s'arrête est donc une
+// victoire du fugitif.
+//
+// La règle vaut telle quelle pour les conditions qu'un plugin ajouterait, à une
+// exception près, plus haut : une fin forcée l'emporte sur tout, le noyau ne
+// connaissant pas sa condition.
 func (p *Game) Outcome() (Outcome, bool) {
 	// Une fin forcée par un plugin l'emporte sur tout : le noyau ne connaît
 	// pas sa condition, il ne peut donc pas l'arbitrer contre les siennes.
@@ -49,6 +59,9 @@ func (p *Game) Outcome() (Outcome, bool) {
 
 	if p.Fugitive.TurnsInZone >= TurnsToExtract {
 		return Outcome{Winner: SideFugitive, Reason: OutcomeExtraction, Turn: p.Turn}, true
+	}
+	if p.Fugitive.Captured {
+		return Outcome{Winner: SideInspectors, Reason: OutcomeCaptured, Turn: p.Turn}, true
 	}
 	if p.Fugitive.Stamina <= 0 {
 		return Outcome{Winner: SideInspectors, Reason: OutcomeStaminaSpent, Turn: p.Turn}, true
@@ -60,6 +73,11 @@ func (p *Game) Outcome() (Outcome, bool) {
 	// Le blocage se constate au début de la phase du fugitif, et là seulement :
 	// plus tard dans son tour, l'absence de déplacement veut dire qu'il a déjà
 	// bougé, ce qui n'est pas la même chose.
+	//
+	// Depuis la capture, c'est un cas de terrain et non de poursuite : un
+	// fugitif entouré d'inspecteurs tombe par capture bien avant d'être à court
+	// de cases. Ce qui reste ici, ce sont les bâtiments et les barrages du
+	// Barreur, seuls capables de l'enfermer sans le toucher.
 	if p.Phase == PhaseFugitive && p.Fugitive.StepsTaken == 0 && p.fugitiveStuck() {
 		return Outcome{Winner: SideInspectors, Reason: OutcomeCornered, Turn: p.Turn}, true
 	}
@@ -82,28 +100,24 @@ func (p *Game) fugitiveStuck() bool {
 
 // extractionUnderway dit si le fugitif tient sa zone.
 //
-// Une zone occupée par un inspecteur est neutralisée : le compte ne démarre pas
-// et s'interrompt s'il était engagé. Camper est une stratégie valide — mais un
-// inspecteur assis sur une zone est un inspecteur qui ne cherche pas.
+// **Une zone ne se neutralise plus, ses cases s'occupent.** Un inspecteur posté
+// dessus n'en retire qu'une case d'entrée, puisque le fugitif ne peut pas y
+// venir — il n'y a donc rien à tester ici : s'il est sur la zone, sa case est
+// libre par construction.
 //
-// Une zone fermée par l'étranglement ne vaut pas mieux : le fugitif qui s'y
-// trouve doit repartir, et payer pour resceller ailleurs.
+// Ce qui était testé avant donnait au camp le moyen de verrouiller les
+// dernières sorties en fin de partie, au moment précis où couvrir ne coûte plus
+// rien puisqu'il n'y a plus rien à chercher. Fermer une zone demande maintenant
+// autant de pions qu'elle a de cases de rue, cinq au minimum.
+//
+// Une zone fermée par l'étranglement, elle, arrête bien le compte : le fugitif
+// qui s'y trouve doit repartir, et payer pour resceller ailleurs.
 func (p *Game) extractionUnderway() bool {
 	zone, existe := p.sealedZone()
 	if !existe || !zone.Contains(p.Fugitive.Position) {
 		return false
 	}
-	for _, ferme := range p.ClosedZones {
-		if ferme == zone.Number {
-			return false
-		}
-	}
-	for _, i := range p.Inspectors {
-		if zone.Contains(i.Position) {
-			return false
-		}
-	}
-	return true
+	return !slices.Contains(p.ClosedZones, zone.Number)
 }
 
 // sealedZone retrouve la zone que le fugitif vise.
@@ -152,9 +166,14 @@ func (p *Game) zoneToStrangle() (int, bool) {
 		return 0, false
 	}
 
+	// L'étranglement s'arrête à ZonesLeftOpen : il doit créer un rendez-vous,
+	// pas un verrou. Avec une seule issue il n'y a plus d'arbitrage et le camp
+	// entier s'y assied ; à trois, couvrir demande de se diviser, et se diviser
+	// coûte la masse qui capture.
 	ordre := p.stranglingOrder()
+	fermetures := len(ordre) - p.Settings.ZonesLeftOpen
 	rang := (p.Turn - debut) / periode
-	if rang >= len(ordre) {
+	if fermetures <= 0 || rang >= fermetures {
 		return 0, false
 	}
 	return ordre[rang], true

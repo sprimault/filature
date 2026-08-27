@@ -99,8 +99,8 @@ règles ajoutant une dépense est utilisable par un bot qui l'ignore.
 {"type":"fin","winner":"fugitive","reason":"extraction","turn":34}
 ```
 
-Le jeu de base produit quatre motifs : `extraction`, `resistance_epuisee`,
-`fugitif_bloque`, `temps_ecoule`. **La liste n'est pas fermée** — un plugin de
+Le jeu de base produit cinq motifs : `extraction`, `captured`, `stamina_spent`,
+`fugitive_cornered`, `time_up`. **La liste n'est pas fermée** — un plugin de
 règles qui invente une condition de victoire produit son propre motif, et un bot
 qui ne le connaît pas l'a appris dans `bonjour`, qui annonce les plugins
 actifs. Traiter le champ comme une chaîne, jamais comme une énumération.

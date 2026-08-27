@@ -34,12 +34,16 @@ type View struct {
 	// Stamina n'est renseignée que pour le fugitif.
 	//
 	// Un pointeur et non un entier : à zéro, le champ dirait qu'il est mort au
-	// lieu de dire qu'on n'en sait rien. Les inspecteurs comptent les contacts
-	// qu'ils infligent et apprennent qu'un silence a été payé — c'est tout, et
-	// c'est ce que la règle leur accorde. Montrer le solde rendrait cette
-	// annonce inutile, et leur livrerait par la bande chaque dépense du
-	// fugitif : une baisse de deux sans contact ne peut être qu'un double
-	// déplacement ou un changement de zone.
+	// lieu de dire qu'on n'en sait rien.
+	//
+	// Ce que les inspecteurs apprennent de sa jauge tient à deux choses : les
+	// contacts qu'ils infligent **quand ils le voient**, et l'annonce d'un
+	// silence payé. Rien ne le leur dit autrement — un contact infligé à un
+	// fugitif caché ne leur est pas signalé, sans quoi ils le localiseraient à
+	// une case près sans l'avoir vu. Montrer le solde rendrait l'annonce
+	// inutile et leur livrerait par la bande chaque dépense : une baisse de
+	// deux sans contact ne peut être qu'un double déplacement ou un changement
+	// de zone.
 	Stamina *int `json:"stamina,omitempty"`
 
 	// KnownTrails ne contient que ce que les inspecteurs ont effectivement
@@ -77,13 +81,19 @@ type View struct {
 // intérêt.
 func (p *Game) ViewFor(a Side) View {
 	v := View{
-		Side:             a,
-		Turn:             p.Turn,
-		Phase:            p.Phase,
-		Settings:         p.Settings,
-		Streets:          list(p.knownStreets()),
-		Zones:            list(p.seenZones()),
-		Roadblocks:       list(p.barrages()),
+		Side:       a,
+		Turn:       p.Turn,
+		Phase:      p.Phase,
+		Settings:   p.Settings,
+		Streets:    list(p.knownStreets()),
+		Zones:      list(p.seenZones()),
+		Roadblocks: list(p.barrages()),
+		// Recopie de structure, et c'est le seul endroit où elle est admise :
+		// tout est public chez un inspecteur. Le corollaire est un piège —
+		// **tout champ ajouté à Inspector devient visible des deux camps sans
+		// que personne ne l'ait décidé.** Ce qui dépend de la position du
+		// fugitif ne vit donc pas dans Inspector mais dans Game, hors de ce qui
+		// se recopie : voir LastContacts.
 		Inspectors:       list(append([]Inspector(nil), p.Inspectors...)),
 		KnownTrails:      p.trailsFor(a),
 		CrimeScenes:      list(append([]CrimeScene(nil), p.CrimeScenes...)),

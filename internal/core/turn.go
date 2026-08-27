@@ -3,6 +3,8 @@
 
 package core
 
+import "slices"
+
 // PlafondContacts borne la perte de résistance d'un seul tour.
 //
 // Être encerclé doit faire très mal sans être instantanément fatal : sans
@@ -18,11 +20,17 @@ const PlafondContacts = 3
 // de fin, et l'extraction se compte en dernier pour qu'une zone fermée à
 // l'instant interrompe le compte du tour même. Le changer change le jeu,
 // silencieusement.
+//
+// La capture se constate ici et non dans Outcome, pour la même raison que la
+// visibilité : elle dépend d'un instant précis. Comparée à la demande, elle
+// vaudrait dès qu'un inspecteur déjà au contact reste où il est, sans laisser
+// au fugitif la phase que la règle lui accorde pour s'écarter.
 func (p *Game) resolveTurnEnd() []func() {
 	var defaire []func()
 	for _, etape := range []func() []func(){
 		p.recomputeSpotting,
 		p.takeContacts,
+		p.checkCapture,
 		p.dropTrails,
 		p.wipeOldTrails,
 		p.revealIfDue,
@@ -76,27 +84,64 @@ func (p *Game) occupiedCells() map[Position]bool {
 	return occupees
 }
 
-// takeContacts retire au fugitif un point par inspecteur adjacent.
+// takeContacts retire au fugitif un point par inspecteur au contact.
 func (p *Game) takeContacts() []func() {
-	perte := p.contacts()
+	perte := min(len(p.contacting()), PlafondContacts)
 	if perte == 0 {
 		return nil
 	}
 	return []func(){p.adjustStamina(-perte)}
 }
 
-// contacts compte les inspecteurs orthogonalement adjacents au fugitif.
+// checkCapture constate la capture, puis retient les contacts du tour.
 //
-// Les diagonales ne comptent pas : elles font du fugitif un pion plus rapide,
-// pas un pion plus vulnérable. Le total est plafonné par PlafondContacts.
-func (p *Game) contacts() int {
-	n := 0
-	for _, i := range p.Inspectors {
-		if ManhattanDistance(i.Position, p.Fugitive.Position) == 1 {
-			n++
+// Un même inspecteur à deux résolutions consécutives capture. Un seul suffit :
+// en terrain ouvert le fugitif rompt le contact d'une diagonale, qui porte la
+// distance orthogonale de un à trois quand le poursuivant n'en regagne qu'un.
+// Ce qui se maintient, c'est le talonnage dans un couloir d'une case — et c'est
+// là que le double déplacement redevient une dépense de survie.
+func (p *Game) checkCapture() []func() {
+	actuels := p.contacting()
+
+	pris := false
+	for _, i := range actuels {
+		if slices.Contains(p.LastContacts, i) {
+			pris = true
+			break
 		}
 	}
-	return min(n, PlafondContacts)
+
+	precedents, precedentPris := p.LastContacts, p.Fugitive.Captured
+	p.LastContacts = actuels
+	p.Fugitive.Captured = p.Fugitive.Captured || pris
+
+	return []func(){func() {
+		p.LastContacts = precedents
+		p.Fugitive.Captured = precedentPris
+	}}
+}
+
+// contacting rend les pions au contact du fugitif, dans l'ordre du camp.
+//
+// Un inspecteur est au contact s'il occupe la case du fugitif ou une case
+// orthogonalement adjacente. Les diagonales ne comptent pas : elles font du
+// fugitif un pion plus rapide, pas un pion plus vulnérable.
+//
+// La case commune en fait partie, et il le faut : rien n'interdit à un
+// inspecteur de marcher sur un fugitif caché, et l'en empêcher lui apprendrait
+// où il est. Un pion à distance nulle qui ne compterait pour rien serait le
+// seul du plateau à ne rien faire de sa position.
+//
+// Qui et non combien : la capture demande le même inspecteur à deux
+// résolutions consécutives, donc leur identité, pas leur nombre.
+func (p *Game) contacting() []int {
+	var pions []int
+	for i := range p.Inspectors {
+		if ManhattanDistance(p.Inspectors[i].Position, p.Fugitive.Position) <= 1 {
+			pions = append(pions, i)
+		}
+	}
+	return pions
 }
 
 // dropTrails marked les cases que le fugitif a quittées ce tour.
