@@ -82,9 +82,8 @@ type View struct {
 // premiers font le jeu ; la quatrième se déduit largement, les contacts et les
 // silences payés étant annoncés, mais elle ne se donne pas pour autant.
 //
-// Ce qui est caché au fugitif : les cases que les inspecteurs surveillent —
-// docs/regles.md §6 les lui promet, et le lot de la couverture adverse les lui
-// rendra.
+// Rien n'est caché au fugitif : il voit tout de lui-même, et les cases
+// surveillées lui reviennent comme aux inspecteurs.
 //
 // Ne pas écrire ici « n'est caché que ceci » : l'énumération a été fausse d'un
 // terme pendant quatre mois, et du côté qui fuit — qui suit « tout le reste est
@@ -114,7 +113,7 @@ func (p *Game) ViewFor(a Side) View {
 		// ailleurs ; le test, si.
 		Inspectors:       list(append([]Inspector(nil), p.Inspectors...)),
 		KnownTrails:      p.trailsFor(a),
-		CasesVisibles:    list(p.visibleCellsFor(a)),
+		CasesVisibles:    list(p.visibleCellsFor()),
 		LegalMoves:       list(p.LegalMoves(a)),
 		ProchaineReveal:  p.nextReveal(),
 		SilencePaye:      p.Fugitive.SilenceBought,
@@ -234,22 +233,20 @@ func (p *Game) trailsFor(a Side) map[string]Trail {
 	return connues
 }
 
-// visibleCellsFor rend ce que le camp voit du terrain.
+// visibleCellsFor rend les cases que les inspecteurs surveillent.
 //
-// Les inspecteurs voient depuis chacun de leurs pions. Le fugitif n'a pas de
-// vision propre dans les règles : il sait s'il est repéré, pas ce que l'autre
-// couvre.
+// **Les deux camps la reçoivent**, et docs/regles.md §6 le veut ainsi : les
+// positions des pions sont déjà publiques et leurs lignes de vue s'en déduisent,
+// donc l'afficher ne livre rien qui ne soit calculable. Les cacher ferait
+// reposer l'équilibre sur la fatigue du joueur, quand son adversaire machine
+// refait ce calcul entier à chaque coup.
 //
 // La table du plateau ne connaît que le terrain : elle donne les candidats, et
 // IsVisible tranche. Sans ce second passage, la vue annoncerait des cases
 // situées derrière un collègue ou un barrage, qu'au même instant le fugitif ne
 // serait pas repéré d'occuper — deux réponses contradictoires à la même
 // question, dont l'une part sur le réseau.
-func (p *Game) visibleCellsFor(a Side) []Position {
-	if a == SideFugitive {
-		return nil
-	}
-
+func (p *Game) visibleCellsFor() []Position {
 	occupees := p.occupiedCells()
 	vues := map[Position]bool{}
 	for i := range p.Inspectors {
