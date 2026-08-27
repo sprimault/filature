@@ -30,6 +30,22 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le protocole de bot passe à la version 3, tout en anglais.** Ses six types de
+message étaient en français sauf un, que le document et le schéma nommaient
+d'ailleurs différemment : un auteur de bot ne pouvait deviner ni la règle ni
+l'exception. Ils sont désormais `hello`, `ready`, `play`, `move`, `over` et
+`error`, comme tous les identifiants publics du projet. Un bot qui annonce une
+autre version est écarté dès sa réponse à `hello`, sur un message qui porte les
+deux numéros.
+
+**Les trois numéros de contrat concordent à nouveau avec ce que le code
+applique.** Le schéma de manifeste figeait `effects_version` à 1 quand le noyau
+appliquait la 2, et celui du protocole restait à 1 dans ses deux messages. Le
+même schéma annonçait quatre motifs de fin francisés là où le jeu en produit
+cinq en anglais, et sa clause conditionnelle sur les effets différés testait un
+nom de primitive qui n'existe pas — elle refusait donc la seule forme valide de
+celle qu'elle prétendait contraindre.
+
 **Les cinq sols entrent tous dans le contrat d'apparence.** Les deux couleurs
 des lieux de ressourcement étaient livrées dans la palette sans être exigées
 d'un plugin : une palette tierce qui les omettait était acceptée, et le rendu
@@ -125,6 +141,21 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The bot protocol moves to version 3, entirely in English.** Its six message
+types were in French except one, which the document and the schema happened to
+name differently: a bot author could guess neither the rule nor the exception.
+They are now `hello`, `ready`, `play`, `move`, `over` and `error`, like every
+other public identifier in the project. A bot announcing any other version is
+turned away on its answer to `hello`, with both numbers in the message.
+
+**The three contract numbers agree again with what the code applies.** The
+manifest schema pinned `effects_version` to 1 while the core applied 2, and the
+protocol schema stayed at 1 in both its messages. That same schema announced
+four French end reasons where the game produces five English ones, and its
+conditional clause on deferred effects tested a primitive name that does not
+exist — so it rejected the only valid form of the very primitive it claimed to
+constrain.
 
 **All five grounds are now part of the appearance contract.** The two respite
 colours shipped in the palette without being required of a plugin: a

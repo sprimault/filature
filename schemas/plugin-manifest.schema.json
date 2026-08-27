@@ -23,7 +23,7 @@
     "effects_version": {
       "type": "integer",
       "enum": [
-        1
+        2
       ],
       "description": "Version du vocabulaire d'effets visee. Obligatoire des qu'une capacite, une depense ou un mode est declare."
     },
@@ -351,9 +351,9 @@
             "properties": {
               "type": {
                 "not": {
-                  "const": "differer"
+                  "const": "defer"
                 },
-                "description": "Toute primitive sauf differer."
+                "description": "Toute primitive sauf defer : un differe ne se differe pas lui-meme."
               }
             }
           }
@@ -364,7 +364,7 @@
           "if": {
             "properties": {
               "type": {
-                "const": "differer"
+                "const": "defer"
               }
             },
             "required": [
