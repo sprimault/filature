@@ -224,6 +224,19 @@ func TestChiefSharesView(t *testing.T) {
 		"son camp voit.")
 }
 
+// TestShelterNeedsEntering vérifie qu'un fugitif immobile sur un lieu ne se
+// ressource pas à chaque recharge.
+//
+// docs/regles.md §5 et §7 : le ressourcement se déclenche en entrant, pas en
+// s'y tenant. Autrement c'est la récupération à l'immobilité, écartée au §2
+// parce qu'elle récompense le campement.
+func TestShelterNeedsEntering(t *testing.T) {
+	t.Skip("MECANIQUE INERTE : useShelter (internal/core/turn.go) teste la " +
+		"présence du fugitif sur le lieu, pas son entrée. Un fugitif qui ne " +
+		"bouge pas y regagne deux points à chaque recharge — mesuré sur " +
+		"Quartier : 10 au tour 1, puis 12, 14, 16 aux tours 1, 9 et 17.")
+}
+
 // TestInertMechanicsAreCounted garde le compte des mécaniques inertes visible.
 //
 // Un test rouge fait mal et se corrige ; un test qui se saute passe inaperçu, et
@@ -241,7 +254,7 @@ func TestChiefSharesView(t *testing.T) {
 // silencieux — il lui faut une constante en face pour qu'une dette ajoutée ou
 // levée sans être déclarée fasse rougir la suite.
 func TestInertMechanicsAreCounted(t *testing.T) {
-	const attendues = 6
+	const attendues = 7
 
 	source, err := os.ReadFile("conformance_test.go")
 	if err != nil {
