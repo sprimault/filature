@@ -59,8 +59,7 @@ ajouter une, vérifier que la composition des existantes ne suffit pas.
 |---|---|---|
 | `change_range` | `target`, `value`, `duration` | Modifie la portée de vue |
 | `reveal_position` | `target` | Rend une position publique ce tour |
-| `cancel_reveal` | `target` | Neutralise la prochaine révélation périodique |
-| `share_view` | `target`, `duration` | Un pion voit ce que voit un autre |
+| `cancel_reveal` | `target` | Neutralise les révélations provoquées par les inspecteurs, pour le tour |
 | `reveal_trails` | `target`, `radius` | Découvre les traces dans le rayon, en distance de Manhattan |
 | `erase_trails` | `target`, `duration` | Supprime les traces plus récentes que `duration` tours |
 | `decoy_trail` | `target` | Substitue aux traces du tour une seule, fausse |
@@ -195,8 +194,9 @@ Une cible incompatible avec le camp déclarant est refusée au chargement : une
 capacité d'inspecteur ne cible pas `fugitive` pour lui rendre de la résistance.
 
 `other_piece` est la seule cible qui en désigne deux : celui qui déclenche et
-celui qui subit. Le Chef, qui voit à travers un coéquipier, en est le seul usage
-livré.
+celui qui subit. **Aucune capacité livrée ne l'emploie** depuis que le Chef force
+une révélation au lieu de partager une vue — elle reste au contrat pour les
+plugins, et le noyau sait la lire.
 
 ---
 

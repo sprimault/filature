@@ -101,6 +101,20 @@ func finirLeTour(t *testing.T, p *core.Game) {
 	}
 }
 
+// finirLaPhase rend la main du camp qui l'a, sans résoudre le tour.
+func finirLaPhase(t *testing.T, p *core.Game) {
+	t.Helper()
+	for _, c := range p.LegalMoves(campDe(p.Phase)) {
+		if c.Type == core.MoveEndPhase {
+			if err := p.Apply(c); err != nil {
+				t.Fatalf("fin de phase : %v", err)
+			}
+			return
+		}
+	}
+	t.Fatalf("aucune fin de phase possible en %s", p.Phase)
+}
+
 // TestStranglingActuallyCloses vérifie que l'étranglement ferme réellement une
 // zone, sur le contenu livré.
 //
@@ -446,20 +460,63 @@ func TestBotProtocolIsCheckedAtHandshake(t *testing.T) {
 		"manque et non qu'une promesse du contrat n'est pas tenue.")
 }
 
-// TestChiefSharesView vérifie que la vue partagée du Chef entre réellement dans
-// ce que son camp voit.
+// TestChiefForcesAReveal vérifie que la capacité du Chef rend la position du
+// fugitif publique, deux tours après son déclenchement.
 //
-// docs/regles.md §9 : « Voit ce que voit un autre inspecteur pendant deux
-// tours ».
-func TestChiefSharesView(t *testing.T) {
-	t.Skip("MECANIQUE INERTE : la capacité n'a pas de sens dans le modèle de " +
-		"vue actuel, et ce n'est donc pas un branchement à faire. " +
-		"visibleCellsFor unit déjà les vues des cinq pions, et recomputeSpotting " +
-		"fait de même pour le repérage : le camp voit déjà tout ce que chacun " +
-		"voit, donc « voir ce que voit un autre » n'ajoute rien. SharedViewOf " +
-		"n'a pas d'appelant parce qu'il n'en existe pas de possible. À trancher " +
-		"dans docs/regles.md §9 : vue individuelle, autre capacité, ou pas de " +
-		"Chef.")
+// docs/regles.md §9. La capacité partageait auparavant la vue d'un coéquipier,
+// ce qui ne voulait rien dire : les cinq inspecteurs sont un joueur unique et
+// ViewFor unit déjà ce que chacun voit. Elle a été écrite contre un modèle
+// d'information que le jeu n'a jamais eu.
+//
+// Le préavis fait partie de la mécanique : une révélation immédiate ne se
+// contrerait pas, le Silence s'achetant avant de savoir.
+func TestChiefForcesAReveal(t *testing.T) {
+	p := partieLivree(t, "district")
+
+	chef := -1
+	for i := range p.Inspectors {
+		if p.Inspectors[i].Ability == "chief" {
+			chef = i
+		}
+	}
+	if chef < 0 {
+		t.Fatal("aucun pion ne porte la capacité chief : le contenu livré a changé")
+	}
+
+	declenche := p.Turn
+	joue := false
+	for _, c := range p.LegalMoves(core.SideInspectors) {
+		if c.Type == core.MoveAbility && c.Piece == chef {
+			if err := p.Apply(c); err != nil {
+				t.Fatalf("capacité du Chef : %v", err)
+			}
+			joue = true
+			break
+		}
+	}
+	if !joue {
+		t.Fatal("la capacité du Chef n'est proposée à aucun coup légal")
+	}
+
+	// Annoncée aux deux camps dès le déclenchement : c'est ce qui laisse au
+	// fugitif le temps de fuir ou de payer.
+	if len(p.ViewFor(core.SideFugitive).AnnouncedEffects) == 0 {
+		t.Error("la révélation n'est pas annoncée au fugitif")
+	}
+
+	// Le coup de filet tombe au tour où la capacité a été jouée, plus le
+	// préavis : il faut donc résoudre ce tour-là, pas seulement l'atteindre.
+	const preavis = 2
+	echeance := declenche + preavis
+	for p.Turn <= echeance && p.Phase != core.PhaseOver {
+		p.Fugitive.Visible = false
+		finirLeTour(t, p)
+	}
+
+	if !p.Fugitive.Visible {
+		t.Errorf("le fugitif n'est pas révélé au tour %d, %d tours après le coup de filet",
+			echeance, preavis)
+	}
 }
 
 // TestShelterNeedsEntering vérifie qu'un fugitif immobile sur un lieu ne se
@@ -513,7 +570,7 @@ func TestShelterNeedsEntering(t *testing.T) {
 // silencieux — il lui faut une constante en face pour qu'une dette ajoutée ou
 // levée sans être déclarée fasse rougir la suite.
 func TestInertMechanicsAreCounted(t *testing.T) {
-	const attendues = 3
+	const attendues = 2
 
 	source, err := os.ReadFile("conformance_test.go")
 	if err != nil {
@@ -532,5 +589,84 @@ func TestInertMechanicsAreCounted(t *testing.T) {
 	}
 	if n > 0 {
 		t.Logf("%d mécanique(s) encore inerte(s)", n)
+	}
+}
+
+// TestSilenceCoversTheWholeTurn vérifie qu'un silence acheté neutralise toutes
+// les révélations du tour, pas seulement la première.
+//
+// Le fugitif paie avant que les inspecteurs jouent : il ne peut pas prévoir
+// qu'un coup de filet tombera le même tour que la révélation périodique. Le
+// faire payer deux fois pour cette coïncidence serait une punition, pas un
+// arbitrage.
+//
+// La coïncidence est obtenue en jouant, pas en posant un effet en attente : le
+// Chef est déclenché au tour qui place son échéance sur une révélation
+// périodique. Un test qui construirait la file lui-même n'exercerait pas le
+// chemin qui la remplit — c'est ainsi qu'une mécanique reste morte sous des
+// tests verts.
+func TestSilenceCoversTheWholeTurn(t *testing.T) {
+	p := partieLivree(t, "district")
+
+	const preavis = 2
+	echeance := p.Settings.RevealPeriod
+	if echeance <= preavis {
+		t.Skipf("periode de revelation de %d tours : trop courte pour que les deux coincident", echeance)
+	}
+
+	// Avancer jusqu'au tour d'où le coup de filet tombe sur la révélation.
+	for p.Turn < echeance-preavis && p.Phase != core.PhaseOver {
+		finirLeTour(t, p)
+	}
+
+	chef := -1
+	for i := range p.Inspectors {
+		if p.Inspectors[i].Ability == "chief" {
+			chef = i
+		}
+	}
+	joue := false
+	for _, c := range p.LegalMoves(core.SideInspectors) {
+		if c.Type == core.MoveAbility && c.Piece == chef {
+			if err := p.Apply(c); err != nil {
+				t.Fatalf("capacité du Chef : %v", err)
+			}
+			joue = true
+			break
+		}
+	}
+	if !joue {
+		t.Fatal("la capacité du Chef n'est proposée à aucun coup légal")
+	}
+
+	// Le fugitif paie son silence pendant sa phase, sans savoir que les deux
+	// révélations tomberont ensemble.
+	for p.Phase == core.PhaseInspectors {
+		finirLaPhase(t, p)
+	}
+	achete := false
+	for _, c := range p.LegalMoves(core.SideFugitive) {
+		if c.Type == core.MoveExpense && c.Expense == core.ExpenseSilence {
+			if err := p.Apply(c); err != nil {
+				t.Fatalf("silence : %v", err)
+			}
+			achete = true
+			break
+		}
+	}
+	if !achete {
+		t.Fatal("le silence n'est proposé à aucun coup légal")
+	}
+
+	for p.Turn <= echeance && p.Phase != core.PhaseOver {
+		p.Fugitive.Visible = false
+		finirLeTour(t, p)
+	}
+
+	if p.Fugitive.Visible {
+		t.Error("le silence n'a pas couvert les deux révélations du tour")
+	}
+	if p.Fugitive.SilenceBought {
+		t.Error("le silence n'a pas été dépensé alors qu'il a servi")
 	}
 }

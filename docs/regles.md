@@ -333,6 +333,12 @@ Le fugitif peut acheter le silence (3 points) pour sauter une révélation — m
 les inspecteurs sont informés qu'il a payé. Ils ne savent pas où il est, ils
 savent qu'il s'est appauvri.
 
+**Un silence couvre le tour, pas une révélation.** Le coup de filet du Chef (§9)
+peut tomber le même tour que la révélation périodique, et le fugitif paie avant
+que les inspecteurs jouent : il ne peut pas anticiper la coïncidence, donc il
+n'a pas à la payer deux fois. Il s'achète contre être trouvé, jamais contre se
+montrer — une révélation qu'il s'inflige lui-même reste en vigueur.
+
 ---
 
 ## 7. Résistance
@@ -342,7 +348,7 @@ savent qu'il s'est appauvri.
 | Dépense | Coût | Effet |
 |---|---|---|
 | Double déplacement | 2 | Deux cases au lieu d'une, ce tour |
-| Silence | 3 | Annule la prochaine révélation périodique |
+| Silence | 3 | Annule les révélations d'un tour, périodique ou forcée |
 | Effacement | 1 | Supprime toutes ses traces de moins de 3 tours |
 | Changement de zone | 2 | Rescelle une autre zone d'extraction |
 | Leurre | 1 | Falsifie la trace du tour, 3 fois par partie (§12) |
@@ -428,7 +434,7 @@ elle ne se joue pas et ne s'épuise pas.
 | Coureur | Déplacement de deux cases ce tour |
 | Traqueur | Perçoit les traces à deux cases, en permanence (passif) |
 | Barreur | Ferme une case de rue pendant 3 tours |
-| Chef | Voit ce que voit un autre inspecteur pendant deux tours |
+| Chef | Ordonne un coup de filet : position révélée dans deux tours |
 
 Le Barreur mérite attention : c'est le seul moyen de créer une impasse là où il
 n'y en a pas. Sur un plateau ouvert, c'est lui qui rend le piégeage possible.

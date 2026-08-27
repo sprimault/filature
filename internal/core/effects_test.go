@@ -211,16 +211,6 @@ func tousLesCas() []casEffet {
 			},
 		},
 		{
-			nom:   "partager_vue",
-			effet: Effect{Type: EffectShareView, Target: TargetOtherPiece, Duration: 2},
-			ctx:   EffectContext{Side: SideInspectors, Piece: 2, AutrePion: 0},
-			verifie: func(t *testing.T, p *Game) {
-				if got := p.SharedViewOf(2); !reflect.DeepEqual(got, []int{0}) {
-					t.Errorf("vue partagée %v, attendu [0]", got)
-				}
-			},
-		},
-		{
 			nom:   "couter_resistance",
 			effet: Effect{Type: EffectCostStamina, Target: TargetFugitive, Value: 3},
 			ctx:   fugitif,

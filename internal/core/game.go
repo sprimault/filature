@@ -58,6 +58,14 @@ type Fugitive struct {
 	TurnsInZone   int  `json:"turns_in_zone"`
 	SilenceBought bool `json:"silence_bought"`
 
+	// SilenceUsed dit qu'une révélation a été neutralisée ce tour. Un silence
+	// couvre le tour et non une révélation : le fugitif paie avant que les
+	// inspecteurs décident, donc il ne peut pas prévoir qu'une révélation
+	// forcée tombera le même tour que la périodique. Le faire payer deux fois
+	// pour une coïncidence qu'il ne pouvait pas anticiper serait une punition,
+	// pas un arbitrage.
+	SilenceUsed bool `json:"silence_used"`
+
 	// StepsTaken est remis à zéro à chaque tour, comme celui des
 	// inspecteurs. Le fugitif n'a pas de quota de pions, mais une mobilité
 	// qu'un double déplacement porte à deux.
