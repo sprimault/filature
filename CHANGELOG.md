@@ -30,6 +30,14 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Les zones se ferment aux tours annoncés.** Le préavis de deux tours était
+déclaré par le mode d'étranglement du contenu livré, et s'ajoutait à une cadence
+que le noyau calculait déjà en tours de fermeture : tout glissait de deux tours,
+et la dernière zone tombait au dernier tour de la partie au lieu de laisser de
+quoi en profiter. Le préavis devient un paramètre de partie, refusé s'il dépasse
+la période — voir une fermeture venir est une règle, et une règle ne se négocie
+pas par manifeste.
+
 **Le taux de rues ne juge plus que la trame.** Les blocs percés par-dessus —
 zones d'extraction et lieux de ressourcement — n'entrent plus dans la mesure :
 ce ne sont pas du terrain mais des dispositifs, publics et désignés, et les
@@ -109,6 +117,13 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Zones now close on the turns announced.** The two-turn notice was declared by
+the shipped strangling mode, and added itself to a cadence the core already
+computed as closing turns: everything slid by two, and the last zone fell on the
+final turn of the game instead of leaving room to use it. The notice becomes a
+game setting, refused if it exceeds the period — seeing a closure coming is a
+rule, and a rule is not negotiable by manifest.
 
 **The street ratio now judges the grid alone.** The blocks carved on top —
 extraction zones and respites — no longer count towards it: they are not

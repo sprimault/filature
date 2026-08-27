@@ -233,6 +233,9 @@
         "stamina": {
           "type": "integer"
         },
+        "strangling_notice": {
+          "type": "integer"
+        },
         "strangling_period": {
           "type": "integer"
         },
@@ -263,6 +266,7 @@
         "shelters",
         "size",
         "stamina",
+        "strangling_notice",
         "strangling_period",
         "strangling_start",
         "trail_lifetime",

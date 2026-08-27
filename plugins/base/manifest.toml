@@ -159,9 +159,12 @@ trigger = "fugitive_phase"
 # Modes : ce que le jeu déclenche de lui-même, sans qu'un joueur le choisisse.
 # ---------------------------------------------------------------------------
 
-# La fermeture progressive des zones d'extraction. Le préavis de deux tours est
-# ici parce qu'il fait partie de la mécanique : les deux camps voient venir la
-# fermeture, personne ne la subit par surprise.
+# La fermeture progressive des zones d'extraction. Le mode ferme, rien de plus.
+#
+# Le préavis n'est pas ici : « personne ne la subit par surprise » est une règle
+# du jeu, et une règle ne se négocie pas par manifeste — un plugin qui déclarait
+# un préavis nul ne réglait pas le jeu, il en cassait une garantie. Le noyau
+# l'annonce lui-même, deux tours avant de déclencher ce mode.
 #
 # À partir de quel tour l'étranglement commence et tous les combien il se répète
 # restent des paramètres de partie, réglables dans l'interface. Les inscrire ici
@@ -173,10 +176,5 @@ name = "Étranglement"
 trigger = "strangling"
 
   [[mode.strangling.effect]]
-  type = "defer"
-  duration = 2
-  announced = true
-
-    [[mode.strangling.effect.then]]
-    type = "close_zone"
-    target = "zone"
+  type = "close_zone"
+  target = "zone"

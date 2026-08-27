@@ -113,7 +113,7 @@ func (p *Game) ViewFor(a Side) View {
 		SilencePaye:      p.Fugitive.SilenceBought,
 		AnnouncedEffects: list(p.announcedEffects()),
 	}
-	v.ZonesAnnoncees = list(announcedZones(v.AnnouncedEffects))
+	v.ZonesAnnoncees = list(p.announcedZones(v.AnnouncedEffects))
 
 	// Le fugitif voit tout de lui-même. Les inspecteurs ne voient sa position
 	// que s'il est repéré ou révélé, et sa zone jamais.
@@ -299,10 +299,19 @@ func (p *Game) announcedEffects() []PendingEffect {
 
 // announcedZones extrait les zones dont la fermeture est annoncée.
 //
-// Dérivé des effets plutôt que stocké : c'est la même information sous une
-// forme que l'interface consomme sans walk des effets imbriqués.
-func announcedZones(annonces []PendingEffect) []int {
+// Deux sources, et c'est voulu. L'étranglement vient du noyau, qui sait dès
+// maintenant ce qu'il fermera dans StranglingNotice tours : le préavis est une
+// règle (docs/regles.md §10) et ne peut donc pas dépendre d'un manifeste. Le
+// reste vient des differer qu'un plugin a marqués annoncés, où prévenir ou non
+// est le choix de son auteur.
+//
+// Dérivé plutôt que stocké : c'est la même information sous une forme que
+// l'interface consomme sans walk des effets imbriqués.
+func (p *Game) announcedZones(annonces []PendingEffect) []int {
 	var zones []int
+	if zone, prevue := p.zoneToStrangleAt(p.Turn + p.Settings.StranglingNotice); prevue {
+		zones = append(zones, zone)
+	}
 	for _, e := range annonces {
 		for _, effet := range e.Effects {
 			if effet.Type == EffectCloseZone {

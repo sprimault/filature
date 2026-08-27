@@ -69,12 +69,23 @@ func SettingsForSize(cote int) Settings {
 	p.StranglingStart = p.Turns * 3 / 4
 
 	// La période s'en déduit : les fermetures doivent tenir dans ce qui reste,
-	// la dernière tombant deux tours avant la fin. Figée, elle épuiserait la
-	// pression à mi-chemin sur une longue partie et déborderait la fin sur une
-	// courte.
+	// la dernière laissant StranglingEndMargin tours de jeu après elle. Figée,
+	// elle épuiserait la pression à mi-chemin sur une longue partie et
+	// déborderait la fin sur une courte.
+	//
+	// Cette marge vaut deux tours comme le préavis, et les deux nombres n'ont
+	// rien à voir : l'un laisse au fugitif de quoi profiter de la dernière
+	// fermeture, l'autre de quoi la voir venir. Les avoir confondus est ce qui a
+	// laissé le mode ajouter son préavis à une cadence déjà calculée.
 	fermetures := p.Zones - p.ZonesLeftOpen
 	if fermetures > 1 {
-		p.StranglingPeriod = max(1, (p.Turns-p.StranglingStart-2)/(fermetures-1))
+		p.StranglingPeriod = max(1, (p.Turns-p.StranglingStart-StranglingEndMargin)/(fermetures-1))
 	}
+
+	// Le préavis se rabat sur la période quand elle est plus courte que lui :
+	// au côté minimal, les fermetures s'enchaînent d'un tour sur l'autre et
+	// deux annonces se recouvriraient. Une dérivation qui produirait des
+	// paramètres que Validate refuse serait un défaut de la dérivation.
+	p.StranglingNotice = min(p.StranglingNotice, p.StranglingPeriod)
 	return p
 }
