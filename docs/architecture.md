@@ -10,7 +10,11 @@ internal/render/  projection isométrique, contrat de formes
 internal/storage/ SQLite : journal, instantanés, poids d'IA
 internal/server/  WebSocket, hébergement et jonction
 internal/loader/  chargement des manifestes, bac à sable WebAssembly
+internal/session/ l'ordre d'une partie : qui joue, quand, ce qu'on montre
 internal/text/    rendu d'une vue en caractères, saisie d'un coup
+internal/preview/ aperçu SVG d'un plugin d'apparence, sans lancer le jeu
+internal/schema/  génération des schémas depuis les structures Go
+internal/quality/ les contrôles qui valent pour le dépôt entier
 plugins/          le contenu livré, embarqué dans le binaire par go:embed
 schemas/          les contrats publics, versionnés à part
 ```
@@ -36,7 +40,10 @@ c'est la même projection, appliquée au même endroit.
 ### Le déterminisme
 
 Graine explicite portée par l'état, jamais de générateur global, IA comprise.
-`core.Alea` est le seul générateur autorisé, y compris pour les plugins.
+`core.Random` est le seul générateur autorisé, y compris pour les plugins. Il se
+construit par `NewRandom(graine, flux)`, où le flux est un nom : isoler les
+tirages fait qu'ajouter un dé quelque part ne déplace pas ce qui est tiré
+ailleurs, et qu'une partie rejouée retrouve le même déroulement.
 
 C'est ce qui rend possible le rejeu depuis le journal, la reproduction d'un
 défaut, et la comparaison de deux versions d'IA sur les mêmes plateaux.
@@ -65,6 +72,42 @@ cesse d'être reproductible.
 Conséquence utile : un bot non déterministe reste parfaitement jouable, puisque
 le journal enregistre ses **coups** et non son état interne.
 
+## Ce qui se recalcule ne se stocke pas
+
+Toute information dérivable — visibilité, coups légaux, carte de croyance,
+extraction en cours — est recalculée, jamais rangée dans `Game`. C'est la
+condition pour que rejouer le journal reconstruise exactement le même état : un
+champ dérivé qu'un `Undo` oublierait de défaire, ou qu'une reprise ne
+reconstituerait pas, ferait diverger deux parties que rien ne distingue par
+ailleurs.
+
+Si un calcul devient coûteux, le cache vit **à côté** de l'état et se
+reconstruit à partir de lui, jamais dedans.
+
+## `LegalMoves` est la seule source de vérité
+
+L'interface s'en sert pour surligner les cases, l'IA pour explorer, le serveur
+pour valider ce qui arrive du réseau, le pilote de bot pour vérifier un coup
+reçu. **Aucun des quatre ne réimplémente la règle.**
+
+Un coup reçu se compare par égalité à une entrée de la liste. Le jeu ne corrige
+ni n'interprète jamais un coup : un coup illégal interrompt la partie et part au
+journal tel quel.
+
+C'est aussi ce qui rend un plugin de règles utilisable par un bot qui l'ignore.
+Une dépense ajoutée apparaît dans la liste, et choisir dedans suffit à jouer
+correctement — un bot n'a rien à savoir des règles pour être légal.
+
+## L'ordre de résolution est un contrat
+
+Visibilité, contacts, capture, traces, ressourcement, révélation, fermeture de
+zone, test de fin. L'ordre exact est dans [`regles.md`](regles.md) §5, et il ne
+se change pas sans changer le jeu.
+
+Le décompte des contacts a lieu **après** le déplacement du fugitif, pas avant.
+Déplacer une étape d'un cran modifie des parties entières sans qu'aucun test
+unitaire ne s'en aperçoive, parce que chaque étape prise isolément reste juste.
+
 ## Le vocabulaire d'effets
 
 Une capacité, une dépense ou un mode de jeu se décrit par composition de
@@ -83,6 +126,32 @@ le portent est dans [`plugins.md`](plugins.md).
 Un plugin ne touche jamais `*Game`. Il produit des `Effect` ou des `Move`, le
 noyau les applique. C'est ce qui fait qu'il ne peut pas lire la zone scellée du
 fugitif, et que `Undo` reste praticable.
+
+**Ajouter une primitive est une décision lourde** : elle entre dans le contrat
+public et n'en ressort plus sans périmer les plugins existants. Avant d'en
+ajouter une, vérifier que la composition des existantes ne suffit pas.
+
+## L'IA raisonne sur une croyance, pas sur un arbre
+
+Information imparfaite : un minimax classique ne s'applique pas, et un élagage
+alpha-bêta serait une erreur de catégorie — il n'y a pas d'état unique à
+évaluer. L'approche est un filtre bayésien discret : une carte de croyance sur
+les positions possibles du fugitif, propagée à chaque tour, resserrée par ce que
+les inspecteurs voient et par les traces qu'ils découvrent.
+
+**L'absence d'observation est l'information la plus riche du jeu.** Une case vue
+et vide passe à zéro. C'est ce qui fait que patrouiller vaut mieux que camper —
+et c'est aussi ce qu'un joueur humain doit tenir de tête pendant que son
+adversaire machine l'a sous les yeux.
+
+Les niveaux sont des jeux de poids, pas des algorithmes différents.
+L'amélioration au fil des parties ajuste ces poids. Pas de réseau de neurones :
+le gain serait invisible sur un jeu à quelques milliers de cases, et la carte de
+croyance a l'avantage décisif de s'afficher telle quelle en vue de débogage.
+
+L'IA livrée se branche sur la même signature qu'un bot externe. C'est ce qui
+garantit que [le protocole](protocole-bot.md) suffit : si quelque chose y
+manquait, le jeu ne pourrait pas jouer contre lui-même.
 
 ## Le rendu
 
