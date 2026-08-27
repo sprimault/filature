@@ -164,16 +164,13 @@ vingtième d'une Ville.
 
 **Le petit préréglage en sort plus ouvert, et ce n'est pas une intention.** Ses
 zones seules le portaient déjà au-dessus du plafond, si bien que la génération
-y jetait 92 % de ses tirages et ne retenait que les trames les plus denses.
-Mesuré le 27 août 2026, après correction : surface praticable médiane de 52 %
-sur le Quartier — 47 % sur la Ville —, et 1,2 essai par plateau retenu au lieu
-de 13,8.
+n'y retenait que les trames les plus denses.
 
 **L'étape 4 vise une impasse par carré de huit cases, elle ne la garantit
-pas** : le creusement dépense ce que les amorces permettent. Mesuré à la même
-date, 1,2 % des Quartiers retenus en portent moins de cinq, le plus pauvre en
-comptant deux ; sur Faubourg et Ville, aucun ne descend sous les planchers
-correspondants.
+pas** : le creusement dépense ce que les amorces permettent, et le Quartier est
+le seul préréglage où des plateaux passent sous le plancher qu'on en attendait.
+
+Les chiffres de tout cela sont mesurés et datés au §15.
 
 Une zone d'extraction est un bloc de 3×3 dont au moins 5 cases sont des rues.
 Les six zones sont visibles des deux joueurs dès le début.
@@ -691,10 +688,9 @@ ne serait qu'un mur de déplacement sans effet sur l'information.
   et elle vient d'une estimation. Un prototype antérieur tournait à 28 % en
   produisant des plateaux jouables — chiffre rapporté de mémoire, jamais
   revérifié ici. La fourchette est peut-être à revoir vers le bas.
-- **Le Quartier a retrouvé sa marge sous la borne haute** : sa trame produit
-  46 % de rues en médiane pour un plafond de 50, et 1,2 essai suffit désormais à
-  retenir un plateau, contre 13,8 quand les blocs entraient dans le taux
-  (mesuré le 27 août 2026). Reste que c'est le format où toutes les valeurs
+- **Le Quartier a retrouvé sa marge sous la borne haute** : sa trame tient sous
+  le plafond et un tirage y suffit presque toujours, là où les blocs comptés
+  dans le taux en faisaient jeter la plupart (§15). Reste que c'est le format où toutes les valeurs
   constantes touchent leur limite : le préavis d'étranglement y égale la
   période, la couronne intermédiaire n'y a qu'un rayon de libre, et c'est le
   seul où des plateaux passent sous cinq impasses. **Décider à l'étape 11 s'il
@@ -704,6 +700,37 @@ ne serait qu'un mur de déplacement sans effet sur l'information.
   mesuré.** La capture repose sur le talonnage en couloir (§14), que les impasses
   rendent possible ; si les Quartiers pauvres en impasses donnent une
   distribution de motifs de fin différente des autres, c'est là qu'on le verra.
+
+---
+
+## 15. Mesures
+
+Ce que la génération produit, par opposition à ce qu'on lui demande. Les bornes
+du §11 sont décidées ; ce qui suit est observé, et n'a donc de sens qu'avec sa
+date.
+
+**Ce bloc est réécrit par la mesure elle-même** — `go test ./internal/core
+-maj-mesures` — et se relit comme n'importe quel diff. Ne pas le modifier à la
+main : un chiffre corrigé sans avoir été remesuré redevient ce que le préambule
+proscrit.
+
+<!-- mesures:début -->
+*Mesuré le 2026-08-27 sur 2000 graines par préréglage.*
+
+| Préréglage | Trame | Praticable | Tirages par plateau | Impasses |
+|---|---|---|---|---|
+| quartier | 46 % en médiane, de 37 à 56 | 52 % en médiane, 57 au plus | 1,21 en moyenne, 5 au pire | 2 au moins, 1,4 % sous 5 |
+| faubourg | 46 % en médiane, de 38 à 54 | 49 % en médiane, 54 au plus | 1,04 en moyenne, 2 au pire | 13 au moins, 0,0 % sous 7 |
+| ville | 45 % en médiane, de 39 à 54 | 47 % en médiane, 52 au plus | 1,02 en moyenne, 2 au pire | 30 au moins, 0,0 % sous 10 |
+<!-- mesures:fin -->
+
+**Trame** est la part de cases praticables avant que les zones et les lieux
+soient percés, celle que le taux du §3 borne. **Praticable** est la part finale,
+blocs compris, qui n'est bornée par rien. **Tirages par plateau** dit ce que la
+génération jette avant de retenir. **Impasses** compte les rues à voisine
+unique, contre le quart du côté qu'on attendait de l'étape 4.
+
+---
 
 L'architecture, les structures et la feuille de route ont leur propre document :
 [`architecture.md`](architecture.md).

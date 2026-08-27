@@ -81,11 +81,18 @@ type View struct {
 // copié ici, jamais par recopie de structure. Une omission fait fuiter, un
 // oubli ne fait qu'afficher moins.
 //
-// Trois choses seulement sont cachées, et ce sont les trois qui font le jeu :
-// où est le fugitif, quelle zone il vise, et quelles traces il a laissées hors
-// de portée. Tout le reste est public, y compris sa résistance — les contacts
-// et les silences payés sont annoncés, la déduire serait un exercice sans
-// intérêt.
+// Ce qui est caché aux inspecteurs : où est le fugitif, quelle zone il vise,
+// quelles traces il a laissées hors de portée, et sa résistance. Les trois
+// premiers font le jeu ; la quatrième se déduit largement, les contacts et les
+// silences payés étant annoncés, mais elle ne se donne pas pour autant.
+//
+// Ce qui est caché au fugitif : les cases que les inspecteurs surveillent —
+// docs/regles.md §6 les lui promet, et le lot de la couverture adverse les lui
+// rendra.
+//
+// Ne pas écrire ici « n'est caché que ceci » : l'énumération a été fausse d'un
+// terme pendant quatre mois, et du côté qui fuit — qui suit « tout le reste est
+// public » en ajoutant un champ l'expose.
 func (p *Game) ViewFor(a Side) View {
 	v := View{
 		Side:       a,
@@ -98,12 +105,17 @@ func (p *Game) ViewFor(a Side) View {
 		Shelters:   list(append([]Shelter(nil), p.Board.Shelters()...)),
 
 		ShelterReady: list(append([]int(nil), p.ShelterReady...)),
-		// Recopie de structure, et c'est le seul endroit où elle est admise :
-		// tout est public chez un inspecteur. Le corollaire est un piège —
-		// **tout champ ajouté à Inspector devient visible des deux camps sans
-		// que personne ne l'ait décidé.** Ce qui dépend de la position du
-		// fugitif ne vit donc pas dans Inspector mais dans Game, hors de ce qui
-		// se recopie : voir LastContacts.
+		// Recopie de structure : tout est public chez un inspecteur, comme dans
+		// une zone, un lieu ou une scène de crime — les quatre types que cette
+		// fonction prend entiers. Le corollaire est un piège : **tout champ
+		// ajouté à l'un d'eux devient visible des deux camps sans que personne
+		// ne l'ait décidé.** Ce qui dépend de la position du fugitif ne vit donc
+		// pas dans Inspector mais dans Game, hors de ce qui se recopie : voir
+		// LastContacts.
+		//
+		// TestBulkCopiedTypesAreDeclared épingle leurs champs et échoue à
+		// l'ajout. Le rappel ci-dessus ne se relit pas quand on ajoute un champ
+		// ailleurs ; le test, si.
 		Inspectors:       list(append([]Inspector(nil), p.Inspectors...)),
 		KnownTrails:      p.trailsFor(a),
 		CrimeScenes:      list(append([]CrimeScene(nil), p.CrimeScenes...)),

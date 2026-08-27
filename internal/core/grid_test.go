@@ -249,18 +249,59 @@ func TestZonesWalkable(t *testing.T) {
 	}
 }
 
-// TestValidationRejects vérifie que les trois critères mordent réellement.
+// TestValidationRejects vérifie que chacun des six refus de validate mord, et
+// mord pour la raison annoncée.
 //
 // Un validateur qui accepte tout laisserait passer les plateaux injouables, et
 // aucun autre test ne s'en apercevrait puisqu'ils partent tous de plateaux
 // validés.
+//
+// **Le message autant que le rejet.** Plusieurs critères attrapent les mêmes
+// plateaux dégénérés — un plateau vide échoue aussi sur son taux —, si bien
+// qu'un critère supprimé peut rester invisible. Trois l'étaient : les zones et
+// les lieux atteignables n'avaient aucun cas, et « sans rue » était couvert par
+// le taux qui vaut alors zéro.
+//
+// Quand le taux n'est pas le sujet, ruesTrame est passé plutôt que compté :
+// c'est ce qui permet d'atteindre le critère suivant sans avoir à bâtir un
+// plateau qui satisfasse tous les précédents par accident.
 func TestValidationRejects(t *testing.T) {
 	p := settingsFor(21)
+	trameValide := p.Size * p.Size * (MinStreetRatio + MaxStreetRatio) / 200
+
+	// connexe ouvre le bord haut et la colonne gauche : de quoi former une
+	// seule composante et porter des rues hors du noyau, sans rien ouvrir
+	// ailleurs — ce qui laisse la place aux blocs qu'on veut voir refusés.
+	connexe := func() *BoundedBoard {
+		b := &BoundedBoard{cote: p.Size, rues: make([]bool, p.Size*p.Size)}
+		for i := 0; i < p.Size; i++ {
+			b.open(Position{Column: i, Row: 0})
+			b.open(Position{Column: 0, Row: i})
+		}
+		return b
+	}
+
+	// batiCentral rend les neuf cases d'un bloc laissé entièrement bâti, au
+	// milieu du plateau où connexe n'a rien ouvert.
+	batiCentral := func() []Position {
+		milieu := p.Size / 2
+		var cases []Position
+		for ligne := milieu - 1; ligne <= milieu+1; ligne++ {
+			for colonne := milieu - 1; colonne <= milieu+1; colonne++ {
+				cases = append(cases, Position{Column: colonne, Row: ligne})
+			}
+		}
+		return cases
+	}
 
 	t.Run("plateau vide", func(t *testing.T) {
 		b := &BoundedBoard{cote: p.Size, rues: make([]bool, p.Size*p.Size)}
-		if err := b.validate(p, b.countStreets()); err == nil {
-			t.Error("un plateau sans rue est accepté")
+		err := b.validate(p, trameValide)
+		if err == nil {
+			t.Fatal("un plateau sans rue est accepté")
+		}
+		if !strings.Contains(err.Error(), "sans rue") {
+			t.Errorf("rejeté pour %q, attendu le critère de la rue absente", err)
 		}
 	})
 
@@ -269,8 +310,43 @@ func TestValidationRejects(t *testing.T) {
 		for i := range b.rues {
 			b.rues[i] = true
 		}
-		if err := b.validate(p, b.countStreets()); err == nil {
-			t.Error("un plateau à 100 % de rues est accepté")
+		err := b.validate(p, b.countStreets())
+		if err == nil {
+			t.Fatal("un plateau à 100 % de rues est accepté")
+		}
+		if !strings.Contains(err.Error(), "taux de rues") {
+			t.Errorf("rejeté pour %q, attendu le critère du taux", err)
+		}
+	})
+
+	// Les deux cas suivants ne se produisent pas depuis draw, dont carveBlock
+	// garantit cinq cases praticables par bloc : ils gardent le générateur de
+	// plateau d'un plugin, qui pose ses zones comme il l'entend. Un bloc qui
+	// porte au moins une rue est toujours atteignable, la connexité étant
+	// vérifiée juste avant — c'est un bloc entièrement bâti qu'il faut.
+	t.Run("zone inatteignable", func(t *testing.T) {
+		b := connexe()
+		b.zones = []Zone{{Number: 3, Cells: batiCentral()}}
+
+		err := b.validate(p, trameValide)
+		if err == nil {
+			t.Fatal("une zone sans case praticable est acceptée")
+		}
+		if !strings.Contains(err.Error(), "zone 3") {
+			t.Errorf("rejeté pour %q, attendu le critère des zones atteignables", err)
+		}
+	})
+
+	t.Run("lieu inatteignable", func(t *testing.T) {
+		b := connexe()
+		b.abris = []Shelter{{Number: 2, Cells: batiCentral()}}
+
+		err := b.validate(p, trameValide)
+		if err == nil {
+			t.Fatal("un lieu sans case praticable est accepté")
+		}
+		if !strings.Contains(err.Error(), "lieu 2") {
+			t.Errorf("rejeté pour %q, attendu le critère des lieux atteignables", err)
 		}
 	})
 
@@ -315,8 +391,12 @@ func TestValidationRejects(t *testing.T) {
 				c := Position{Column: colonne, Row: ligne}
 				if !b.IsStreet(c) && !b.touchesStreet(c) {
 					b.open(c)
-					if err := b.validate(p, trame); err == nil {
-						t.Error("une rue isolée du reste du plateau est acceptée")
+					err := b.validate(p, trame)
+					if err == nil {
+						t.Fatal("une rue isolée du reste du plateau est acceptée")
+					}
+					if !strings.Contains(err.Error(), "isolees") {
+						t.Errorf("rejeté pour %q, attendu le critère de la connexité", err)
 					}
 					return
 				}
