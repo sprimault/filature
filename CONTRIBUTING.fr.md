@@ -48,6 +48,80 @@ Les conventions de code et la doctrine de test sont dans
   sont sans écran ; un test qui exige une fenêtre n'a pas sa place dans la suite
   par défaut.
 
+## Livraison
+
+**Un lot, une branche, un commit.** La branche part de `master` à jour et se
+nomme `<type>/<sujet>`, où le type est le préfixe conventionnel de son commit :
+`feat/`, `fix/`, `docs/`, `chore/`, `test/`, `refactor/`. Ne pas enchaîner deux
+lots sur la même branche — chacun doit rester relisible et annulable seul.
+
+Elle retourne dans `master` **par une pull request**, jamais par une fusion
+locale : c'est la PR qui laisse la trace de ce qui a été livré, et sa fusion qui
+supprime la branche des deux côtés.
+
+**Vérifier avant de pousser, pas après :**
+
+```
+make lint && make test && make race && make vulncheck && make sec
+```
+
+`govulncheck` interroge sa base d'avis **en direct** : un job vert le matin peut
+être rouge l'après-midi sur exactement le même code. Ne pas se reposer sur
+l'intégration continue seule, qui valide une fois la branche déjà poussée.
+
+**La documentation part avec le changement.** Avant de commiter, vérifier ce que
+le changement rend faux ailleurs : l'état annoncé dans le README, une règle de
+[`docs/regles.md`](docs/regles.md), un exemple, un schéma de
+[`schemas/`](schemas/). Cas propre à ce projet : une règle du jeu qui change rend
+`docs/regles.md` faux, et ce document fait foi — le code ne prend jamais de
+l'avance sur lui.
+
+**Un message dit ce qui change et pourquoi**, en quelques lignes. Le défaut est
+le titre seul : un corps n'existe que s'il porte quelque chose que le titre ne
+dit pas et que le diff ne montre pas. Une description de pull request n'existe
+que si elle porte ce qu'un relecteur ne peut pas déduire du diff — une mesure,
+un cas reproduit, une rupture pour l'utilisateur. Sans cela, elle reste vide.
+
+## Corriger une vulnérabilité sans en créer une autre
+
+Ne pas adopter une version publiée **le jour même**, même corrective. Chercher
+la plus ancienne qui suffit :
+
+```
+go list -m -versions <module>
+```
+
+Une version parue dans l'heure est le profil type d'une compromission de compte
+mainteneur.
+
+Un épinglage s'explique : un `require` figé plus bas que le dernier disponible
+porte un commentaire de fin de ligne disant pourquoi, et **quand le retirer**.
+
+## Quatre numéros, à ne pas confondre
+
+| Numéro | Où | Ce qu'il suit |
+|---|---|---|
+| version du dépôt | tag git | le binaire |
+| `shapes_version` | chaque fichier de formes | le contrat d'apparence |
+| `protocol` | échanges avec un bot | le contrat de bot |
+| `effects_version` | manifeste d'un plugin de règles | le vocabulaire d'effets |
+
+Les trois derniers sont des entiers sans rapport avec SemVer : ajouter un champ
+optionnel ne les incrémente pas, tout le reste les incrémente. Une version peut
+sortir sans qu'ils bougent ; ils ne bougent jamais sans version.
+
+**Un `shapes_version` qui change périme tous les plugins d'apparence publiés.**
+C'est l'événement le plus coûteux du projet, à annoncer en tête des notes de
+version. Un `effects_version` qui change périme les plugins de règles, ce qui
+touche moins de monde mais casse aussi les sauvegardes qui les portent.
+
+Le dépôt suit SemVer avec la clause du zéro : **en `0.x`, rien n'est imposé.**
+Le mineur marque un jalon de [`ROADMAP.md`](ROADMAP.md), pas une rupture d'API ;
+tout le reste s'accumule en correctif, qu'il s'agisse d'un correctif, d'une
+fonctionnalité ou d'une rupture. Conséquence directe : **le numéro ne prévient
+de rien**, et ce sont les notes de version qui doivent dire ce qu'un auteur de
+plugin doit reprendre.
+
 ## Langue
 
 **Les identifiants sont en anglais** — répertoires, fichiers, paquets, types,
