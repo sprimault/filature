@@ -49,15 +49,23 @@ ajouter une, vérifier que la composition des existantes ne suffit pas.
 |---|---|---|
 | `step` | `target`, `value` (cases) | Déplace un pion, sans consommer son quota de tour |
 | `teleport` | `target` | Place un pion sur la case du contexte |
-| `change_mobility` | `target`, `value`, `duration` | Ajoute des cases de déplacement pour la durée |
+| `change_mobility` | `target`, `value`, `duration`, `mode` | Ajoute des cases de déplacement pour la durée |
 
 `value` négative est légale : `change_mobility` à -1 immobilise.
+
+**`mode` dit comment `value` s'applique.** Absent, elle s'ajoute ; à `multiply`,
+elle multiplie. Un manifeste écrit avant ce champ garde donc son sens.
+
+Il existe parce que la portée, la durée et le rayon du noyau dérivent de la
+taille du plateau : une valeur absolue ne peut plus dire une intention relative.
+Le Guetteur déclarait « portée 8 », juste tant qu'un seul préréglage existait, et
+qui triplait la portée d'un Quartier. Il déclare maintenant « portée × 2 ».
 
 ### Information
 
 | Type | Paramètres | Effet |
 |---|---|---|
-| `change_range` | `target`, `value`, `duration` | Modifie la portée de vue |
+| `change_range` | `target`, `value`, `duration`, `mode` | Modifie la portée de vue |
 | `reveal_position` | `target` | Rend une position publique ce tour |
 | `cancel_reveal` | `target` | Neutralise les révélations provoquées par les inspecteurs, pour le tour |
 | `reveal_trails` | `target`, `radius` | Découvre les traces dans le rayon, en distance de Manhattan |

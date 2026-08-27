@@ -430,7 +430,7 @@ elle ne se joue pas et ne s'épuise pas.
 
 | Pion | Capacité |
 |---|---|
-| Guetteur | Portée de vue doublée pendant un tour |
+| Guetteur | Portée de vue doublée pendant un tour, quel que soit le préréglage |
 | Coureur | Déplacement de deux cases ce tour |
 | Traqueur | Perçoit les traces à deux cases, en permanence (passif) |
 | Barreur | Ferme une case de rue pendant 3 tours |

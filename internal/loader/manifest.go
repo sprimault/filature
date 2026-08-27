@@ -344,6 +344,9 @@ func checkEffects(effets []core.Effect, camp core.Side, chemin, ou string, dansU
 		if raison := cibleHorsDuCamp(e.Target, camp); raison != "" {
 			ajouter("cible %q dans une declaration du camp %q : %s", e.Target, camp, raison)
 		}
+		if !core.ValueModeKnown(e.Mode) {
+			ajouter("mode %q inconnu, attendu multiply ou rien", e.Mode)
+		}
 
 		if e.Type != core.EffectDefer {
 			if len(e.Then) > 0 {

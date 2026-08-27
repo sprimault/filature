@@ -23,6 +23,10 @@ name = "Français"
 # Capacités des inspecteurs : une par pion, une seule fois par partie.
 # ---------------------------------------------------------------------------
 
+# La portée double, elle ne gagne pas huit cases : elle dérive de la taille du
+# plateau, donc une valeur absolue dirait autre chose selon le préréglage. À 8
+# en absolu, la capacité triplait la portée d'un Quartier.
+
 [ability.lookout]
 name = "Guetteur"
 side = "inspectors"
@@ -32,7 +36,8 @@ trigger = "inspectors_phase"
   [[ability.lookout.effect]]
   type = "change_range"
   target = "current_piece"
-  value = 8
+  mode = "multiply"
+  value = 2
   duration = 1
 
 [ability.runner]

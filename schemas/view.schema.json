@@ -15,6 +15,9 @@
         "duration": {
           "type": "integer"
         },
+        "mode": {
+          "type": "string"
+        },
         "radius": {
           "type": "integer"
         },
