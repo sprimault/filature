@@ -201,17 +201,6 @@ func tousLesCas() []casEffet {
 			},
 		},
 		{
-			nom:   "marquer_scene",
-			effet: Effect{Type: EffectMarkCrimeScene, Target: TargetFugitive},
-			ctx:   fugitif,
-			verifie: func(t *testing.T, p *Game) {
-				attendue := CrimeScene{Position: Position{Column: 4, Row: 4}, Turn: 5}
-				if !reflect.DeepEqual(p.CrimeScenes, []CrimeScene{attendue}) {
-					t.Errorf("scènes %v, attendu [%v]", p.CrimeScenes, attendue)
-				}
-			},
-		},
-		{
 			nom:   "annuler_revelation",
 			effet: Effect{Type: EffectCancelReveal, Target: TargetFugitive},
 			ctx:   fugitif,

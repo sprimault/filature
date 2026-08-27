@@ -44,7 +44,6 @@ piece_chief = "Chef"
 term_stamina = "Résistance"
 term_trail = "Trace"
 term_zone = "Zone d'extraction"
-term_crime_scene = "Scène"
 term_roadblock = "Barrage"
 term_turn = "Tour"
 

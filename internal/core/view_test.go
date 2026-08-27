@@ -202,16 +202,12 @@ func TestTrackerExtendsRange(t *testing.T) {
 // l'est, dans les deux vues.
 func TestViewCarriesPublicInformation(t *testing.T) {
 	p := hiddenGame()
-	p.CrimeScenes = []CrimeScene{{Position: Position{Column: 1, Row: 1}, Turn: 2}}
 	p.Roadblocks = map[Position]int{{Column: 3, Row: 3}: 5}
 	p.ClosedZones = []int{0}
 
 	for _, sideName := range []Side{SideFugitive, SideInspectors} {
 		v := p.ViewFor(sideName)
 
-		if len(v.CrimeScenes) != 1 {
-			t.Errorf("%s : %d scènes, attendu 1 — un meurtre est public", sideName, len(v.CrimeScenes))
-		}
 		if len(v.Roadblocks) != 1 {
 			t.Errorf("%s : %d barrages, attendu 1", sideName, len(v.Roadblocks))
 		}

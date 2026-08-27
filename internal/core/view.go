@@ -57,10 +57,6 @@ type View struct {
 	// découvert. Le fugitif, lui, voit les siennes.
 	KnownTrails map[string]Trail `json:"known_trails"`
 
-	// CrimeScenes est identique pour les deux camps : un meurtre est public, c'est
-	// ce que le fugitif paie. Ne jamais la filtrer par acteur.
-	CrimeScenes []CrimeScene `json:"crime_scenes"`
-
 	CasesVisibles   []Position `json:"visible_cells"`
 	LegalMoves      []Move     `json:"legal_moves"`
 	ProchaineReveal int        `json:"next_reveal"`
@@ -118,7 +114,6 @@ func (p *Game) ViewFor(a Side) View {
 		// ailleurs ; le test, si.
 		Inspectors:       list(append([]Inspector(nil), p.Inspectors...)),
 		KnownTrails:      p.trailsFor(a),
-		CrimeScenes:      list(append([]CrimeScene(nil), p.CrimeScenes...)),
 		CasesVisibles:    list(p.visibleCellsFor(a)),
 		LegalMoves:       list(p.LegalMoves(a)),
 		ProchaineReveal:  p.nextReveal(),

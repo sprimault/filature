@@ -37,7 +37,7 @@ var RequiredColors = append(append([]string{}, Grounds...),
 	"building", "backdrop",
 	"fugitive_main", "fugitive_detail",
 	"inspector_main", "inspector_detail",
-	"marker_outline", "trail", "roadblock", "crime_scene",
+	"marker_outline", "trail", "roadblock",
 )
 
 // Grounds énumère les fonds sur lesquels une forme peut se poser.

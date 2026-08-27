@@ -30,6 +30,21 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le meurtre disparaît, et la scène de crime avec lui.** Le leurre fait le même
+travail en mentant au lieu de se dénoncer, ce qui laisse au fugitif quelque
+chose à faire de son information au lieu de la sacrifier. Le jeu quitte le
+registre du polar noir, et c'est le prix. Un plugin de règles peut le rétablir —
+le coût et le plafond sont déclaratifs — mais il devra livrer la forme et la
+couleur de sa scène. `shapes_version` passe à 4 pour cette raison, et
+`mark_crime_scene` quitte le vocabulaire.
+
+**Défaire une dépense rendait un état équivalent, pas identique.** Le compteur
+d'emplois gardait sa clé à zéro, et la table restait allouée là où elle était
+nulle : sans effet sur les règles, puisqu'une clé absente se lit zéro, mais
+l'IA compare des états pour reconnaître une position déjà explorée et en aurait
+vu deux. Le geste qui manquait était écrit deux fois ailleurs dans le noyau ; il
+est désormais écrit une seule.
+
 **Le fugitif peut mentir avec ses traces.** Un leurre coûte un point, trois fois
 par partie, et substitue une fausse trace à toutes celles que son déplacement
 aurait laissées ce tour-là — il ne s'y ajoute pas, faute de quoi un inspecteur
@@ -169,6 +184,21 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Murder is gone, and the crime scene with it.** The decoy does the same work by
+lying instead of giving itself away, which leaves the fugitive something to do
+with his information rather than sacrificing it. The game leaves the noir
+register, and that is the price. A rules plugin can bring it back — cost and cap
+are declarative — but it will have to ship the shape and the colour of its
+scene. `shapes_version` moves to 4 for that reason, and `mark_crime_scene`
+leaves the vocabulary.
+
+**Undoing an expense returned an equivalent state, not an identical one.** The
+use counter kept its key at zero, and the table stayed allocated where it had
+been nil: no effect on the rules, since a missing key reads as zero, but the AI
+compares states to recognise an already-explored position and would have seen
+two. The missing gesture was written twice elsewhere in the core; it is now
+written once.
 
 **The fugitive can now lie with his trails.** A decoy costs one point, three
 times a game, and substitutes a false trail for every one his movement would

@@ -22,7 +22,7 @@ const (
 
 // ShapesVersion est la version du contrat que ce binaire sait lire. Un plugin
 // écrit contre une version inconnue est refusé plutôt que lu de travers.
-const ShapesVersion = 3
+const ShapesVersion = 4
 
 // StrokeType énumère les quatre primitives. Le vocabulaire est volontairement
 // pauvre : tout ce qui est livré avec le jeu s'y exprime, et une primitive de

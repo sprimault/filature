@@ -10,7 +10,7 @@
 # Ni rue, ni zone : le sol n'est pas une forme. Le losange est tracé par le
 # moteur, un plugin n'en change que la couleur par la palette.
 
-shapes_version = 3
+shapes_version = 4
 
 # Seul trait accepté pour un bâtiment : l'emprise est le losange de la case,
 # elle ne se déclare pas. Une emprise libre permettrait de déborder sur les
@@ -105,26 +105,3 @@ role = "marker"
   color = "roadblock"
   outline = "marker_outline"
 
-# La scène reste sur le plateau une fois posée : c'est ce que le fugitif a payé,
-# elle ne s'efface pas comme une trace.
-#
-# Son rouge est presque exactement la luminance d'une zone fermée : sans contour
-# elle y disparaît, et une zone est justement l'endroit où un meurtre se produit.
-[shape.crime_scene]
-role = "marker"
-
-  [[shape.crime_scene.stroke]]
-  type = "segment"
-  from = [-9, -9]
-  to = [9, 9]
-  thickness = 3
-  color = "crime_scene"
-  outline = "marker_outline"
-
-  [[shape.crime_scene.stroke]]
-  type = "segment"
-  from = [-9, 9]
-  to = [9, -9]
-  thickness = 3
-  color = "crime_scene"
-  outline = "marker_outline"

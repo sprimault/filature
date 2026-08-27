@@ -32,7 +32,6 @@ const (
 	ExpenseWipeTrails Expense = "wipe_trails"
 	ExpenseChangeZone Expense = "change_zone"
 	ExpenseDecoy      Expense = "decoy"
-	ExpenseMurder     Expense = "murder"
 )
 
 // Move est volontairement un enregistrement plat plutôt qu'une interface.

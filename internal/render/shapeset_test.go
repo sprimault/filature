@@ -15,7 +15,7 @@ import (
 // résolution des noms, jamais leur rendu.
 func paletteComplete() string {
 	var b strings.Builder
-	b.WriteString("shapes_version = 3\n\n[palette]\n")
+	b.WriteString("shapes_version = 4\n\n[palette]\n")
 	for _, nom := range RequiredColors {
 		b.WriteString(nom + " = \"#808080\"\n")
 	}
@@ -91,7 +91,7 @@ func TestReadRejectsAnotherContractVersion(t *testing.T) {
 // de clés, sans que rien ne le signale.
 func TestReadRejectsUnplacedKeys(t *testing.T) {
 	_, err := Read(source(`
-shapes_version = 3
+shapes_version = 4
 
 [shape.fugitive]
 role = "piece"
@@ -117,7 +117,7 @@ role = "piece"
 // surcharger doit rester possible sans conflit.
 func TestReadNamesEachShape(t *testing.T) {
 	j := lire(t, `
-shapes_version = 3
+shapes_version = 4
 
 [shape.fugitive]
 role = "piece"
@@ -145,7 +145,7 @@ role = "piece"
 // contrat, c'est le contrat qu'il faudrait reprendre.
 func TestValidateAcceptsShippedShapes(t *testing.T) {
 	j := lire(t, `
-shapes_version = 3
+shapes_version = 4
 
 [shape.building]
 role = "building"
@@ -339,9 +339,9 @@ role = "marker"
 
 	for _, c := range cas {
 		t.Run(c.nom, func(t *testing.T) {
-			formes := "shapes_version = 3\n\n" + c.formes
+			formes := "shapes_version = 4\n\n" + c.formes
 			if !strings.Contains(formes, "role =") {
-				formes = "shapes_version = 3\n\n[shape.essai]\nrole = \"marker\"\n" + c.formes
+				formes = "shapes_version = 4\n\n[shape.essai]\nrole = \"marker\"\n" + c.formes
 			}
 
 			j, err := Read(source(formes, paletteComplete()), "essai")
@@ -366,7 +366,7 @@ role = "marker"
 // TestValidateWantsEveryRequiredColor vérifie qu'une palette incomplète est
 // refusée, couleur par couleur.
 func TestValidateWantsEveryRequiredColor(t *testing.T) {
-	j, err := Read(source("", "shapes_version = 3\n\n[palette]\nstreet = \"#d8d2c4\"\n"), "essai")
+	j, err := Read(source("", "shapes_version = 4\n\n[palette]\nstreet = \"#d8d2c4\"\n"), "essai")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -387,7 +387,7 @@ func TestValidateWantsEveryRequiredColor(t *testing.T) {
 // moment-là : c'est le même avantage de jeu, simplement intermittent.
 func TestValidateChecksVariantsToo(t *testing.T) {
 	j := lire(t, `
-shapes_version = 3
+shapes_version = 4
 
 [shape.essai]
 role = "marker"
@@ -417,7 +417,7 @@ role = "marker"
 // corriger en autant d'allers-retours qu'il a de fautes.
 func TestValidateListsEverythingAtOnce(t *testing.T) {
 	j := lire(t, `
-shapes_version = 3
+shapes_version = 4
 
 [shape.un]
 role = "marker"
@@ -454,7 +454,7 @@ role = "marker"
 // deviendrait illisible.
 func TestValidateIsStable(t *testing.T) {
 	j := lire(t, `
-shapes_version = 3
+shapes_version = 4
 
 [shape.aaa]
 role = "marker"
@@ -487,7 +487,7 @@ role = "marker"
 // seul pion obligerait à livrer toutes les formes, et personne ne le ferait.
 func TestMergeOverridesOnlyWhatIsDeclared(t *testing.T) {
 	base := lire(t, `
-shapes_version = 3
+shapes_version = 4
 
 [shape.fugitive]
 role = "piece"
@@ -507,7 +507,7 @@ role = "piece"
 `)
 
 	surcharge, err := Read(source(`
-shapes_version = 3
+shapes_version = 4
 
 [shape.fugitive]
 role = "piece"
@@ -544,7 +544,7 @@ role = "piece"
 // pourquoi, et l'auteur écarté n'aurait aucun moyen de s'en apercevoir.
 func TestMergeRefusesTwoPluginsOnTheSameShape(t *testing.T) {
 	forme := `
-shapes_version = 3
+shapes_version = 4
 
 [shape.fugitive]
 role = "piece"
@@ -586,9 +586,9 @@ role = "piece"
 // la palette qui le définit, et deux palettes qui reteintent la même chose est
 // le cas normal — le joueur choisit celle qu'il installe.
 func TestMergeAcceptsTwoPalettes(t *testing.T) {
-	base := lire(t, "shapes_version = 3\n")
+	base := lire(t, "shapes_version = 4\n")
 
-	autre, err := Read(source("", "shapes_version = 3\n\n[palette]\nstreet = \"#000000\"\n"), "essai")
+	autre, err := Read(source("", "shapes_version = 4\n\n[palette]\nstreet = \"#000000\"\n"), "essai")
 	if err != nil {
 		t.Fatal(err)
 	}

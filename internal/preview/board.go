@@ -120,12 +120,11 @@ func rendre(s *strings.Builder, p *core.Game, j *render.ShapeSet) {
 
 // occupation dit ce que porte chaque case, sol compris.
 type occupation struct {
-	sol         map[core.Position]string
-	trails      map[core.Position]bool
-	roadblocks  map[core.Position]bool
-	crimeScenes map[core.Position]bool
-	inspectors  map[core.Position]bool
-	fugitive    core.Position
+	sol        map[core.Position]string
+	trails     map[core.Position]bool
+	roadblocks map[core.Position]bool
+	inspectors map[core.Position]bool
+	fugitive   core.Position
 }
 
 // formes rend les noms à dessiner sur une case, du sol vers le dessus.
@@ -136,9 +135,6 @@ func (o occupation) formes(p core.Position) []string {
 	var noms []string
 	if o.trails[p] && !o.roadblocks[p] {
 		noms = append(noms, "trail")
-	}
-	if o.crimeScenes[p] {
-		noms = append(noms, "crime_scene")
 	}
 	if o.roadblocks[p] {
 		noms = append(noms, "roadblock")
@@ -155,12 +151,11 @@ func (o occupation) formes(p core.Position) []string {
 // releve rassemble en une passe ce que chaque case porte.
 func releve(p *core.Game) occupation {
 	o := occupation{
-		sol:         map[core.Position]string{},
-		trails:      map[core.Position]bool{},
-		roadblocks:  map[core.Position]bool{},
-		crimeScenes: map[core.Position]bool{},
-		inspectors:  map[core.Position]bool{},
-		fugitive:    p.Fugitive.Position,
+		sol:        map[core.Position]string{},
+		trails:     map[core.Position]bool{},
+		roadblocks: map[core.Position]bool{},
+		inspectors: map[core.Position]bool{},
+		fugitive:   p.Fugitive.Position,
 	}
 
 	for pos := range p.Trails {
@@ -168,9 +163,6 @@ func releve(p *core.Game) occupation {
 	}
 	for pos := range p.Roadblocks {
 		o.roadblocks[pos] = true
-	}
-	for _, c := range p.CrimeScenes {
-		o.crimeScenes[c.Position] = true
 	}
 	for _, i := range p.Inspectors {
 		o.inspectors[i.Position] = true

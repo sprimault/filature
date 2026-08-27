@@ -97,7 +97,7 @@ Toute liste y est un tableau, jamais `null` : une vue sans barrage porte un
 tableau vide. Un bot n'a pas à traiter deux formes pour la même absence.
 
 `legal_moves` contient tout ce que le camp peut faire ce tour-ci —
-déplacements, capacités, dépenses de résistance, meurtre compris. Un bot n'a
+déplacements, capacités, dépenses de résistance, leurres compris. Un bot n'a
 donc rien à savoir des règles pour être correct : il ne peut pas jouer un coup
 illégal s'il choisit dans cette liste. C'est aussi ce qui fait qu'un plugin de
 règles ajoutant une dépense est utilisable par un bot qui l'ignore.

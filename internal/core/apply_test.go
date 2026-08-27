@@ -32,13 +32,10 @@ func testRegistry() *Registry {
 				Trigger: OnFugitivePhase,
 				Effects: []Effect{{Type: EffectCancelReveal, Target: TargetFugitive}},
 			},
-			ExpenseMurder: {
-				Name: "Meurtre", Camp: SideFugitive, Cost: 3, Uses: 2,
+			ExpenseDecoy: {
+				Name: "Leurre", Camp: SideFugitive, Cost: 1, Uses: 2,
 				Trigger: OnFugitivePhase,
-				Effects: []Effect{
-					{Type: EffectRevealPosition, Target: TargetFugitive},
-					{Type: EffectMarkCrimeScene, Target: TargetFugitive},
-				},
+				Effects: []Effect{{Type: EffectDecoyTrail, Target: TargetCell}},
 			},
 			ExpenseChangeZone: {
 				Name: "Changement de zone", Camp: SideFugitive, Cost: 2,
@@ -181,37 +178,38 @@ func TestExpenseCostsAndUndoes(t *testing.T) {
 	}
 }
 
-// TestUsesCapped vérifie que le compteur d'emplois est générique : le
-// noyau n'a pas à savoir que la dépense plafonnée s'appelle meurtre.
+// TestUsesCapped vérifie que le compteur d'emplois est générique : le noyau
+// n'a pas à savoir laquelle des dépenses est plafonnée, ni à combien.
+//
+// Le plafond a changé de dépense — c'était le meurtre, c'est le leurre — sans
+// qu'une ligne du noyau bouge, ce qui est exactement ce que ce test garde.
 func TestUsesCapped(t *testing.T) {
 	p := playableGame()
 	p.Fugitive.Stamina = 20
 
 	for i := 0; i < 2; i++ {
-		var meurtre Move
+		var leurre Move
 		for _, c := range p.LegalMoves(SideFugitive) {
-			if c.Type == MoveExpense && c.Expense == ExpenseMurder {
-				meurtre = c
+			if c.Type == MoveExpense && c.Expense == ExpenseDecoy {
+				leurre = c
+				break
 			}
 		}
-		if meurtre.Type == "" {
-			t.Fatalf("le meurtre n'est plus proposé au %dᵉ emploi", i+1)
+		if leurre.Type == "" {
+			t.Fatalf("le leurre n'est plus proposé au %dᵉ emploi", i+1)
 		}
-		if err := p.Apply(meurtre); err != nil {
+		if err := p.Apply(leurre); err != nil {
 			t.Fatal(err)
 		}
 	}
 
-	if p.ExpenseUses[ExpenseMurder] != 2 {
-		t.Errorf("%d emplois comptés, attendu 2", p.ExpenseUses[ExpenseMurder])
+	if p.ExpenseUses[ExpenseDecoy] != 2 {
+		t.Errorf("%d emplois comptés, attendu 2", p.ExpenseUses[ExpenseDecoy])
 	}
 	for _, c := range p.LegalMoves(SideFugitive) {
-		if c.Type == MoveExpense && c.Expense == ExpenseMurder {
-			t.Error("un troisième meurtre est proposé")
+		if c.Type == MoveExpense && c.Expense == ExpenseDecoy {
+			t.Error("un troisième leurre est proposé")
 		}
-	}
-	if len(p.CrimeScenes) != 2 {
-		t.Errorf("%d scènes, attendu 2", len(p.CrimeScenes))
 	}
 }
 

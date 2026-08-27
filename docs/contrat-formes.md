@@ -1,6 +1,6 @@
 # Contrat de formes
 
-Version du contrat : **3**
+Version du contrat : **4**
 
 Tout ce qui se dessine sur le plateau — pions, sol, bâtiments, marqueurs — est
 décrit en géométrie, jamais en image. Un plugin d'apparence est un fichier
@@ -278,7 +278,7 @@ géométrie.
 qualifie le fichier, pas la palette.
 
 ```toml
-shapes_version = 3
+shapes_version = 4
 
 [palette]
 street = "#d8d2c4"
@@ -295,7 +295,6 @@ inspector_detail = "#101c2a"
 marker_outline = "#241d16"
 trail = "#f0e6c8"
 roadblock = "#8a7a4a"
-crime_scene = "#9b2c2c"
 ```
 
 **Deux sols se distinguent d'abord par la luminance, la teinte ne vient
@@ -362,7 +361,7 @@ description = "Le fugitif en voiture, les inspecteurs en gyrophare"
 
 ```toml
 # shapes.toml
-shapes_version = 3
+shapes_version = 4
 
 [shape.fugitive]
 [[shape.fugitive.stroke]]
@@ -419,7 +418,6 @@ rendu.
 | `inspector_1` … `inspector_5` | surcharge par pion, facultative |
 | `trail` | passage découvert |
 | `roadblock` | case fermée par le Barreur |
-| `crime_scene` | lieu d'un meurtre, connu des deux camps |
 | `cell_visible`, `cell_playable` | marqueurs de surcouche |
 
 `inspector_1` à `5` n'existent que pour qui veut distinguer les cinq

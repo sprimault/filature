@@ -59,7 +59,6 @@ ajouter une, vérifier que la composition des existantes ne suffit pas.
 |---|---|---|
 | `change_range` | `target`, `value`, `duration` | Modifie la portée de vue |
 | `reveal_position` | `target` | Rend une position publique ce tour |
-| `mark_crime_scene` | `target` | Inscrit un lieu, durablement et pour les deux camps |
 | `cancel_reveal` | `target` | Neutralise la prochaine révélation périodique |
 | `share_view` | `target`, `duration` | Un pion voit ce que voit un autre |
 | `reveal_trails` | `target`, `radius` | Découvre les traces dans le rayon, en distance de Manhattan |
@@ -78,10 +77,11 @@ pas du manifeste. Un leurre a la forme d'un pas qui n'a pas eu lieu, si bien que
 les règles de déplacement s'y appliquent telles quelles : il ne peut produire
 qu'une trace qu'un vrai déplacement aurait pu laisser.
 
-`reveal_position` et `mark_crime_scene` sont volontairement distincts, et le
-meurtre les compose : le premier ne vaut qu'un tour, le second reste sur le
-plateau. Les fondre en un seul interdirait de révéler sans laisser de marque, ce
-dont toute mécanique de repérage a besoin.
+`reveal_position` ne vaut qu'un tour : elle rend une position publique sans
+rien laisser sur le plateau. C'est la seule primitive de révélation, et elle est
+volontairement sans marque durable — une mécanique de repérage a besoin de dire
+« il est là maintenant » sans inscrire « il était là » pour le reste de la
+partie.
 
 ### Terrain
 
@@ -279,9 +279,9 @@ jamais par accident.
 ## 8. Ce qui n'est pas dans le vocabulaire, et pourquoi
 
 **Rien qui force un adversaire à jouer un coup.** Un effet modifie ce qui est
-possible, jamais ce qui est choisi. La convergence des inspecteurs sur une scène
-de meurtre n'est pas un effet : ils sont libres de l'ignorer, et c'est ce qui
-fait du meurtre un pari plutôt qu'un automatisme.
+possible, jamais ce qui est choisi. La convergence des inspecteurs sur une
+fausse trace n'est pas un effet : ils sont libres de l'ignorer, et c'est ce qui
+fait du leurre un pari plutôt qu'un automatisme.
 
 **Rien qui lise l'état caché.** Pas de primitive « connaître la zone scellée ».
 Un plugin qui en aurait besoin demanderait en fait un autre jeu.
