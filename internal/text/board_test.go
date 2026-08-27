@@ -208,8 +208,9 @@ func TestPieceLetterBounded(t *testing.T) {
 func TestEndingNamesTheReason(t *testing.T) {
 	for motif, attendu := range map[string]string{
 		core.OutcomeExtraction:   "extrait",
+		core.OutcomeCaptured:     "rattrapé",
 		core.OutcomeStaminaSpent: "à bout",
-		core.OutcomeCornered:     "pris",
+		core.OutcomeCornered:     "acculé",
 		core.OutcomeTimeUp:       "écoulé",
 	} {
 		rendu := Ending(core.Outcome{Winner: core.SideFugitive, Reason: motif, Turn: 12})

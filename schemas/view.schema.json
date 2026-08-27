@@ -238,6 +238,9 @@
         },
         "zones": {
           "type": "integer"
+        },
+        "zones_left_open": {
+          "type": "integer"
         }
       },
       "required": [
@@ -252,7 +255,8 @@
         "strangling_start",
         "trail_lifetime",
         "turns",
-        "zones"
+        "zones",
+        "zones_left_open"
       ]
     },
     "Trail": {

@@ -24,6 +24,7 @@ type Settings struct {
 	TrailLifetime    int `json:"trail_lifetime"`
 	StranglingStart  int `json:"strangling_start"`
 	StranglingPeriod int `json:"strangling_period"`
+	ZonesLeftOpen    int `json:"zones_left_open"`
 }
 
 // DefaultSettings correspond au préréglage « Ville ». Les valeurs sont
@@ -42,7 +43,8 @@ func DefaultSettings() Settings {
 		Zones:            6,
 		TrailLifetime:    6,
 		StranglingStart:  30,
-		StranglingPeriod: 2,
+		StranglingPeriod: 4,
+		ZonesLeftOpen:    3,
 	}
 }
 

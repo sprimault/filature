@@ -55,6 +55,77 @@ func TestContactsCapped(t *testing.T) {
 	}
 }
 
+// TestSharedCellIsContact vérifie qu'un inspecteur sur la case du fugitif est
+// au contact.
+//
+// Rien ne lui interdit d'y marcher, et rien ne doit le lui interdire : un coup
+// refusé parce qu'un fugitif invisible s'y trouve reviendrait à le lui
+// annoncer. Le pion le plus proche possible serait alors le seul du plateau à
+// ne rien faire de sa position.
+func TestSharedCellIsContact(t *testing.T) {
+	p := gameOn(grid(".....", ".....", ".....", ".....", "....."),
+		Position{Column: 2, Row: 2}, Position{Column: 2, Row: 2})
+	p.Extensions = testRegistry()
+	endTurn(t, p)
+
+	if p.Fugitive.Stamina != 9 {
+		t.Errorf("résistance %d, attendu 9 : la case commune ne compte pas",
+			p.Fugitive.Stamina)
+	}
+}
+
+// TestCaptureNeedsTwoResolutions vérifie qu'un contact isolé ne capture pas, et
+// que le même inspecteur maintenu capture.
+//
+// C'est ce qui sépare la capture du blocage : en terrain ouvert le fugitif rompt
+// le contact d'une diagonale, qui porte la distance orthogonale de un à trois
+// quand le poursuivant n'en regagne qu'un. Ce qui se maintient, c'est le
+// talonnage dans un couloir.
+func TestCaptureNeedsTwoResolutions(t *testing.T) {
+	p := gameOn(grid(".....", ".....", ".....", ".....", "....."),
+		Position{Column: 2, Row: 2}, Position{Column: 2, Row: 1})
+	p.Extensions = testRegistry()
+
+	endTurn(t, p)
+	if p.Fugitive.Captured {
+		t.Fatal("capturé dès le premier contact")
+	}
+	if _, fini := p.Outcome(); fini {
+		t.Fatal("la partie s'achève au premier contact")
+	}
+
+	endTurn(t, p)
+	if !p.Fugitive.Captured {
+		t.Fatal("le contact tenu deux résolutions ne capture pas")
+	}
+	r, fini := p.Outcome()
+	if !fini || r.Winner != SideInspectors || r.Reason != OutcomeCaptured {
+		t.Errorf("résultat %+v, attendu inspecteurs/captured", r)
+	}
+}
+
+// TestBrokenContactDoesNotCapture vérifie qu'un pion qui lâche prise ne
+// capture pas, même si un autre prend le relais.
+//
+// La règle demande le *même* inspecteur deux fois : deux pions qui se relaient
+// autour du fugitif le fatiguent, ils ne l'arrêtent pas.
+func TestBrokenContactDoesNotCapture(t *testing.T) {
+	p := gameOn(grid(".....", ".....", ".....", ".....", "....."),
+		Position{Column: 2, Row: 2}, Position{Column: 2, Row: 1}, Position{Column: 4, Row: 4})
+	p.Extensions = testRegistry()
+
+	endTurn(t, p)
+
+	// Le premier s'écarte, le second vient prendre sa place.
+	p.Inspectors[0].Position = Position{Column: 0, Row: 0}
+	p.Inspectors[1].Position = Position{Column: 1, Row: 2}
+	endTurn(t, p)
+
+	if p.Fugitive.Captured {
+		t.Error("capturé par deux pions qui se sont relayés")
+	}
+}
+
 // TestDiagonalsMakeNoContact vérifie que l'adjacence est orthogonale.
 //
 // Les diagonales font du fugitif un pion plus rapide, pas un pion plus
@@ -209,11 +280,12 @@ func TestDeferredComesDue(t *testing.T) {
 // cible, et que le mode fait le reste.
 func TestStranglingTriggersMode(t *testing.T) {
 	b := grid(".....", ".....", ".....", ".....", ".....")
-	b.zones = []Zone{{Number: 0}, {Number: 1}, {Number: 2}}
+	b.zones = []Zone{{Number: 0}, {Number: 1}, {Number: 2}, {Number: 3}}
 	p := gameOn(b, Position{Column: 2, Row: 2})
 	p.Seed = 99
 	p.Settings.StranglingStart = 3
 	p.Settings.StranglingPeriod = 2
+	p.Settings.ZonesLeftOpen = 3
 	p.Extensions = testRegistry()
 	p.Extensions.Modes = map[string]Mode{"etranglement": {
 		Name: "Étranglement", Trigger: OnStrangling,
@@ -261,22 +333,28 @@ func TestStranglingOrderDeterministic(t *testing.T) {
 	}
 }
 
-// TestStranglingCadence vérifie quand l'étranglement mord, et quand il se
-// tait.
+// TestStranglingCadence vérifie quand l'étranglement mord, quand il se tait, et
+// qu'il s'arrête avant d'avoir tout fermé.
+//
+// Six zones dont trois restent ouvertes : l'entonnoir doit créer un
+// rendez-vous, pas un verrou. Avec une seule issue, le camp entier s'y assied
+// et il n'y a plus d'arbitrage.
 func TestStranglingCadence(t *testing.T) {
 	b := grid(".....", ".....", ".....", ".....", ".....")
-	b.zones = []Zone{{Number: 0}, {Number: 1}, {Number: 2}}
+	b.zones = []Zone{{Number: 0}, {Number: 1}, {Number: 2},
+		{Number: 3}, {Number: 4}, {Number: 5}}
 
 	cas := []struct {
 		tour   int
 		attend bool
 	}{
 		{2, false}, // avant le début
-		{3, true},  // premier tour d'étranglement
+		{3, true},  // première fermeture
 		{4, false}, // hors cadence
 		{5, true},  // deux tours plus tard
-		{7, true},  // la troisième et dernière zone
-		{9, false}, // plus de zone à fermer
+		{7, true},  // la troisième et dernière
+		{9, false}, // il reste trois zones, l'étranglement s'arrête
+		{11, false},
 	}
 
 	for _, c := range cas {
@@ -285,6 +363,7 @@ func TestStranglingCadence(t *testing.T) {
 		p.Turn = c.tour
 		p.Settings.StranglingStart = 3
 		p.Settings.StranglingPeriod = 2
+		p.Settings.ZonesLeftOpen = 3
 
 		if _, vise := p.zoneToStrangle(); vise != c.attend {
 			t.Errorf("tour %d : visé=%v, attendu %v", c.tour, vise, c.attend)

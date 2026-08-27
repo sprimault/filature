@@ -46,6 +46,7 @@ type Fugitive struct {
 	Position      Position `json:"position"`
 	Stamina       int      `json:"stamina"`
 	Visible       bool     `json:"spotted"`
+	Captured      bool     `json:"captured"`
 	SealedZone    int      `json:"sealed_zone"`
 	TurnsInZone   int      `json:"turns_in_zone"`
 	SilenceBought bool     `json:"silence_bought"`
@@ -109,6 +110,17 @@ type Game struct {
 	Openings   map[Position]int `json:"openings"`
 
 	ClosedZones []int `json:"closed_zones"`
+
+	// LastContacts porte les pions qui étaient au contact du fugitif à la
+	// résolution précédente. C'est ce qui rend la capture possible : elle
+	// demande le même inspecteur deux fois de suite, et cette information ne se
+	// recalcule pas — il faudrait rejouer le journal à chaque tour.
+	//
+	// Dans Game et non dans Inspector, et c'est délibéré : ViewFor recopie les
+	// inspecteurs en bloc, donc un champ posé là partirait aux deux camps et
+	// dirait aux inspecteurs qu'ils touchent un fugitif qu'ils ne voient pas.
+	// Ce qui dépend de sa position vit hors de ce qui se recopie.
+	LastContacts []int `json:"last_contacts"`
 
 	// AbilityPlayed dit qu'une capacité a déjà été déclenchée ce tour. La
 	// règle en autorise une par tour en plus d'une par pion et par partie :

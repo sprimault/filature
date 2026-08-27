@@ -67,5 +67,14 @@ func SettingsForSize(cote int) Settings {
 	// sur quarante. Plus tôt, il décide de l'issue ; plus tard, il n'a pas le
 	// temps de fermer assez de zones pour peser.
 	p.StranglingStart = p.Turns * 3 / 4
+
+	// La période s'en déduit : les fermetures doivent tenir dans ce qui reste,
+	// la dernière tombant deux tours avant la fin. Figée, elle épuiserait la
+	// pression à mi-chemin sur une longue partie et déborderait la fin sur une
+	// courte.
+	fermetures := p.Zones - p.ZonesLeftOpen
+	if fermetures > 1 {
+		p.StranglingPeriod = max(1, (p.Turns-p.StranglingStart-2)/(fermetures-1))
+	}
 	return p
 }

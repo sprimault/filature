@@ -30,6 +30,21 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**La capture entre dans le jeu.** Un inspecteur qui reste au contact du fugitif
+deux résolutions de suite le rattrape. En terrain ouvert celui-ci rompt le
+contact d'une diagonale ; dans un couloir d'une case il ne le peut pas, et le
+double déplacement redevient une dépense de survie. Un inspecteur qui occupe sa
+case compte désormais comme au contact — l'en empêcher lui aurait appris où il
+se trouve.
+
+**Une zone ne se neutralise plus, ses cases s'occupent.** Un pion posté dessus
+n'en retire qu'une case d'entrée : fermer une zone demande autant de pions
+qu'elle a de cases de rue. L'étranglement s'arrête en laissant trois zones
+ouvertes, et sa cadence suit la durée de la partie au lieu d'être figée.
+
+**Quand deux conditions de fin tombent ensemble, celle du fugitif l'emporte.**
+Les inspecteurs en ont quatre, il n'en a qu'une.
+
 **Le noyau de départ suit la taille du plateau, et les inspecteurs ne s'y
 placent plus.** Son rayon valait cinq quelle que soit la ville, pendant que la
 portée de vue, elle, suivait le côté : cinq pions posés autour du centre y
@@ -68,6 +83,20 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Capture enters the game.** An inspector who stays in contact with the fugitive
+across two resolutions catches him. In open ground the fugitive breaks contact
+with a diagonal step; in a one-cell corridor he cannot, and the double step
+becomes a survival cost again. An inspector standing on his cell now counts as
+contact — refusing him that move would have told him where the fugitive is.
+
+**A zone is no longer neutralised, its cells are occupied.** A piece posted on
+one only removes an entry cell: closing a zone takes as many pieces as it has
+street cells. Strangling stops with three zones left open, and its cadence
+follows the length of the game instead of being fixed.
+
+**When two end conditions fall together, the fugitive's wins.** Inspectors have
+four of them, he has one.
 
 **The starting core follows the board size, and inspectors can no longer be
 placed inside it.** Its radius was five whatever the city, while sight range

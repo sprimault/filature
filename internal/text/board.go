@@ -226,8 +226,9 @@ func sideName(a core.Side) string {
 func Ending(r core.Outcome) string {
 	motifs := map[string]string{
 		core.OutcomeExtraction:   "le fugitif s'est extrait",
+		core.OutcomeCaptured:     "le fugitif est rattrapé",
 		core.OutcomeStaminaSpent: "le fugitif est à bout",
-		core.OutcomeCornered:     "le fugitif est pris",
+		core.OutcomeCornered:     "le fugitif est acculé",
 		core.OutcomeTimeUp:       "le temps est écoulé",
 		core.OutcomePlugin:       "une règle de plugin y a mis fin",
 	}
