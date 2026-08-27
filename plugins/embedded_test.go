@@ -15,7 +15,9 @@ import (
 //
 // Un `//go:embed` qui oublie un dossier ne fait pas échouer la compilation : le
 // jeu se construit, et se retrouve sans règles ou sans traduction à
-// l'exécution. Ce test est le seul endroit où l'oubli se voit.
+// l'exécution. Ce test le voit sur une liste attendue ;
+// TestEmbeddedFollowsRepository le voit sur le dépôt réel, donc sans liste à
+// tenir à jour.
 func TestShippedCarriesExpectedContent(t *testing.T) {
 	livres := Shipped()
 

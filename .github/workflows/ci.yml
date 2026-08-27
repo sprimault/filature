@@ -95,7 +95,7 @@ jobs:
           make sec
 
   # Ce que le poste de développement ne peut pas vérifier : que le code se
-  # construit encore pour les six cibles publiées. Sans ce job, une rupture de
+  # construit encore pour les cibles de la matrice. Sans ce job, une rupture de
   # compilation sur macOS ou arm64 n'apparaîtrait qu'au moment de publier.
   cibles:
     name: Compilation ${{ matrix.os }}/${{ matrix.arch }}

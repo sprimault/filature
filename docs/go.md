@@ -58,17 +58,22 @@ une image `scratch`.
 **Aucune autre dépendance n'a le droit d'introduire cgo.** `modernc.org/sqlite`
 est choisi pour cela : une seconde source rendrait les cibles Windows et
 WebAssembly impossibles. C'est aussi pourquoi `js/wasm` continue d'être compilé
-en intégration continue sans être publié — c'est le seul contrôle qui empêche
-une dépendance d'en ajouter par surprise.
+en intégration continue sans être publié : il empêche une dépendance d'en
+ajouter par surprise, comme `windows/amd64` qui est compilé sans cgo lui aussi.
 
 ## 3. `internal/core` est une feuille du graphe
 
 Le paquet des règles ne dépend de rien d'autre dans `internal/`, et ça doit le
-rester. `ai`, `render`, `storage` et `server` en dépendent tous ; l'inverse
-jamais.
+rester. Tout le reste en dépend ; l'inverse jamais. `render` fait exception dans
+l'autre sens : il ne dépend de rien non plus, la projection isométrique
+n'ayant pas besoin des règles.
 
 Il n'importe **jamais** Ebitengine. Un test qui exigerait une fenêtre n'a pas sa
 place dans la suite par défaut, les runners d'intégration étant sans écran.
+
+`TestPackagesKeepTheirImportsClean` applique les trois : la feuille du graphe,
+l'absence d'Ebitengine, et celle de `math/rand` — le générateur de `core` est le
+seul autorisé.
 
 ## 4. La configuration entre par `cmd/`
 
@@ -87,8 +92,9 @@ de commande qui le détient.
 - Constructeurs `New…` rendant `(*T, error)` si l'initialisation peut échouer.
 - Interfaces définies côté consommateur, pas côté implémentation.
 - Une interface de plus de trois méthodes signale en général deux
-  responsabilités mélangées. `Board` en a quatre parce qu'elle doit survivre au
-  passage au plateau infini ; c'est la seule.
+  responsabilités mélangées. `Board` dépasse ce seuil parce qu'elle doit survivre
+  au passage au plateau infini, et chaque méthode ajoutée depuis porte sa
+  justification en godoc.
 
 Un fichier porte le nom du type qu'il déclare — `game.go` pour `Game`,
 `board.go` pour `Board`. C'est ce qui permet de trouver une déclaration sans
@@ -142,7 +148,30 @@ Ce sont les seuils qu'exige `gosec`, et aucun cas n'a justifié de s'en écarter
 Le jour où il y en aura un, c'est un `#nosec` commenté, pas un assouplissement
 global.
 
-## 8. Journalisation
+## 8. Une affirmation de nombre s'adosse à un test, ou perd son quantificateur
+
+« Le seul endroit où », « les quatre recopies », « une par pion », « dix dessins
+en moyenne ». Une affirmation de quantité est vérifiable ; une affirmation de
+principe ne l'est pas — c'est ce qui rend celle-là exigible et donne un critère
+mécanique : chercher ces tournures, regarder lesquelles ont un test en face.
+
+Le danger n'est pas qu'elle devienne fausse, c'est qu'elle **empêche de
+chercher**. Une phrase qui affirme l'unicité d'un garde-fou dispense de vérifier
+s'il y en a un second, et une relecture ne se déclenche pas quand quelqu'un
+ajoute un cas ailleurs.
+
+Deux formes, deux remèdes. Une affirmation d'unicité sur une **catégorie
+fermée** — « le seul champ non sérialisé de `Game` » — se vérifie une fois et
+tient. Sur une **catégorie ouverte** — les endroits où une recopie est admise,
+les causes d'un échec — elle est fausse dès le prochain ajout, et c'est là qu'il
+faut un test.
+
+Vaut pour les documents : un chiffre qui **décrit le code** s'adosse à un test
+qui lit le document, un chiffre qui **décide** est exercé par le test de
+conformité, un chiffre **mesuré** porte sa date et sa mesure rejouable — voir
+`-maj-mesures`. Un quantificateur qui n'est aucun des trois n'a rien à faire là.
+
+## 9. Journalisation
 
 `log/slog` uniquement, structuré. Clés en anglais, message en français :
 
@@ -154,7 +183,7 @@ Jamais de `fmt.Println` de débogage laissé derrière soi. La sortie d'erreur d
 bot externe est capturée et journalisée telle quelle — c'est là que va son
 débogage, jamais sur sa sortie standard, qui porte le protocole.
 
-## 9. Concurrence
+## 10. Concurrence
 
 - `context.Context` en premier paramètre de toute fonction faisant de
   l'entrée-sortie, propagé jusqu'au bout. Pas de `context.Background()` hors de
@@ -170,7 +199,7 @@ débogage, jamais sur sa sortie standard, qui porte le protocole.
 
 ---
 
-## 10. Tests
+## 11. Tests
 
 ### Aucun test n'ouvre de fenêtre
 
@@ -225,12 +254,39 @@ C'est ce qui a révélé qu'une annulation laissait une tranche vide non nulle l
 où il y avait `nil`, ce qui aurait fait diverger le rejeu du journal en JSON
 sans que rien ne le signale.
 
+### Un test qui bâtit son entrée ne teste pas le chemin qui la produit
+
+Bâtir une entrée à la main est légitime pour **isoler un critère** — atteindre le
+quatrième refus d'un validateur sans satisfaire les trois premiers par accident.
+Ce qui ne l'est pas, c'est d'affirmer une propriété du **système monté** en
+contournant le montage.
+
+Un mode d'étranglement est resté inerte des mois durant : le test posait
+lui-même la clé du mode, une clé que le manifeste livré n'a jamais portée. Un
+second test vérifiait la bonne, les deux passaient au vert.
+
+D'où `internal/quality/conformance_test.go`, qui charge le manifeste, joue, et
+n'injecte rien.
+
+### Un test aléatoire dit ce qu'il a visité, pas seulement qu'il est passé
+
+Un tirage au sort parmi les coups légaux ne couvre que ce que sa distribution
+lui présente. Une dépense plafonnée pesait un coup sur vingt et son défaut
+d'annulation a survécu ; le leurre en pèse la moitié, et il est tombé à la
+première partie. **Le test n'avait pas changé, seul l'espace avait bougé.**
+
+Compter les types de coups joués, et le dire.
+
 ### Conformité du protocole de bot
 
-Le bot minimal de [`protocole-bot.md`](protocole-bot.md) est un cas de test : il
-joue cent parties au hasard, aucune ne doit s'interrompre sur un coup illégal ou
-un message mal formé. L'IA livrée passe par le même chemin — si le protocole
-manquait de quelque chose, ce test échouerait.
+Le bot minimal de [`protocole-bot.md`](protocole-bot.md) sera un cas de test :
+des parties jouées au hasard, aucune ne devant s'interrompre sur un coup illégal
+ou un message mal formé.
+
+**Rien n'exerce le protocole aujourd'hui.** `TestSeveralSeedsPlayThrough` joue
+vingt-cinq parties, mais par `ai.RandomBrain` et en mémoire ; le pilote de
+processus externe est un stub d'étape 9. Tant qu'il l'est, rien ne prouve que le
+protocole suffit.
 
 ### Ce qu'on ne teste pas
 

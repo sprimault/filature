@@ -107,9 +107,11 @@ func zeroValue(e ast.Expr) bool {
 	return false
 }
 
-// marked dit si un corps contient le commentaire d'étape. Le compare par
-// position est le seul moyen : l'AST rattache les commentaires au fichier, pas
-// aux blocs.
+// marked dit si un corps contient le commentaire d'étape.
+//
+// Les positions se comparent à la main parce que l'AST rattache les commentaires
+// au fichier et non aux blocs. ast.NewCommentMap ferait le même travail ; six
+// lignes ne valent pas la dépendance à sa sémantique de rattachement.
 func marked(f *ast.File, b *ast.BlockStmt) bool {
 	for _, g := range f.Comments {
 		if g.Pos() > b.Pos() && g.End() < b.End() && strings.Contains(g.Text(), "à implémenter") {

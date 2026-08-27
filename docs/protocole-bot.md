@@ -222,9 +222,9 @@ Le catalogue **ne distribue aucun exécutable**. L'entrée d'index porte le nom,
 la licence, le camp, le drapeau de déterminisme et l'URL du dépôt de l'auteur.
 L'installation se fait depuis chez lui, comme n'importe quel logiciel.
 
-Les contrôles — protocole, légalité des coups sur cent parties, déterminisme
-déclaré — tournent chez l'auteur, via un workflow réutilisable publié avec le
-jeu. Un bot arrive au catalogue validé, ou n'y arrive pas.
+Les contrôles — protocole, légalité des coups sur un grand nombre de parties,
+déterminisme déclaré — tourneront chez l'auteur, via un workflow réutilisable
+publié avec le jeu. Un bot arrivera au catalogue validé, ou n'y arrivera pas.
 
 Hors catalogue, aucune restriction : un exécutable posé dans le dossier des
 plugins est lancé tel quel.
