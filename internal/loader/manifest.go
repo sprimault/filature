@@ -38,6 +38,13 @@ var licencesAdmises = []string{
 // nomValide dit si un nom de plugin suit le motif du contrat.
 func nomValide(nom string) bool { return nomDePlugin.MatchString(nom) }
 
+// codeDeLangue est l'étiquette BCP 47 que le schéma publie : de, pt-BR,
+// zh-Hans.
+//
+// Recopié comme le motif d'un nom, et pour la même raison : le chargeur ne lit
+// pas de fichier de contrat au démarrage. Un test rapproche les deux.
+var codeDeLangue = regexp.MustCompile(`^[a-z]{2,3}(-[A-Za-z]{2,8})*$`)
+
 // manifeste est la forme d'un manifeste.toml, telle que
 // schemas/manifeste-plugin.schema.json la décrit.
 //
@@ -178,6 +185,23 @@ func (m *manifeste) validate(chemin, dossier string) []error {
 		}
 	}
 
+	// Le code de langue sert de clé au sélecteur et à la poignée de main : deux
+	// plugins qui déclarent le même sont un conflit, ce qui n'a de sens que si
+	// la forme est fixée. Le motif était publié par le schéma et lu par
+	// personne.
+	if m.Langue != nil {
+		if m.Langue.Code == "" {
+			ajouter("langue sans code")
+		} else if !codeDeLangue.MatchString(m.Langue.Code) {
+			ajouter("code de langue %q : attendu une etiquette BCP 47, comme de, pt-BR ou zh-Hans",
+				m.Langue.Code)
+		}
+		if m.Langue.Name == "" {
+			ajouter("langue %q sans nom : c'est lui qui s'affiche dans le selecteur",
+				m.Langue.Code)
+		}
+	}
+
 	// Un bot choisit ses coups, il ne légifère pas. S'il pouvait aussi changer
 	// la règle, deux joueurs compareraient des manifestes identiques en jouant
 	// deux jeux différents.
@@ -216,7 +240,7 @@ func (m *manifeste) checkAllEffects(chemin string) []error {
 					chemin, cle, mode.Trigger, listeDesTriggers()))
 		}
 		manquements = append(manquements,
-			checkEffects(mode.Effects, chemin, "mode."+cle, false)...)
+			checkEffects(mode.Effects, "", chemin, "mode."+cle, false)...)
 	}
 	return manquements
 }
@@ -264,7 +288,36 @@ func checkAbility(c core.Ability, chemin, ou string) []error {
 				"un pion qui s'y accroche agirait sans que son camp l'ait joue",
 			chemin, ou, core.OnStrangling))
 	}
-	return append(manquements, checkEffects(c.Effects, chemin, ou, false)...)
+	return append(manquements, checkEffects(c.Effects, c.Camp, chemin, ou, false)...)
+}
+
+// cibleHorsDuCamp dit pourquoi une cible ne convient pas au camp qui la déclare,
+// et rend une chaîne vide quand elle convient.
+//
+// **Ce qui se refuse est ce qui ne désigne personne, pas ce qui avantage
+// l'adversaire.** docs/vocabulaire-effets.md §4 promettait le second, avec pour
+// exemple une capacité d'inspecteur qui rendrait de la résistance au fugitif —
+// mais cibler le fugitif depuis le camp adverse est le cas ordinaire : le Chef
+// révèle sa position, le Barreur lui ferme une case. Séparer le bénéfique du
+// nuisible demanderait au chargeur de juger chaque couple effet-cible, c'est-à-dire
+// exactement le raisonnement que le vocabulaire déclaratif refuse de porter.
+//
+// Le document a été corrigé pour dire ce qui est réellement vérifié. Une
+// promesse qu'aucun code ne peut tenir vaut moins qu'une garantie plus étroite
+// qui, elle, s'applique.
+//
+// Un mode n'a pas de camp : c'est le jeu qui le déclenche, et il agit sur qui la
+// règle désigne. Camp vide, donc rien à contrôler.
+func cibleHorsDuCamp(cible core.Target, camp core.Side) string {
+	// Le fugitif est seul : « un autre pion » et « tous les pions » ne
+	// désignent rien chez lui, et un effet qui les vise ne s'appliquerait à
+	// personne sans qu'aucun message ne le dise. current_piece reste admis, il
+	// le désigne lui-même.
+	if camp == core.SideFugitive &&
+		(cible == core.TargetOtherPiece || cible == core.TargetAllPieces) {
+		return "le fugitif est seul, cette cible ne designe aucun pion"
+	}
+	return ""
 }
 
 // checkEffects contrôle une liste d'effets, et refuse un differer imbriqué.
@@ -272,7 +325,7 @@ func checkAbility(c core.Ability, chemin, ou string) []error {
 // Deux durées s'additionnent, donc l'imbrication n'ajoute rien ; et elle
 // permettrait des chaînes qu'aucune annulation ne saurait dérouler, ce qui
 // coûterait l'invariant de réversibilité pour rien.
-func checkEffects(effets []core.Effect, chemin, ou string, dansUnDiffere bool) []error {
+func checkEffects(effets []core.Effect, camp core.Side, chemin, ou string, dansUnDiffere bool) []error {
 	var manquements []error
 
 	for i, e := range effets {
@@ -288,6 +341,9 @@ func checkEffects(effets []core.Effect, chemin, ou string, dansUnDiffere bool) [
 		if e.Target != "" && !core.TargetKnown(e.Target) {
 			ajouter("cible %q inconnue", e.Target)
 		}
+		if raison := cibleHorsDuCamp(e.Target, camp); raison != "" {
+			ajouter("cible %q dans une declaration du camp %q : %s", e.Target, camp, raison)
+		}
 
 		if e.Type != core.EffectDefer {
 			if len(e.Then) > 0 {
@@ -302,7 +358,7 @@ func checkEffects(effets []core.Effect, chemin, ou string, dansUnDiffere bool) [
 			ajouter("differer sans puis")
 		}
 		manquements = append(manquements,
-			checkEffects(e.Then, chemin, place+".then", true)...)
+			checkEffects(e.Then, camp, chemin, place+".then", true)...)
 	}
 	return manquements
 }

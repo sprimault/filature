@@ -56,8 +56,8 @@ chemin est exercé à chaque partie, plutôt qu'une fois de temps en temps.
 | `description` | chaîne | non | une phrase, affichée dans l'écran des plugins |
 | `license` | chaîne | au catalogue | identifiant SPDX |
 
-`nom` suit `^[a-z][a-z0-9-]{1,31}$` : minuscules, chiffres et tirets, de 2 à 32
-caractères.
+`name` suit `^[a-z][a-z0-9-]{1,31}$` : minuscules, chiffres et tirets, de 2 à 32
+caractères. Le contrôle est appliqué au chargement.
 
 `version` n'a aucune valeur de preuve. Ce qui identifie réellement un plugin
 est l'empreinte de son contenu, calculée au chargement : deux plugins qui se
@@ -114,7 +114,7 @@ Même structure : c'est le sens du coût qui change, pas la forme.
 | Champ | Type | Rôle |
 |---|---|---|
 | `name` | chaîne | libellé affiché |
-| `side` | `fugitive` | `inspectors` || `inspecteurs` | qui peut la déclencher |
+| `side` | `fugitive` ou `inspectors` | qui peut la déclencher |
 | `uses` | entier | déclenchements par partie ; absent vaut illimité |
 | `cost` | entier | points de résistance prélevés |
 | `passive` | booléen | s'applique en permanence, sans déclenchement |
@@ -130,15 +130,16 @@ trigger = "inspectors_phase"
 
   [[ability.blocker.effect]]
   type = "block_cell"
-  target = "case"
+  target = "cell"
   duration = 3
 ```
 
 Les primitives disponibles, leurs paramètres et leurs cibles sont dans
 [`vocabulaire-effets.md`](vocabulaire-effets.md).
 
-Une cible incompatible avec le `camp` déclaré est refusée au chargement : une
-capacité d'inspecteur ne rend pas de résistance au fugitif.
+Une cible qui ne désigne personne est refusée au chargement : une dépense du
+fugitif ne vise ni `other_piece` ni `all_pieces`, puisqu'il est seul. Viser le
+camp adverse, en revanche, est le cas ordinaire — voir §9.
 
 ---
 
@@ -207,16 +208,16 @@ code = "de"
 name = "Deutsch"
 ```
 
-`code` est une étiquette BCP 47 — `de`, `pt-BR`, `zh-Hans`. `nom` est le nom de
-la langue **dans cette langue**, parce que c'est lui qui s'affiche dans le
-sélecteur : quelqu'un qui cherche sa langue y cherche « Deutsch », pas
-« allemand ».
+`code` est une étiquette BCP 47 — `de`, `pt-BR`, `zh-Hans` — et sa forme est
+vérifiée au chargement. `name` est le nom de la langue **dans cette langue**,
+parce que c'est lui qui s'affiche dans le sélecteur : quelqu'un qui cherche sa
+langue y cherche « Deutsch », pas « allemand ».
 
 ```toml
 # language.toml
 [label]
-menu_nouvelle_partie = "Neues Spiel"
-camp_fugitif = "Flüchtiger"
+menu_new_game = "Neues Spiel"
+side_fugitive = "Flüchtiger"
 ```
 
 **Une langue par plugin.** Un traducteur publie et met à jour la sienne sans
@@ -391,7 +392,18 @@ reste du texte comme le reste de ce qu'un plugin publie.
 - un nom hors du motif `^[a-z][a-z0-9-]{1,31}$`, qui sert d'identifiant partout ;
 - une `license` absente de la liste fermée du §2 ;
 - un `trigger` inconnu, ou `strangling` sur une capacité — le jeu le déclenche
-  lui-même, et un pion qui s'y accrocherait agirait sans que son camp l'ait joué.
+  lui-même, et un pion qui s'y accrocherait agirait sans que son camp l'ait joué ;
+- une cible qui ne désigne personne : `other_piece` ou `all_pieces` dans une
+  dépense du fugitif, qui est seul ;
+- un `code` de langue hors de l'étiquette BCP 47, ou une langue sans `name` —
+  c'est lui qui s'affiche dans le sélecteur.
+
+**Ce qui n'est pas refusé, et ne peut pas l'être** : un effet qui vise le camp
+adverse. Le Chef révèle la position du fugitif, le Barreur lui ferme une case ;
+distinguer cela d'une capacité d'inspecteur qui lui rendrait de la résistance
+demanderait au chargeur de juger l'intention derrière chaque couple effet-cible,
+c'est-à-dire de porter le raisonnement que le vocabulaire déclaratif refuse
+d'avoir. Un tel plugin se charge : il est mal écrit, pas invalide.
 
 Le catalogue ajoute une seule règle, mécanique : **aucun fichier binaire, sous
 aucune extension.** C'est ce qui supprime toute question de provenance, donc

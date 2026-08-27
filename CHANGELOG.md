@@ -30,6 +30,16 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Deux refus de plus au chargement, et une promesse retirée.** Une cible qui ne
+désigne personne — `other_piece` ou `all_pieces` dans une dépense du fugitif,
+qui est seul — et un code de langue hors de l'étiquette BCP 47 étaient tous deux
+acceptés. En revanche, la promesse qu'une cible « incompatible avec le camp
+déclarant » serait refusée disparaît : viser le camp adverse est le cas
+ordinaire, et distinguer ce qui avantage le fugitif de ce qui le gêne
+demanderait au chargeur de juger l'intention de chaque effet. Un plugin qui
+déclare côté inspecteurs un effet lui rendant de la résistance se charge : il
+est mal écrit, pas invalide.
+
 **Le Chef ordonne un coup de filet.** Sa capacité partageait la vue d'un
 coéquipier, ce qui ne voulait rien dire : les cinq inspecteurs sont un joueur
 unique, et la vue du camp unit déjà ce que chacun voit. Elle rend désormais la
@@ -198,6 +208,15 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Two more rejections at load time, and one promise withdrawn.** A target that
+designates nobody — `other_piece` or `all_pieces` in a fugitive expense, he being
+alone — and a language code outside the BCP 47 tag were both accepted. The
+promise that a target "incompatible with the declaring side" would be refused, on
+the other hand, is gone: targeting the opposing side is the ordinary case, and
+telling what helps the fugitive from what hinders him would require the loader to
+judge each effect's intent. A plugin declaring an inspector-side effect that
+restores his stamina loads: it is badly written, not invalid.
 
 **The Chief calls a dragnet.** His ability shared a teammate's view, which meant
 nothing: the five inspectors are a single player, and the side's view already
