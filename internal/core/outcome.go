@@ -150,19 +150,31 @@ func (p *Game) countExtraction() []func() {
 	return []func(){func() { p.Fugitive.TurnsInZone = precedent }}
 }
 
-// zoneToStrangle renvoie la zone que l'étranglement vise à ce tour, s'il en
-// vise une.
+// zoneToStrangle renvoie la zone que l'étranglement ferme à ce tour, s'il en
+// ferme une.
 //
-// Elle ne ferme rien : elle donne la cadence et la cible au mode etranglement
-// de plugins/base, qui porte le préavis et la fermeture. Un plugin qui
-// remplace ce mode change ce qui se passe, jamais quand.
-//
-// Une seule zone à la fois, et non deux listes : le préavis n'est plus l'affaire
-// du noyau depuis que le mode le déclare, et rendre « ce qui est annoncé » ici
-// dupliquerait ce que la file des différés porte déjà.
+// Elle donne la cadence et la cible au mode déclaré sur OnStrangling, qui porte
+// la fermeture. Un plugin qui remplace ce mode change ce qui se passe, jamais
+// quand.
 func (p *Game) zoneToStrangle() (int, bool) {
+	return p.zoneToStrangleAt(p.Turn)
+}
+
+// zoneToStrangleAt renvoie la zone que l'étranglement fermera au tour demandé.
+//
+// Interrogeable pour un tour à venir, et c'est ce qui porte l'annonce : la vue
+// la lit à Turn+StranglingNotice, sans qu'aucun effet ait à être posé.
+//
+// **Le préavis appartient au noyau et non au mode.** docs/regles.md §10 promet
+// que personne ne subit une fermeture par surprise : une promesse de règle ne
+// peut pas dépendre de ce qu'un manifeste déclare, pas plus que la vue filtrée
+// ne se négocie. Le mode le portait auparavant sous forme d'un differer de deux
+// tours, qui s'ajoutait à la cadence au lieu de la précéder — les fermetures
+// tombaient deux tours après le tableau publié, la dernière au dernier tour de
+// la partie.
+func (p *Game) zoneToStrangleAt(tour int) (int, bool) {
 	debut, periode := p.Settings.StranglingStart, p.Settings.StranglingPeriod
-	if periode <= 0 || p.Turn < debut || (p.Turn-debut)%periode != 0 {
+	if periode <= 0 || tour < debut || (tour-debut)%periode != 0 {
 		return 0, false
 	}
 
@@ -172,7 +184,7 @@ func (p *Game) zoneToStrangle() (int, bool) {
 	// coûte la masse qui capture.
 	ordre := p.stranglingOrder()
 	fermetures := len(ordre) - p.Settings.ZonesLeftOpen
-	rang := (p.Turn - debut) / periode
+	rang := (tour - debut) / periode
 	if fermetures <= 0 || rang >= fermetures {
 		return 0, false
 	}

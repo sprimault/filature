@@ -5,6 +5,7 @@ package quality
 
 import (
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -120,6 +121,80 @@ func TestStranglingActuallyCloses(t *testing.T) {
 	if reste := ouvertes - len(p.ClosedZones); reste < p.Settings.ZonesLeftOpen {
 		t.Errorf("%d zones ouvertes, %d attendues au minimum",
 			reste, p.Settings.ZonesLeftOpen)
+	}
+}
+
+// TestStranglingClosesOnScheduleAndAnnouncesAhead vérifie que les zones ferment
+// aux tours publiés et qu'aucune ne ferme sans avoir été annoncée.
+//
+// docs/regles.md §10 donne les tours de fermeture par préréglage et promet un
+// préavis de deux tours. Les deux moitiés se tiennent : le mode livré portait
+// auparavant le préavis sous forme d'un differer, qui s'ajoutait à la cadence du
+// noyau au lieu de la précéder — les fermetures tombaient deux tours après le
+// tableau, la dernière au dernier tour de la partie, et le contrôle arithmétique
+// des préréglages ne le voyait pas puisqu'il mesurait le tour d'annonce.
+//
+// Se joue sur les trois préréglages : la période dérive de la durée, et le
+// Quartier est le seul où elle égale le préavis.
+func TestStranglingClosesOnScheduleAndAnnouncesAhead(t *testing.T) {
+	for _, cle := range []string{"quartier", "faubourg", "ville"} {
+		t.Run(cle, func(t *testing.T) {
+			p := partieLivree(t, cle)
+			s := p.Settings
+
+			annonce := map[int]int{}
+			fermeture := map[int]int{}
+			var ordre []int
+
+			for p.Phase != core.PhaseOver {
+				tour := p.Turn
+				for _, zone := range p.ViewFor(core.SideFugitive).ZonesAnnoncees {
+					if _, vue := annonce[zone]; !vue {
+						annonce[zone] = tour
+					}
+				}
+
+				avant := append([]int(nil), p.ClosedZones...)
+				finirLeTour(t, p)
+				for _, zone := range p.ClosedZones {
+					if !slices.Contains(avant, zone) {
+						fermeture[zone] = tour
+						ordre = append(ordre, zone)
+					}
+				}
+			}
+
+			attendues := s.Zones - s.ZonesLeftOpen
+			if len(ordre) != attendues {
+				t.Fatalf("%d zones fermées en %d tours, %d attendues",
+					len(ordre), s.Turns, attendues)
+			}
+
+			for rang, zone := range ordre {
+				voulu := s.StranglingStart + rang*s.StranglingPeriod
+				if fermeture[zone] != voulu {
+					t.Errorf("zone %d fermée au tour %d, attendu %d",
+						zone, fermeture[zone], voulu)
+				}
+				quand, annoncee := annonce[zone]
+				if !annoncee {
+					t.Errorf("zone %d fermée au tour %d sans avoir été annoncée",
+						zone, fermeture[zone])
+					continue
+				}
+				if delai := fermeture[zone] - quand; delai != s.StranglingNotice {
+					t.Errorf("zone %d annoncée %d tours avant sa fermeture, attendu %d",
+						zone, delai, s.StranglingNotice)
+				}
+			}
+
+			// La dernière fermeture laisse de quoi jouer après elle, sans quoi
+			// la pression tomberait quand il n'y a plus rien à en faire.
+			if derniere := fermeture[ordre[len(ordre)-1]]; derniere > s.Turns-core.StranglingEndMargin {
+				t.Errorf("dernière fermeture au tour %d pour %d tours de jeu",
+					derniere, s.Turns)
+			}
+		})
 	}
 }
 

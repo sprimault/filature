@@ -27,6 +27,12 @@ type Settings struct {
 	ShelterRecharge  int `json:"shelter_recharge"`
 	StranglingStart  int `json:"strangling_start"`
 	StranglingPeriod int `json:"strangling_period"`
+
+	// StranglingNotice est le nombre de tours entre l'annonce d'une fermeture
+	// et la fermeture elle-même. Dans les paramètres et non dans le mode :
+	// docs/regles.md §10 en fait une règle, et une règle ne se négocie pas par
+	// manifeste.
+	StranglingNotice int `json:"strangling_notice"`
 	ZonesLeftOpen    int `json:"zones_left_open"`
 }
 
@@ -55,6 +61,14 @@ func DefaultSettings() Settings {
 		ShelterRecharge:  8,
 		StranglingStart:  30,
 		StranglingPeriod: 4,
+
+		// Deux tours, quelle que soit la taille. Le préavis n'achète pas de la
+		// distance mais une décision — resceller pour 2 points, ou ne pas
+		// s'engager vers une zone condamnée —, et il est borné par la période :
+		// deux annonces qui se recouvrent donnent une information illisible,
+		// c'est-à-dire le contraire de ce que l'annonce existe pour donner. Le
+		// Quartier sature déjà cette borne, sa période valant 2.
+		StranglingNotice: 2,
 		ZonesLeftOpen:    3,
 	}
 }
@@ -88,6 +102,11 @@ const (
 	// voisines immédiates. Le maximum est relatif au plateau : voir la moitié
 	// du terrain depuis un pion rendrait la fuite impossible.
 	MinRange = 3
+
+	// StranglingEndMargin est ce que la dernière fermeture laisse de jeu après
+	// elle. Sans cette marge, la pression du dernier resserrement tomberait
+	// alors qu'il n'y a plus rien à en faire.
+	StranglingEndMargin = 2
 )
 
 // Validate refuse les combinaisons qui rendent la partie injouable plutôt que de
@@ -115,6 +134,14 @@ func (p Settings) Validate() error {
 	case p.StranglingStart >= p.Turns:
 		return fmt.Errorf("etranglement au tour %d pour une partie de %d tours : "+
 			"il doit commencer avant la fin", p.StranglingStart, p.Turns)
+
+	// Un préavis plus long que la période ferait se recouvrir deux annonces, et
+	// le joueur ne saurait plus laquelle il lit — ce qui retire à l'annonce ce
+	// qu'elle apporte. C'est ce contrôle qui fait de la promesse du §10 une
+	// garantie plutôt qu'une phrase.
+	case p.StranglingNotice < 0 || (p.StranglingPeriod > 0 && p.StranglingNotice > p.StranglingPeriod):
+		return fmt.Errorf("preavis d'etranglement de %d tours pour une periode de %d : "+
+			"deux annonces se recouvriraient", p.StranglingNotice, p.StranglingPeriod)
 	case p.PiecesPerTurn < 1 || p.PiecesPerTurn > p.Inspectors:
 		return fmt.Errorf("%d pions deplacables pour %d inspecteurs",
 			p.PiecesPerTurn, p.Inspectors)

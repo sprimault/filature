@@ -496,6 +496,13 @@ déciderait de l'issue ; plus tard, il n'aurait pas le temps de peser. L'interva
 en découle, la dernière fermeture tombant deux tours avant la fin — sans quoi la
 pression s'épuiserait à mi-chemin et les derniers tours seraient plats.
 
+Ces deux tours-là et ceux du préavis sont deux nombres distincts qui se
+trouvent égaux : l'un laisse de quoi profiter de la dernière fermeture, l'autre
+de quoi la voir venir. **Le préavis ne dépasse jamais la période** — deux
+annonces qui se recouvrent donnent une information qu'on ne peut plus lire,
+c'est-à-dire le contraire de ce qu'une annonce apporte. Sur le Quartier, où la
+période vaut 2, la contrainte est atteinte.
+
 **Trois zones et non une.** L'entonnoir doit créer un rendez-vous, pas un
 verrou : avec une seule issue, il n'y a plus d'arbitrage et le camp entier s'y
 assied. À trois, couvrir demande de se diviser, et se diviser coûte la masse qui
@@ -527,6 +534,7 @@ d'équilibrage.
 | Recharge d'un lieu | 8 tours | Ne suit pas la taille, voir §7 |
 | Contacts consécutifs pour capturer | 2 | |
 | Début de l'étranglement | 3/4 de la durée | Tour 30 sur quarante |
+| Préavis d'une fermeture | 2 tours | Constant, mais jamais plus que la période |
 | Zones restantes après étranglement | 3 | |
 
 **Quatre de ces valeurs suivent le côté du plateau au lieu d'être posées** : la
