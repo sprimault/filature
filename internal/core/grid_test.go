@@ -103,7 +103,10 @@ func drawAsText(b *BoundedBoard, cas casPlateau, retenue int64) string {
 	}
 
 	var texte strings.Builder
-	fmt.Fprintf(&texte, "# %s — graine demandée %d, retenue %d, côté %d\n\n",
+	// La graine retenue est une sortie, pas un choix : c'est celle où la
+	// validation a fini par aboutir, et elle rebouge à chaque changement de
+	// génération. Seule la demandée est fixée par le cas de test.
+	fmt.Fprintf(&texte, "# %s — graine demandée %d, retenue %d (sortie), côté %d\n\n",
 		cas.nom, cas.graine, retenue, cas.cote)
 
 	for ligne := 0; ligne < b.cote; ligne++ {

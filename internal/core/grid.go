@@ -112,15 +112,31 @@ func (b *BoundedBoard) traceAvenues(a *Random) {
 
 // axes tire les indices des avenues, du premier bord au dernier.
 //
-// Le dernier axe est ramené sur le bord opposé : sans lui, la bande de cases
-// qui le longe n'est atteignable que par un côté, et les zones qu'on y pose
-// deviennent des culs-de-sac que la validation rejette.
+// Le bord opposé est toujours une avenue : sans lui, la bande de cases qui le
+// longe n'est atteignable que par un côté, et les zones qu'on y pose deviennent
+// des culs-de-sac que la validation rejette.
+//
+// **Le tirage s'arrête assez tôt pour que ce bord respecte l'écart minimal.**
+// L'ajouter sans regarder la distance au dernier axe le collait à lui : l'écart
+// final valait 2,9 en moyenne au lieu des 3 à 6 annoncés, sur les trois
+// préréglages. Une avenue de trop resserre toute la trame, et d'autant plus que
+// le plateau est petit — le Quartier n'y survivait que treize fois sur deux
+// cents.
 func (b *BoundedBoard) axes(a *Random) []int {
+	bord := b.cote - 1
+
 	var indices []int
-	for x := 0; x < b.cote-1; x += MinAvenueGap + a.Int(MaxAvenueGap-MinAvenueGap+1) {
+	for x := 0; x < bord-MinAvenueGap; x += MinAvenueGap + a.Int(MaxAvenueGap-MinAvenueGap+1) {
 		indices = append(indices, x)
 	}
-	return append(indices, b.cote-1)
+
+	// L'écart qui reste jusqu'au bord n'est plus tiré : il est ce que la boucle
+	// laisse, et il dépasse parfois la borne haute. C'est assumé — le rattraper
+	// par une avenue de plus coûterait bien davantage, l'essai ramenant le
+	// Quartier de cent neuf plateaux acceptés sur deux cents à quarante-deux.
+	// Un îlot un peu large en périphérie se traverse ; une trame resserrée ne
+	// se corrige pas.
+	return append(indices, bord)
 }
 
 // punchCourtyards ouvre des cours dans les îlots, pour casser la régularité.

@@ -132,7 +132,10 @@ déplacement et vision.
 
 Génération déterministe depuis une graine :
 
-1. Trame de rues orthogonales à intervalle irrégulier (3 à 6 cases).
+1. Trame de rues orthogonales à intervalle irrégulier (3 à 6 cases). **Le
+   dernier îlot fait exception** : les quatre bords sont toujours des avenues,
+   et ce qui reste entre la dernière avenue tirée et le bord peut dépasser six
+   cases. Le rattraper par une avenue de plus resserrerait toute la trame.
 2. Remplissage des îlots en bâtiments.
 3. Perçage aléatoire de passages et de cours, pour casser la régularité.
 4. Creusement d'impasses, une par carré de huit cases de côté — sans bords, ce
@@ -633,6 +636,12 @@ ne serait qu'un mur de déplacement sans effet sur l'information.
 - Le taux de bâtiments visé, 35 à 50 %, vient d'une estimation. Un prototype
   antérieur tournait à 28 % et produisait des plateaux jouables : la fourchette
   est peut-être à revoir vers le bas.
+- **Le Quartier n'a aucune marge sous la borne haute** : il produit en moyenne
+  50 % de rues pour un plafond de 50, et un plateau sur deux est rejeté. C'est
+  jouable, mais le prochain changement de génération — n'importe lequel — le
+  fera repasser sous la barre, et le signal se déclenchera dans un lot sans
+  rapport. Ou la fourchette est trop étroite, ou le petit format demande une
+  trame à lui.
 
 L'architecture, les structures et la feuille de route ont leur propre document :
 [`architecture.md`](architecture.md).

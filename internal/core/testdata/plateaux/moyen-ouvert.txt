@@ -1,4 +1,4 @@
-# moyen-ouvert — graine demandée 1, retenue 1, côté 31
+# moyen-ouvert — graine demandée 1, retenue 1 (sortie), côté 31
 
 000................111.........
 000#.#####.###.###.111##.#.###.
