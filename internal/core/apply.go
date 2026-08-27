@@ -16,8 +16,8 @@ import (
 // interne relève du défaut. Le jeu ne corrige ni n'interprète jamais un coup.
 var ErrIllegalMove = errors.New("coup absent des coups legaux")
 
-// ErrRienAAnnuler est renvoyé quand la pile d'annulations est vide.
-var ErrRienAAnnuler = errors.New("aucun coup a annuler")
+// ErrNothingToUndo est renvoyé quand la pile d'annulations est vide.
+var ErrNothingToUndo = errors.New("aucun coup a annuler")
 
 // Apply joue un coup et fait avancer la phase.
 //
@@ -49,7 +49,7 @@ func (p *Game) Apply(c Move) error {
 // vérité.
 func (p *Game) Undo() error {
 	if len(p.annulations) == 0 {
-		return ErrRienAAnnuler
+		return ErrNothingToUndo
 	}
 
 	dernier := len(p.annulations) - 1

@@ -284,8 +284,8 @@ func TestTurnEndResetsQuotas(t *testing.T) {
 
 // TestUndoWithNoMove vérifie qu'annuler sur une partie vierge le dit.
 func TestUndoWithNoMove(t *testing.T) {
-	if err := playableGame().Undo(); !errors.Is(err, ErrRienAAnnuler) {
-		t.Fatalf("erreur %v, attendu ErrRienAAnnuler", err)
+	if err := playableGame().Undo(); !errors.Is(err, ErrNothingToUndo) {
+		t.Fatalf("erreur %v, attendu ErrNothingToUndo", err)
 	}
 }
 
