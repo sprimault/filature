@@ -20,14 +20,17 @@ const (
 	margeEtiquette = 8
 )
 
-// sols sont les trois fonds sur lesquels une forme peut se poser.
+// sols vient de render : ce sont les fonds sur lesquels une forme peut se
+// poser, et la planche les montre tous.
 //
-// Les trois et non le seul sol de rue : leurs luminances vont de 210 à 82, et
-// une forme lisible sur l'un peut disparaître sur l'autre. C'est précisément ce
-// qu'un auteur doit voir avant de publier.
-var sols = []string{"street", "zone_open", "zone_closed"}
+// Tous et non le seul sol de rue : leurs luminances vont de 210 à 84, et une
+// forme lisible sur l'un peut disparaître sur l'autre. C'est précisément ce
+// qu'un auteur doit voir avant de publier — et la planche l'a manqué pendant
+// qu'elle en oubliait deux, ceux-là mêmes que la palette livrée signale comme
+// trop proches l'un de l'autre.
+var sols = render.Grounds
 
-// Shapes écrit la planche des formes, chacune sur les trois sols possibles.
+// Shapes écrit la planche des formes, chacune sur tous les sols possibles.
 //
 // origine désigne le plugin dont on fait l'aperçu : ses formes portent une
 // marque, les autres retombent sur le contenu livré. C'est ce qui permet de voir
@@ -93,7 +96,7 @@ func cadre(s *strings.Builder, x, y float64, sol string) {
 
 // contraste choisit du noir ou du blanc selon le fond.
 //
-// Une étiquette d'une seule couleur disparaîtrait sur l'un des trois sols, et
+// Une étiquette d'une seule couleur disparaîtrait sur l'un des sols, et
 // l'aperçu deviendrait illisible là où il sert le plus.
 func contraste(fond string) string {
 	var r, v, b int

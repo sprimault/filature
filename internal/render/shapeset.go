@@ -24,20 +24,33 @@ type Palette map[string]string
 // se verrait à l'écran comme un trou, plusieurs écrans plus loin.
 //
 // Les noms en _detail et marker_outline sont des contours et non des nuances
-// d'accompagnement. Un pion se pose sur des sols dont la luminance va du simple
-// au triple ; aucun remplissage ne se détache des trois, le contour le fait.
-// Une palette qui les remonterait au niveau de son remplissage rendrait les
-// pions illisibles sans qu'aucun contrôle ne s'en aperçoive.
+// d'accompagnement. Un pion se pose sur n'importe lequel des sols de Grounds,
+// dont la luminance va du simple au double et demi ; aucun remplissage ne se
+// détache de tous, le contour le fait. Une palette qui les remonterait au
+// niveau de son remplissage rendrait les pions illisibles sans qu'aucun
+// contrôle ne s'en aperçoive.
 //
 // backdrop est ce qu'on voit autour du plateau, et n'appartient à aucune forme.
 // Il est dans le socle parce qu'une palette qui le laisserait au niveau du bâti
 // ferait disparaître les blocs du pourtour, et les pièces avec eux.
-var RequiredColors = []string{
-	"street", "building", "zone_open", "zone_closed", "backdrop",
+var RequiredColors = append(append([]string{}, Grounds...),
+	"building", "backdrop",
 	"fugitive_main", "fugitive_detail",
 	"inspector_main", "inspector_detail",
 	"marker_outline", "trail", "roadblock", "crime_scene",
-}
+)
+
+// Grounds énumère les fonds sur lesquels une forme peut se poser.
+//
+// Une seule liste, parce qu'elle était écrite à trois endroits qui ont divergé :
+// les lieux de ressourcement sont arrivés dans la palette livrée sans entrer
+// dans les couleurs exigées, si bien qu'une palette tierce qui les oubliait
+// passait la validation et laissait le rendu chercher un nom absent sur toutes
+// les cases d'abri. La planche d'aperçu, elle, continuait de n'en montrer trois.
+//
+// L'ordre va du plus clair au plus sombre : c'est celui d'une planche de
+// contrôle, où l'on cherche la forme qui disparaît sur un fond.
+var Grounds = []string{"street", "zone_open", "shelter_open", "shelter_used", "zone_closed"}
 
 // Les deux fichiers d'un plugin d'apparence. Séparés et tous deux facultatifs :
 // une palette seule est le mod le moins cher qui existe, et des formes seules

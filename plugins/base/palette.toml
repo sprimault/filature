@@ -5,10 +5,9 @@
 # tierce s'appuie dessus sans savoir quelle palette sera active.
 #
 # Les valeurs ne sont pas choisies au jugé. Un pion se pose indifféremment sur
-# la rue, une zone ouverte ou une zone fermée, dont les luminances vont de 210 à
-# 82 : aucune couleur de remplissage ne peut se détacher des trois à la fois.
-# C'est le contour qui porte la silhouette, et le remplissage qui ne porte plus
-# que l'identité du camp.
+# l'un des cinq sols, dont les luminances vont de 210 à 84 : aucune couleur de
+# remplissage ne peut se détacher de tous à la fois. C'est le contour qui porte
+# la silhouette, et le remplissage qui ne porte plus que l'identité du camp.
 
 shapes_version = 3
 
