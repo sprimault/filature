@@ -43,13 +43,20 @@ type Trail struct {
 // Fugitive porte l'état du camp caché. SealedZone est l'information la plus
 // sensible du jeu : elle ne doit jamais franchir ViewFor côté inspecteurs.
 type Fugitive struct {
-	Position      Position `json:"position"`
-	Stamina       int      `json:"stamina"`
-	Visible       bool     `json:"spotted"`
-	Captured      bool     `json:"captured"`
-	SealedZone    int      `json:"sealed_zone"`
-	TurnsInZone   int      `json:"turns_in_zone"`
-	SilenceBought bool     `json:"silence_bought"`
+	Position Position `json:"position"`
+	Stamina  int      `json:"stamina"`
+	Visible  bool     `json:"spotted"`
+	Captured bool     `json:"captured"`
+
+	// LastShelter est le lieu de ressourcement occupé à la résolution
+	// précédente, NoShelter s'il n'y en avait pas. C'est ce qui distingue
+	// entrer de s'y tenir : sans lui, un fugitif immobile se ressourcerait à
+	// chaque recharge, ce qui est la récupération à l'immobilité que
+	// docs/regles.md §2 écarte.
+	LastShelter   int  `json:"last_shelter"`
+	SealedZone    int  `json:"sealed_zone"`
+	TurnsInZone   int  `json:"turns_in_zone"`
+	SilenceBought bool `json:"silence_bought"`
 
 	// StepsTaken est remis à zéro à chaque tour, comme celui des
 	// inspecteurs. Le fugitif n'a pas de quota de pions, mais une mobilité
@@ -168,6 +175,12 @@ type Game struct {
 	alea       *Random
 }
 
+// NoShelter dit que le fugitif n'était sur aucun lieu.
+//
+// Une constante nommée plutôt que zéro, pour la même raison que ShelterActive :
+// zéro est le numéro du premier lieu, et un état non initialisé le désignerait.
+const NoShelter = -1
+
 // ShelterActive marque un lieu de ressourcement disponible.
 //
 // Une constante nommée plutôt que zéro : un numéro de tour vaut zéro avant que
@@ -211,9 +224,10 @@ func NewGame(plateau Board, graine int64, p Settings, r *Registry) (*Game, error
 		Board:    plateau,
 		Phase:    PhaseFugitiveSetup,
 		Fugitive: Fugitive{
-			Position:   depart,
-			Stamina:    p.Stamina,
-			SealedZone: -1,
+			Position:    depart,
+			Stamina:     p.Stamina,
+			SealedZone:  -1,
+			LastShelter: NoShelter,
 		},
 		ShelterReady: abris,
 		Extensions:   r,

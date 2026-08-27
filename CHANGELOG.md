@@ -30,6 +30,12 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Cinq règles ne s'appliquaient pas.** L'étranglement ne fermait aucune zone, un
+barrage et un percement duraient jusqu'à la fin de la partie, les capacités
+passives n'étaient jamais posées, le déplacement rendu par un repérage
+n'existait pas, et un fugitif immobile sur un lieu de ressourcement s'y
+rechargeait chaque fois que celui-ci redevenait actif.
+
 **La résistance se récupère, sur quatre lieux du plateau.** Un lieu de
 ressourcement est un bloc au même format qu'une zone d'extraction, posé dans la
 couronne entre le noyau de départ et les sorties. Le fugitif y regagne deux
@@ -93,6 +99,11 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Five rules did not apply.** Strangling closed no zone, a roadblock and an
+opening lasted until the end of the game, passive abilities were never applied,
+the step granted by a sighting did not exist, and a fugitive standing still on a
+respite recovered there again every time it came back.
 
 **Stamina can be recovered, at four places on the board.** A respite is a block
 in the same format as an extraction zone, set in the ring between the starting

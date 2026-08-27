@@ -310,15 +310,20 @@ func truncate[T any](s []T) []T {
 }
 
 // alter inscrit une case dans une couche d'altération du terrain, jusqu'au
-// tour d'expiration. Une case déjà inscrite voit sa date remplacée, et
+// dernier tour où elle vaut. Une case déjà inscrite voit sa date remplacée, et
 // l'annulation rend l'ancienne plutôt que d'effacer.
+//
+// La date se compte comme celle d'un effet actif — dernier tour inclus, d'où le
+// moins un. Elle valait un tour de plus, et personne ne s'en apercevait :
+// aucune lecture ne la consultait, un barrage tenait jusqu'à la fin de la
+// partie. C'est expireTerrain qui la relit désormais.
 func (p *Game) alter(couche *map[Position]int, pos Position, duree int) func() {
 	etaitNulle := *couche == nil
 	if etaitNulle {
 		*couche = make(map[Position]int)
 	}
 	precedent, existait := (*couche)[pos]
-	(*couche)[pos] = p.Turn + duree
+	(*couche)[pos] = p.Turn + duree - 1
 	return func() {
 		if existait {
 			(*couche)[pos] = precedent

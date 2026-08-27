@@ -145,11 +145,18 @@ func (p *Game) placeForPhase(c Move) []func() {
 		return []func(){phaseName, func() { p.Fugitive.SealedZone = precedente }}
 	}
 
+	pion := len(p.Inspectors)
 	p.Inspectors = append(p.Inspectors, Inspector{
 		Position: c.To,
-		Ability:  p.abilityFor(len(p.Inspectors)),
+		Ability:  p.abilityFor(pion),
 	})
 	defaire := []func(){func() { p.Inspectors = truncate(p.Inspectors) }}
+
+	// Une capacité passive n'est pas un coup : elle ne se déclenche pas, donc
+	// elle doit s'appliquer ici. Sans cela le Traqueur avait le rayon de traces
+	// de tout le monde — abilityMoves écarte les passives, à juste titre, et
+	// rien ne posait leurs effets en échange.
+	defaire = append(defaire, p.arm(pion)...)
 
 	// Le tour 1 commence quand le dernier pion est posé, pas sur une fin de
 	// phase : la mise en place n'a rien à rendre.
@@ -183,6 +190,33 @@ func (p *Game) abilityFor(indice int) string {
 	return cles[indice]
 }
 
+// arm applique les effets de la capacité d'un pion, si elle est passive.
+//
+// Une capacité passive vaut toute la partie et ne se joue pas : elle n'a donc
+// ni coup légal, ni déclenchement, et ses effets n'ont aucune autre occasion
+// d'entrer dans l'état. Les poser au placement est le seul moment où le pion
+// existe et où sa capacité est connue.
+//
+// Les durées déclarées sont ignorées : une capacité passive est permanente par
+// définition, et une échéance en ferait une capacité déclenchée qui s'oublie.
+func (p *Game) arm(pion int) []func() {
+	if p.Extensions == nil || pion >= len(p.Inspectors) {
+		return nil
+	}
+	capacite, connue := p.Extensions.Abilities[p.Inspectors[pion].Ability]
+	if !connue || !capacite.Passive {
+		return nil
+	}
+
+	ctx := EffectContext{Side: SideInspectors, Piece: pion}
+	var defaire []func()
+	for _, e := range capacite.Effects {
+		e.Duration = 0
+		defaire = append(defaire, p.activate(e, ctx))
+	}
+	return defaire
+}
+
 // step bouge un pion et décompte son déplacement.
 func (p *Game) step(c Move) ([]func(), error) {
 	ctx := EffectContext{Side: c.Side, Piece: c.Piece, Case: c.To}
@@ -197,7 +231,41 @@ func (p *Game) step(c Move) ([]func(), error) {
 	}
 	pion := c.Piece
 	p.Inspectors[pion].StepsTaken++
-	return []func(){defaire, func() { p.Inspectors[pion].StepsTaken-- }}, nil
+	rendus := []func(){defaire, func() { p.Inspectors[pion].StepsTaken-- }}
+
+	return append(rendus, p.rewardSpotting(pion)...), nil
+}
+
+// rewardSpotting rend un pas au pion qui vient de repérer le fugitif.
+//
+// docs/regles.md §2 : c'est ce qui remplace la téléportation supprimée. La
+// pression est conservée — un inspecteur qui trouve le fugitif se rapproche
+// aussitôt — mais la partie ne se termine plus sur un seul coup.
+//
+// Hors quota, et c'est le point : le bonus porte sur la mobilité du pion, pas
+// sur le nombre de pions déplaçables. Un quatrième pion ne s'ouvre pas parce
+// qu'un autre a vu quelque chose.
+//
+// Une fois par tour et par pion. Sans cette garde, un pion qui va et vient dans
+// une ligne de vue gagnerait un pas à chaque aller.
+func (p *Game) rewardSpotting(pion int) []func() {
+	occupees := p.occupiedCells()
+	if !IsVisible(p.Board, p.Inspectors[pion].Position, p.Fugitive.Position,
+		p.RangeOf(pion), occupees) {
+		return nil
+	}
+
+	for _, actif := range p.ActiveEffects {
+		if actif.Effect.Type == EffectChangeMobility && actif.Aims(pion) &&
+			actif.AppliesAt(p.Turn) {
+			return nil
+		}
+	}
+
+	return []func(){p.activate(
+		Effect{Type: EffectChangeMobility, Target: TargetCurrentPiece, Value: 1, Duration: 1},
+		EffectContext{Side: SideInspectors, Piece: pion},
+	)}
 }
 
 // targetOf traduit un camp en cible d'effet.

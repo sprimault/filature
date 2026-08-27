@@ -75,7 +75,9 @@ func gameOn(b *plateauTrame, fugitif Position, inspecteurs ...Position) *Game {
 		Board:    b,
 		Turn:     3,
 		Phase:    PhaseFugitive,
-		Fugitive: Fugitive{Position: fugitif, Stamina: 10},
+		// LastShelter comme NewGame le pose : zéro désignerait le premier lieu,
+		// et le fugitif y serait réputé déjà installé.
+		Fugitive: Fugitive{Position: fugitif, Stamina: 10, LastShelter: NoShelter},
 	}
 	for _, pos := range inspecteurs {
 		p.Inspectors = append(p.Inspectors, Inspector{Position: pos})

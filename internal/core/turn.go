@@ -33,6 +33,7 @@ func (p *Game) resolveTurnEnd() []func() {
 		p.checkCapture,
 		p.dropTrails,
 		p.wipeOldTrails,
+		p.expireTerrain,
 		p.useShelter,
 		p.revealIfDue,
 		p.resolveDeferred,
@@ -122,8 +123,46 @@ func (p *Game) checkCapture() []func() {
 	}}
 }
 
-// useShelter rend de la résistance au fugitif s'il termine le tour sur un lieu
-// actif, et met ce lieu en recharge.
+// expireTerrain rend les cases dont l'altération a fait son temps.
+//
+// Barrages et percements portaient une date d'expiration que rien ne relisait :
+// un barrage du Barreur, annoncé pour trois tours, fermait sa case jusqu'à la
+// fin de la partie — au déplacement, à la vue, et dans ce que les deux camps
+// voient. La purge remplace un test de date à chaque lecture, et il y en a
+// trois : le déplacement, l'occlusion et la vue filtrée.
+//
+// L'ordre de parcours d'une map n'influence rien ici — retirer des entrées
+// indépendantes donne le même état quel qu'il soit — mais l'annulation les rend
+// dans l'ordre inverse de leur retrait, ce qui suffit à la réversibilité.
+func (p *Game) expireTerrain() []func() {
+	var defaire []func()
+
+	for _, couche := range []*map[Position]int{&p.Roadblocks, &p.Openings} {
+		for pos, echeance := range *couche {
+			if echeance > p.Turn {
+				continue
+			}
+			cible, echue := couche, echeance
+			delete(*couche, pos)
+			defaire = append(defaire, func() {
+				if *cible == nil {
+					*cible = make(map[Position]int)
+				}
+				(*cible)[pos] = echue
+			})
+		}
+	}
+	return defaire
+}
+
+// useShelter rend de la résistance au fugitif quand il vient d'entrer sur un
+// lieu actif, et met ce lieu en recharge.
+//
+// **En entrant, jamais en s'y tenant.** Le test portait auparavant sur la seule
+// présence : un fugitif immobile regagnait deux points à chaque recharge, ce
+// qui est la récupération à l'immobilité que docs/regles.md §2 écarte parce
+// qu'elle récompense le campement. Il doit repartir et revenir, donc s'exposer
+// entre-temps.
 //
 // Après les contacts, donc jamais avant : un lieu n'est pas un sanctuaire. Des
 // inspecteurs qui acculent le fugitif dessus l'emportent, et il ne se relève pas
@@ -138,25 +177,36 @@ func (p *Game) useShelter() []func() {
 		return nil
 	}
 
+	sur := NoShelter
 	abris := p.Board.Shelters()
 	for i := range abris {
-		if i >= len(p.ShelterReady) || !abris[i].Contains(p.Fugitive.Position) {
-			continue
+		if abris[i].Contains(p.Fugitive.Position) {
+			sur = i
+			break
 		}
-		if p.ShelterReady[i] != ShelterActive && p.Turn < p.ShelterReady[i] {
-			continue
-		}
-
-		precedent := p.ShelterReady[i]
-		p.ShelterReady[i] = p.Turn + p.Settings.ShelterRecharge
-
-		defaire := p.adjustStamina(p.Settings.ShelterGain)
-		return []func(){func() {
-			defaire()
-			p.ShelterReady[i] = precedent
-		}}
 	}
-	return nil
+
+	// Le souvenir se met à jour même quand rien n'est rendu : sortir d'un lieu
+	// doit s'enregistrer, sinon y revenir ne compterait plus comme une entrée.
+	avant := p.Fugitive.LastShelter
+	p.Fugitive.LastShelter = sur
+	defaire := []func(){func() { p.Fugitive.LastShelter = avant }}
+
+	entre := sur != NoShelter && sur != avant
+	pret := sur != NoShelter && sur < len(p.ShelterReady) &&
+		(p.ShelterReady[sur] == ShelterActive || p.Turn >= p.ShelterReady[sur])
+	if !entre || !pret {
+		return defaire
+	}
+
+	precedent := p.ShelterReady[sur]
+	p.ShelterReady[sur] = p.Turn + p.Settings.ShelterRecharge
+	rendre := p.adjustStamina(p.Settings.ShelterGain)
+
+	return append(defaire, func() {
+		rendre()
+		p.ShelterReady[sur] = precedent
+	})
 }
 
 // contacting rend les pions au contact du fugitif, dans l'ordre du camp.
@@ -300,23 +350,56 @@ func (p *Game) resolveDeferred() []func() {
 	return defaire
 }
 
-// strangle déclenche le mode qui ferme les zones, quand le tour l'impose.
+// strangle déclenche les modes qui ferment les zones, quand le tour l'impose.
 //
-// Le noyau donne la cadence et la cible, le mode dit ce qui se passe. Un
+// Le noyau donne la cadence et la cible, les modes disent ce qui se passe. Un
 // plugin qui remplace ce mode change le préavis ou l'effet, jamais le moment.
+//
+// **Les modes sont trouvés par leur déclencheur, jamais par leur nom.** Le
+// noyau cherchait auparavant la clé « etranglement » quand le contenu livré la
+// déclare « strangling » : la mécanique n'a jamais tourné, et deux tests
+// verts s'en accommodaient — l'un injectait la clé française, l'autre
+// vérifiait l'anglaise. Chercher par nom impose de surcroît à un plugin de
+// reprendre exactement la clé du contenu livré, ce que la promesse ci-dessus
+// contredit.
+//
+// L'ordre de parcours est trié : celui d'une map ne l'est pas, et deux modes
+// déclarés sur le même moment produiraient sinon deux parties différentes sur
+// la même graine.
 func (p *Game) strangle() []func() {
 	zone, cetour := p.zoneToStrangle()
 	if !cetour || p.Extensions == nil {
 		return nil
 	}
-	mode, connu := p.Extensions.Modes["etranglement"]
-	if !connu || mode.Trigger != OnStrangling {
+
+	var defaire []func()
+	for _, mode := range p.modesOn(OnStrangling) {
+		effets, err := p.applyEffects(mode.Effects, EffectContext{Side: SideInspectors, Zone: zone})
+		if err != nil {
+			continue
+		}
+		defaire = append(defaire, effets...)
+	}
+	return defaire
+}
+
+// modesOn rend les modes déclarés sur un moment, dans l'ordre de leur clé.
+func (p *Game) modesOn(quand Trigger) []Mode {
+	if p.Extensions == nil {
 		return nil
 	}
 
-	effets, err := p.applyEffects(mode.Effects, EffectContext{Side: SideInspectors, Zone: zone})
-	if err != nil {
-		return nil
+	cles := make([]string, 0, len(p.Extensions.Modes))
+	for cle, mode := range p.Extensions.Modes {
+		if mode.Trigger == quand {
+			cles = append(cles, cle)
+		}
 	}
-	return effets
+	slices.Sort(cles)
+
+	modes := make([]Mode, 0, len(cles))
+	for _, cle := range cles {
+		modes = append(modes, p.Extensions.Modes[cle])
+	}
+	return modes
 }

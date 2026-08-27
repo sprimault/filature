@@ -98,21 +98,56 @@ func TestShelterRestoresThenRecharges(t *testing.T) {
 	}
 }
 
-// TestShelterComesBack vérifie qu'un lieu redevient actif au tour dit.
+// TestShelterComesBack vérifie qu'un lieu redevient actif au tour dit, et qu'y
+// revenir le fait rendre à nouveau.
 //
 // C'est ce qui distingue la recharge de l'usage unique, et ce qui rend la
 // ressource disponible pour la percée finale plutôt que consommée trop tôt.
+//
+// Le fugitif sort avant de revenir : rester ne suffit pas, sans quoi ce serait
+// la récupération à l'immobilité.
 func TestShelterComesBack(t *testing.T) {
 	p := gameWithShelter(Position{Column: 0, Row: 0})
 	endTurn(t, p)
 
 	avant := p.Fugitive.Stamina
 	p.Turn = p.ShelterReady[0]
+
+	// Un tour passé hors du lieu, puis le retour.
+	p.Fugitive.Position = Position{Column: 4, Row: 4}
+	endTurn(t, p)
+	p.Fugitive.Position = Position{Column: 0, Row: 0}
 	endTurn(t, p)
 
 	if p.Fugitive.Stamina != avant+p.Settings.ShelterGain {
 		t.Errorf("résistance %d, attendu %d : le lieu n'est pas revenu",
 			p.Fugitive.Stamina, avant+p.Settings.ShelterGain)
+	}
+}
+
+// TestShelterIgnoresStandingStill vérifie qu'un fugitif immobile sur un lieu ne
+// se ressource pas à chaque recharge.
+//
+// C'est la récupération à l'immobilité, écartée par docs/regles.md §2 parce
+// qu'elle récompense le campement — exactement ce que le jeu doit décourager.
+func TestShelterIgnoresStandingStill(t *testing.T) {
+	p := gameWithShelter(Position{Column: 0, Row: 0})
+	endTurn(t, p)
+
+	apresEntree := p.Fugitive.Stamina
+
+	// Deux recharges de large : assez pour que le lieu redevienne actif deux
+	// fois, sans atteindre la fin de la partie que le helper cale à trois.
+	for i := 0; i < 2*p.Settings.ShelterRecharge && p.Phase != PhaseOver; i++ {
+		endTurn(t, p)
+	}
+	if p.Phase == PhaseOver {
+		t.Fatal("la partie se termine avant la seconde recharge")
+	}
+
+	if p.Fugitive.Stamina != apresEntree {
+		t.Errorf("résistance %d après immobilité, %d juste après l'entrée",
+			p.Fugitive.Stamina, apresEntree)
 	}
 }
 
