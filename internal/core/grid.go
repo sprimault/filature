@@ -13,9 +13,18 @@ const (
 	MinAvenueGap = 3
 	MaxAvenueGap = 6
 
-	// MinStreetRatio et MaxStreetRatio bornent la part de cases praticables. Trop
-	// peu, le fugitif n'a nulle part où aller ; trop, les inspecteurs ne
-	// peuvent plus rien couvrir.
+	// MinStreetRatio et MaxStreetRatio bornent la part de cases praticables que
+	// produit la trame. Trop peu, le fugitif n'a nulle part où aller ; trop, les
+	// inspecteurs ne peuvent plus rien couvrir.
+	//
+	// La trame seule, et les blocs percés par-dessus n'y entrent pas. Ce sont
+	// deux populations : la trame est du terrain, une case de zone ou de lieu
+	// est un dispositif — publique, désignée, et que les inspecteurs occupent au
+	// lieu d'avoir à la fouiller. Les agréger faisait dépendre le seuil d'une
+	// composition qui varie avec la taille : dix blocs de neuf cases pèsent un
+	// cinquième d'un Quartier contre un vingtième d'une Ville, si bien que le
+	// petit préréglage dépassait le plafond par ses seules zones et que
+	// Generate y jetait quatre-vingt-douze tirages sur cent.
 	MinStreetRatio = 35
 	MaxStreetRatio = 50
 
@@ -54,10 +63,10 @@ func Generate(graine int64, p Settings) (*BoundedBoard, int64, error) {
 
 	for essai := 0; essai < maxAttempts; essai++ {
 		retenue := graine + int64(essai)
-		b := draw(retenue, p)
-		if err := b.validate(p); err == nil {
+		b, trame := draw(retenue, p)
+		if err := b.validate(p, trame); err == nil {
 			// Après validation seulement : un plateau rejeté n'a pas à payer le
-			// précalcul, et sur un Quartier il y en a une dizaine par tirage.
+			// précalcul.
 			b.vues = precomputeSight(b, b.cote)
 			return b, retenue, nil
 		}
@@ -73,12 +82,21 @@ func Generate(graine int64, p Settings) (*BoundedBoard, int64, error) {
 // ailleurs plutôt que de renoncer.
 var ErrNoPlayableBoard = errors.New("aucun plateau jouable pour cette graine")
 
-// draw trace un plateau complet, sans juger de sa qualité.
+// draw trace un plateau complet, sans juger de sa qualité, et rend avec lui le
+// nombre de cases que la trame a ouvertes.
 //
-// Les cinq étapes de docs/regles.md §3, dans l'ordre : grid, îlots, perçages,
-// impasses, zones. Chacune tire sur son propre flux, ce qui permet d'en
-// modifier une sans déplacer les tirages des autres.
-func draw(graine int64, p Settings) *BoundedBoard {
+// Ce compte est rendu plutôt que relu sur le plateau fini : les blocs percés
+// ensuite recouvrent des cases que la trame avait déjà ouvertes, donc les
+// soustraire après coup enlèverait une centaine de cases de trame sur un
+// Quartier. Un champ le rendrait implicite, et faux par défaut pour tout
+// appelant qui n'est pas draw ; en paramètre, celui qui valide dit ce qu'il
+// mesure.
+//
+// Les six étapes de docs/regles.md §3, dans l'ordre : grid, îlots, perçages,
+// impasses, zones, lieux. Les quatre premières tirent chacune sur leur propre
+// flux, ce qui permet d'en modifier une sans déplacer les tirages des autres ;
+// les deux dernières ne tirent pas, leur position se déduisant de la géométrie.
+func draw(graine int64, p Settings) (*BoundedBoard, int) {
 	b := &BoundedBoard{
 		graine: graine,
 		cote:   p.Size,
@@ -88,9 +106,11 @@ func draw(graine int64, p Settings) *BoundedBoard {
 	b.traceAvenues(NewRandom(graine, "grid"))
 	b.punchCourtyards(NewRandom(graine, "courtyards"))
 	b.carveDeadEnds(NewRandom(graine, "deadends"))
+	trame := b.countStreets()
+
 	b.placeZones(p.Zones)
 	b.placeShelters(p)
-	return b
+	return b, trame
 }
 
 // placeShelters pose les lieux de ressourcement, un par quadrant.
@@ -149,10 +169,10 @@ func (b *BoundedBoard) traceAvenues(a *Random) {
 //
 // **Le tirage s'arrête assez tôt pour que ce bord respecte l'écart minimal.**
 // L'ajouter sans regarder la distance au dernier axe le collait à lui : l'écart
-// final valait 2,9 en moyenne au lieu des 3 à 6 annoncés, sur les trois
+// final tombe alors à 2,9 cases au lieu des 3 à 6 annoncés, sur les trois
 // préréglages. Une avenue de trop resserre toute la trame, et d'autant plus que
-// le plateau est petit — le Quartier n'y survivait que treize fois sur deux
-// cents.
+// le plateau est petit — le Quartier n'en garde que soixante-neuf tirages sur
+// deux cents, contre cent soixante-six (mesuré le 27 août 2026).
 func (b *BoundedBoard) axes(a *Random) []int {
 	bord := b.cote - 1
 
@@ -164,9 +184,9 @@ func (b *BoundedBoard) axes(a *Random) []int {
 	// L'écart qui reste jusqu'au bord n'est plus tiré : il est ce que la boucle
 	// laisse, et il dépasse parfois la borne haute. C'est assumé — le rattraper
 	// par une avenue de plus coûterait bien davantage, l'essai ramenant le
-	// Quartier de cent neuf plateaux acceptés sur deux cents à quarante-deux.
-	// Un îlot un peu large en périphérie se traverse ; une trame resserrée ne
-	// se corrige pas.
+	// Quartier de cent soixante-six plateaux acceptés sur deux cents à
+	// soixante-neuf. Un îlot un peu large en périphérie se traverse ; une trame
+	// resserrée ne se corrige pas.
 	return append(indices, bord)
 }
 
