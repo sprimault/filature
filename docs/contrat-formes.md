@@ -248,13 +248,13 @@ bordures, et il ne porte aucune identité de camp.
 **En dessous de 24 pixels par case, le rendu ne garantit plus rien.** Le
 plancher étant un minimum en pixels, il ne dépend pas de la taille du trait mais
 de l'échelle, et finit par commander partout : à 16 pixels par case, la tête
-d'un pion tombe à 47 % de remplissage. Le plateau entier tient dans 984 sur 556
-pixels à cette limite ; en dessous, la vue défile plutôt que de continuer à
-réduire.
+d'un pion tombe à 47 % de remplissage. Le plateau entier tient dans 984 sur 492
+pixels à cette limite — la projection est en deux pour un — ; en dessous, la vue
+défile plutôt que de continuer à réduire.
 
 La marge est mince et il vaut mieux le savoir : le plus grand préréglage fait 41
-cases de côté, ce qui donne 42 pixels par case sur un écran de 1920 de large,
-mais 28 sur un 1280.
+cases de côté, ce qui donne moins de cinquante pixels par case sur un écran de
+1920 de large, et une trentaine sur un 1280.
 
 Conséquence à connaître avant l'étape 7 : **le halo clair autour d'une pièce est
 désormais pris.** C'est la convention habituelle pour « sélectionné » ou

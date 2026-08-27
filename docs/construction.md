@@ -28,10 +28,11 @@ mode web n'est pas au programme : un plugin tiers y arriverait par le navigateur
 plutôt que par un dossier, et un bot externe, qui est un processus, n'y arrive
 pas du tout.
 
-La cible reste dans la matrice parce qu'elle est le seul contrôle qui **empêche
-une dépendance d'introduire du cgo** sans que personne le voie. La retirer
-rendrait windows/amd64 vulnérable au même défaut, une compilation croisée plus
-tard.
+La cible reste dans la matrice parce qu'elle **empêche une dépendance
+d'introduire du cgo** sans que personne le voie — `windows/amd64`, compilé sans
+cgo lui aussi, attrape la même chose. Elle a d'autres raisons d'y être : la
+surface d'API de `js` et l'absence d'appels système y sont vérifiées, et nulle
+part ailleurs.
 
 La cible Intel a une date de péremption connue : l'image correspondante est
 annoncée comme la dernière x86_64 disponible en intégration continue, jusqu'en
@@ -56,9 +57,12 @@ Windows et WebAssembly impossibles.
 ## Le Makefile ne porte pas la matrice
 
 `make binary` prend `OS`, `ARCH` et `CGO` en paramètres. La liste des couples
-vit dans le workflow d'intégration, seul endroit où elle peut réellement
-s'exécuter. Deux définitions finiraient par diverger, et c'est celle du workflow
-qu'on ne peut pas essayer avant de poser un tag.
+vit dans les workflows, seuls endroits où elle s'exécute réellement.
+
+**Elle y est écrite deux fois**, dans l'intégration et dans la publication, et
+la duplication est assumée : une matrice partagée devrait passer par un workflow
+appelé, ce qui coûterait plus que ce qu'elle éviterait. Les deux ont déjà
+divergé une fois sur le nombre de cibles publiées.
 
 En local, `make binaries` ne produit que ce qui se croise — Windows et
 WebAssembly — et le dit.

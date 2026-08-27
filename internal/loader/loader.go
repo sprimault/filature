@@ -36,9 +36,10 @@ import (
 // distingue. Un raccourci pour le contenu livré laisserait ce chemin non testé
 // jusqu'au jour où quelqu'un installe son premier plugin.
 //
-// C'est aussi le seul endroit où un registre se remplit. Le noyau n'en fabrique
-// pas : il n'a aucune dépendance disque, et lire un manifeste lui en donnerait
-// une pour un travail qui n'est pas le sien.
+// Un registre se remplit ici, et dans LoadOne qui fait le même travail pour un
+// dossier isolé. Le noyau n'en fabrique pas : il n'a aucune dépendance disque,
+// et lire un manifeste lui en donnerait une pour un travail qui n'est pas le
+// sien.
 //
 // L'ordre de chargement est alphabétique au sein de chaque source, donc
 // déterministe. Un manifeste invalide fait échouer le chargement entier plutôt

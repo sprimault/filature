@@ -27,9 +27,10 @@ var cheminSchemaVue = filepath.Join(racine, "schemas", "view.schema.json")
 // TestViewSchemaFollowsStruct vérifie que le contrat publié correspond au type
 // Go dont il est tiré.
 //
-// C'est le seul garde-fou contre un contrat qui vieillit : un champ ajouté à la
-// vue, un tag modifié, un secret rendu obligatoire — tout cela change le schéma,
-// et le test échoue tant que le fichier n'a pas été régénéré puis relu.
+// Un champ ajouté à la vue, un tag modifié, un secret rendu obligatoire : tout
+// cela change le schéma, et le test échoue tant que le fichier n'a pas été
+// régénéré puis relu. TestViewSchemaMarksSecretsOptional garde le troisième cas
+// de plus près.
 //
 // Un bot conforme au schéma doit pouvoir lire ce que le jeu envoie. Si les deux
 // divergent, c'est le bot qui casse, chez son auteur, sans que rien ici ne

@@ -100,9 +100,10 @@ correctement — un bot n'a rien à savoir des règles pour être légal.
 
 ## L'ordre de résolution est un contrat
 
-Visibilité, contacts, capture, traces, ressourcement, révélation, fermeture de
-zone, test de fin. L'ordre exact est dans [`regles.md`](regles.md) §5, et il ne
-se change pas sans changer le jeu.
+Visibilité, contacts, capture, traces, expiration des altérations de terrain,
+ressourcement, révélation, effets différés, fermeture de zone, dépense du
+silence, décompte d'extraction. La liste fait foi dans `resolveTurnEnd`, et elle
+ne se change pas sans changer le jeu.
 
 Le décompte des contacts a lieu **après** le déplacement du fugitif, pas avant.
 Déplacer une étape d'un cran modifie des parties entières sans qu'aucun test
