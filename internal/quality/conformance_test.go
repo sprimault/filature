@@ -6,7 +6,6 @@ package quality
 import (
 	"os"
 	"slices"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -438,11 +437,8 @@ func TestLookoutDoublesRange(t *testing.T) {
 	}
 
 	if got := p.RangeOf(guetteur); got != 2*base {
-		t.Skip("MECANIQUE INERTE : le manifeste déclare change_range avec une " +
-			"valeur absolue, additionnée à la portée de base. Sur Quartier elle " +
-			"vaut " + strconv.Itoa(base) + " et le Guetteur la porte à " +
-			strconv.Itoa(got) + " au lieu de " + strconv.Itoa(2*base) +
-			" : la capacité triple au lieu de doubler.")
+		t.Errorf("portée %d après la capacité, attendu %d — la base était %d",
+			got, 2*base, base)
 	}
 }
 
@@ -570,7 +566,7 @@ func TestShelterNeedsEntering(t *testing.T) {
 // silencieux — il lui faut une constante en face pour qu'une dette ajoutée ou
 // levée sans être déclarée fasse rougir la suite.
 func TestInertMechanicsAreCounted(t *testing.T) {
-	const attendues = 2
+	const attendues = 1
 
 	source, err := os.ReadFile("conformance_test.go")
 	if err != nil {

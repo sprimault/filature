@@ -30,6 +30,13 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le Guetteur double sa portée au lieu de la tripler.** Il déclarait huit cases
+en absolu, juste tant qu'un seul préréglage existait : sur un Quartier, la portée
+vaut quatre et la capacité la portait à douze. Les effets acceptent désormais un
+`mode`, absent pour additionner comme avant, `multiply` pour multiplier — une
+valeur absolue ne peut plus dire une intention relative depuis que la portée
+dérive de la taille du plateau.
+
 **Deux refus de plus au chargement, et une promesse retirée.** Une cible qui ne
 désigne personne — `other_piece` ou `all_pieces` dans une dépense du fugitif,
 qui est seul — et un code de langue hors de l'étiquette BCP 47 étaient tous deux
@@ -208,6 +215,12 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The Lookout doubles his range instead of tripling it.** He declared eight cells
+outright, correct while a single preset existed: on a Small board range is four
+and the ability took it to twelve. Effects now accept a `mode` — absent to add as
+before, `multiply` to multiply — since an absolute value can no longer express a
+relative intent once range derives from board size.
 
 **Two more rejections at load time, and one promise withdrawn.** A target that
 designates nobody — `other_piece` or `all_pieces` in a fugitive expense, he being

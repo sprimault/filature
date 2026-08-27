@@ -332,6 +332,12 @@
           "minimum": 0,
           "description": "Portee en cases, distance de Manhattan : un rayon de 1 couvre la case et ses quatre voisines orthogonales, pas les diagonales."
         },
+        "mode": {
+          "enum": [
+            "multiply"
+          ],
+          "description": "Comment value s'applique a la base qu'elle modifie. Absent, elle s'y ajoute."
+        },
         "announced": {
           "type": "boolean",
           "description": "Pour differer seulement : l'effet en attente figure alors dans la vue des deux camps."

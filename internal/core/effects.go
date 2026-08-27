@@ -124,6 +124,51 @@ type Effect struct {
 	// chaînes qu'aucune annulation ne saurait dérouler.
 	Announced bool     `toml:"announced" json:"announced,omitempty"`
 	Then      []Effect `toml:"then" json:"then,omitempty"`
+
+	// Mode dit comment Value s'applique. Absent vaut ModeAdd, donc tout
+	// manifeste écrit avant ce champ garde son sens.
+	//
+	// Un champ plutôt qu'une primitive de plus : il vaut pour les dix-neuf d'un
+	// coup, là où un change_range_multiply aurait laissé change_mobility
+	// entier. Un champ nommé plutôt qu'un booléen : une troisième forme se
+	// déclare en ajoutant une valeur, sans toucher au contrat.
+	Mode ValueMode `toml:"mode" json:"mode,omitempty"`
+}
+
+// ValueMode dit comment la valeur d'un effet s'applique à ce qu'elle modifie.
+type ValueMode string
+
+// Les deux formes. ModeAdd est la valeur nulle, donc le comportement par
+// défaut.
+//
+// La multiplication existe parce que la portée, la durée et le rayon du noyau
+// dérivent désormais de la taille du plateau : une valeur absolue ne peut plus
+// dire une intention relative. Le Guetteur déclarait « portée 8 », juste tant
+// qu'un seul préréglage existait, et qui triplait la portée d'un Quartier.
+const (
+	ModeAdd      ValueMode = ""
+	ModeMultiply ValueMode = "multiply"
+)
+
+// ValueModes énumère les formes, pour la même raison que EffectTypes.
+func ValueModes() []ValueMode { return []ValueMode{ModeAdd, ModeMultiply} }
+
+// ValueModeKnown dit si une forme fait partie du vocabulaire.
+func ValueModeKnown(m ValueMode) bool {
+	for _, connue := range ValueModes() {
+		if connue == m {
+			return true
+		}
+	}
+	return false
+}
+
+// apply combine une valeur d'effet avec la base qu'elle modifie.
+func (e Effect) apply(base int) int {
+	if e.Mode == ModeMultiply {
+		return base * e.Value
+	}
+	return base + e.Value
 }
 
 // PendingEffect est une entrée de la file des effets différés.
@@ -475,7 +520,7 @@ func (p *Game) RangeOf(pion int) int {
 	portee := p.Settings.Range
 	for _, a := range p.ActiveEffects {
 		if a.Effect.Type == EffectChangeRange && a.AppliesAt(p.Turn) && a.Aims(pion) {
-			portee += a.Effect.Value
+			portee = a.Effect.apply(portee)
 		}
 	}
 	return max(portee, 0)
@@ -495,7 +540,7 @@ func (p *Game) MobilityOf(acteur Side, pion int) int {
 			vise = a.Effect.Target == TargetFugitive
 		}
 		if vise {
-			mobilite += a.Effect.Value
+			mobilite = a.Effect.apply(mobilite)
 		}
 	}
 	return max(mobilite, 0)
