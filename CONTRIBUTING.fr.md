@@ -30,6 +30,9 @@ une discussion de conception, pas un correctif.
 
 ## Ce sur quoi une contribution est jugée
 
+Les conventions de code et la doctrine de test sont dans
+[`docs/go.md`](docs/go.md). Ce qui suit en est le résumé exigible.
+
 - `make lint && make test && make race && make vulncheck && make sec` passent.
 - Toute déclaration a sa documentation. Les commentaires disent *pourquoi*, ils
   ne paraphrasent jamais la ligne suivante.

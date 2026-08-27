@@ -131,6 +131,7 @@ Outside the catalogue, nothing is restricted. Your machine, your rules.
   field by field (French)
 - [`docs/vocabulaire-effets.md`](docs/vocabulaire-effets.md) — the primitives
   abilities, costs and game modes are composed from (French)
+- [`docs/go.md`](docs/go.md) — code conventions and testing doctrine (French)
 - [`docs/construction.md`](docs/construction.md) — build matrix, packaging,
   signing
 - [`schemas/`](schemas/) — the public contracts, versioned separately

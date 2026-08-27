@@ -30,6 +30,9 @@ discussion, not a patch.
 
 ## What a pull request is judged against
 
+Code conventions and testing doctrine are in [`docs/go.md`](docs/go.md), in
+French. What follows is the summary you are held to.
+
 - `make lint && make test && make race && make vulncheck && make sec` pass.
 - Every declaration has documentation. Comments explain *why*, never restate the
   line below.

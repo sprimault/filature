@@ -139,6 +139,7 @@ Hors catalogue, rien n'est restreint. C'est ta machine.
   fichier et champ par champ
 - [`docs/vocabulaire-effets.md`](docs/vocabulaire-effets.md) — les primitives
   dont se composent capacités, dépenses et modes de jeu
+- [`docs/go.md`](docs/go.md) — conventions de code et doctrine de test
 - [`docs/construction.md`](docs/construction.md) — matrice de compilation,
   empaquetage, signature
 - [`schemas/`](schemas/) — les contrats publics, versionnés à part
