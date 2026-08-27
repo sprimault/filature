@@ -24,6 +24,13 @@ type View struct {
 	Zones      []Zone     `json:"zones"`
 	Roadblocks []Position `json:"roadblocks"`
 
+	// Shelters et ShelterReady sont publics pour les deux camps, et il le faut :
+	// les inspecteurs ne peuvent pas couvrir ce qu'ils ne voient pas, et un lieu
+	// en recharge est l'indice que le fugitif paie en s'y ressourçant. Il dit
+	// qu'il est passé là, et quand le lieu reviendra.
+	Shelters     []Shelter `json:"shelters"`
+	ShelterReady []int     `json:"shelter_ready"`
+
 	Inspectors []Inspector `json:"inspectors"`
 
 	// PositionFugitif n'est renseigné que pour le camp fugitif, ou pour les
@@ -88,6 +95,9 @@ func (p *Game) ViewFor(a Side) View {
 		Streets:    list(p.knownStreets()),
 		Zones:      list(p.seenZones()),
 		Roadblocks: list(p.barrages()),
+		Shelters:   list(append([]Shelter(nil), p.Board.Shelters()...)),
+
+		ShelterReady: list(append([]int(nil), p.ShelterReady...)),
 		// Recopie de structure, et c'est le seul endroit où elle est admise :
 		// tout est public chez un inspecteur. Le corollaire est un piège —
 		// **tout champ ajouté à Inspector devient visible des deux camps sans

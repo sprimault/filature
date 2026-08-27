@@ -12,6 +12,7 @@ package core
 type Board interface {
 	IsStreet(p Position) bool
 	Zones() []Zone
+	Shelters() []Shelter
 	Seed() int64
 	// Sight renvoie les cases visibles depuis p, table calculée à la
 	// génération. Renvoie nil si p n'est pas une rue.
@@ -40,6 +41,30 @@ type Zone struct {
 // et fixe, la recherche linéaire est le bon compromis.
 func (z Zone) Contains(p Position) bool {
 	for _, c := range z.Cells {
+		if c == p {
+			return true
+		}
+	}
+	return false
+}
+
+// Shelter est un lieu de ressourcement : un bloc au même format qu'une zone,
+// dont au moins cinq cases sont des rues.
+//
+// Le même format, et c'est le point : un joueur n'a rien de neuf à apprendre,
+// le générateur perce les deux de la même façon, et une case isolée se serait
+// fermée avec un seul inspecteur — ce que le format de bloc interdit.
+//
+// L'état — actif ou en recharge — n'est pas ici mais dans Game : le plateau est
+// en lecture seule, c'est la condition du plateau infini.
+type Shelter struct {
+	Number int
+	Cells  []Position
+}
+
+// Contains dit si une case appartient au lieu.
+func (s Shelter) Contains(p Position) bool {
+	for _, c := range s.Cells {
 		if c == p {
 			return true
 		}

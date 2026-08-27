@@ -33,6 +33,7 @@ func (p *Game) resolveTurnEnd() []func() {
 		p.checkCapture,
 		p.dropTrails,
 		p.wipeOldTrails,
+		p.useShelter,
 		p.revealIfDue,
 		p.resolveDeferred,
 		p.strangle,
@@ -119,6 +120,43 @@ func (p *Game) checkCapture() []func() {
 		p.LastContacts = precedents
 		p.Fugitive.Captured = precedentPris
 	}}
+}
+
+// useShelter rend de la résistance au fugitif s'il termine le tour sur un lieu
+// actif, et met ce lieu en recharge.
+//
+// Après les contacts, donc jamais avant : un lieu n'est pas un sanctuaire. Des
+// inspecteurs qui acculent le fugitif dessus l'emportent, et il ne se relève pas
+// d'un point qu'il n'a plus.
+//
+// **Le lieu entier se consomme**, pas seulement la case foulée. Neuf recharges
+// décalées sur un même bloc dissoudraient l'indice en neuf indices tièdes — or
+// c'est l'indice qui justifie la mécanique : le fugitif achète des points contre
+// du renseignement, comme pour toutes ses autres dépenses.
+func (p *Game) useShelter() []func() {
+	if p.Fugitive.Stamina <= 0 {
+		return nil
+	}
+
+	abris := p.Board.Shelters()
+	for i := range abris {
+		if i >= len(p.ShelterReady) || !abris[i].Contains(p.Fugitive.Position) {
+			continue
+		}
+		if p.ShelterReady[i] != ShelterActive && p.Turn < p.ShelterReady[i] {
+			continue
+		}
+
+		precedent := p.ShelterReady[i]
+		p.ShelterReady[i] = p.Turn + p.Settings.ShelterRecharge
+
+		defaire := p.adjustStamina(p.Settings.ShelterGain)
+		return []func(){func() {
+			defaire()
+			p.ShelterReady[i] = precedent
+		}}
+	}
+	return nil
 }
 
 // contacting rend les pions au contact du fugitif, dans l'ordre du camp.
