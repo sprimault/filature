@@ -3,6 +3,12 @@
 Les règles complètes et leurs chiffres. Ce document fait foi : le code s'y
 conforme, pas l'inverse.
 
+**Aucun chiffre de ce document n'est estimé.** Il est mesuré ou décidé, et il
+dit lequel. Un document qui fait foi et qui approxime fait foi sur du faux :
+deux chiffres écrits à vue ont été corrigés le 27 août 2026, l'un annonçant dix
+tirages de plateau là où il en faut quinze, l'autre les deux tiers d'une partie
+pour deux cinquièmes.
+
 ---
 
 ## 1. Ce qu'est le jeu
@@ -242,8 +248,8 @@ suit n'a lieu entre elles.
    depuis la résolution précédente (§10).
 4. Traces : dépôt sur la case quittée ou leurre à sa place, vieillissement des
    traces existantes (§8).
-5. Ressourcement : un lieu actif sous le fugitif lui rend de la résistance et
-   passe en recharge (§7).
+5. Ressourcement : un lieu actif où le fugitif **vient d'entrer** lui rend de la
+   résistance et passe en recharge (§7).
 6. Révélation périodique si le tour est multiple de 4.
 7. Fermeture de zone si le tour l'impose (§10).
 8. Test des conditions de fin (§10).
@@ -260,9 +266,16 @@ n'a plus.
 **Ce que chaque camp voit.** Le terrain, les zones et leur état, les lieux de
 ressourcement et leur recharge, le noyau, les barrages, les cases surveillées et
 **les positions des cinq inspecteurs** sont publics, et le restent toute la
-partie. Trois choses seulement sont cachées, et ce sont elles qui font le jeu :
-où est le fugitif, quelle zone il a scellée, et les traces qu'aucun inspecteur
-n'a encore découvertes.
+partie. Quatre choses seulement sont cachées : où est le fugitif, quelle zone il
+a scellée, les traces qu'aucun inspecteur n'a encore découvertes, et **le solde
+de sa résistance**.
+
+Les trois premières font le jeu. La quatrième s'y ajoute pour une raison
+distincte : les inspecteurs comptent les contacts qu'ils infligent quand ils le
+voient, et apprennent qu'un silence a été payé. Leur montrer le solde rendrait
+ces annonces inutiles et leur livrerait chaque dépense par la bande — une baisse
+de deux sans contact ne peut être qu'un double déplacement ou un changement de
+zone.
 
 L'asymétrie est donc étroite, et mieux vaut l'énoncer que la laisser déduire de
 ce qui est caché : le fugitif n'est pas le camp qui ne sait rien, c'est le camp
@@ -324,6 +337,11 @@ orthogonalement adjacente**. Les diagonales ne comptent pas.
 **Ressourcement** : 2 points en entrant sur un lieu actif, en fin de tour. Le
 lieu passe alors en recharge et redevient actif 8 tours plus tard.
 
+**En entrant, et non en s'y tenant.** Un fugitif qui reste sur un lieu ne se
+ressource pas à chaque recharge : ce serait la récupération à l'immobilité,
+écartée au §2 parce qu'elle récompense le campement. Il doit repartir et
+revenir, donc s'exposer entre-temps.
+
 C'est la seule source de résistance de la partie, et elle se paie en
 information. Un lieu en recharge est visible des deux camps avec le tour où il
 reviendra : les inspecteurs y lisent que le fugitif est passé là, et savent où
@@ -363,21 +381,29 @@ C'est ce qui donne aux inspecteurs quelque chose à chercher entre deux
 révélations, ce qui récompense la patrouille plutôt que le campement, et ce qui
 fournit à l'IA un objet de jeu concret.
 
-**Il y a exactement une trace par tour joué, leurre compris.** Un leurre ne
-s'ajoute pas à la trace du tour, il s'y substitue : le fugitif paie pour qu'elle
-soit posée sur une case voisine de son choix, avec la direction de son choix.
+**Les traces d'un tour sont toutes vraies ou toutes fausses, jamais mélangées.**
+Un leurre ne s'ajoute pas aux traces du tour, il les remplace toutes par une
+seule : le fugitif paie pour qu'elle soit posée sur la case de son choix — la
+sienne ou une voisine — avec la direction de son choix.
 
-Cette forme est ce qui rend le mensonge indétectable. Deux traces datées du même
-tour seraient impossibles en jeu honnête, et l'inspecteur qui les découvrirait
-saurait aussitôt que l'une est fausse — l'achat serait annulé par le fait même
-de l'avoir fait. Rien ne distingue donc un leurre d'une trace, ni sa date, ni sa
-forme, ni sa couleur.
+C'est cette propriété qui rend le mensonge indétectable, et non le nombre de
+traces. Un tour dont une trace ment et une autre dit vrai s'annonce de lui-même
+à l'inspecteur qui les découvre : il sait qu'il y a eu leurre sans savoir
+laquelle croire, et l'achat est annulé par le fait même de l'avoir fait. Rien ne
+distingue donc un leurre d'une trace, ni sa date, ni sa forme, ni sa couleur.
+
+Conséquence quand le fugitif a payé un double déplacement le même tour : ses
+deux traces deviennent une seule, fausse. **Le leurre cache alors aussi qu'il a
+couru**, et c'est cohérent — il paie pour brouiller ce qu'il a fait de son tour,
+pas seulement où il va. La combinaison coûte trois points, le prix du silence.
 
 ---
 
 ## 9. Les cinq inspecteurs
 
-Une capacité par pion, une seule utilisation par partie.
+Une capacité par pion. **Quatre se déclenchent et ne servent qu'une fois ; celle
+du Traqueur est passive et vaut toute la partie** — elle n'est pas un coup, donc
+elle ne se joue pas et ne s'épuise pas.
 
 | Pion | Capacité |
 |---|---|
@@ -506,9 +532,9 @@ l'information plutôt que sur le plateau.
 
 **Coût : 1 point de résistance. Trois fois par partie au maximum.**
 
-Un leurre ne pose pas une trace de plus : il remplace celle du tour. Le fugitif
-choisit la case, la sienne ou une voisine, et la direction inscrite. Rien ne
-distingue le résultat d'une trace honnête (§8).
+Un leurre ne pose pas une trace de plus : il remplace **toutes celles du tour**
+par une seule. Le fugitif choisit la case, la sienne ou une voisine, et la
+direction inscrite. Rien ne distingue le résultat d'une trace honnête (§8).
 
 Ce qu'il achète, c'est **du mouvement adverse**. Une direction fausse est une
 patrouille qui part du mauvais côté, et surtout une déduction faussée : contre un
@@ -591,10 +617,10 @@ ne serait qu'un mur de déplacement sans effet sur l'information.
   compter deux fois quand on jugera l'équilibre.
 - **Le milieu de partie doit avoir un contenu propre.** Sur la plus grande
   ville, le fugitif atteint sa zone en quatorze pas et l'étranglement ne démarre
-  qu'au tour trente : près des deux tiers de la partie ne sont ni du trajet ni
-  de la fin. Le trajet n'est pas le jeu, l'occupation du temps l'est — et ce
-  sont les lieux de ressourcement et les leurres qui doivent la porter, puisque
-  rien d'autre ne s'y passe. Si le milieu se joue à vide, c'est là qu'il faut
+  qu'au tour trente : seize tours sur quarante, deux cinquièmes de la partie, ne
+  sont ni du trajet ni de la fin. Le trajet n'est pas le jeu, l'occupation du
+  temps l'est — et ce sont les lieux de ressourcement et les leurres qui doivent
+  la porter, puisque rien d'autre ne s'y passe. Si le milieu se joue à vide, c'est là qu'il faut
   corriger, pas dans la fin de partie qui n'en serait que le symptôme.
 - **Le noyau ne doit pas devenir un abri où le fugitif s'attarde.** C'est
   l'endroit où la couverture initiale est la plus faible, donc celui où il est
@@ -633,9 +659,10 @@ ne serait qu'un mur de déplacement sans effet sur l'information.
 - Le taux de repérage du fugitif va baisser du fait des cases surveillées
   affichées (§6). C'est un effet attendu, à ne pas confondre avec une portée
   trop courte.
-- Le taux de bâtiments visé, 35 à 50 %, vient d'une estimation. Un prototype
-  antérieur tournait à 28 % et produisait des plateaux jouables : la fourchette
-  est peut-être à revoir vers le bas.
+- **La fourchette de 35 à 50 % porte sur les rues, pas sur les bâtiments** (§3),
+  et elle vient d'une estimation. Un prototype antérieur tournait à 28 % en
+  produisant des plateaux jouables — chiffre rapporté de mémoire, jamais
+  revérifié ici. La fourchette est peut-être à revoir vers le bas.
 - **Le Quartier n'a aucune marge sous la borne haute** : il produit en moyenne
   50 % de rues pour un plafond de 50, et un plateau sur deux est rejeté. C'est
   jouable, mais le prochain changement de génération — n'importe lequel — le
