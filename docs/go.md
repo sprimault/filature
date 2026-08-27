@@ -26,6 +26,20 @@ Les exceptions sont connues d'avance :
 Une dépendance ajoutée passe par `make notices` : sa licence entre dans
 `THIRD-PARTY-NOTICES`, qui accompagne le binaire dans chaque archive.
 
+**Une dépendance qui ne vit que dans des fichiers de test ne se juge pas au même
+critère.** Elle n'entre dans aucun binaire, n'ajoute rien aux archives, ne peut
+pas introduire de cgo dans une cible publiée, et disparaît du graphe dès qu'on
+retire le test. Le critère se réduit alors à deux questions : est-elle en Go
+pur, et le test qu'elle permet vaut-il plus que sa maintenance ?
+
+| Module | Ce qu'il apporte | Où |
+|---|---|---|
+| `github.com/santhosh-tekuri/jsonschema/v6` | exécute les schémas de `schemas/` | tests seulement |
+
+Ce n'est pas une porte dérobée pour élargir la liste du dessus : une dépendance
+importée par un seul `_test.go` aujourd'hui et par du code demain change de
+catégorie, et repasse par la question complète.
+
 ## 2. cgo n'est pas uniforme, et c'est la seule entorse
 
 | Cible | `CGO_ENABLED` |

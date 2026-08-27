@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"regexp"
+	"slices"
 	"sort"
 	"strings"
 
@@ -16,6 +18,25 @@ import (
 
 // ManifestName est le fichier que tout plugin porte à sa racine.
 const ManifestName = "manifest.toml"
+
+// nomDePlugin est le motif que schemas/plugin-manifest.schema.json publie.
+//
+// Recopié ici et non dérivé du schéma : le chargeur doit rester autonome au
+// démarrage, sans lire de fichier de contrat. Un test rapproche les deux.
+var nomDePlugin = regexp.MustCompile(`^[a-z][a-z0-9-]{1,31}$`)
+
+// licencesAdmises est la liste blanche SPDX du catalogue, dans l'ordre où le
+// schéma la publie.
+//
+// Courte et fermée par choix : un champ libre laisserait passer « à voir » et
+// rendrait les entrées inexploitables, comme les fichiers binaires que le
+// catalogue refuse. Rien à juger, donc rien à relire à la main.
+var licencesAdmises = []string{
+	"MIT", "Apache-2.0", "CC0-1.0", "CC-BY-4.0", "CC-BY-SA-4.0", "BSD-3-Clause",
+}
+
+// nomValide dit si un nom de plugin suit le motif du contrat.
+func nomValide(nom string) bool { return nomDePlugin.MatchString(nom) }
 
 // manifeste est la forme d'un manifeste.toml, telle que
 // schemas/manifeste-plugin.schema.json la décrit.
@@ -120,6 +141,23 @@ func (m *manifeste) validate(chemin, dossier string) []error {
 		ajouter("nom %q dans un dossier %q", m.Name, dossier)
 	}
 
+	// Le nom sert d'identifiant partout — dossier, empreinte, index du
+	// catalogue —, et le motif est celui que le schéma publie. Il n'était
+	// contrôlé nulle part : « A_x » passait, alors que le contrat l'exclut.
+	if m.Name != "" && !nomValide(m.Name) {
+		ajouter("nom %q : attendu de 2 a 32 caracteres, minuscules, chiffres et tirets, "+
+			"commencant par une lettre", m.Name)
+	}
+
+	// La licence est une liste fermée et non un champ libre : le catalogue
+	// refuse ce qu'il ne peut pas juger, et « a voir » est exactement l'entrée
+	// que la liste existe pour écarter. Facultative hors catalogue, d'où le
+	// contrôle sur la valeur seulement.
+	if m.Licence != "" && !slices.Contains(licencesAdmises, m.Licence) {
+		ajouter("licence %q inconnue, attendu l'une de %s",
+			m.Licence, strings.Join(licencesAdmises, ", "))
+	}
+
 	porteDesEffets := len(m.Abilities) > 0 || len(m.Expenses) > 0 || len(m.Modes) > 0
 
 	if porteDesEffets && m.EffectsVersion != core.EffectsVersion {
@@ -168,14 +206,36 @@ func (m *manifeste) checkAllEffects(chemin string) []error {
 	}
 	for _, cle := range sortedKeys(m.Modes) {
 		mode := m.Modes[cle]
-		if mode.Trigger == "" {
+		switch {
+		case mode.Trigger == "":
 			manquements = append(manquements,
 				fmt.Errorf("%s: mode.%s: declenchement manquant", chemin, cle))
+		case !triggerConnu(mode.Trigger):
+			manquements = append(manquements,
+				fmt.Errorf("%s: mode.%s: declenchement %q inconnu, attendu l'un de %s",
+					chemin, cle, mode.Trigger, listeDesTriggers()))
 		}
 		manquements = append(manquements,
 			checkEffects(mode.Effects, chemin, "mode."+cle, false)...)
 	}
 	return manquements
+}
+
+// triggerConnu dit si un déclenchement fait partie du vocabulaire.
+func triggerConnu(t core.Trigger) bool {
+	return slices.Contains(core.Triggers(), t)
+}
+
+// listeDesTriggers rend les déclenchements pour un message d'erreur.
+//
+// Un refus qui ne dit pas ce qui était attendu oblige l'auteur à ouvrir le
+// schéma, alors qu'il a le message sous les yeux.
+func listeDesTriggers() string {
+	noms := make([]string, 0, len(core.Triggers()))
+	for _, t := range core.Triggers() {
+		noms = append(noms, string(t))
+	}
+	return strings.Join(noms, ", ")
 }
 
 // checkAbility contrôle une capacité ou une dépense, qui partagent leur
@@ -189,6 +249,20 @@ func checkAbility(c core.Ability, chemin, ou string) []error {
 	if c.Camp != core.SideFugitive && c.Camp != core.SideInspectors {
 		manquements = append(manquements, fmt.Errorf("%s: %s: camp %q, attendu %q ou %q",
 			chemin, ou, c.Camp, core.SideFugitive, core.SideInspectors))
+	}
+
+	// Le déclenchement n'était contrôlé nulle part : n'importe quelle chaîne
+	// passait, et la capacité n'entrait alors jamais en jeu sans qu'un message
+	// le dise. Une capacité passive n'en déclare pas, elle vaut toute la partie.
+	if !c.Passive && c.Trigger != "" && !triggerConnu(c.Trigger) {
+		manquements = append(manquements, fmt.Errorf("%s: %s: declenchement %q inconnu, attendu l'un de %s",
+			chemin, ou, c.Trigger, listeDesTriggers()))
+	}
+	if c.Trigger == core.OnStrangling {
+		manquements = append(manquements, fmt.Errorf(
+			"%s: %s: declenchement %q reserve a un mode : le jeu le declenche lui-meme, "+
+				"un pion qui s'y accroche agirait sans que son camp l'ait joue",
+			chemin, ou, core.OnStrangling))
 	}
 	return append(manquements, checkEffects(c.Effects, chemin, ou, false)...)
 }

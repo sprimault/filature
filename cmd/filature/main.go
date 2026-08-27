@@ -68,7 +68,7 @@ func main() {
 	dossierPlugins := flag.String("plugins", pluginsParDefaut(), "dossier des plugins")
 	partie := flag.String("game", "", "nom d'une partie enregistrée à reprendre")
 	cote := flag.String("side", "inspectors", "camp joué : fugitive, inspectors, ou watch pour regarder")
-	preset := flag.String("preset", "ville", "préréglage : quartier, faubourg ou ville")
+	preset := flag.String("preset", "city", "préréglage : district, outskirts ou city")
 	graine := flag.Int64("seed", 1, "graine de la partie")
 	pause := flag.Duration("delay", 0, "pause entre deux tours quand personne ne joue, par exemple 800ms")
 
@@ -331,7 +331,7 @@ func writePreviews(sortie io.Writer, dossier, destination string) error {
 		return err
 	}
 	if err := ecrireSVG(cible("-plateau"), func(w io.Writer) error {
-		return preview.Board(w, formes, registre, "quartier")
+		return preview.Board(w, formes, registre, "district")
 	}); err != nil {
 		return err
 	}

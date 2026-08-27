@@ -19,7 +19,7 @@ import (
 // le déroulé — étranglement, révélation, traces — et la suite entière tourne
 // en une fraction de seconde.
 func partieRegardee(seed int64, sortie io.Writer) Options {
-	reglage, _ := core.PresetByKey("quartier")
+	reglage, _ := core.PresetByKey("district")
 	return Options{
 		Seed:     seed,
 		Settings: reglage.Settings,

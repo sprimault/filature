@@ -29,6 +29,21 @@ const (
 	OnStrangling      Trigger = "strangling"
 )
 
+// Triggers énumère les moments de déclenchement, dans l'ordre de leur
+// déclaration.
+//
+// Comme EffectTypes et Targets, et pour la même raison : le chargeur en a
+// besoin pour refuser ce que le noyau ne saura pas déclencher. Sans elle, un
+// manifeste pouvait poser n'importe quelle chaîne dans trigger — le contrôle
+// n'existait pas, et une capacité mal déclarée n'entrait jamais en jeu sans
+// qu'un message le dise.
+func Triggers() []Trigger {
+	return []Trigger{
+		OnInspectorsPhase, OnFugitivePhase, OnTurnEnd,
+		OnContact, OnReveal, OnStrangling,
+	}
+}
+
 // Ability est une entrée déclarative, chargée depuis un manifeste. Les cinq
 // capacités livrées ne sont pas codées en dur : elles vivent dans
 // plugins/base, au même format que celles d'un tiers.

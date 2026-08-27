@@ -30,6 +30,23 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le chargeur applique trois refus qu'il annonçait sans les faire.** Un nom de
+plugin hors du motif publié, une licence absente de la liste fermée, un
+déclenchement inventé ou `strangling` sur une capacité étaient tous acceptés.
+La licence est le cas le plus net : la liste blanche existe pour écarter les
+mentions qu'on ne peut pas juger, et « à voir » entrait sans un mot.
+
+**Les schémas de `schemas/` sont désormais exécutés.** Un test valide le
+manifeste livré contre le contrat publié, et une série de manifestes ne portant
+chacun qu'une faute, pour que chaque refus soit exercé séparément. Tant que
+personne ne les exécutait, ils pouvaient mentir comme un commentaire.
+
+**Les préréglages s'appellent `district`, `outskirts` et `city`.** Leurs clés
+étaient en français quand les dictionnaires livrés déclaraient déjà les libellés
+sous les noms anglais : aucun préréglage n'aurait trouvé son libellé, et le
+repli sur le français n'aurait pas joué non plus, la clé manquant des deux
+côtés. `filature -preset quartier` devient `filature -preset district`.
+
 **Le protocole de bot passe à la version 3, tout en anglais.** Ses six types de
 message étaient en français sauf un, que le document et le schéma nommaient
 d'ailleurs différemment : un auteur de bot ne pouvait deviner ni la règle ni
@@ -141,6 +158,23 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The loader now applies three rejections it announced without performing.** A
+plugin name outside the published pattern, a licence missing from the closed
+list, an invented trigger or `strangling` on an ability were all accepted. The
+licence is the clearest case: the allow-list exists to keep out entries nobody
+can judge, and "à voir" walked straight in.
+
+**The schemas in `schemas/` are now executed.** A test validates the shipped
+manifest against the published contract, along with a series of manifests each
+carrying a single fault, so every rejection is exercised on its own. As long as
+nothing ran them, they could lie like a comment.
+
+**The presets are now called `district`, `outskirts` and `city`.** Their keys
+were in French while the shipped dictionaries already declared the labels under
+the English names: no preset would have found its label, and the fallback to
+French would not have helped either, the key being missing on both sides.
+`filature -preset quartier` becomes `filature -preset district`.
 
 **The bot protocol moves to version 3, entirely in English.** Its six message
 types were in French except one, which the document and the schema happened to

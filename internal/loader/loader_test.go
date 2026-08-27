@@ -590,3 +590,84 @@ role = "piece"
 		t.Errorf("message %q, attendu qu'il dise le gabarit", err)
 	}
 }
+
+// TestManifestRejectsOneFaultAtATime exerce les trois refus que le chargeur
+// n'appliquait pas, chacun sur un manifeste qui ne porte que cette faute.
+//
+// Ils étaient spécifiés depuis des mois dans docs/plugins.md et publiés par le
+// schéma, sans qu'aucune ligne de Go les applique : un plugin nommé « A_x »,
+// une licence « à voir », un déclenchement inventé passaient tous les trois. Le
+// cas de la licence est celui qui a motivé la liste blanche, et c'est justement
+// l'exemple qu'elle laissait entrer.
+//
+// Une faute par manifeste : cumulées, l'une masquerait l'absence de contrôle
+// sur l'autre.
+func TestManifestRejectsOneFaultAtATime(t *testing.T) {
+	cas := []struct {
+		nom     string
+		dossier string
+		contenu string
+		attendu string
+	}{
+		{
+			nom:     "nom hors du motif",
+			dossier: "A_x",
+			contenu: "name = \"A_x\"\nversion = \"0.1.0\"\n",
+			attendu: "minuscules",
+		},
+		{
+			nom:     "licence hors de la liste",
+			dossier: "essai",
+			contenu: "name = \"essai\"\nversion = \"0.1.0\"\nlicense = \"a voir\"\n",
+			attendu: "licence \"a voir\" inconnue",
+		},
+		{
+			nom:     "declenchement inconnu",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 2
+
+[ability.x]
+name = "X"
+side = "inspectors"
+trigger = "n_importe_quoi"
+`,
+			attendu: "declenchement \"n_importe_quoi\" inconnu",
+		},
+		{
+			nom:     "etranglement sur une capacite",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 2
+
+[ability.x]
+name = "X"
+side = "inspectors"
+trigger = "strangling"
+`,
+			attendu: "reserve a un mode",
+		},
+	}
+
+	for _, c := range cas {
+		t.Run(c.nom, func(t *testing.T) {
+			dossier := filepath.Join(t.TempDir(), c.dossier)
+			if err := os.MkdirAll(dossier, 0o750); err != nil {
+				t.Fatal(err)
+			}
+			writeFile(t, filepath.Join(dossier, ManifestName), c.contenu)
+
+			err := Validate(dossier)
+			if err == nil {
+				t.Fatal("le chargeur accepte ce manifeste")
+			}
+			if !strings.Contains(err.Error(), c.attendu) {
+				t.Errorf("refusé, mais pas sur %q :\n%v", c.attendu, err)
+			}
+		})
+	}
+}

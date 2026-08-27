@@ -280,10 +280,22 @@ Les messages échangés sont dans [`protocole-bot.md`](protocole-bot.md).
 ## 8. Ce qui se passe au chargement
 
 1. Lecture des manifestes, dans l'ordre alphabétique des dossiers.
-2. Validation de chacun contre
-   [`schemas/plugin-manifest.schema.json`](../schemas/plugin-manifest.schema.json).
+2. Validation de chacun, contrôle par contrôle, par le chargeur lui-même.
 3. Calcul de l'empreinte du contenu.
 4. Fusion dans le registre.
+
+**Le chargeur applique le contrat, il ne lit pas le schéma.** Le jeu se lance
+sans dépendre d'un fichier de description, et
+[`schemas/plugin-manifest.schema.json`](../schemas/plugin-manifest.schema.json)
+reste ce que lit un auteur pour savoir contre quoi il écrit. Les deux disent la
+même chose, et des tests les tiennent ensemble : l'un valide le contenu livré et
+une série de manifestes fautifs contre le schéma, l'autre rapproche du contrat
+publié le motif d'un nom, la liste des licences, les énumérations du vocabulaire
+et les trois numéros de version.
+
+Ce n'est pas un détail d'implémentation. Tant que rien n'exécutait le schéma, il
+pouvait mentir sans qu'on le sache — sa clause sur les effets différés a refusé
+pendant des mois la seule forme valide de la primitive qu'elle contraint.
 
 **Un plugin invalide fait échouer le chargement entier.** Il n'est pas ignoré :
 un plugin à moitié actif est pire qu'un plugin absent, parce que la partie se
@@ -375,7 +387,11 @@ reste du texte comme le reste de ce qu'un plugin publie.
 - une couleur en hexadécimal dans une forme : les formes ne référencent que des
   noms de palette ;
 - un `shapes_version` ou un `effects_version` que ce binaire ne connaît pas ;
-- un plugin qui déclare à la fois un bot et des effets.
+- un plugin qui déclare à la fois un bot et des effets ;
+- un nom hors du motif `^[a-z][a-z0-9-]{1,31}$`, qui sert d'identifiant partout ;
+- une `license` absente de la liste fermée du §2 ;
+- un `trigger` inconnu, ou `strangling` sur une capacité — le jeu le déclenche
+  lui-même, et un pion qui s'y accrocherait agirait sans que son camp l'ait joué.
 
 Le catalogue ajoute une seule règle, mécanique : **aucun fichier binaire, sous
 aucune extension.** C'est ce qui supprime toute question de provenance, donc
