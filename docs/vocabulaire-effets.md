@@ -31,7 +31,7 @@ effet qui ne sait pas se défaire n'entre pas dans le vocabulaire : sans ça,
 l'IA ne peut plus explorer des milliers de positions sans copier l'état, et le
 rejeu du journal diverge.
 
-**Tout effet est déterministe.** L'aléatoire disponible est `core.Alea`,
+**Tout effet est déterministe.** L'aléatoire disponible est `core.Random`,
 alimenté par la graine de la partie. Ni horloge, ni entropie système, ni
 parcours de `map` — dont l'ordre n'est pas stable en Go.
 
