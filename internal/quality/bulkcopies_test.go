@@ -19,10 +19,9 @@ import (
 // pourquoi ce qui dépend de la position du fugitif vit dans Game et non dans
 // Inspector — voir LastContacts.
 var recopiesEnBloc = map[string][]string{
-	"Inspector":  {"Position", "Ability", "AbilityUsed", "StepsTaken"},
-	"Zone":       {"Number", "Cells", "Closed"},
-	"Shelter":    {"Number", "Cells"},
-	"CrimeScene": {"Position", "Turn"},
+	"Inspector": {"Position", "Ability", "AbilityUsed", "StepsTaken"},
+	"Zone":      {"Number", "Cells", "Closed"},
+	"Shelter":   {"Number", "Cells"},
 }
 
 // TestBulkCopiedTypesAreDeclared épingle les champs des types que ViewFor
@@ -43,10 +42,9 @@ var recopiesEnBloc = map[string][]string{
 // l'un des deux ignore ? Si oui, il vit dans Game, hors de ce qui se recopie.
 func TestBulkCopiedTypesAreDeclared(t *testing.T) {
 	types := map[string]reflect.Type{
-		"Inspector":  reflect.TypeOf(core.Inspector{}),
-		"Zone":       reflect.TypeOf(core.Zone{}),
-		"Shelter":    reflect.TypeOf(core.Shelter{}),
-		"CrimeScene": reflect.TypeOf(core.CrimeScene{}),
+		"Inspector": reflect.TypeOf(core.Inspector{}),
+		"Zone":      reflect.TypeOf(core.Zone{}),
+		"Shelter":   reflect.TypeOf(core.Shelter{}),
 	}
 
 	for nom, attendus := range recopiesEnBloc {

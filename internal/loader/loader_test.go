@@ -65,7 +65,7 @@ func TestLoadsShippedContent(t *testing.T) {
 	}
 	for _, cle := range []core.Expense{
 		core.ExpenseDoubleStep, core.ExpenseSilence, core.ExpenseWipeTrails,
-		core.ExpenseChangeZone, core.ExpenseMurder,
+		core.ExpenseChangeZone, core.ExpenseDecoy,
 	} {
 		if _, connue := r.Expenses[cle]; !connue {
 			t.Errorf("la dépense %s manque", cle)
@@ -506,7 +506,7 @@ func ecrire(t *testing.T, racine, chemin, contenu string) {
 func TestShippedShapesCanBeOverridden(t *testing.T) {
 	racine := t.TempDir()
 	ecrire(t, racine, "mien/manifest.toml", manifesteValide("mien"))
-	ecrire(t, racine, "mien/shapes.toml", `shapes_version = 3
+	ecrire(t, racine, "mien/shapes.toml", `shapes_version = 4
 
 [shape.fugitive]
 role = "piece"
@@ -535,7 +535,7 @@ role = "piece"
 // est signalé, et qu'il nomme les deux.
 func TestTwoPluginsOnTheSameShapeConflict(t *testing.T) {
 	racine := t.TempDir()
-	forme := `shapes_version = 3
+	forme := `shapes_version = 4
 
 [shape.fugitive]
 role = "piece"
@@ -571,7 +571,7 @@ role = "piece"
 func TestBrokenAppearanceStopsTheLoad(t *testing.T) {
 	racine := t.TempDir()
 	ecrire(t, racine, "large/manifest.toml", manifesteValide("large"))
-	ecrire(t, racine, "large/shapes.toml", `shapes_version = 3
+	ecrire(t, racine, "large/shapes.toml", `shapes_version = 4
 
 [shape.fugitive]
 role = "piece"

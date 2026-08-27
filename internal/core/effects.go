@@ -29,7 +29,6 @@ const (
 	EffectOpenCell       EffectType = "open_cell"
 	EffectRevealTrails   EffectType = "reveal_trails"
 	EffectRevealPosition EffectType = "reveal_position"
-	EffectMarkCrimeScene EffectType = "mark_crime_scene"
 	EffectCancelReveal   EffectType = "cancel_reveal"
 	EffectShareView      EffectType = "share_view"
 	EffectCostStamina    EffectType = "cost_stamina"
@@ -55,7 +54,7 @@ func EffectTypes() []EffectType {
 	return []EffectType{
 		EffectMove, EffectChangeRange, EffectChangeMobility,
 		EffectBlockCell, EffectOpenCell, EffectRevealTrails,
-		EffectRevealPosition, EffectMarkCrimeScene, EffectCancelReveal,
+		EffectRevealPosition, EffectCancelReveal,
 		EffectShareView, EffectCostStamina, EffectRestoreStamina,
 		EffectEraseTrails, EffectDecoyTrail, EffectCloseZone, EffectOpenZone,
 		EffectSealZone, EffectTeleport, EffectDefer, EffectEndGame,
@@ -230,9 +229,6 @@ func (p *Game) ApplyOneEffect(e Effect, ctx EffectContext) (annulation func(), e
 		p.Fugitive.Visible = true
 		return func() { p.Fugitive.Visible = precedent }, nil
 
-	case EffectMarkCrimeScene:
-		return p.markCrimeScene(e, ctx), nil
-
 	case EffectCancelReveal:
 		precedent := p.Fugitive.SilenceBought
 		p.Fugitive.SilenceBought = true
@@ -318,6 +314,42 @@ func truncate[T any](s []T) []T {
 	return s
 }
 
+// setIn inscrit une valeur dans une map de l'état et rend de quoi défaire
+// exactement, la map comprise.
+//
+// Trois choses à rendre, et la troisième est celle qu'on oublie : la valeur
+// précédente si la clé existait, l'absence de clé sinon, et la nullité de la map
+// si c'est cet appel qui l'a créée. Une map vide n'est pas une map nulle pour
+// reflect.DeepEqual ni pour JSON — {} contre null —, si bien qu'appliquer puis
+// annuler laissait un état équivalent au sens des règles et différent au sens de
+// la comparaison. L'IA compare des états pour reconnaître une position déjà
+// explorée : elle aurait refait un travail qu'elle croyait éviter, sans qu'aucune
+// partie soit faussée.
+//
+// Extraite parce que le geste était écrit deux fois — les traces, les
+// altérations de terrain — et manquait au troisième endroit. Deux copies ne
+// déclenchent aucune alarme, et c'est exactement le seuil où la duplication
+// coûte : assez fréquente pour être un motif, pas assez pour qu'on la nomme.
+func setIn[K comparable, V any](m *map[K]V, cle K, valeur V) func() {
+	etaitNulle := *m == nil
+	if etaitNulle {
+		*m = make(map[K]V)
+	}
+	precedente, existait := (*m)[cle]
+	(*m)[cle] = valeur
+
+	return func() {
+		if existait {
+			(*m)[cle] = precedente
+			return
+		}
+		delete(*m, cle)
+		if etaitNulle {
+			*m = nil
+		}
+	}
+}
+
 // alter inscrit une case dans une couche d'altération du terrain, jusqu'au
 // dernier tour où elle vaut. Une case déjà inscrite voit sa date remplacée, et
 // l'annulation rend l'ancienne plutôt que d'effacer.
@@ -327,37 +359,7 @@ func truncate[T any](s []T) []T {
 // aucune lecture ne la consultait, un barrage tenait jusqu'à la fin de la
 // partie. C'est expireTerrain qui la relit désormais.
 func (p *Game) alter(couche *map[Position]int, pos Position, duree int) func() {
-	etaitNulle := *couche == nil
-	if etaitNulle {
-		*couche = make(map[Position]int)
-	}
-	precedent, existait := (*couche)[pos]
-	(*couche)[pos] = p.Turn + duree - 1
-	return func() {
-		if existait {
-			(*couche)[pos] = precedent
-			return
-		}
-		delete(*couche, pos)
-		if etaitNulle {
-			*couche = nil
-		}
-	}
-}
-
-// markCrimeScene inscrit un lieu de meurtre, à la case du contexte ou à celle du
-// fugitif selon la cible.
-//
-// Contrairement à reveler_position, qui ne vaut qu'un tour, la scène reste :
-// c'est ce que le fugitif achète en payant, et ce sur quoi les inspecteurs
-// devront parier longtemps après.
-func (p *Game) markCrimeScene(e Effect, ctx EffectContext) func() {
-	pos := ctx.Case
-	if e.Target == TargetFugitive {
-		pos = p.Fugitive.Position
-	}
-	p.CrimeScenes = append(p.CrimeScenes, CrimeScene{Position: pos, Turn: p.Turn})
-	return func() { p.CrimeScenes = truncate(p.CrimeScenes) }
+	return setIn(couche, pos, p.Turn+duree-1)
 }
 
 // armDecoy retient la trace que le fugitif substituera aux siennes.

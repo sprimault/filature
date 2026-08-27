@@ -14,7 +14,7 @@
       "type": "integer",
       "description": "Version du contrat de formes. Un fichier écrit contre une autre version est refusé, jamais lu partiellement.",
       "enum": [
-        3
+        4
       ]
     },
     "shape": {

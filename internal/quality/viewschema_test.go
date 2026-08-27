@@ -85,7 +85,7 @@ func TestViewSchemaMarksSecretsOptional(t *testing.T) {
 	}
 
 	// Et l'inverse : ce qui est toujours là doit être annoncé comme tel.
-	for _, public := range []string{"side", "turn", "phase", "crime_scenes"} {
+	for _, public := range []string{"side", "turn", "phase", "known_trails"} {
 		if !requis[public] {
 			t.Errorf("%s n'est pas déclaré obligatoire alors qu'il est toujours présent", public)
 		}

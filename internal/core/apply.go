@@ -319,11 +319,7 @@ func (p *Game) spend(c Move) ([]func(), error) {
 	// contrat, et le noyau n'a pas à savoir que la dépense plafonnée s'appelle
 	// meurtre.
 	if depense.Uses > 0 {
-		if p.ExpenseUses == nil {
-			p.ExpenseUses = map[Expense]int{}
-		}
-		p.ExpenseUses[cle]++
-		faites = append(faites, func() { p.ExpenseUses[cle]-- })
+		faites = append(faites, setIn(&p.ExpenseUses, cle, p.ExpenseUses[cle]+1))
 	}
 
 	// Une dépense qui porte deux cases les impose au contexte : c'est ainsi

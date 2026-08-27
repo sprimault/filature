@@ -89,7 +89,7 @@ func TestDescribeEveryMoveType(t *testing.T) {
 		{core.Move{Type: core.MoveStep, Side: core.SideInspectors, Piece: 0,
 			From: core.Position{Column: 1, Row: 1}, To: core.Position{Column: 2, Row: 1}}, "déplacer A"},
 		{core.Move{Type: core.MoveAbility, Piece: 2, Ability: "tracker"}, "capacité tracker de C"},
-		{core.Move{Type: core.MoveExpense, Expense: core.ExpenseMurder}, "dépenser murder"},
+		{core.Move{Type: core.MoveExpense, Expense: core.ExpenseDecoy}, "dépenser decoy"},
 		{core.Move{Type: core.MoveChangeZone, Zone: 1}, "resceller vers la zone 1"},
 		{core.Move{Type: core.MovePass}, "passer"},
 		{core.Move{Type: core.MoveEndPhase}, "rendre la main"},

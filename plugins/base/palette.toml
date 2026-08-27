@@ -9,7 +9,7 @@
 # remplissage ne peut se détacher de tous à la fois. C'est le contour qui porte
 # la silhouette, et le remplissage qui ne porte plus que l'identité du camp.
 
-shapes_version = 3
+shapes_version = 4
 
 [palette]
 
@@ -73,7 +73,3 @@ inspector_detail = "#101c2a"
 marker_outline = "#241d16"
 trail = "#f0e6c8"
 roadblock = "#8a7a4a"
-
-# La scène est la seule exception : un meurtre est public et coûte cher, il se
-# voit.
-crime_scene = "#9b2c2c"

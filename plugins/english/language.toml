@@ -41,7 +41,6 @@ piece_chief = "Chief"
 term_stamina = "Stamina"
 term_trail = "Trail"
 term_zone = "Extraction zone"
-term_crime_scene = "Crime scene"
 term_roadblock = "Roadblock"
 term_turn = "Turn"
 

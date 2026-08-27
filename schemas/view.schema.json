@@ -6,21 +6,6 @@
   "description": "Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis core.View : ne pas modifier a la main.",
   "$ref": "#/$defs/View",
   "$defs": {
-    "CrimeScene": {
-      "type": "object",
-      "properties": {
-        "position": {
-          "$ref": "#/$defs/Position"
-        },
-        "turn": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "position",
-        "turn"
-      ]
-    },
     "Effect": {
       "type": "object",
       "properties": {
@@ -327,12 +312,6 @@
             "type": "integer"
           }
         },
-        "crime_scenes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/CrimeScene"
-          }
-        },
         "fugitive_position": {
           "$ref": "#/$defs/Position"
         },
@@ -421,7 +400,6 @@
       "required": [
         "announced_effects",
         "announced_zones",
-        "crime_scenes",
         "inspectors",
         "known_trails",
         "legal_moves",

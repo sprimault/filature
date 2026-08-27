@@ -81,17 +81,6 @@ type Decoy struct {
 	Toward Position `json:"toward"`
 }
 
-// CrimeScene est un lieu de meurtre. Contrairement à une trace, elle est connue des
-// deux camps dès qu'elle existe : c'est ce que le fugitif achète en payant.
-//
-// Elle ne contraint personne. Les inspecteurs sont libres de l'ignorer, et
-// c'est tout l'intérêt — ils savent où il était, ils doivent parier sur ce que
-// ça dit de sa destination.
-type CrimeScene struct {
-	Position Position `json:"position"`
-	Turn     int      `json:"turn"`
-}
-
 // Inspector porte un pion et sa capacité, utilisable une fois par partie.
 //
 // Aucun bonus n'est stocké ici : portée, mobilité et rayon de détection se
@@ -124,8 +113,7 @@ type Game struct {
 	Fugitive   Fugitive    `json:"fugitive"`
 	Inspectors []Inspector `json:"inspectors"`
 
-	Trails      map[Position]Trail `json:"trails"`
-	CrimeScenes []CrimeScene       `json:"crime_scenes"`
+	Trails map[Position]Trail `json:"trails"`
 
 	// Roadblocks et Openings sont les deux altérations du terrain, en tours
 	// d'expiration. Le plateau est en lecture seule — c'est la condition du

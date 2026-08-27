@@ -27,7 +27,6 @@ const (
 	CarRue        = '.'
 	CarFugitif    = 'F'
 	CarBarrage    = 'X'
-	CarScene      = '!'
 	CarTrace      = '+'
 	CarInspecteur = 'A' // A, B, C… selon le rang du pion
 
@@ -100,9 +99,6 @@ func Board(v core.View) string {
 		if p, ok := core.PositionFromKey(cle); ok {
 			poser(p, CarTrace)
 		}
-	}
-	for _, s := range v.CrimeScenes {
-		poser(s.Position, CarScene)
 	}
 	for _, p := range v.Roadblocks {
 		poser(p, CarBarrage)

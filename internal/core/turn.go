@@ -265,22 +265,7 @@ func (p *Game) dropTrails() []func() {
 
 // dropTrail inscrit une trace et renvoie de quoi la retirer.
 func (p *Game) dropTrail(pos Position, t Trail) func() {
-	etaitNulle := p.Trails == nil
-	if etaitNulle {
-		p.Trails = map[Position]Trail{}
-	}
-	precedente, existait := p.Trails[pos]
-	p.Trails[pos] = t
-	return func() {
-		if existait {
-			p.Trails[pos] = precedente
-			return
-		}
-		delete(p.Trails, pos)
-		if etaitNulle {
-			p.Trails = nil
-		}
-	}
+	return setIn(&p.Trails, pos, t)
 }
 
 // wipeOldTrails retire celles qui ont passé leur durée.

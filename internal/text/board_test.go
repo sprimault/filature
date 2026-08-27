@@ -67,11 +67,10 @@ func TestPiecesCoverTheRest(t *testing.T) {
 	sur := core.Position{Column: 1, Row: 1}
 
 	v.KnownTrails = map[string]core.Trail{sur.Key(): {Turn: 2, Direction: core.Est}}
-	v.CrimeScenes = []core.CrimeScene{{Position: sur, Turn: 2}}
 	v.Inspectors = []core.Inspector{{Position: sur}}
 
 	if got := ligneDe(t, Board(v), 1); got[1] != CarInspecteur {
-		t.Errorf("ligne 1 = %q, l'inspecteur devrait couvrir la scène et la trace", got)
+		t.Errorf("ligne 1 = %q, l'inspecteur devrait couvrir la trace", got)
 	}
 }
 

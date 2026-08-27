@@ -154,29 +154,6 @@ trigger = "fugitive_phase"
   type = "decoy_trail"
   target = "cell"
 
-# Le meurtre se compose : révéler la position, marquer la scène, et payer. Les
-# deux premiers restent distincts parce qu'ils ne durent pas pareil — la
-# révélation vaut un tour, la scène reste sur le plateau.
-#
-# La convergence des inspecteurs n'est pas un effet : rien ne les oblige à se
-# rendre sur la scène. C'est justement ce qui fait du meurtre un pari et non un
-# automatisme.
-
-[expense.murder]
-name = "Meurtre"
-side = "fugitive"
-cost = 3
-uses = 2
-trigger = "fugitive_phase"
-
-  [[expense.murder.effect]]
-  type = "reveal_position"
-  target = "fugitive"
-
-  [[expense.murder.effect]]
-  type = "mark_crime_scene"
-  target = "fugitive"
-
 # ---------------------------------------------------------------------------
 # Modes : ce que le jeu déclenche de lui-même, sans qu'un joueur le choisisse.
 # ---------------------------------------------------------------------------
