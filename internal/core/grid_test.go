@@ -146,11 +146,14 @@ func TestBoardAlwaysPlayable(t *testing.T) {
 	p := DefaultSettings()
 
 	for graine := int64(1); graine <= 150; graine++ {
-		b, _, err := Generate(graine, p)
+		b, retenue, err := Generate(graine, p)
 		if err != nil {
 			t.Fatalf("graine %d : %v", graine, err)
 		}
-		if err := b.validate(p); err != nil {
+		// La graine retenue redonne le même tirage, donc la même trame : c'est
+		// le seul moyen de retrouver le compte que Generate a validé.
+		_, trame := draw(retenue, p)
+		if err := b.validate(p, trame); err != nil {
 			t.Fatalf("graine %d : un plateau retenu ne valide pas — %v", graine, err)
 		}
 		if len(b.Zones()) != p.Zones {
@@ -256,7 +259,7 @@ func TestValidationRejects(t *testing.T) {
 
 	t.Run("plateau vide", func(t *testing.T) {
 		b := &BoundedBoard{cote: p.Size, rues: make([]bool, p.Size*p.Size)}
-		if err := b.validate(p); err == nil {
+		if err := b.validate(p, b.countStreets()); err == nil {
 			t.Error("un plateau sans rue est accepté")
 		}
 	})
@@ -266,7 +269,7 @@ func TestValidationRejects(t *testing.T) {
 		for i := range b.rues {
 			b.rues[i] = true
 		}
-		if err := b.validate(p); err == nil {
+		if err := b.validate(p, b.countStreets()); err == nil {
 			t.Error("un plateau à 100 % de rues est accepté")
 		}
 	})
@@ -288,7 +291,7 @@ func TestValidationRejects(t *testing.T) {
 			}
 		}
 
-		err := b.validate(q)
+		err := b.validate(q, b.countStreets())
 		if err == nil {
 			t.Fatal("un plateau sans rue hors du noyau est accepté")
 		}
@@ -301,17 +304,18 @@ func TestValidationRejects(t *testing.T) {
 	})
 
 	t.Run("rue isolée", func(t *testing.T) {
-		b, _, err := Generate(3, p)
+		b, retenue, err := Generate(3, p)
 		if err != nil {
 			t.Fatal(err)
 		}
+		_, trame := draw(retenue, p)
 		// Une case ouverte au milieu d'un îlot, sans voisine praticable.
 		for ligne := 1; ligne < b.cote-1; ligne++ {
 			for colonne := 1; colonne < b.cote-1; colonne++ {
 				c := Position{Column: colonne, Row: ligne}
 				if !b.IsStreet(c) && !b.touchesStreet(c) {
 					b.open(c)
-					if err := b.validate(p); err == nil {
+					if err := b.validate(p, trame); err == nil {
 						t.Error("une rue isolée du reste du plateau est acceptée")
 					}
 					return
@@ -357,22 +361,37 @@ func deadEnds(b *BoundedBoard) int {
 // plateau qui n'en aurait pas resterait connexe, praticable et accepté par la
 // validation — la capacité deviendrait décorative sans que rien ne le dise.
 //
-// Le seuil est un plancher, pas une cible : combien il en faut ne se saura
-// qu'en jouant. Il est placé sous le minimum mesuré et au-dessus de ce que les
-// seules cours percées produisent, ce qui est tout ce qu'on lui demande — une
-// version de carveDeadEnds sans effet échoue ici sur les trois préréglages.
+// Le même tirage est comparé à lui-même privé de l'étape, et non à un plancher.
+// Un seuil aurait été emprunté à la distribution que les autres critères
+// laissent passer : quand le taux de rues a cessé de compter les blocs, la
+// population s'est élargie et sa queue basse est apparue — quatre impasses sur
+// un Quartier là où le plancher en demandait cinq, sans que l'étape ait bougé.
+// Un seuil calibré ainsi ne dit pas si carveDeadEnds agit, il dit ce que le
+// hasard a laissé passer. Ce qui doit être vrai est plus simple, et vrai quelle
+// que soit la taille : après l'étape, il y en a davantage qu'avant.
 func TestBoardCarriesDeadEnds(t *testing.T) {
 	for _, pre := range Presets() {
 		t.Run(pre.Key, func(t *testing.T) {
-			plancher := pre.Settings.Size / 4
-
 			for graine := int64(1); graine <= 60; graine++ {
-				b, _, err := Generate(graine, pre.Settings)
+				b, retenue, err := Generate(graine, pre.Settings)
 				if err != nil {
 					t.Fatalf("graine %d : %v", graine, err)
 				}
-				if n := deadEnds(b); n < plancher {
-					t.Fatalf("graine %d : %d impasses, attendu au moins %d", graine, n, plancher)
+
+				// Le même plateau sans la quatrième étape. La graine retenue
+				// rejoue les trois premières à l'identique, donc l'écart ne
+				// vient que d'elle.
+				sans := &BoundedBoard{graine: retenue, cote: pre.Settings.Size,
+					rues: make([]bool, pre.Settings.Size*pre.Settings.Size)}
+				sans.traceAvenues(NewRandom(retenue, "grid"))
+				sans.punchCourtyards(NewRandom(retenue, "courtyards"))
+				sans.placeZones(pre.Settings.Zones)
+				sans.placeShelters(pre.Settings)
+
+				avec, avant := deadEnds(b), deadEnds(sans)
+				if avec <= avant {
+					t.Fatalf("graine %d : %d impasses avec l'etape, %d sans — elle n'ajoute rien",
+						graine, avec, avant)
 				}
 			}
 		})

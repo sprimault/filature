@@ -30,6 +30,16 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le taux de rues ne juge plus que la trame.** Les blocs percés par-dessus —
+zones d'extraction et lieux de ressourcement — n'entrent plus dans la mesure :
+ce ne sont pas du terrain mais des dispositifs, publics et désignés, et les
+agréger faisait dépendre le plafond d'une composition qui varie avec la taille
+du plateau. Le Quartier passait ainsi la borne haute par ses seules zones, si
+bien que la génération y jetait quatre-vingt-douze tirages sur cent et ne
+retenait que les trames les plus denses. Il en sort plus ouvert qu'il ne
+l'était, un tirage suffit là où il en fallait quatorze, et quelques-uns de ses
+plateaux portent moins de cinq impasses.
+
 **Cinq règles ne s'appliquaient pas.** L'étranglement ne fermait aucune zone, un
 barrage et un percement duraient jusqu'à la fin de la partie, les capacités
 passives n'étaient jamais posées, le déplacement rendu par un repérage
@@ -99,6 +109,15 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The street ratio now judges the grid alone.** The blocks carved on top —
+extraction zones and respites — no longer count towards it: they are not
+terrain but fixtures, public and marked, and lumping them together made the
+ceiling depend on a composition that varies with board size. The Small preset
+was therefore over the upper bound on its zones alone, so generation threw away
+ninety-two draws out of every hundred and kept only the densest grids. It comes
+out more open than it was, one draw now suffices where fourteen were needed,
+and a few of its boards carry fewer than five dead ends.
 
 **Five rules did not apply.** Strangling closed no zone, a roadblock and an
 opening lasted until the end of the game, passive abilities were never applied,

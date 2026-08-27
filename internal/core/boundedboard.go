@@ -136,12 +136,19 @@ type BoundedBoard struct {
 // La génération elle-même vit dans grid.go.
 
 // validate vérifie qu'une seule composante connexe couvre toutes les rues, que
-// chaque zone est atteignable et que le taux de rues tombe dans ses bornes.
+// chaque zone est atteignable et que le taux de rues de la trame tombe dans ses
+// bornes.
+//
+// ruesTrame est le nombre de cases ouvertes avant que les blocs soient percés —
+// draw le rend, et un plateau bâti à la main passe son propre compte, puisqu'il
+// n'a pas de blocs. Le paramètre plutôt qu'un champ : ce qu'on mesure ici n'est
+// pas déductible du plateau qu'on reçoit, et le taire le rendrait nul pour qui
+// ne passe pas par draw.
 //
 // Un plateau qui échoue est jeté, jamais rapiécé : boucher un trou en ouvrant
 // des cases au hasard donnerait un terrain que personne n'a dessiné, et dont on
 // ne saurait plus dire s'il tient les critères pour de bon ou par accident.
-func (b *BoundedBoard) validate(p Settings) error {
+func (b *BoundedBoard) validate(p Settings, ruesTrame int) error {
 	rues := b.countStreets()
 	if rues == 0 {
 		return errors.New("plateau sans rue")
@@ -150,9 +157,9 @@ func (b *BoundedBoard) validate(p Settings) error {
 	// Le taux se mesure en centièmes plutôt qu'en flottants : deux machines
 	// doivent trancher pareil, et une comparaison de flottants au bord de la
 	// fourchette est le genre de chose qui diverge.
-	taux := rues * 100 / (b.cote * b.cote)
+	taux := ruesTrame * 100 / (b.cote * b.cote)
 	if taux < MinStreetRatio || taux > MaxStreetRatio {
-		return fmt.Errorf("taux de rues de %d %%, hors des bornes %d a %d",
+		return fmt.Errorf("taux de rues de %d %% dans la trame, hors des bornes %d a %d",
 			taux, MinStreetRatio, MaxStreetRatio)
 	}
 

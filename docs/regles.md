@@ -155,6 +155,26 @@ Génération déterministe depuis une graine :
    entre 35 % et 50 %. Un plateau qui échoue est rejeté et régénéré avec la
    graine suivante.
 
+**Le taux de rues se mesure sur la trame seule**, étapes 1 à 4 : les blocs
+percés ensuite n'y entrent pas. Une case de zone ou de lieu n'est pas du
+terrain, c'est un dispositif — publique, désignée, occupée plutôt que fouillée.
+Les compter ensemble faisait dépendre le seuil d'une composition qui varie avec
+la taille : dix blocs de neuf cases pèsent un cinquième d'un Quartier contre un
+vingtième d'une Ville.
+
+**Le petit préréglage en sort plus ouvert, et ce n'est pas une intention.** Ses
+zones seules le portaient déjà au-dessus du plafond, si bien que la génération
+y jetait 92 % de ses tirages et ne retenait que les trames les plus denses.
+Mesuré le 27 août 2026, après correction : surface praticable médiane de 52 %
+sur le Quartier — 47 % sur la Ville —, et 1,2 essai par plateau retenu au lieu
+de 13,8.
+
+**L'étape 4 vise une impasse par carré de huit cases, elle ne la garantit
+pas** : le creusement dépense ce que les amorces permettent. Mesuré à la même
+date, 1,2 % des Quartiers retenus en portent moins de cinq, le plus pauvre en
+comptant deux ; sur Faubourg et Ville, aucun ne descend sous les planchers
+correspondants.
+
 Une zone d'extraction est un bloc de 3×3 dont au moins 5 cases sont des rues.
 Les six zones sont visibles des deux joueurs dès le début.
 
@@ -663,12 +683,19 @@ ne serait qu'un mur de déplacement sans effet sur l'information.
   et elle vient d'une estimation. Un prototype antérieur tournait à 28 % en
   produisant des plateaux jouables — chiffre rapporté de mémoire, jamais
   revérifié ici. La fourchette est peut-être à revoir vers le bas.
-- **Le Quartier n'a aucune marge sous la borne haute** : il produit en moyenne
-  50 % de rues pour un plafond de 50, et un plateau sur deux est rejeté. C'est
-  jouable, mais le prochain changement de génération — n'importe lequel — le
-  fera repasser sous la barre, et le signal se déclenchera dans un lot sans
-  rapport. Ou la fourchette est trop étroite, ou le petit format demande une
-  trame à lui.
+- **Le Quartier a retrouvé sa marge sous la borne haute** : sa trame produit
+  46 % de rues en médiane pour un plafond de 50, et 1,2 essai suffit désormais à
+  retenir un plateau, contre 13,8 quand les blocs entraient dans le taux
+  (mesuré le 27 août 2026). Reste que c'est le format où toutes les valeurs
+  constantes touchent leur limite : le préavis d'étranglement y égale la
+  période, la couronne intermédiaire n'y a qu'un rayon de libre, et c'est le
+  seul où des plateaux passent sous cinq impasses. **Décider à l'étape 11 s'il
+  est un préréglage à part entière ou un cas limite maintenu par symétrie** — et
+  pas sans les taux de victoire.
+- **Une propriété de génération peut peser sur l'équilibre, et ça n'a jamais été
+  mesuré.** La capture repose sur le talonnage en couloir (§14), que les impasses
+  rendent possible ; si les Quartiers pauvres en impasses donnent une
+  distribution de motifs de fin différente des autres, c'est là qu'on le verra.
 
 L'architecture, les structures et la feuille de route ont leur propre document :
 [`architecture.md`](architecture.md).
