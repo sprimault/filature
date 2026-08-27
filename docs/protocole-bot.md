@@ -1,6 +1,6 @@
 # Protocole de bot
 
-Version du protocole : **2**
+Version du protocole : **3**
 
 Un bot **remplace** l'IA du jeu, il ne l'étend pas. Le jeu lui transmet une vue
 de la partie, il renvoie un coup. Aucune API interne à respecter, aucun plugin
@@ -36,43 +36,52 @@ elle est appliquée au même endroit.
 ## 2. Séquence
 
 ```
-jeu  -> bot   bonjour     version du protocole, réglages, graine, camp
-bot  -> jeu   pret        nom, version, déterminisme
-jeu  -> bot   joue        vue de la partie, budget en millisecondes
-bot  -> jeu   coup        le coup choisi
+jeu  -> bot   hello       version du protocole, réglages, graine, camp
+bot  -> jeu   ready       nom, version, déterminisme
+jeu  -> bot   play        vue de la partie, budget en millisecondes
+bot  -> jeu   move        le coup choisi
               ... répété jusqu'à la fin ...
-jeu  -> bot   fin         résultat
+jeu  -> bot   over        résultat
 ```
 
-Le jeu ferme l'entrée standard après `fin`. Le bot termine ; s'il est encore
+Le jeu ferme l'entrée standard après `over`. Le bot termine ; s'il est encore
 vivant au bout d'une seconde, il est tué.
+
+**Les six types sont en anglais, comme tous les identifiants publics du
+projet.** Ils ne l'étaient pas jusqu'au protocole 3 : cinq l'étaient en
+français, et le sixième portait deux noms selon qu'on lisait le document ou le
+schéma. Un bot qui annonce une version antérieure est écarté dès sa réponse à
+`hello`, avec le numéro attendu — il n'a pas à le découvrir sur un type inconnu
+trois messages plus loin.
 
 ---
 
 ## 3. Messages du jeu
 
-### bonjour
+### hello
 
 ```json
-{"type":"bonjour","protocol":2,"side":"inspectors","seed":178342119,
+{"type":"hello","protocol":3,"side":"inspectors","seed":178342119,
  "settings":{"size":41,"range":8,"turns":40,"centre_radius":10,"stamina":10,
  "inspectors":5,"pieces_per_turn":3,"reveal_period":4,"zones":6,
- "trail_lifetime":6,"strangling_start":30,"strangling_period":2},
+ "trail_lifetime":6,"strangling_start":30,"strangling_period":4,
+ "strangling_notice":2},
  "plugins":[{"name":"base","version":"0.1.0","fingerprint":"…","rules":true}]}
 ```
 
 `seed` est fournie pour qu'un bot puisse être déterministe s'il le souhaite.
-**Un bot ne tire jamais de l'entropie système ni de l'horloge s'il se déclare
-déterministe** : c'est la seule chose que le jeu lui demande, et elle est
-vérifiée.
+**Un bot qui se déclare déterministe ne tire jamais de l'entropie système ni de
+l'horloge.** Le jeu ne le vérifie pas : le contrôle est celui du catalogue, deux
+parties sur la même graine comparées coup à coup (§6). Ce qu'il fait respecter à
+tout bot, déterministe ou non, est au §5.
 
 `plugins` liste les extensions de règles actives. Un bot qui ne les connaît pas
 peut refuser de jouer plutôt que de jouer faux.
 
-### joue
+### play
 
 ```json
-{"type":"joue","turn":7,"budget_ms":2000,"view":{ … }}
+{"type":"play","turn":7,"budget_ms":2000,"view":{ … }}
 ```
 
 `view` est l'objet décrit dans
@@ -93,30 +102,33 @@ donc rien à savoir des règles pour être correct : il ne peut pas jouer un cou
 illégal s'il choisit dans cette liste. C'est aussi ce qui fait qu'un plugin de
 règles ajoutant une dépense est utilisable par un bot qui l'ignore.
 
-### fin
+### over
 
 ```json
-{"type":"fin","winner":"fugitive","reason":"extraction","turn":34}
+{"type":"over","winner":"fugitive","reason":"extraction","turn":34}
 ```
 
 Le jeu de base produit cinq motifs : `extraction`, `captured`, `stamina_spent`,
 `fugitive_cornered`, `time_up`. **La liste n'est pas fermée** — un plugin de
 règles qui invente une condition de victoire produit son propre motif, et un bot
-qui ne le connaît pas l'a appris dans `bonjour`, qui annonce les plugins
+qui ne le connaît pas l'a appris dans `hello`, qui annonce les plugins
 actifs. Traiter le champ comme une chaîne, jamais comme une énumération.
 
 ---
 
 ## 4. Messages du bot
 
-### pret
+### ready
 
 ```json
-{"type":"pret","name":"traqueur-glouton","version":"0.3.1",
- "protocol":2,"deterministic":true,"author":"…"}
+{"type":"ready","name":"traqueur-glouton","version":"0.3.1",
+ "protocol":3,"deterministic":true,"author":"…"}
 ```
 
-### coup
+Un `protocol` qui n'est pas celui du jeu écarte le bot ici, avant tout autre
+échange, sur un message qui porte les deux numéros.
+
+### move
 
 ```json
 {"type":"move","move":{"turn":7,"side":"inspectors","type":"step",
@@ -126,10 +138,10 @@ actifs. Traiter le champ comme une chaîne, jamais comme une énumération.
 Le coup doit figurer tel quel dans `legal_moves`. Le jeu ne corrige rien et
 n'interprète rien.
 
-### erreur
+### error
 
 ```json
-{"type":"erreur","message":"cas non traité : phase de placement"}
+{"type":"error","message":"cas non traité : phase de placement"}
 ```
 
 Le bot déclare qu'il ne peut pas jouer. La partie s'arrête proprement, avec le
@@ -146,7 +158,7 @@ message affiché.
 | `budget_ms` dépassé une fois | coup légal choisi au sort, incident journalisé |
 | Budget dépassé trois fois | partie interrompue |
 | Processus mort | partie interrompue |
-| `protocol` inconnu dans `pret` | refus avant le début |
+| `protocol` inconnu dans `ready` | refus avant le début |
 
 Un bot lent est toléré une fois puis écarté : laisser une partie se figer sur un
 processus tiers est pire qu'un coup au hasard, et le journal garde la trace des
@@ -170,7 +182,7 @@ Le déterminisme n'est requis que pour deux usages :
 - entrer dans une passe d'équilibrage, où des milliers de parties doivent être
   comparables entre deux versions.
 
-D'où le drapeau `deterministic` dans `pret`, et le contrôle correspondant : deux
+D'où le drapeau `deterministic` dans `ready`, et le contrôle correspondant : deux
 parties sur la même graine, comparaison des coups. Un bot qui se déclare
 déterministe sans l'être est refusé au catalogue.
 
@@ -228,10 +240,10 @@ import json, random, sys
 
 for ligne in sys.stdin:
     message = json.loads(ligne)
-    if message["type"] == "bonjour":
-        reponse = {"type": "pret", "name": "hasard", "version": "1.0.0",
-                   "protocol": 2, "deterministic": False}
-    elif message["type"] == "joue":
+    if message["type"] == "hello":
+        reponse = {"type": "ready", "name": "hasard", "version": "1.0.0",
+                   "protocol": 3, "deterministic": False}
+    elif message["type"] == "play":
         reponse = {"type": "move",
                    "move": random.choice(message["view"]["legal_moves"])}
     else:

@@ -6,12 +6,18 @@ package ai
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/sprimault/filature/internal/core"
 )
 
 // BotProtocol est la version parlée par ce binaire.
-const BotProtocol = 2
+//
+// Passée à 3 quand les six types de message sont passés à l'anglais. Les
+// versions 1 et 2 nommaient un coup « coup » dans le schéma et « move » dans la
+// documentation, et les cinq autres types en français : un auteur de bot ne
+// pouvait deviner ni la règle ni l'exception.
+const BotProtocol = 3
 
 // Un bot remplace l'IA du jeu, il ne l'étend pas : le jeu envoie une View, le
 // bot renvoie un Move. L'IA livrée parle ce même protocole, ce qui garantit
@@ -39,6 +45,7 @@ type Message struct {
 
 	Name         string `json:"name,omitempty"`
 	Version      string `json:"version,omitempty"`
+	Author       string `json:"author,omitempty"`
 	Deterministe bool   `json:"deterministic,omitempty"`
 
 	Move *core.Move `json:"move,omitempty"`
@@ -60,12 +67,34 @@ type Bot struct {
 	depassements int
 }
 
-// Start démarre le processus et échange bonjour/pret.
+// Start démarre le processus et échange hello/ready.
 //
 // La graine de la partie lui est transmise : c'est ce qui permet à un bot
 // d'être déterministe sans horloge ni entropie système.
+//
+// checkProtocol est appelé sur le ready reçu, avant tout autre message.
 func Start(ctx context.Context, command string, args []string, sideName core.Side, p *core.Game) (*Bot, error) {
 	return nil, errors.New("à implémenter : étape 9")
+}
+
+// checkProtocol accepte ou écarte la version qu'un bot annonce dans son ready.
+//
+// **Au premier message et non au troisième.** Un bot écrit contre une version
+// antérieure enverrait sinon des types que ce binaire ne connaît plus, et
+// échouerait sur un « type inconnu » qui ne dit pas ce qui s'est passé. Le
+// message porte les deux numéros et ce qu'il y a à faire : c'est tout ce dont
+// son auteur dispose, le jeu n'ayant aucun moyen de le joindre.
+func checkProtocol(annoncee int) error {
+	if annoncee == BotProtocol {
+		return nil
+	}
+	if annoncee < BotProtocol {
+		return fmt.Errorf("le bot annonce le protocole %d, ce binaire parle le %d : "+
+			"mettre le bot a jour, ou jouer avec une version du jeu qui parle le %d",
+			annoncee, BotProtocol, annoncee)
+	}
+	return fmt.Errorf("le bot annonce le protocole %d, ce binaire parle le %d : "+
+		"mettre le jeu a jour", annoncee, BotProtocol)
 }
 
 // Play demande un coup et vérifie qu'il figure dans les coups légaux.
@@ -79,7 +108,7 @@ func (b *Bot) Play(ctx context.Context, v core.View, budgetMs int) (core.Move, e
 	return core.Move{}, errors.New("à implémenter : étape 9")
 }
 
-// Stop envoie fin et ferme l'entrée standard, puis tue le processus s'il
+// Stop envoie over et ferme l'entrée standard, puis tue le processus s'il
 // survit une seconde.
 func (b *Bot) Stop(r core.Outcome) error {
 	return errors.New("à implémenter : étape 9")

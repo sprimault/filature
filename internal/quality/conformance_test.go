@@ -360,6 +360,20 @@ func TestLookoutDoublesRange(t *testing.T) {
 	}
 }
 
+// TestBotProtocolIsCheckedAtHandshake vérifie qu'un bot d'une autre version du
+// protocole est écarté avant de jouer.
+//
+// docs/protocole-bot.md §5 : « protocol inconnu dans ready — refus avant le
+// début ». La promesse est faite à des auteurs de bots, qui n'ont aucun moyen
+// de savoir qu'elle n'est pas encore tenue.
+func TestBotProtocolIsCheckedAtHandshake(t *testing.T) {
+	t.Skip("MECANIQUE INERTE : checkProtocol est écrite et exercée, mais " +
+		"ai.Start est un stub d'étape 9 et ne l'appelle donc pas encore. " +
+		"Le contrôle existe sans être branché — le compter ici plutôt que de " +
+		"s'en remettre au marqueur de stub de Start, qui dit qu'une étape " +
+		"manque et non qu'une promesse du contrat n'est pas tenue.")
+}
+
 // TestChiefSharesView vérifie que la vue partagée du Chef entre réellement dans
 // ce que son camp voit.
 //
@@ -427,7 +441,7 @@ func TestShelterNeedsEntering(t *testing.T) {
 // silencieux — il lui faut une constante en face pour qu'une dette ajoutée ou
 // levée sans être déclarée fasse rougir la suite.
 func TestInertMechanicsAreCounted(t *testing.T) {
-	const attendues = 2
+	const attendues = 3
 
 	source, err := os.ReadFile("conformance_test.go")
 	if err != nil {

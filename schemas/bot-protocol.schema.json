@@ -6,26 +6,26 @@
   "description": "Messages échangés en JSON Lines sur les entrée et sortie standard d'un processus externe. Un objet par ligne. L'IA livrée avec le jeu parle ce protocole : s'il manquait quelque chose, le jeu ne pourrait pas jouer contre lui-même.",
   "oneOf": [
     {
-      "$ref": "#/$defs/bonjour"
+      "$ref": "#/$defs/hello"
     },
     {
-      "$ref": "#/$defs/joue"
+      "$ref": "#/$defs/play"
     },
     {
-      "$ref": "#/$defs/fin"
+      "$ref": "#/$defs/over"
     },
     {
-      "$ref": "#/$defs/pret"
+      "$ref": "#/$defs/ready"
     },
     {
-      "$ref": "#/$defs/coup"
+      "$ref": "#/$defs/move"
     },
     {
-      "$ref": "#/$defs/erreur"
+      "$ref": "#/$defs/error"
     }
   ],
   "$defs": {
-    "bonjour": {
+    "hello": {
       "description": "jeu -> bot, une fois au démarrage.",
       "type": "object",
       "required": [
@@ -37,13 +37,14 @@
       ],
       "properties": {
         "type": {
-          "const": "bonjour"
+          "const": "hello"
         },
         "protocol": {
           "type": "integer",
           "enum": [
-            1
-          ]
+            3
+          ],
+          "description": "Version du protocole. Un bot qui en annonce une autre est ecarte des la poignee de main, avec le numero attendu."
         },
         "side": {
           "enum": [
@@ -86,7 +87,7 @@
         }
       }
     },
-    "joue": {
+    "play": {
       "description": "jeu -> bot, à chaque tour. vue est l'objet que reçoit l'interface : le bot ne voit jamais la position cachée du fugitif ni sa zone scellée.",
       "type": "object",
       "required": [
@@ -97,7 +98,7 @@
       ],
       "properties": {
         "type": {
-          "const": "joue"
+          "const": "play"
         },
         "turn": {
           "type": "integer",
@@ -112,35 +113,36 @@
         }
       }
     },
-    "fin": {
+    "over": {
       "description": "jeu -> bot, puis fermeture de l'entrée standard.",
       "type": "object",
       "required": [
         "type",
-        "vainqueur",
+        "winner",
         "reason",
         "turn"
       ],
       "properties": {
         "type": {
-          "const": "fin"
+          "const": "over"
         },
-        "vainqueur": {
+        "winner": {
           "enum": [
             "fugitive",
             "inspectors"
-          ]
+          ],
+          "description": "Camp qui l'emporte. En cas de simultaneite, celui du fugitif."
         },
         "reason": {
           "type": "string",
-          "description": "Le jeu de base en produit quatre : extraction, resistance_epuisee, fugitif_bloque, temps_ecoule. Un plugin de regles peut en produire d'autres, d'ou l'absence de liste fermee ; les plugins actifs sont annonces dans bonjour."
+          "description": "Le jeu de base en produit cinq : extraction, captured, stamina_spent, fugitive_cornered, time_up. Un plugin de regles peut en produire d'autres, d'ou l'absence de liste fermee ; les plugins actifs sont annonces dans bonjour."
         },
         "turn": {
           "type": "integer"
         }
       }
     },
-    "pret": {
+    "ready": {
       "description": "bot -> jeu, en réponse à bonjour.",
       "type": "object",
       "required": [
@@ -152,7 +154,7 @@
       ],
       "properties": {
         "type": {
-          "const": "pret"
+          "const": "ready"
         },
         "name": {
           "type": "string",
@@ -165,20 +167,22 @@
         "protocol": {
           "type": "integer",
           "enum": [
-            1
-          ]
+            3
+          ],
+          "description": "Version du protocole. Un bot qui en annonce une autre est ecarte des la poignee de main, avec le numero attendu."
         },
         "deterministic": {
           "type": "boolean",
           "description": "Un bot non déterministe reste jouable : le journal enregistre les coups, pas l'état interne. Le déterminisme n'est requis que pour reproduire un défaut et pour entrer dans une passe d'équilibrage."
         },
-        "auteur": {
+        "author": {
           "type": "string",
-          "maxLength": 64
+          "maxLength": 64,
+          "description": "Facultatif, affiche a l'ecran de fin quand un bot tient un camp."
         }
       }
     },
-    "coup": {
+    "move": {
       "description": "bot -> jeu. Le coup doit figurer tel quel dans coups_legaux : le jeu ne corrige ni n'interprète rien.",
       "type": "object",
       "required": [
@@ -187,14 +191,14 @@
       ],
       "properties": {
         "type": {
-          "const": "coup"
+          "const": "move"
         },
         "move": {
           "type": "object"
         }
       }
     },
-    "erreur": {
+    "error": {
       "description": "bot -> jeu. Le bot déclare qu'il ne peut pas jouer ; la partie s'arrête proprement.",
       "type": "object",
       "required": [
@@ -203,7 +207,7 @@
       ],
       "properties": {
         "type": {
-          "const": "erreur"
+          "const": "error"
         },
         "message": {
           "type": "string",
