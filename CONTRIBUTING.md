@@ -45,6 +45,80 @@ French. What follows is the summary you are held to.
 - Nothing in `internal/core` or `internal/ai` imports the renderer. CI runners
   are headless; a test that needs a window does not belong in the default suite.
 
+## Delivery
+
+**One batch, one branch, one commit.** The branch starts from an up-to-date
+`master` and is named `<type>/<subject>`, where the type is its commit's
+conventional prefix: `feat/`, `fix/`, `docs/`, `chore/`, `test/`, `refactor/`.
+Do not chain two batches on one branch — each must stay readable and revertable
+on its own.
+
+It goes back into `master` **through a pull request**, never through a local
+merge: the PR is what records what was delivered, and merging it removes the
+branch on both sides.
+
+**Check before pushing, not after:**
+
+```
+make lint && make test && make race && make vulncheck && make sec
+```
+
+`govulncheck` queries its advisory database **live**: a job that is green in the
+morning can be red in the afternoon on exactly the same code. Do not rely on
+continuous integration alone, which validates once the branch is already pushed.
+
+**Documentation ships with the change.** Before committing, check what the change
+makes false elsewhere: the status announced in the README, a rule in
+[`docs/regles.md`](docs/regles.md), an example, a schema in
+[`schemas/`](schemas/). Specific to this project: a game rule that changes makes
+`docs/regles.md` false, and that document is authoritative — the code never runs
+ahead of it.
+
+**A message says what changes and why**, in a few lines. The default is the
+title alone: a body exists only if it carries something the title does not say
+and the diff does not show. A pull request description exists only if it carries
+what a reviewer cannot infer from the diff — a measurement, a reproduced case, a
+break for users. Otherwise it stays empty.
+
+## Fixing a vulnerability without creating another
+
+Do not adopt a version published **the same day**, even a corrective one. Look
+for the oldest one that suffices:
+
+```
+go list -m -versions <module>
+```
+
+A version released within the hour is the typical profile of a compromised
+maintainer account.
+
+A pin is explained: a `require` held below the latest available carries an
+end-of-line comment saying why, and **when to remove it**.
+
+## Four numbers, not to be confused
+
+| Number | Where | What it tracks |
+|---|---|---|
+| repository version | git tag | the binary |
+| `shapes_version` | every shapes file | the appearance contract |
+| `protocol` | exchanges with a bot | the bot contract |
+| `effects_version` | a rules plugin's manifest | the effects vocabulary |
+
+The last three are integers unrelated to SemVer: adding an optional field does
+not bump them, everything else does. A release can ship without them moving;
+they never move without a release.
+
+**A `shapes_version` change invalidates every published appearance plugin.** It
+is the most expensive event in the project, to be announced at the top of the
+release notes. An `effects_version` change invalidates rules plugins, which
+affects fewer people but also breaks the saves that carry them.
+
+The repository follows SemVer with the zero clause: **in `0.x`, nothing is
+imposed.** The minor marks a milestone from [`ROADMAP.md`](ROADMAP.md), not an
+API break; everything else accumulates as a patch, be it a fix, a feature or a
+break. Direct consequence: **the number warns of nothing**, and it is the release
+notes that must say what a plugin author has to revisit.
+
 ## Language
 
 **Identifiers are in English** — directories, files, packages, types, functions,
