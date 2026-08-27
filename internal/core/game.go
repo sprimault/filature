@@ -62,6 +62,23 @@ type Fugitive struct {
 	// inspecteurs. Le fugitif n'a pas de quota de pions, mais une mobilité
 	// qu'un double déplacement porte à deux.
 	StepsTaken int `json:"steps_taken"`
+
+	// Decoy est la trace que la résolution posera à la place des vraies, nil
+	// quand aucun leurre n'a été payé ce tour.
+	Decoy *Decoy `json:"decoy,omitempty"`
+}
+
+// Decoy est une trace que le fugitif achète, posée à la place de celles que son
+// déplacement aurait laissées.
+//
+// Deux cases plutôt qu'une case et une direction : c'est la forme d'un pas, et
+// la direction s'en déduit comme pour un vrai. Rien n'y marque la fausseté —
+// une trace que le noyau distinguerait d'une vraie serait une fuite qui n'attend
+// qu'un appelant distrait, et le journal porte la dépense pour qui veut refaire
+// le compte après la partie.
+type Decoy struct {
+	At     Position `json:"at"`
+	Toward Position `json:"toward"`
 }
 
 // CrimeScene est un lieu de meurtre. Contrairement à une trace, elle est connue des

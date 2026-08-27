@@ -326,7 +326,14 @@ func (p *Game) spend(c Move) ([]func(), error) {
 		faites = append(faites, func() { p.ExpenseUses[cle]-- })
 	}
 
+	// Une dépense qui porte deux cases les impose au contexte : c'est ainsi
+	// qu'elle choisit où agir au lieu d'agir sur la position du fugitif. Les
+	// autres les laissent à zéro, donc égales. Générique par nécessité — le
+	// noyau n'a pas à savoir laquelle des dépenses s'appelle leurre.
 	ctx := EffectContext{Side: c.Side, Case: p.Fugitive.Position, Zone: c.Zone}
+	if c.From != c.To {
+		ctx.Case, ctx.Toward = c.From, c.To
+	}
 	effets, err := p.applyEffects(depense.Effects, ctx)
 	if err != nil {
 		undoAll(faites)
@@ -400,6 +407,14 @@ func (p *Game) resetQuotas() []func() {
 	if p.AbilityPlayed {
 		p.AbilityPlayed = false
 		defaire = append(defaire, func() { p.AbilityPlayed = true })
+	}
+
+	// Le leurre vaut pour le tour où il est payé : la résolution vient de
+	// poser sa trace, et le garder ferait mentir tous les tours suivants pour
+	// un point dépensé une fois.
+	if pose := p.Fugitive.Decoy; pose != nil {
+		p.Fugitive.Decoy = nil
+		defaire = append(defaire, func() { p.Fugitive.Decoy = pose })
 	}
 	return defaire
 }

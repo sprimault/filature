@@ -171,19 +171,9 @@ func (p *Game) fugitiveMoves() []Move {
 	depart := p.Fugitive.Position
 
 	if p.Fugitive.StepsTaken < p.MobilityOf(SideFugitive, 0) {
-		for d := Nord; d <= NordOuest; d++ {
-			arrivee := depart.Step(d)
-			if !p.IsWalkable(arrivee) || p.occupied(arrivee) {
+		for _, arrivee := range p.terrainSteps(depart) {
+			if p.occupied(arrivee) {
 				continue
-			}
-			// Un angle fermé ne se franchit pas : la diagonale exige qu'au
-			// moins une des deux cases orthogonales intermédiaires soit une
-			// rue, sinon le bâti ne bloque plus rien.
-			if d.IsDiagonal() {
-				a, b := depart.CornerCells(d)
-				if !p.IsWalkable(a) && !p.IsWalkable(b) {
-					continue
-				}
 			}
 			coups = append(coups, Move{
 				Turn: p.Turn, Side: SideFugitive, Type: MoveStep,
@@ -195,6 +185,77 @@ func (p *Game) fugitiveMoves() []Move {
 	coups = append(coups, p.expenseMoves()...)
 	coups = append(coups, Move{Turn: p.Turn, Side: SideFugitive, Type: MovePass})
 	return append(coups, Move{Turn: p.Turn, Side: SideFugitive, Type: MoveEndPhase})
+}
+
+// terrainSteps rend les cases qu'un pas depuis depart peut atteindre, terrain
+// seul.
+//
+// Sans le quota ni l'occupation, que l'appelant ajoute s'il les veut : un
+// déplacement les subit, un leurre non — une trace reste plausible sur une case
+// où un inspecteur se tient maintenant, puisqu'il a pu y arriver après.
+//
+// Extraite parce qu'elle sert deux fois, et c'est ce qui donne au leurre sa
+// contrainte sans qu'on l'écrive : il ne peut produire qu'une trace qu'un vrai
+// pas aurait pu laisser. Une seconde validation aurait dérivé de celle-ci.
+func (p *Game) terrainSteps(depart Position) []Position {
+	var cases []Position
+	for d := Nord; d <= NordOuest; d++ {
+		arrivee := depart.Step(d)
+		if !p.IsWalkable(arrivee) {
+			continue
+		}
+		// Un angle fermé ne se franchit pas : la diagonale exige qu'au moins
+		// une des deux cases orthogonales intermédiaires soit une rue, sinon le
+		// bâti ne bloque plus rien.
+		if d.IsDiagonal() {
+			a, b := depart.CornerCells(d)
+			if !p.IsWalkable(a) && !p.IsWalkable(b) {
+				continue
+			}
+		}
+		cases = append(cases, arrivee)
+	}
+	return cases
+}
+
+// decoyMoves énumère les traces qu'un leurre peut poser.
+//
+// La case de départ est la sienne ou une voisine praticable, la case visée en
+// est atteignable par un pas : docs/regles.md §8 donne la première liberté, et
+// la seconde vient du terrain. Un leurre pointant vers la case que le fugitif
+// occupe reste proposé — il dirait la vérité, mais l'énumération dit ce qui est
+// légal, pas ce qui est sage, et l'écarter demanderait au noyau une notion
+// d'utilité qu'il n'a nulle part ailleurs.
+func (p *Game) decoyMoves(cle Expense) []Move {
+	depart := p.Fugitive.Position
+	origines := append([]Position{depart}, p.terrainSteps(depart)...)
+
+	var coups []Move
+	for _, at := range origines {
+		if !p.IsWalkable(at) {
+			continue
+		}
+		for _, vers := range p.terrainSteps(at) {
+			coups = append(coups, Move{
+				Turn: p.Turn, Side: SideFugitive, Type: MoveExpense,
+				Expense: cle, From: at, To: vers,
+			})
+		}
+	}
+	return coups
+}
+
+// poseUneTrace dit si une dépense demande au joueur où poser sa trace.
+//
+// Sur ce que la dépense fait et non sur son nom : le noyau n'a pas à savoir
+// laquelle s'appelle leurre, pas plus qu'il ne sait laquelle plafonne à trois.
+func poseUneTrace(d Ability) bool {
+	for _, e := range d.Effects {
+		if e.Type == EffectDecoyTrail {
+			return true
+		}
+	}
+	return false
 }
 
 // expenseMoves énumère ce que le fugitif peut acheter avec sa résistance.
@@ -227,6 +288,10 @@ func (p *Game) expenseMoves() []Move {
 			continue
 		}
 		if cle == ExpenseSilence && p.Fugitive.SilenceBought {
+			continue
+		}
+		if poseUneTrace(d) {
+			coups = append(coups, p.decoyMoves(cle)...)
 			continue
 		}
 		coups = append(coups, Move{

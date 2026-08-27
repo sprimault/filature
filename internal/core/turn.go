@@ -237,6 +237,18 @@ func (p *Game) contacting() []int {
 // Une par case quittée, pas une par tour : un double déplacement en laisse deux,
 // et c'est ce qui rend la dépense lisible pour qui les découvre.
 func (p *Game) dropTrails() []func() {
+	// Un leurre remplace toutes les traces du tour par la sienne, il ne s'y
+	// ajoute pas : docs/regles.md §8 veut qu'elles soient toutes vraies ou
+	// toutes fausses. Mêlées, un inspecteur qui en découvre deux incompatibles
+	// saurait qu'il y a eu leurre — et l'apprendre est déjà une information.
+	if d := p.Fugitive.Decoy; d != nil {
+		direction, adjacente := DirectionTo(d.At, d.Toward)
+		if !adjacente {
+			return nil
+		}
+		return []func(){p.dropTrail(d.At, Trail{Turn: p.Turn, Direction: direction})}
+	}
+
 	var defaire []func()
 	for _, c := range p.Journal {
 		if c.Turn != p.Turn || c.Side != SideFugitive || c.Type != MoveStep {

@@ -198,6 +198,78 @@ func TestStranglingClosesOnScheduleAndAnnouncesAhead(t *testing.T) {
 	}
 }
 
+// TestDecoyReplacesTheTurnTrails vérifie qu'un leurre substitue sa trace à
+// celles du tour, au lieu de s'y ajouter.
+//
+// docs/regles.md §8 : « les traces d'un tour sont toutes vraies ou toutes
+// fausses, jamais mélangées ». Mêlées, un inspecteur qui en découvrirait deux
+// incompatibles saurait qu'il y a eu leurre — et l'apprendre est déjà une
+// information que le fugitif a payée pour ne pas donner.
+func TestDecoyReplacesTheTurnTrails(t *testing.T) {
+	p := partieLivree(t, "district")
+
+	// Les inspecteurs jouent avant le fugitif : leur rendre la main est ce qui
+	// lui donne la sienne.
+	for _, c := range p.LegalMoves(core.SideInspectors) {
+		if c.Type == core.MoveEndPhase {
+			if err := p.Apply(c); err != nil {
+				t.Fatalf("fin de la phase des inspecteurs : %v", err)
+			}
+			break
+		}
+	}
+
+	// Un pas d'abord : sans lui, la substitution ne remplacerait rien et le
+	// test passerait pour une partie où le fugitif n'a pas bougé.
+	var pas core.Move
+	for _, c := range p.LegalMoves(core.SideFugitive) {
+		if c.Type == core.MoveStep {
+			pas = c
+			break
+		}
+	}
+	if pas.Type == "" {
+		t.Fatal("aucun déplacement légal au premier tour")
+	}
+	if err := p.Apply(pas); err != nil {
+		t.Fatalf("déplacement : %v", err)
+	}
+
+	var leurre core.Move
+	for _, c := range p.LegalMoves(core.SideFugitive) {
+		if c.Type == core.MoveExpense && c.Expense == core.ExpenseDecoy {
+			leurre = c
+			break
+		}
+	}
+	if leurre.Type == "" {
+		t.Fatal("aucun leurre proposé : la dépense n'est pas dans le contenu livré, " +
+			"ou elle ne demande pas où poser sa trace")
+	}
+	if err := p.Apply(leurre); err != nil {
+		t.Fatalf("leurre : %v", err)
+	}
+
+	tour := p.Turn
+	finirLeTour(t, p)
+
+	posees := map[core.Position]bool{}
+	for pos, trace := range p.Trails {
+		if trace.Turn == tour {
+			posees[pos] = true
+		}
+	}
+	if len(posees) != 1 {
+		t.Fatalf("%d traces posées au tour %d, une seule attendue", len(posees), tour)
+	}
+	if !posees[leurre.From] {
+		t.Errorf("la trace du tour n'est pas celle du leurre : posée ailleurs qu'en %v", leurre.From)
+	}
+	if posees[pas.From] && pas.From != leurre.From {
+		t.Errorf("la trace du déplacement en %v est restée", pas.From)
+	}
+}
+
 // TestRoadblockExpires vérifie qu'un barrage rend sa case au bout de sa durée.
 //
 // docs/regles.md §9 : le Barreur ferme une case de rue pendant 3 tours.

@@ -7,7 +7,7 @@
 
 name = "base"
 version = "0.1.0"
-effects_version = 2
+effects_version = 3
 rules = true
 license = "Apache-2.0"
 description = "Capacités et dépenses de la règle standard"
@@ -131,6 +131,28 @@ trigger = "fugitive_phase"
   [[expense.change_zone.effect]]
   type = "seal_zone"
   target = "zone"
+
+# Le leurre falsifie la trace du tour au lieu de l'effacer. Un point, trois fois
+# par partie : moins cher que l'effacement d'un tour, parce qu'il en dit plus.
+#
+# Effacer laisse un trou, et un trou est une information — les inspecteurs
+# savent qu'ils cherchent quelqu'un qui a payé. Une fausse trace ne se distingue
+# pas d'une vraie, donc elle attaque la déduction elle-même plutôt que de la
+# priver de matière.
+#
+# La case et la direction viennent du coup, pas d'ici : le joueur choisit où
+# poser sa trace parmi ce que le terrain autorise.
+
+[expense.decoy]
+name = "Leurre"
+side = "fugitive"
+cost = 1
+uses = 3
+trigger = "fugitive_phase"
+
+  [[expense.decoy.effect]]
+  type = "decoy_trail"
+  target = "cell"
 
 # Le meurtre se compose : révéler la position, marquer la scène, et payer. Les
 # deux premiers restent distincts parce qu'ils ne durent pas pareil — la

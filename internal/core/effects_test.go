@@ -265,6 +265,30 @@ func tousLesCas() []casEffet {
 			},
 		},
 		{
+			nom:   "leurre",
+			effet: Effect{Type: EffectDecoyTrail, Target: TargetCell},
+			ctx: EffectContext{
+				Side:   SideFugitive,
+				Case:   Position{Column: 7, Row: 7},
+				Toward: Position{Column: 8, Row: 7},
+			},
+			verifie: func(t *testing.T, p *Game) {
+				pose := p.Fugitive.Decoy
+				if pose == nil {
+					t.Fatal("aucune trace retenue")
+				}
+				if pose.At != (Position{Column: 7, Row: 7}) || pose.Toward != (Position{Column: 8, Row: 7}) {
+					t.Errorf("trace retenue en %v vers %v", pose.At, pose.Toward)
+				}
+				// Retenue, pas posée : les traces s'inscrivent à la
+				// résolution, et une trace posée ici coexisterait avec les
+				// vraies.
+				if _, deja := p.Trails[pose.At]; deja {
+					t.Error("la trace est déjà sur le plateau")
+				}
+			},
+		},
+		{
 			nom:   "fermer_zone",
 			effet: Effect{Type: EffectCloseZone, Target: TargetZone},
 			ctx:   EffectContext{Side: SideInspectors, Piece: 1, Zone: 3},
