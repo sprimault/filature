@@ -313,7 +313,7 @@ func TestViewAndSpottingAgree(t *testing.T) {
 	p.Roadblocks = map[Position]int{{Column: 5, Row: 8}: 3}
 
 	vue := map[Position]bool{}
-	for _, c := range p.visibleCellsFor(SideInspectors) {
+	for _, c := range p.visibleCellsFor() {
 		vue[c] = true
 	}
 	if len(vue) == 0 {

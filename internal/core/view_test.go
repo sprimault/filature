@@ -334,3 +334,31 @@ func TestOutcomeInTheView(t *testing.T) {
 		}
 	}
 }
+
+// TestWatchedCellsReachBothSides vérifie que les cases surveillées partent aux
+// deux camps.
+//
+// docs/regles.md §2 et §6 : les positions des inspecteurs sont déjà publiques et
+// leurs lignes de vue s'en déduisent, donc les cacher ferait reposer l'équilibre
+// sur la fatigue du joueur — quand son adversaire machine refait ce calcul
+// entier à chaque coup.
+func TestWatchedCellsReachBothSides(t *testing.T) {
+	p := hiddenGame()
+
+	inspecteurs := p.ViewFor(SideInspectors).CasesVisibles
+	if len(inspecteurs) == 0 {
+		t.Fatal("les inspecteurs ne voient aucune case")
+	}
+
+	fugitif := p.ViewFor(SideFugitive).CasesVisibles
+	if len(fugitif) != len(inspecteurs) {
+		t.Errorf("%d cases surveillées côté fugitif, %d côté inspecteurs",
+			len(fugitif), len(inspecteurs))
+	}
+	for i := range fugitif {
+		if fugitif[i] != inspecteurs[i] {
+			t.Fatalf("les deux vues divergent en %d : %v contre %v",
+				i, fugitif[i], inspecteurs[i])
+		}
+	}
+}

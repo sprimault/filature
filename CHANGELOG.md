@@ -30,6 +30,11 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le fugitif voit ce que les inspecteurs surveillent.** Les cases tenues par une
+ligne de vue ne partaient qu'à un camp, alors que les positions des pions et le
+terrain sont publics : ce calcul se déduit, mais le dérouler de tête à chaque
+coup adverse ne handicape que celui des deux joueurs qui fatigue.
+
 **Le Guetteur double sa portée au lieu de la tripler.** Il déclarait huit cases
 en absolu, juste tant qu'un seul préréglage existait : sur un Quartier, la portée
 vaut quatre et la capacité la portait à douze. Les effets acceptent désormais un
@@ -215,6 +220,11 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The fugitive now sees what the inspectors watch.** Cells held by a line of
+sight went to one side only, though piece positions and terrain are public: the
+calculation follows from them, but running it in your head on every opposing
+move only handicaps whichever of the two players gets tired.
 
 **The Lookout doubles his range instead of tripling it.** He declared eight cells
 outright, correct while a single preset existed: on a Small board range is four
