@@ -107,19 +107,19 @@ func finirLeTour(t *testing.T, p *core.Game) {
 // intervalle régulier jusqu'à ce qu'il n'en reste que trois.
 func TestStranglingActuallyCloses(t *testing.T) {
 	p := partieLivree(t, "quartier")
-
-	if _, connu := p.Extensions.Modes["etranglement"]; !connu {
-		t.Skip("MECANIQUE INERTE : le noyau cherche Modes[\"etranglement\"] " +
-			"(internal/core/turn.go) alors que plugins/base/manifest.toml déclare " +
-			"[mode.strangling] et que le chargeur recopie la clé telle quelle. " +
-			"Aucune zone ne se ferme, aucun préavis n'est annoncé.")
-	}
+	ouvertes := len(p.Board.Zones())
 
 	for p.Phase != core.PhaseOver && len(p.ClosedZones) == 0 {
 		finirLeTour(t, p)
 	}
+
 	if len(p.ClosedZones) == 0 {
-		t.Error("aucune zone fermée sur une partie entière")
+		t.Fatalf("aucune zone fermée en %d tours, alors que l'étranglement "+
+			"démarre au tour %d", p.Turn, p.Settings.StranglingStart)
+	}
+	if reste := ouvertes - len(p.ClosedZones); reste < p.Settings.ZonesLeftOpen {
+		t.Errorf("%d zones ouvertes, %d attendues au minimum",
+			reste, p.Settings.ZonesLeftOpen)
 	}
 }
 
@@ -127,10 +127,44 @@ func TestStranglingActuallyCloses(t *testing.T) {
 //
 // docs/regles.md §9 : le Barreur ferme une case de rue pendant 3 tours.
 func TestRoadblockExpires(t *testing.T) {
-	t.Skip("MECANIQUE INERTE : IsWalkable ne teste que la présence de la clé " +
-		"dans Roadblocks (internal/core/game.go) et aucune étape de résolution " +
-		"ne purge les entrées échues. Un barrage tient jusqu'à la fin de la " +
-		"partie, et open_cell perce définitivement.")
+	p := partieLivree(t, "quartier")
+
+	barreur := -1
+	for i := range p.Inspectors {
+		if p.Inspectors[i].Ability == "blocker" {
+			barreur = i
+		}
+	}
+	if barreur < 0 {
+		t.Fatal("aucun pion ne porte la capacité blocker : le contenu livré a changé")
+	}
+
+	joue := false
+	for _, c := range p.LegalMoves(core.SideInspectors) {
+		if c.Type == core.MoveAbility && c.Piece == barreur {
+			if err := p.Apply(c); err != nil {
+				t.Fatalf("déclenchement du Barreur : %v", err)
+			}
+			joue = true
+			break
+		}
+	}
+	if !joue {
+		t.Fatal("la capacité du Barreur n'est pas proposée en phase inspecteurs")
+	}
+	if len(p.Roadblocks) == 0 {
+		t.Fatal("le Barreur n'a barré aucune case")
+	}
+
+	// La règle donne trois tours : la case est fermée pendant celui où elle est
+	// posée et les deux suivants, puis elle rouvre.
+	for i := 0; i < 3 && p.Phase != core.PhaseOver; i++ {
+		finirLeTour(t, p)
+	}
+	if len(p.Roadblocks) != 0 {
+		t.Errorf("%d barrage(s) au bout de trois tours, attendu aucun",
+			len(p.Roadblocks))
+	}
 }
 
 // TestTrackerSeesFarther vérifie que le Traqueur perçoit les traces à deux
@@ -151,11 +185,18 @@ func TestTrackerSeesFarther(t *testing.T) {
 		t.Fatal("aucun pion ne porte la capacité tracker : le contenu livré a changé")
 	}
 
-	if p.TrailRadiusOf(traqueur) < 2 {
-		t.Skip("MECANIQUE INERTE : une capacité passive n'est jamais appliquée. " +
-			"abilityMoves (internal/core/legalmoves.go) exclut les passives, et " +
-			"rien ne pose leurs effets à la mise en place. Le Traqueur découvre " +
-			"les traces comme les quatre autres pions.")
+	if got := p.TrailRadiusOf(traqueur); got < 2 {
+		t.Errorf("rayon de traces du Traqueur %d, attendu au moins 2", got)
+	}
+
+	// Et lui seul : une capacité passive ne déteint pas sur le camp.
+	for i := range p.Inspectors {
+		if i == traqueur {
+			continue
+		}
+		if got := p.TrailRadiusOf(i); got != 1 {
+			t.Errorf("rayon du pion %d à %d, attendu 1", i, got)
+		}
 	}
 }
 
@@ -164,9 +205,41 @@ func TestTrackerSeesFarther(t *testing.T) {
 //
 // docs/regles.md §2 et §5 : c'est ce qui remplace la téléportation supprimée.
 func TestSpotterGetsAnExtraStep(t *testing.T) {
-	t.Skip("MECANIQUE INERTE : rien dans legalmoves.go ne rend un déplacement " +
-		"supplémentaire à un pion qui vient de repérer le fugitif. Le quota de " +
-		"PiecesPerTurn s'applique sans exception.")
+	p := partieLivree(t, "quartier")
+
+	// Le pion 0 est amené à portée de vue du fugitif, puis on lui fait faire un
+	// pas : la règle lui en rend un.
+	depart := p.Fugitive.Position
+	p.Inspectors[0].Position = core.Position{Column: depart.Column, Row: depart.Row}
+	p.Phase = core.PhaseInspectors
+
+	base := p.MobilityOf(core.SideInspectors, 0)
+	for _, c := range p.LegalMoves(core.SideInspectors) {
+		if c.Type == core.MoveStep && c.Piece == 0 {
+			if err := p.Apply(c); err != nil {
+				t.Fatalf("déplacement du pion 0 : %v", err)
+			}
+			break
+		}
+	}
+
+	if got := p.MobilityOf(core.SideInspectors, 0); got != base+1 {
+		t.Errorf("mobilité %d après repérage, attendu %d", got, base+1)
+	}
+
+	// Hors quota, et c'est le point : même avec un quota d'un seul pion, déjà
+	// consommé par ce déplacement, le repéreur garde son pas supplémentaire.
+	p.Settings.PiecesPerTurn = 1
+
+	encore := false
+	for _, c := range p.LegalMoves(core.SideInspectors) {
+		if c.Type == core.MoveStep && c.Piece == 0 {
+			encore = true
+		}
+	}
+	if !encore {
+		t.Error("le repéreur n'a plus de déplacement alors que le pas rendu est hors quota")
+	}
 }
 
 // TestLookoutDoublesRange vérifie que le Guetteur double sa portée plutôt que
@@ -218,10 +291,14 @@ func TestLookoutDoublesRange(t *testing.T) {
 // docs/regles.md §9 : « Voit ce que voit un autre inspecteur pendant deux
 // tours ».
 func TestChiefSharesView(t *testing.T) {
-	t.Skip("MECANIQUE INERTE : SharedViewOf (internal/core/effects.go) n'a " +
-		"aucun appelant hors test. visibleCellsFor ne consulte pas les vues " +
-		"partagées, donc déclencher la capacité du Chef ne change rien à ce que " +
-		"son camp voit.")
+	t.Skip("MECANIQUE INERTE : la capacité n'a pas de sens dans le modèle de " +
+		"vue actuel, et ce n'est donc pas un branchement à faire. " +
+		"visibleCellsFor unit déjà les vues des cinq pions, et recomputeSpotting " +
+		"fait de même pour le repérage : le camp voit déjà tout ce que chacun " +
+		"voit, donc « voir ce que voit un autre » n'ajoute rien. SharedViewOf " +
+		"n'a pas d'appelant parce qu'il n'en existe pas de possible. À trancher " +
+		"dans docs/regles.md §9 : vue individuelle, autre capacité, ou pas de " +
+		"Chef.")
 }
 
 // TestShelterNeedsEntering vérifie qu'un fugitif immobile sur un lieu ne se
@@ -231,10 +308,31 @@ func TestChiefSharesView(t *testing.T) {
 // s'y tenant. Autrement c'est la récupération à l'immobilité, écartée au §2
 // parce qu'elle récompense le campement.
 func TestShelterNeedsEntering(t *testing.T) {
-	t.Skip("MECANIQUE INERTE : useShelter (internal/core/turn.go) teste la " +
-		"présence du fugitif sur le lieu, pas son entrée. Un fugitif qui ne " +
-		"bouge pas y regagne deux points à chaque recharge — mesuré sur " +
-		"Quartier : 10 au tour 1, puis 12, 14, 16 aux tours 1, 9 et 17.")
+	p := partieLivree(t, "quartier")
+
+	abris := p.Board.Shelters()
+	if len(abris) == 0 {
+		t.Fatal("aucun lieu de ressourcement sur le plateau")
+	}
+
+	// Le fugitif est posé sur un lieu et n'en bouge plus. La première entrée
+	// est légitime ; toute la question est la suite.
+	p.Fugitive.Position = abris[0].Cells[0]
+	p.Fugitive.LastShelter = core.NoShelter
+	finirLeTour(t, p)
+
+	apresEntree := p.Fugitive.Stamina
+
+	// Assez de tours pour couvrir plusieurs recharges.
+	for i := 0; i < 3*p.Settings.ShelterRecharge && p.Phase != core.PhaseOver; i++ {
+		finirLeTour(t, p)
+	}
+
+	if p.Fugitive.Stamina > apresEntree {
+		t.Errorf("résistance %d après immobilité, %d juste après l'entrée : "+
+			"le lieu rend des points à qui ne bouge pas",
+			p.Fugitive.Stamina, apresEntree)
+	}
 }
 
 // TestInertMechanicsAreCounted garde le compte des mécaniques inertes visible.
@@ -254,7 +352,7 @@ func TestShelterNeedsEntering(t *testing.T) {
 // silencieux — il lui faut une constante en face pour qu'une dette ajoutée ou
 // levée sans être déclarée fasse rougir la suite.
 func TestInertMechanicsAreCounted(t *testing.T) {
-	const attendues = 7
+	const attendues = 2
 
 	source, err := os.ReadFile("conformance_test.go")
 	if err != nil {
