@@ -30,8 +30,19 @@ run:
 PKG ?= ./...
 RUN ?=
 
+# Le compte des mécaniques inertes est affiché avec la suite, jamais séparément :
+# un test qui se saute passe inaperçu là où un test rouge fait mal, et six mois
+# plus tard il reste des skips que personne ne regarde. C'est le pendant du
+# compte de stubs de ROADMAP.md — il descend tout seul et ne ment pas.
+#
+# Le compte vient du test, jamais d'un motif recopié ici. La première version
+# posait un grep dont le motif divergeait d'un espace de celui du fichier : elle
+# affichait zéro, ce qui est pire qu'aucun compteur. Aucun filtre non plus sur la
+# sortie — il dépendrait du texte du message et casserait à la première
+# reformulation, en silence.
 test:
 	go test $(if $(RUN),-run '$(RUN)') $(PKG)
+	@go test -v -run TestInertMechanicsAreCounted ./internal/quality/
 
 race:
 	CGO_ENABLED=1 go test -race ./...
