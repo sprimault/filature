@@ -6,9 +6,15 @@ package core
 // Preset nomme un jeu de paramètres prêt à play.
 //
 // La clé est un identifiant, pas un libellé : l'interface cherche
-// « prereglage_<cle> » dans le dictionnaire actif, et la même partie s'annonce
+// « preset_<cle> » dans le dictionnaire actif, et la même partie s'annonce
 // « Quartier » ou « District » selon la langue. Mettre le texte ici le figerait
 // en français jusque dans les sauvegardes.
+//
+// Les clés sont donc en anglais, comme le reste des identifiants publics — et
+// elles ne l'étaient pas : les dictionnaires déclaraient preset_district quand
+// Presets rendait « quartier », si bien qu'aucun libellé n'aurait été trouvé.
+// Le repli sur le français que docs/plugins.md promet n'aurait pas joué non
+// plus, la clé n'existant dans aucun des deux.
 type Preset struct {
 	Key      string
 	Settings Settings
@@ -25,9 +31,9 @@ type Preset struct {
 // lancement à l'autre serait déroutant.
 func Presets() []Preset {
 	return []Preset{
-		{Key: "quartier", Settings: SettingsForSize(21)},
-		{Key: "faubourg", Settings: SettingsForSize(31)},
-		{Key: "ville", Settings: DefaultSettings()},
+		{Key: "district", Settings: SettingsForSize(21)},
+		{Key: "outskirts", Settings: SettingsForSize(31)},
+		{Key: "city", Settings: DefaultSettings()},
 	}
 }
 

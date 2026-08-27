@@ -165,7 +165,7 @@ func TestCentreLeavesRoomForInspectors(t *testing.T) {
 
 // TestPresetByKey vérifie la recherche, et qu'une clé inconnue le dit.
 func TestPresetByKey(t *testing.T) {
-	p, trouve := PresetByKey("ville")
+	p, trouve := PresetByKey("city")
 	if !trouve {
 		t.Fatal("le préréglage par défaut est introuvable")
 	}

@@ -114,10 +114,10 @@ func TestBoardIsStable(t *testing.T) {
 	formes, registre := livre(t)
 
 	var premier, second strings.Builder
-	if err := Board(&premier, formes, registre, "quartier"); err != nil {
+	if err := Board(&premier, formes, registre, "district"); err != nil {
 		t.Fatal(err)
 	}
-	if err := Board(&second, formes, registre, "quartier"); err != nil {
+	if err := Board(&second, formes, registre, "district"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -135,7 +135,7 @@ func TestBoardShowsPiecesAndMarkers(t *testing.T) {
 	formes, registre := livre(t)
 
 	var svg strings.Builder
-	if err := Board(&svg, formes, registre, "quartier"); err != nil {
+	if err := Board(&svg, formes, registre, "district"); err != nil {
 		t.Fatal(err)
 	}
 

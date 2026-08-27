@@ -115,20 +115,27 @@ rejeux du même journal pourraient diverger.
 La primitive la plus lourde du vocabulaire, et la seule dont l'ajout demande
 d'être défendu. Deux justifications indépendantes.
 
-**Elle rend déclaratif ce qui est codé en dur.** L'étranglement — les zones
-d'extraction qui se ferment à partir du tour 30, annoncées deux tours à
-l'avance — est aujourd'hui dans le noyau. Il s'exprime avec `defer` :
+**Elle rend déclaratif ce qui demanderait sinon du code.** Un mode qui ferme une
+zone deux tours après son déclenchement s'écrit ainsi, sans qu'une ligne du
+noyau connaisse ce délai :
 
 ```toml
-[[mode.strangling.effect]]
+[[mode.exemple.effect]]
 type = "defer"
 duration = 2
 announced = true
 
-  [[mode.strangling.effect.then]]
+  [[mode.exemple.effect.then]]
   type = "close_zone"
   target = "zone"
 ```
+
+**Ce n'est pas ainsi que l'étranglement livré est écrit**, et c'est instructif :
+son préavis a été retiré du mode parce que « personne ne subit une fermeture par
+surprise » est une règle du jeu, et qu'une règle ne se négocie pas par
+manifeste. Un plugin qui déclarait un préavis nul ne réglait pas le jeu, il en
+cassait une garantie. `defer` reste le bon outil pour ce qu'un plugin décide
+lui-même de retarder.
 
 **Elle ouvre les plateaux qui se transforment** — la mécanique de blocs qui
 tombent. Un mur qui apparaît sans prévenir transformerait un plan raisonné en
@@ -167,12 +174,12 @@ L'annulation défait la mise en file, pas l'effet : annuler le tour où le
 | `current_piece` | Le pion qui déclenche |
 | `other_piece` | Un autre pion du même camp, choisi au déclenchement |
 | `all_pieces` | Tous les pions du camp |
-| `fugitif` | Le fugitif |
-| `case` | La case portée par le contexte du coup |
+| `fugitive` | Le fugitif |
+| `cell` | La case portée par le contexte du coup |
 | `zone` | La zone portée par le contexte |
 
 Une cible incompatible avec le camp déclarant est refusée au chargement : une
-capacité d'inspecteur ne cible pas `fugitif` pour lui rendre de la résistance.
+capacité d'inspecteur ne cible pas `fugitive` pour lui rendre de la résistance.
 
 `other_piece` est la seule cible qui en désigne deux : celui qui déclenche et
 celui qui subit. Le Chef, qui voit à travers un coéquipier, en est le seul usage
@@ -206,26 +213,24 @@ effets.
 ```toml
 [mode.strangling]
 name = "Étranglement"
-trigger = "etranglement"
+trigger = "strangling"
 
   [[mode.strangling.effect]]
-  type = "defer"
-  duration = 2
-  announced = true
-
-    [[mode.strangling.effect.then]]
-    type = "close_zone"
-    target = "zone"
+  type = "close_zone"
+  target = "zone"
 ```
 
 **La cadence n'est pas dans le mode.** À partir de quel tour l'étranglement
-commence et tous les combien il se répète sont des `Settings`, réglés dans
-l'interface et enregistrés avec la partie. Le mode dit *ce qui se passe*, le
-paramètre dit *quand* : les écrire tous deux ici donnerait deux sources de
-vérité pour un même réglage, et un préréglage de difficulté cesserait d'agir.
+commence, tous les combien il se répète et combien de tours à l'avance il
+s'annonce sont des `Settings`, réglés dans l'interface et enregistrés avec la
+partie. Le mode dit *ce qui se passe*, le paramètre dit *quand* : les écrire
+tous deux ici donnerait deux sources de vérité pour un même réglage, et un
+préréglage de difficulté cesserait d'agir.
 
-La `duration` du `defer` ci-dessus est le préavis, pas la période. Les deux
-valent 2 dans la règle standard, et ce n'est qu'une coïncidence de chiffres.
+**Le préavis en fait partie, et il n'en a pas toujours été ainsi.** Il vivait
+dans le mode sous la forme d'un `defer` de deux tours, qui s'ajoutait à une
+cadence que le noyau calculait déjà en tours de fermeture : tout tombait deux
+tours après le tableau publié.
 
 `strangling` n'est ouvert qu'à un mode. Une capacité ne lit pas les
 paramètres de cadence, elle n'aurait donc aucun moyen de savoir quand se

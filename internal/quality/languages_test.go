@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/BurntSushi/toml"
+	"github.com/sprimault/filature/internal/core"
 )
 
 // dictionnaire est la forme d'un langue.toml.
@@ -81,4 +82,26 @@ func missing(attendu, obtenu map[string]string) []string {
 	}
 	sort.Strings(cles)
 	return cles
+}
+
+// TestPresetKeysHaveALabel vérifie que chaque préréglage a de quoi s'afficher.
+//
+// La clé d'un préréglage est un identifiant ; son libellé vient du
+// dictionnaire, sous « preset_<cle> ». Les deux ne s'étaient jamais rencontrés :
+// les dictionnaires déclaraient preset_district quand Presets rendait
+// « quartier ». Rien ne le disait, l'interface étant l'étape 7 — et le repli sur
+// le français n'aurait pas joué non plus, la clé manquant des deux côtés.
+//
+// Le contrôle porte sur la langue de repli seulement : TestShippedLanguagesCoverKeys
+// tient les autres alignées sur elle.
+func TestPresetKeysHaveALabel(t *testing.T) {
+	base := lireDictionnaire(t, langueDeBase)
+
+	for _, p := range core.Presets() {
+		cle := "preset_" + p.Key
+		if _, present := base[cle]; !present {
+			t.Errorf("le préréglage %q n'a pas de libellé : %s manque du dictionnaire de repli",
+				p.Key, cle)
+		}
+	}
 }

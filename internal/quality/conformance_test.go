@@ -107,7 +107,7 @@ func finirLeTour(t *testing.T, p *core.Game) {
 // docs/regles.md §10 : aux trois quarts de la partie, les zones se ferment à
 // intervalle régulier jusqu'à ce qu'il n'en reste que trois.
 func TestStranglingActuallyCloses(t *testing.T) {
-	p := partieLivree(t, "quartier")
+	p := partieLivree(t, "district")
 	ouvertes := len(p.Board.Zones())
 
 	for p.Phase != core.PhaseOver && len(p.ClosedZones) == 0 {
@@ -137,7 +137,7 @@ func TestStranglingActuallyCloses(t *testing.T) {
 // Se joue sur les trois préréglages : la période dérive de la durée, et le
 // Quartier est le seul où elle égale le préavis.
 func TestStranglingClosesOnScheduleAndAnnouncesAhead(t *testing.T) {
-	for _, cle := range []string{"quartier", "faubourg", "ville"} {
+	for _, cle := range []string{"district", "outskirts", "city"} {
 		t.Run(cle, func(t *testing.T) {
 			p := partieLivree(t, cle)
 			s := p.Settings
@@ -202,7 +202,7 @@ func TestStranglingClosesOnScheduleAndAnnouncesAhead(t *testing.T) {
 //
 // docs/regles.md §9 : le Barreur ferme une case de rue pendant 3 tours.
 func TestRoadblockExpires(t *testing.T) {
-	p := partieLivree(t, "quartier")
+	p := partieLivree(t, "district")
 
 	barreur := -1
 	for i := range p.Inspectors {
@@ -248,7 +248,7 @@ func TestRoadblockExpires(t *testing.T) {
 // docs/regles.md §9 : « Perçoit les traces à deux cases, en permanence
 // (passif) ».
 func TestTrackerSeesFarther(t *testing.T) {
-	p := partieLivree(t, "quartier")
+	p := partieLivree(t, "district")
 
 	traqueur := -1
 	for i := range p.Inspectors {
@@ -280,7 +280,7 @@ func TestTrackerSeesFarther(t *testing.T) {
 //
 // docs/regles.md §2 et §5 : c'est ce qui remplace la téléportation supprimée.
 func TestSpotterGetsAnExtraStep(t *testing.T) {
-	p := partieLivree(t, "quartier")
+	p := partieLivree(t, "district")
 
 	// Le pion 0 est amené à portée de vue du fugitif, puis on lui fait faire un
 	// pas : la règle lui en rend un.
@@ -324,7 +324,7 @@ func TestSpotterGetsAnExtraStep(t *testing.T) {
 // voit que sur le plus petit préréglage, où la portée vaut 4 : doubler donne 8,
 // ajouter 8 donne 12.
 func TestLookoutDoublesRange(t *testing.T) {
-	p := partieLivree(t, "quartier")
+	p := partieLivree(t, "district")
 
 	guetteur := -1
 	for i := range p.Inspectors {
@@ -397,7 +397,7 @@ func TestChiefSharesView(t *testing.T) {
 // s'y tenant. Autrement c'est la récupération à l'immobilité, écartée au §2
 // parce qu'elle récompense le campement.
 func TestShelterNeedsEntering(t *testing.T) {
-	p := partieLivree(t, "quartier")
+	p := partieLivree(t, "district")
 
 	abris := p.Board.Shelters()
 	if len(abris) == 0 {
