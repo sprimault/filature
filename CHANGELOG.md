@@ -30,6 +30,20 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le Chef ordonne un coup de filet.** Sa capacité partageait la vue d'un
+coéquipier, ce qui ne voulait rien dire : les cinq inspecteurs sont un joueur
+unique, et la vue du camp unit déjà ce que chacun voit. Elle rend désormais la
+position du fugitif publique deux tours plus tard, annoncée aux deux camps —
+seule capacité d'information à côté de quatre capacités de terrain, elle donne
+aux inspecteurs le moyen d'en acheter que le fugitif avait déjà trois fois pour
+la brouiller.
+
+**Un silence couvre le tour, pas une révélation.** Un coup de filet peut tomber
+le même tour que la révélation périodique, et le fugitif paie avant que les
+inspecteurs jouent : il ne peut pas anticiper la coïncidence, donc il n'a pas à
+la payer deux fois. Il s'achète contre être trouvé, jamais contre se montrer —
+une révélation qu'il s'inflige lui-même reste en vigueur.
+
 **Le meurtre disparaît, et la scène de crime avec lui.** Le leurre fait le même
 travail en mentant au lieu de se dénoncer, ce qui laisse au fugitif quelque
 chose à faire de son information au lieu de la sacrifier. Le jeu quitte le
@@ -184,6 +198,19 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The Chief calls a dragnet.** His ability shared a teammate's view, which meant
+nothing: the five inspectors are a single player, and the side's view already
+merges what each of them sees. It now makes the fugitive's position public two
+turns later, announced to both sides — the only information ability next to four
+terrain ones, giving the inspectors a way to buy what the fugitive already had
+three ways to blur.
+
+**Silence covers the turn, not a reveal.** A dragnet can land on the same turn as
+the periodic reveal, and the fugitive pays before the inspectors play: he cannot
+anticipate the coincidence, so he does not pay for it twice. It is bought against
+being found, never against showing oneself — a reveal he inflicts on himself
+still stands.
 
 **Murder is gone, and the crime scene with it.** The decoy does the same work by
 lying instead of giving itself away, which leaves the fugitive something to do

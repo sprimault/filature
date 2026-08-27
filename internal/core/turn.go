@@ -38,6 +38,7 @@ func (p *Game) resolveTurnEnd() []func() {
 		p.revealIfDue,
 		p.resolveDeferred,
 		p.strangle,
+		p.consumeSilence,
 		p.countExtraction,
 	} {
 		defaire = append(defaire, etape()...)
@@ -295,14 +296,18 @@ func (p *Game) wipeOldTrails() []func() {
 //
 // Le silence acheté consomme la révélation sans la subir. Les inspecteurs
 // apprennent qu'il a payé, pas où il est : ils savent qu'il s'est appauvri.
+//
+// Il n'est pas dépensé ici mais marqué : consumeSilence le retire en fin de
+// résolution, une fois que tout ce qui pouvait révéler a été tenté.
 func (p *Game) revealIfDue() []func() {
 	if p.Settings.RevealPeriod <= 0 || p.Turn%p.Settings.RevealPeriod != 0 {
 		return nil
 	}
 
 	if p.Fugitive.SilenceBought {
-		p.Fugitive.SilenceBought = false
-		return []func(){func() { p.Fugitive.SilenceBought = true }}
+		precedent := p.Fugitive.SilenceUsed
+		p.Fugitive.SilenceUsed = true
+		return []func(){func() { p.Fugitive.SilenceUsed = precedent }}
 	}
 
 	if p.Fugitive.Visible {
@@ -310,6 +315,29 @@ func (p *Game) revealIfDue() []func() {
 	}
 	p.Fugitive.Visible = true
 	return []func(){func() { p.Fugitive.Visible = false }}
+}
+
+// consumeSilence dépense le silence si quelque chose l'a mis à contribution.
+//
+// En dernier, une fois que la révélation périodique et les effets différés ont
+// été tentés : un silence couvre le tour, pas une révélation. Le fugitif paie
+// avant que les inspecteurs jouent, donc il ne peut pas prévoir qu'une
+// révélation forcée tombera le même tour que la périodique — le faire payer
+// deux fois pour cette coïncidence serait une punition, pas un arbitrage.
+//
+// Un silence qui n'a rien bloqué reste : il neutralise la prochaine révélation,
+// quel que soit le tour où elle vient. Le consommer au tour plutôt qu'à l'effet
+// ferait perdre trois points sans que rien se produise, et le joueur n'aurait
+// aucun moyen de comprendre pourquoi sa protection a disparu — il a payé, rien
+// n'est arrivé, et le tour suivant il est découvert.
+func (p *Game) consumeSilence() []func() {
+	if !p.Fugitive.SilenceUsed {
+		return nil
+	}
+	p.Fugitive.SilenceBought, p.Fugitive.SilenceUsed = false, false
+	return []func(){func() {
+		p.Fugitive.SilenceBought, p.Fugitive.SilenceUsed = true, true
+	}}
 }
 
 // resolveDeferred applique les effets arrivés à échéance et vide la file de

@@ -69,6 +69,22 @@ trigger = "inspectors_phase"
   target = "cell"
   duration = 3
 
+# Le Chef ordonne un coup de filet : la position du fugitif devient publique
+# dans deux tours, et les deux camps le voient venir.
+#
+# La seule capacité d'information du camp, à côté de quatre capacités de
+# terrain. Elle corrige une asymétrie : le fugitif a trois dépenses pour brouiller
+# ce que les inspecteurs savent, eux n'avaient aucun moyen d'en acheter.
+#
+# Le préavis n'affaiblit pas le coup, il le rend jouable. Une révélation
+# immédiate ne se contre pas — le Silence s'achète avant de savoir —, donc elle
+# serait un couperet. Annoncée, elle force une décision : fuir, ou payer.
+#
+# Ici et non dans les paramètres, contrairement au préavis de l'étranglement :
+# celui-là garantit qu'aucune fermeture ne surprend, c'est une règle du jeu.
+# Celui-ci est ce que cette capacité-là décide de faire, et un plugin qui la
+# remplace est libre d'en changer.
+
 [ability.chief]
 name = "Chef"
 side = "inspectors"
@@ -76,9 +92,13 @@ uses = 1
 trigger = "inspectors_phase"
 
   [[ability.chief.effect]]
-  type = "share_view"
-  target = "other_piece"
+  type = "defer"
   duration = 2
+  announced = true
+
+    [[ability.chief.effect.then]]
+    type = "reveal_position"
+    target = "fugitive"
 
 # ---------------------------------------------------------------------------
 # Dépenses de résistance du fugitif. Même format que les capacités : c'est le

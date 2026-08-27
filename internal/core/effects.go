@@ -30,7 +30,6 @@ const (
 	EffectRevealTrails   EffectType = "reveal_trails"
 	EffectRevealPosition EffectType = "reveal_position"
 	EffectCancelReveal   EffectType = "cancel_reveal"
-	EffectShareView      EffectType = "share_view"
 	EffectCostStamina    EffectType = "cost_stamina"
 	EffectRestoreStamina EffectType = "restore_stamina"
 	EffectEraseTrails    EffectType = "erase_trails"
@@ -55,7 +54,7 @@ func EffectTypes() []EffectType {
 		EffectMove, EffectChangeRange, EffectChangeMobility,
 		EffectBlockCell, EffectOpenCell, EffectRevealTrails,
 		EffectRevealPosition, EffectCancelReveal,
-		EffectShareView, EffectCostStamina, EffectRestoreStamina,
+		EffectCostStamina, EffectRestoreStamina,
 		EffectEraseTrails, EffectDecoyTrail, EffectCloseZone, EffectOpenZone,
 		EffectSealZone, EffectTeleport, EffectDefer, EffectEndGame,
 	}
@@ -186,8 +185,10 @@ type EffectContext struct {
 	// Toward, exactement comme un pas réel produit la sienne.
 	Toward Position `json:"toward"`
 
-	// AutrePion est le second pion d'un effet qui en relie deux. Le Chef, qui
-	// voit à travers un coéquipier, est le seul cas livré.
+	// AutrePion est le second pion d'un effet qui en relie deux, celui que
+	// vise other_piece. Aucune capacité livrée ne l'emploie depuis que le Chef
+	// force une révélation au lieu de partager une vue : la cible reste au
+	// contrat pour les plugins, et Aims la sait lire.
 	AutrePion int `json:"autre_pion"`
 }
 
@@ -215,7 +216,7 @@ func (p *Game) ApplyOneEffect(e Effect, ctx EffectContext) (annulation func(), e
 		}
 		return p.place(ctx), nil
 
-	case EffectChangeRange, EffectChangeMobility, EffectRevealTrails, EffectShareView:
+	case EffectChangeRange, EffectChangeMobility, EffectRevealTrails:
 		return p.activate(e, ctx), nil
 
 	case EffectBlockCell:
@@ -224,7 +225,16 @@ func (p *Game) ApplyOneEffect(e Effect, ctx EffectContext) (annulation func(), e
 	case EffectOpenCell:
 		return p.alter(&p.Openings, ctx.Case, e.Duration), nil
 
+	// Le silence s'achète contre être trouvé, pas contre se montrer : une
+	// révélation provoquée par les inspecteurs se neutralise, celle que le
+	// fugitif s'inflige jamais. Le camp du contexte suffit à les distinguer,
+	// et la règle couvre les cas qu'un plugin inventera.
 	case EffectRevealPosition:
+		if ctx.Side == SideInspectors && p.Fugitive.SilenceBought {
+			precedent := p.Fugitive.SilenceUsed
+			p.Fugitive.SilenceUsed = true
+			return func() { p.Fugitive.SilenceUsed = precedent }, nil
+		}
 		precedent := p.Fugitive.Visible
 		p.Fugitive.Visible = true
 		return func() { p.Fugitive.Visible = precedent }, nil
@@ -503,15 +513,4 @@ func (p *Game) TrailRadiusOf(pion int) int {
 		}
 	}
 	return rayon
-}
-
-// SharedViewOf renvoie les pions dont un inspecteur emprunte la vue.
-func (p *Game) SharedViewOf(pion int) []int {
-	var pions []int
-	for _, a := range p.ActiveEffects {
-		if a.Effect.Type == EffectShareView && a.AppliesAt(p.Turn) && a.EffectContext.Piece == pion {
-			pions = append(pions, a.EffectContext.AutrePion)
-		}
-	}
-	return pions
 }
