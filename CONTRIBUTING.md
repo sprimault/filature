@@ -28,6 +28,27 @@ Open an issue first for anything beyond a fix. The rules are settled and written
 down in [`docs/regles.md`](docs/regles.md); a change to them is a design
 discussion, not a patch.
 
+## What gets discussed before it gets written
+
+A pull request touching any of these paths without prior discussion will be sent
+back to an issue, however good it is — not on principle, but because these are
+the places where one change makes others fall over.
+
+- **[`docs/regles.md`](docs/regles.md)** is authoritative. The code conforms to
+  it, so changing a line there changes what the code must do, and invalidates
+  recorded games.
+- **[`docs/contrat-formes.md`](docs/contrat-formes.md),
+  [`docs/vocabulaire-effets.md`](docs/vocabulaire-effets.md),
+  [`docs/protocole-bot.md`](docs/protocole-bot.md), [`schemas/`](schemas/)** are
+  public contracts. What is written there binds already-published plugins and
+  bots.
+- **`.github/workflows/`** decides what gets checked. Branch protection requires
+  checks by name, not by content: a modified workflow can turn green a check
+  that no longer verifies anything.
+
+Everything else — code, tests, supporting documentation — can be proposed
+directly.
+
 ## What a pull request is judged against
 
 Code conventions and testing doctrine are in [`docs/go.md`](docs/go.md), in

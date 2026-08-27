@@ -28,6 +28,26 @@ Ouvrir une issue d'abord, pour tout ce qui dépasse une correction. Les règles
 sont figées et écrites dans [`docs/regles.md`](docs/regles.md) ; les changer est
 une discussion de conception, pas un correctif.
 
+## Ce qui se discute avant d'être écrit
+
+Une pull request qui touche l'un de ces chemins sans discussion préalable sera
+renvoyée à une issue, quelle que soit sa qualité — non par principe, mais parce
+que ce sont les endroits où une modification en fait basculer d'autres.
+
+- **[`docs/regles.md`](docs/regles.md)** fait foi. Le code s'y conforme, donc en
+  changer une ligne change ce que le code doit faire, et périme les parties
+  enregistrées.
+- **[`docs/contrat-formes.md`](docs/contrat-formes.md),
+  [`docs/vocabulaire-effets.md`](docs/vocabulaire-effets.md),
+  [`docs/protocole-bot.md`](docs/protocole-bot.md), [`schemas/`](schemas/)** sont
+  des contrats publics. Ce qui y est écrit engage les plugins et les bots déjà
+  publiés.
+- **`.github/workflows/`** décide de ce qui est vérifié. La protection de
+  branche exige les contrôles par leur nom, pas par leur contenu : un workflow
+  modifié peut rendre vert un contrôle qui ne vérifie plus rien.
+
+Le reste — code, tests, documentation d'accompagnement — se propose directement.
+
 ## Ce sur quoi une contribution est jugée
 
 Les conventions de code et la doctrine de test sont dans
