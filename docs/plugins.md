@@ -180,7 +180,7 @@ La géométrie, les gabarits, les quatre primitives de dessin et les noms de
 formes attendus sont dans [`contrat-formes.md`](contrat-formes.md).
 
 `filature preview <dossier>` en sort un aperçu SVG sans lancer le jeu : les
-formes sur les trois sols et un plateau en situation. Voir §8.
+formes sur chacun des sols et un plateau en situation. Voir §8.
 
 ---
 
@@ -344,7 +344,7 @@ mes-vehicules-plateau.svg
 ```
 
 Deux fichiers, parce que les deux questions ne se jugent pas au même endroit :
-la planche pose chaque forme sur les trois sols possibles, où la même couleur
+la planche pose chaque forme sur chacun des cinq sols, où la même couleur
 ne se lit pas pareil, et le plateau la montre en situation. Un second argument
 dit où les écrire.
 

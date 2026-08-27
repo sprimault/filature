@@ -304,7 +304,7 @@ func extract(dossier, actifs string) error {
 // orthographiée passe la validation sans rien surcharger, et rien d'autre ne le
 // dirait.
 //
-// Deux fichiers plutôt qu'un : les formes se jugent côte à côte sur les trois
+// Deux fichiers plutôt qu'un : les formes se jugent côte à côte sur chacun des
 // sols, le plateau se juge en situation, et personne ne veut ouvrir l'un pour
 // regarder l'autre.
 func writePreviews(sortie io.Writer, dossier, destination string) error {

@@ -64,8 +64,8 @@ le haut. Le sol est donc `y = 0`, et une forme s'élève en `y` positif.
 
 **Le sol ne se dessine pas.** Le losange est tracé par le moteur ; un plugin
 n'en change que la couleur, par la palette. Il n'existe donc pas de
-`shape.street` : `street`, `zone_open` et `zone_closed` sont des noms de
-couleurs, pas des formes.
+`shape.street` : les cinq noms de sol sont des noms de couleurs, pas des
+formes.
 
 La raison est mécanique. Un losange identique pour toutes les cases, c'est une
 géométrie construite une fois pour les seize cents, un tri en profondeur qui
@@ -285,6 +285,8 @@ street = "#d8d2c4"
 building = "#3a3f4a"
 zone_open = "#7fa86b"
 zone_closed = "#6b4a4a"
+shelter_open = "#b5895a"
+shelter_used = "#6b5a4a"
 backdrop = "#0f1116"
 fugitive_main = "#e07a45"
 fugitive_detail = "#2a1a10"
@@ -316,11 +318,11 @@ regarder, ce que `filature preview` donne sans lancer le jeu.
 
 Les noms en `_detail` et `marker_outline` sont des **contours**, pas des nuances
 d'accompagnement, et c'est la contrainte la moins évidente de la palette. Une
-forme se pose indifféremment sur la rue, une zone ouverte ou une zone fermée,
-dont les luminances vont de 210 à 82 : aucun remplissage ne se détache des
-trois. Une palette qui remonterait ses contours au niveau de ses remplissages
-rendrait pions et marqueurs illisibles sur les sols sombres, sans qu'aucun
-contrôle ne puisse le voir.
+forme se pose indifféremment sur n'importe lequel des cinq sols, dont les
+luminances vont de 210 à 84 : aucun remplissage ne se détache de tous. Une
+palette qui remonterait ses contours au niveau de ses remplissages rendrait
+pions et marqueurs illisibles sur les sols sombres, sans qu'aucun contrôle ne
+puisse le voir.
 
 `backdrop` est ce qu'on voit autour du plateau, et n'appartient à aucune forme.
 Il doit être franchement plus sombre que `building` : à égalité, les blocs du
@@ -328,10 +330,11 @@ pourtour perdent leur silhouette et la ville se dissout sur ses bords, avec les
 pièces qui s'y trouvent.
 
 Les noms ci-dessus sont **obligatoires** : ils constituent le socle sur lequel
-toute forme peut compter. `street`, `zone_open` et `zone_closed` n'ont
-d'ailleurs pas d'autre existence — ce sont les seules prises qu'un plugin a sur
-le sol. Une palette peut en ajouter, et une forme qui référence un nom ajouté
-doit livrer la palette qui le définit.
+toute forme peut compter. Les cinq sols — `street`, `zone_open`, `zone_closed`,
+`shelter_open`, `shelter_used` — n'ont d'ailleurs pas d'autre existence : ce
+sont les prises qu'un plugin a sur le losange, et il n'en a pas d'autres. Une
+palette peut ajouter des noms, et une forme qui référence un nom ajouté doit
+livrer la palette qui le définit.
 
 ---
 

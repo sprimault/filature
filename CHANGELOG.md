@@ -30,6 +30,14 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Les cinq sols entrent tous dans le contrat d'apparence.** Les deux couleurs
+des lieux de ressourcement étaient livrées dans la palette sans être exigées
+d'un plugin : une palette tierce qui les omettait était acceptée, et le rendu
+cherchait un nom absent sur toutes les cases d'abri. La planche de `filature
+preview` les montre désormais — elle n'en affichait que trois, et laissait donc
+de côté les deux fonds que la palette livrée signale elle-même comme trop
+proches l'un de l'autre.
+
 **Les zones se ferment aux tours annoncés.** Le préavis de deux tours était
 déclaré par le mode d'étranglement du contenu livré, et s'ajoutait à une cadence
 que le noyau calculait déjà en tours de fermeture : tout glissait de deux tours,
@@ -117,6 +125,13 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**All five grounds are now part of the appearance contract.** The two respite
+colours shipped in the palette without being required of a plugin: a
+third-party palette that omitted them was accepted, and rendering then looked up
+a missing name on every respite cell. The `filature preview` board now shows
+them — it displayed only three, and so left out the very two backgrounds the
+shipped palette itself flags as too close to each other.
 
 **Zones now close on the turns announced.** The two-turn notice was declared by
 the shipped strangling mode, and added itself to a cadence the core already

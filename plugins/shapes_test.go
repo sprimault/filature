@@ -80,6 +80,23 @@ func TestShippedPaletteCoversRequiredColors(t *testing.T) {
 			t.Errorf("couleur obligatoire absente de la palette : %s", nom)
 		}
 	}
+
+	// Et l'inverse, qui est le sens par lequel le défaut est arrivé : les deux
+	// couleurs des lieux de ressourcement ont été livrées dans la palette sans
+	// entrer dans le socle. Une palette tierce qui les oubliait passait alors la
+	// validation, et le rendu cherchait un nom absent sur toutes les cases
+	// d'abri. Une couleur qui existe ici sans être exigée n'est garantie par
+	// personne.
+	exigees := map[string]bool{}
+	for _, nom := range render.RequiredColors {
+		exigees[nom] = true
+	}
+	for nom := range palette {
+		if !exigees[nom] {
+			t.Errorf("la palette livrée porte %s, que RequiredColors n'exige pas : "+
+				"une palette tierce peut l'omettre sans être refusée", nom)
+		}
+	}
 }
 
 // TestShippedShapesResolveTheirColors vérifie que tout nom référencé par une
