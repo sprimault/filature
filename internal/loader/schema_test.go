@@ -35,6 +35,15 @@ func TestLoaderMatchesThePublishedContract(t *testing.T) {
 				Enum []string `json:"enum"`
 			} `json:"license"`
 		} `json:"properties"`
+		Defs struct {
+			Language struct {
+				Properties struct {
+					Code struct {
+						Pattern string `json:"pattern"`
+					} `json:"code"`
+				} `json:"properties"`
+			} `json:"language"`
+		} `json:"$defs"`
 	}
 	if err := json.Unmarshal(brut, &schema); err != nil {
 		t.Fatal(err)
@@ -47,5 +56,9 @@ func TestLoaderMatchesThePublishedContract(t *testing.T) {
 	if publiees := schema.Properties.License.Enum; !slices.Equal(publiees, licencesAdmises) {
 		t.Errorf("le schéma publie les licences %v, le chargeur admet %v",
 			publiees, licencesAdmises)
+	}
+	if motif := schema.Defs.Language.Properties.Code.Pattern; motif != codeDeLangue.String() {
+		t.Errorf("le schéma publie le motif de code de langue %q, le chargeur applique %q",
+			motif, codeDeLangue.String())
 	}
 }

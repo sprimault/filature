@@ -190,8 +190,15 @@ L'annulation défait la mise en file, pas l'effet : annuler le tour où le
 | `cell` | La case portée par le contexte du coup |
 | `zone` | La zone portée par le contexte |
 
-Une cible incompatible avec le camp déclarant est refusée au chargement : une
-capacité d'inspecteur ne cible pas `fugitive` pour lui rendre de la résistance.
+**Une cible qui ne désigne personne est refusée au chargement** : une dépense du
+fugitif ne vise ni `other_piece` ni `all_pieces`, puisqu'il est seul.
+
+Viser le camp adverse, en revanche, est le cas ordinaire — le Chef révèle la
+position du fugitif, le Barreur lui ferme une case. Le chargeur ne cherche donc
+pas à distinguer ce qui l'avantage de ce qui le gêne : il faudrait juger chaque
+couple effet-cible, c'est-à-dire porter le raisonnement que ce vocabulaire
+refuse d'avoir. Un plugin qui déclarerait côté inspecteurs un effet rendant de
+la résistance au fugitif se charge ; il est mal écrit, pas invalide.
 
 `other_piece` est la seule cible qui en désigne deux : celui qui déclenche et
 celui qui subit. **Aucune capacité livrée ne l'emploie** depuis que le Chef force

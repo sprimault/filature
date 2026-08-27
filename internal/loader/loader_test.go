@@ -637,6 +637,36 @@ trigger = "n_importe_quoi"
 			attendu: "declenchement \"n_importe_quoi\" inconnu",
 		},
 		{
+			nom:     "cible qui ne designe personne",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[expense.x]
+name = "X"
+side = "fugitive"
+
+  [[expense.x.effect]]
+  type = "change_mobility"
+  target = "all_pieces"
+`,
+			attendu: "le fugitif est seul",
+		},
+		{
+			nom:     "code de langue hors du motif",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+
+[language]
+code = "Francais"
+name = "Français"
+`,
+			attendu: "BCP 47",
+		},
+		{
 			nom:     "etranglement sur une capacite",
 			dossier: "essai",
 			contenu: `name = "essai"
