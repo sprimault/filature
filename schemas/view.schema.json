@@ -68,6 +68,9 @@
         "side": {
           "type": "string"
         },
+        "toward": {
+          "$ref": "#/$defs/Position"
+        },
         "zone": {
           "type": "integer"
         }
@@ -77,6 +80,7 @@
         "cell",
         "piece",
         "side",
+        "toward",
         "zone"
       ]
     },

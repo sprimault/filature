@@ -35,6 +35,7 @@ const (
 	EffectCostStamina    EffectType = "cost_stamina"
 	EffectRestoreStamina EffectType = "restore_stamina"
 	EffectEraseTrails    EffectType = "erase_trails"
+	EffectDecoyTrail     EffectType = "decoy_trail"
 	EffectCloseZone      EffectType = "close_zone"
 	EffectOpenZone       EffectType = "open_zone"
 	EffectSealZone       EffectType = "seal_zone"
@@ -56,7 +57,7 @@ func EffectTypes() []EffectType {
 		EffectBlockCell, EffectOpenCell, EffectRevealTrails,
 		EffectRevealPosition, EffectMarkCrimeScene, EffectCancelReveal,
 		EffectShareView, EffectCostStamina, EffectRestoreStamina,
-		EffectEraseTrails, EffectCloseZone, EffectOpenZone,
+		EffectEraseTrails, EffectDecoyTrail, EffectCloseZone, EffectOpenZone,
 		EffectSealZone, EffectTeleport, EffectDefer, EffectEndGame,
 	}
 }
@@ -181,6 +182,11 @@ type EffectContext struct {
 	Case  Position `json:"cell"`
 	Zone  int      `json:"zone"`
 
+	// Toward est la seconde case d'un effet qui en relie deux. Le leurre est le
+	// seul cas livré : il pose sa trace sur Case et la fait pointer vers
+	// Toward, exactement comme un pas réel produit la sienne.
+	Toward Position `json:"toward"`
+
 	// AutrePion est le second pion d'un effet qui en relie deux. Le Chef, qui
 	// voit à travers un coéquipier, est le seul cas livré.
 	AutrePion int `json:"autre_pion"`
@@ -240,6 +246,9 @@ func (p *Game) ApplyOneEffect(e Effect, ctx EffectContext) (annulation func(), e
 
 	case EffectEraseTrails:
 		return p.wipeTrails(e.Duration), nil
+
+	case EffectDecoyTrail:
+		return p.armDecoy(ctx), nil
 
 	case EffectCloseZone:
 		return p.toggleZone(ctx.Zone, true), nil
@@ -349,6 +358,18 @@ func (p *Game) markCrimeScene(e Effect, ctx EffectContext) func() {
 	}
 	p.CrimeScenes = append(p.CrimeScenes, CrimeScene{Position: pos, Turn: p.Turn})
 	return func() { p.CrimeScenes = truncate(p.CrimeScenes) }
+}
+
+// armDecoy retient la trace que le fugitif substituera aux siennes.
+//
+// Retenue et non posée : les traces s'inscrivent à la résolution, après la
+// phase du fugitif, et une trace posée maintenant coexisterait avec les vraies
+// — ce que docs/regles.md §8 interdit, les traces d'un tour étant toutes vraies
+// ou toutes fausses.
+func (p *Game) armDecoy(ctx EffectContext) func() {
+	precedent := p.Fugitive.Decoy
+	p.Fugitive.Decoy = &Decoy{At: ctx.Case, Toward: ctx.Toward}
+	return func() { p.Fugitive.Decoy = precedent }
 }
 
 // adjustStamina ajoute un delta à la résistance du fugitif, plancher à

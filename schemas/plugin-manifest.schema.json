@@ -23,7 +23,7 @@
     "effects_version": {
       "type": "integer",
       "enum": [
-        2
+        3
       ],
       "description": "Version du vocabulaire d'effets visee. Obligatoire des qu'une capacite, une depense ou un mode est declare."
     },
@@ -299,6 +299,7 @@
             "cost_stamina",
             "restore_stamina",
             "erase_trails",
+            "decoy_trail",
             "close_zone",
             "open_zone",
             "seal_zone",

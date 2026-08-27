@@ -32,7 +32,7 @@ func source(fichiers map[string]string) fstest.MapFS {
 func manifesteValide(nom string) string {
 	return `name = "` + nom + `"
 version = "1.0.0"
-effects_version = 2
+effects_version = 3
 rules = true
 
 [ability.` + nom + `]
@@ -197,7 +197,7 @@ func TestRejections(t *testing.T) {
 			nom: "regles fausses avec une capacité",
 			manifeste: `name = "essai"
 version = "1.0.0"
-effects_version = 2
+effects_version = 3
 rules = false
 
 [ability.x]
@@ -228,7 +228,7 @@ side = "inspectors"
 			nom: "camp inconnu",
 			manifeste: `name = "essai"
 version = "1.0.0"
-effects_version = 2
+effects_version = 3
 rules = true
 
 [ability.x]
@@ -241,7 +241,7 @@ side = "referees"
 			nom: "primitive inconnue",
 			manifeste: `name = "essai"
 version = "1.0.0"
-effects_version = 2
+effects_version = 3
 rules = true
 
 [ability.x]
@@ -257,7 +257,7 @@ side = "inspectors"
 			nom: "differer imbriqué",
 			manifeste: `name = "essai"
 version = "1.0.0"
-effects_version = 2
+effects_version = 3
 rules = true
 
 [mode.x]
@@ -281,7 +281,7 @@ trigger = "turn_end"
 			nom: "differer sans suite",
 			manifeste: `name = "essai"
 version = "1.0.0"
-effects_version = 2
+effects_version = 3
 rules = true
 
 [mode.x]
@@ -298,7 +298,7 @@ trigger = "turn_end"
 			nom: "un bot et des effets",
 			manifeste: `name = "essai"
 version = "1.0.0"
-effects_version = 2
+effects_version = 3
 rules = true
 
 [bot]
@@ -627,7 +627,7 @@ func TestManifestRejectsOneFaultAtATime(t *testing.T) {
 			contenu: `name = "essai"
 version = "0.1.0"
 rules = true
-effects_version = 2
+effects_version = 3
 
 [ability.x]
 name = "X"
@@ -642,7 +642,7 @@ trigger = "n_importe_quoi"
 			contenu: `name = "essai"
 version = "0.1.0"
 rules = true
-effects_version = 2
+effects_version = 3
 
 [ability.x]
 name = "X"

@@ -1,6 +1,6 @@
 # Vocabulaire d'effets
 
-Version du vocabulaire : **2**
+Version du vocabulaire : **3**
 
 Un plugin qui déclare une capacité, une dépense ou un mode porte
 `effects_version` dans son manifeste. C'est le quatrième numéro de contrat du
@@ -64,6 +64,19 @@ ajouter une, vérifier que la composition des existantes ne suffit pas.
 | `share_view` | `target`, `duration` | Un pion voit ce que voit un autre |
 | `reveal_trails` | `target`, `radius` | Découvre les traces dans le rayon, en distance de Manhattan |
 | `erase_trails` | `target`, `duration` | Supprime les traces plus récentes que `duration` tours |
+| `decoy_trail` | `target` | Substitue aux traces du tour une seule, fausse |
+
+`decoy_trail` **remplace**, il n'ajoute pas. C'est une propriété du §8 des
+règles — les traces d'un tour sont toutes vraies ou toutes fausses —, et elle
+tient parce qu'une seule primitive fait les deux gestes. Poser une fausse trace
+et effacer les vraies par deux primitives distinctes laisserait composer les
+deux dans l'autre sens, c'est-à-dire mélanger : **une règle qu'on peut enfreindre
+par composition n'est pas une règle.**
+
+La case où la trace se pose et celle vers laquelle elle pointe viennent du coup,
+pas du manifeste. Un leurre a la forme d'un pas qui n'a pas eu lieu, si bien que
+les règles de déplacement s'y appliquent telles quelles : il ne peut produire
+qu'une trace qu'un vrai déplacement aurait pu laisser.
 
 `reveal_position` et `mark_crime_scene` sont volontairement distincts, et le
 meurtre les compose : le premier ne vaut qu'un tour, le second reste sur le

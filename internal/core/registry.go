@@ -13,7 +13,7 @@ import (
 // Un plugin écrit contre une version inconnue est refusé plutôt qu'appliqué de
 // travers. Sans ce numéro, un manifeste employant une primitive apparue plus
 // tard échouerait sur un message de champ inconnu.
-const EffectsVersion = 2
+const EffectsVersion = 3
 
 // Trigger dit quand une capacité ou un mode entre en jeu.
 type Trigger string

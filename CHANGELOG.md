@@ -30,6 +30,17 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le fugitif peut mentir avec ses traces.** Un leurre coûte un point, trois fois
+par partie, et substitue une fausse trace à toutes celles que son déplacement
+aurait laissées ce tour-là — il ne s'y ajoute pas, faute de quoi un inspecteur
+qui en découvrirait deux incompatibles saurait qu'il y a eu leurre. Effacer
+laisse un trou, et un trou est déjà une information ; une fausse trace attaque
+la déduction elle-même.
+
+Le joueur choisit la case et la direction parmi ce que le terrain autorise : un
+leurre a la forme d'un pas qui n'a pas eu lieu, donc il ne peut produire qu'une
+trace qu'un vrai déplacement aurait pu laisser. `effects_version` passe à 3.
+
 **Le chargeur applique trois refus qu'il annonçait sans les faire.** Un nom de
 plugin hors du motif publié, une licence absente de la liste fermée, un
 déclenchement inventé ou `strangling` sur une capacité étaient tous acceptés.
@@ -158,6 +169,16 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The fugitive can now lie with his trails.** A decoy costs one point, three
+times a game, and substitutes a false trail for every one his movement would
+have left that turn — it does not add to them, otherwise an inspector finding
+two incompatible ones would know a decoy had been played. Erasing leaves a gap,
+and a gap is already information; a false trail attacks the deduction itself.
+
+The player picks the cell and the direction from what the terrain allows: a
+decoy has the shape of a step that never happened, so it can only produce a
+trail a real move could have left. `effects_version` moves to 3.
 
 **The loader now applies three rejections it announced without performing.** A
 plugin name outside the published pattern, a licence missing from the closed
