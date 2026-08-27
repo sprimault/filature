@@ -199,16 +199,16 @@ Un contour seul ne suffit pas, et c'est le point le moins évident du contrat. I
 tient contre le sol, qui est clair. Mais un pion se dessine par-dessus les cubes
 situés devant lui : sa moitié supérieure est en permanence sur du bâti sombre,
 où un contour sombre ne se voit plus. L'inverse vaut pour un contour clair, qui
-meurt sur la rue. Les fonds possibles vont de 15 à 210 en luminance ; aucune
+meurt sur la rue. Les fonds possibles vont de 17 à 230 en luminance ; aucune
 couleur unique ne les couvre.
 
 | Fond | Contour seul | Avec liseré |
 |---|---|---|
 | hors plateau | 1,10 | **14,62** |
-| face latérale d'un bâtiment | 1,25 | **10,69** |
-| dessus d'un bâtiment | 2,65 | **5,03** |
-| zone fermée | 2,21 | **6,01** |
-| rue | 11,41 | 11,41 |
+| face latérale d'un bâtiment | 1,11 | **12,03** |
+| dessus d'un bâtiment | 2,00 | **6,66** |
+| zone fermée | 2,25 | **5,92** |
+| rue | 11,74 | 11,74 |
 
 C'est de l'éclairage et non une couleur de plugin, au même titre que les
 coefficients de faces. Une palette qui pourrait le déplacer pourrait rendre les
@@ -281,20 +281,20 @@ qualifie le fichier, pas la palette.
 shapes_version = 4
 
 [palette]
-street = "#d8d2c4"
-building = "#3a3f4a"
-zone_open = "#7fa86b"
-zone_closed = "#6b4a4a"
-shelter_open = "#b5895a"
-shelter_used = "#6b5a4a"
+street = "#dbd5c6"
+building = "#2f333c"
+zone_open = "#99ca81"
+zone_closed = "#6c4b4b"
+shelter_open = "#e5bf88"
+shelter_used = "#756251"
 backdrop = "#0f1116"
-fugitive_main = "#e07a45"
+fugitive_main = "#e47c46"
 fugitive_detail = "#2a1a10"
-inspector_main = "#2a5580"
+inspector_main = "#254b71"
 inspector_detail = "#101c2a"
 marker_outline = "#241d16"
 trail = "#f0e6c8"
-roadblock = "#8a7a4a"
+roadblock = "#877849"
 ```
 
 **Deux sols se distinguent d'abord par la luminance, la teinte ne vient
@@ -318,7 +318,7 @@ regarder, ce que `filature preview` donne sans lancer le jeu.
 Les noms en `_detail` et `marker_outline` sont des **contours**, pas des nuances
 d'accompagnement, et c'est la contrainte la moins évidente de la palette. Une
 forme se pose indifféremment sur n'importe lequel des cinq sols, dont les
-luminances vont de 210 à 84 : aucun remplissage ne se détache de tous. Une
+luminances vont de 213 à 85 : aucun remplissage ne se détache de tous. Une
 palette qui remonterait ses contours au niveau de ses remplissages rendrait
 pions et marqueurs illisibles sur les sols sombres, sans qu'aucun contrôle ne
 puisse le voir.
@@ -461,6 +461,20 @@ tenir compte, et tous en bénéficient — y compris ceux qui ne changent que la
 palette. C'est la raison d'avoir écarté une cinquième primitive de motif : elle
 aurait alourdi le contrat public de façon permanente pour un besoin décoratif,
 en déplaçant la responsabilité du fini visuel vers les auteurs de plugins.
+
+**L'amplitude est une constante du moteur : ±5 niveaux de luminance sur 255.**
+Absolue et non proportionnelle — à trois pour cent, le grain vaudrait six niveaux
+sur la rue et moins de trois sur une zone fermée, donc il disparaîtrait là où les
+sols sont les plus serrés. Un plugin ne peut pas la changer.
+
+**D'où un refus au chargement : deux sols voisins sur l'échelle de luminance
+doivent être séparés de plus de dix niveaux.** En dessous, le grain les fait
+échanger leur rang à l'affichage, et le joueur lit une zone fermée là où il y a
+un lieu en recharge. Le refus nomme la paire fautive et son écart.
+
+C'est la seule contrainte que le contrat impose entre deux couleurs. Elle existe
+parce que le grain casse l'aplat sans porter d'information : une variation
+décorative n'a pas à brouiller une donnée de jeu.
 
 Trois contraintes, qui sont ce qui fait la différence entre du grain et du
 bruit :

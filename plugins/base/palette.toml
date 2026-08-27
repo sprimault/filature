@@ -5,7 +5,7 @@
 # tierce s'appuie dessus sans savoir quelle palette sera active.
 #
 # Les valeurs ne sont pas choisies au jugé. Un pion se pose indifféremment sur
-# l'un des cinq sols, dont les luminances vont de 210 à 84 : aucune couleur de
+# l'un des cinq sols, dont les luminances vont de 213 à 85 : aucune couleur de
 # remplissage ne peut se détacher de tous à la fois. C'est le contour qui porte
 # la silhouette, et le remplissage qui ne porte plus que l'identité du camp.
 
@@ -15,23 +15,21 @@ shapes_version = 4
 
 # Le sol. Ces noms n'ont pas d'autre existence : rue, zones et lieux ne sont pas
 # des formes, ce sont les seules prises qu'un plugin a sur le losange.
-street = "#d8d2c4"
-zone_open = "#7fa86b"
-zone_closed = "#6b4a4a"
+street = "#dbd5c6"
+zone_open = "#99ca81"
+zone_closed = "#6c4b4b"
 
 # Les lieux de ressourcement, sur le même couple clair / éteint que les zones,
 # dans une teinte brune : rien de neuf à apprendre pour un joueur qui sait déjà
 # lire une zone fermée.
 #
-# **shelter_used est à reprendre.** Il partage la luminosité de zone_closed à
-# neuf niveaux de gris près, donc les deux sont indiscernables en niveaux de
-# gris comme pour un daltonien — alors qu'ils disent le contraire l'un de
-# l'autre : une zone fermée est perdue, un lieu en recharge revient. La sortie
-# n'est pas dans la teinte, qui bute sur roadblock dès qu'on s'écarte, mais dans
-# la luminance : quatre sols sombres s'entassent entre 84 et 121 pendant que la
-# moitié haute de l'échelle est vide.
-shelter_open = "#b5895a"
-shelter_used = "#6b5a4a"
+# Les cinq sols sont étagés d'au moins dix-sept niveaux de luminance, du plus
+# clair au plus sombre : rue, lieu actif, zone ouverte, lieu en recharge, zone
+# fermée. Le chargeur refuse une palette qui les resserre en dessous de dix,
+# parce que le grain du sol déplace chaque case de cinq et les ferait alors se
+# recouvrir.
+shelter_open = "#e5bf88"
+shelter_used = "#756251"
 
 # Ce qu'on voit autour du plateau. Bien plus sombre que le bâti, faute de quoi
 # les blocs du pourtour n'ont plus de silhouette et la ville se dissout sur ses
@@ -43,13 +41,13 @@ backdrop = "#0f1116"
 
 # Le bâti, nettement plus sombre que la rue : c'est le contraste sol / obstacle
 # qui porte la lecture du plateau, avant toute autre distinction.
-building = "#3a3f4a"
+building = "#2f333c"
 
 # Les pions. Chaud contre froid, et surtout clair contre sombre : c'est l'écart
 # de luminance qui sépare les deux camps sur une capture en niveaux de gris ou
 # pour un daltonien, pas la teinte. Soixante-neuf niveaux entre les deux.
-fugitive_main = "#e07a45"
-inspector_main = "#2a5580"
+fugitive_main = "#e47c46"
+inspector_main = "#254b71"
 
 # Les contours. Presque noirs, et c'est le point : un remplissage clair meurt
 # sur la rue, un remplissage sombre meurt sur une zone fermée, mais un contour
@@ -72,4 +70,4 @@ inspector_detail = "#101c2a"
 # premier cas se produit dès qu'une partie dure.
 marker_outline = "#241d16"
 trail = "#f0e6c8"
-roadblock = "#8a7a4a"
+roadblock = "#877849"

@@ -27,7 +27,7 @@ func livre(t *testing.T) (*render.ShapeSet, *core.Registry) {
 // TestShapesDrawsEveryShapeOnEveryGround vérifie que la planche montre chaque
 // forme sur chacun des sols.
 //
-// Tous et non le seul sol de rue : leurs luminances vont de 210 à 84, et une
+// Tous et non le seul sol de rue : leurs luminances vont de 213 à 85, et une
 // forme lisible sur l'un peut disparaître sur l'autre. Une planche qui n'en
 // montrerait qu'une partie laisserait passer exactement ce qu'elle sert à voir
 // — ce qu'elle a fait tant qu'elle en oubliait deux.
