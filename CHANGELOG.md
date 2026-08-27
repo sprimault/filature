@@ -30,6 +30,17 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Les sols et les pions se distinguent par leur luminance, et le chargeur le
+vérifie.** Trois couleurs se tenaient en trois niveaux de gris — une zone
+ouverte, un lieu actif et le fugitif — et deux autres en neuf. Les dix sont
+reposées d'un coup, étagées de dix-sept niveaux au moins, trente autour du
+fugitif : un sol confondu avec un autre se rattrape sur la carte à plat, un
+camp confondu avec l'autre fausse la lecture du plateau.
+
+Le grain du sol déplaçant chaque case de cinq niveaux, deux sols voisins qui
+s'en approchent échangeraient leur rang à l'affichage. Toute palette qui les
+resserre sous dix est désormais refusée au chargement, la paire fautive nommée.
+
 **Le fugitif voit ce que les inspecteurs surveillent.** Les cases tenues par une
 ligne de vue ne partaient qu'à un camp, alors que les positions des pions et le
 terrain sont publics : ce calcul se déduit, mais le dérouler de tête à chaque
@@ -220,6 +231,17 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Grounds and pieces are told apart by luminance, and the loader checks it.**
+Three colours sat within three grey levels of each other — an open zone, an
+active respite and the fugitive — and two more within nine. All ten are reset at
+once, spaced at least seventeen levels apart and thirty around the fugitive: one
+ground mistaken for another is caught on the flat map, one side mistaken for the
+other misreads the whole board.
+
+Since the ground grain shifts each cell by five levels, two neighbouring grounds
+closer than that would swap ranks on screen. Any palette packing them under ten
+is now refused at load time, with the offending pair named.
 
 **The fugitive now sees what the inspectors watch.** Cells held by a line of
 sight went to one side only, though piece positions and terrain are public: the

@@ -268,6 +268,12 @@ second test vérifiait la bonne, les deux passaient au vert.
 D'où `internal/quality/conformance_test.go`, qui charge le manifeste, joue, et
 n'injecte rien.
 
+**Et une entrée de test doit être une entrée que le système accepterait.**
+Contourner le montage et forger un état invalide sont deux façons de tester ce
+qui n'arrivera jamais : une palette de secours donnait la même couleur aux cinq
+sols, ce qu'aucun chargement n'accepte, et c'est le jour où le contrôle est entré
+dans `Validate` qu'on l'a su.
+
 ### Un test aléatoire dit ce qu'il a visité, pas seulement qu'il est passé
 
 Un tirage au sort parmi les coups légaux ne couvre que ce que sa distribution

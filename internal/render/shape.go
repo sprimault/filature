@@ -172,7 +172,7 @@ type Shape struct {
 // devant lui : sa moitié supérieure est en permanence sur du bâti sombre, où un
 // contour sombre ne se voit plus — 1,25 sur une face latérale. L'inverse est
 // vrai d'un contour clair, qui meurt sur la rue. Aucune couleur unique ne
-// couvre une plage de fonds qui va de 15 à 210 en luminance.
+// couvre une plage de fonds qui va de 17 à 230 en luminance.
 //
 // Les deux ensemble la couvrent : quel que soit le fond, l'un des deux traits
 // tranche, et le pire cas remonte de 1,10 à 5,03.

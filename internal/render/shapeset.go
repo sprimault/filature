@@ -213,6 +213,59 @@ func (j *ShapeSet) Validate() []error {
 			manquements = append(manquements, fmt.Errorf("palette: couleur obligatoire absente : %s", nom))
 		}
 	}
+	return append(manquements, j.validerEcartDesSols()...)
+}
+
+// validerEcartDesSols refuse deux sols que le grain ferait se recouvrir.
+//
+// Le moteur déplace chaque case de sol de ±GroundGrainAmplitude : deux sols
+// séparés de moins du double échangent leur rang à l'affichage, et le joueur lit
+// une zone fermée là où il y a un lieu en recharge. Le grain casse l'aplat, il
+// ne porte aucune information — une variation décorative n'a pas à brouiller
+// une donnée de jeu.
+//
+// **Le contrôle porte sur toute palette chargée, pas seulement la livrée.**
+// L'amplitude est une constante du moteur, qu'un plugin ne peut pas changer ;
+// sans ce contrôle, il resserrerait ses sols et la garantie tomberait de son
+// côté seulement.
+func (j *ShapeSet) validerEcartDesSols() []error {
+	type sol struct {
+		nom string
+		l   float64
+	}
+
+	var sols []sol
+	for _, nom := range Grounds {
+		hex, present := j.Palette[nom]
+		if !present {
+			continue // déjà signalé par le contrôle des couleurs obligatoires
+		}
+		var r, v, b int
+		if _, err := fmt.Sscanf(hex, "#%02x%02x%02x", &r, &v, &b); err != nil {
+			continue // une valeur mal formée est signalée par ailleurs
+		}
+		sols = append(sols, sol{nom, 0.299*float64(r) + 0.587*float64(v) + 0.114*float64(b)})
+	}
+	slices.SortFunc(sols, func(a, b sol) int {
+		switch {
+		case a.l > b.l:
+			return -1
+		case a.l < b.l:
+			return 1
+		}
+		return strings.Compare(a.nom, b.nom)
+	})
+
+	minimal := float64(2 * GroundGrainAmplitude)
+	var manquements []error
+	for i := 1; i < len(sols); i++ {
+		if ecart := sols[i-1].l - sols[i].l; ecart <= minimal {
+			manquements = append(manquements, fmt.Errorf(
+				"palette: %s et %s sont a %.0f niveaux de luminance, il en faut plus de %.0f : "+
+					"le grain du sol les ferait se recouvrir",
+				sols[i-1].nom, sols[i].nom, ecart, minimal))
+		}
+	}
 	return manquements
 }
 

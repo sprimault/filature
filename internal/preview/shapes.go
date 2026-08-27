@@ -23,11 +23,9 @@ const (
 // sols vient de render : ce sont les fonds sur lesquels une forme peut se
 // poser, et la planche les montre tous.
 //
-// Tous et non le seul sol de rue : leurs luminances vont de 210 à 84, et une
+// Tous et non le seul sol de rue : leurs luminances vont de 213 à 85, et une
 // forme lisible sur l'un peut disparaître sur l'autre. C'est précisément ce
-// qu'un auteur doit voir avant de publier — et la planche l'a manqué pendant
-// qu'elle en oubliait deux, ceux-là mêmes que la palette livrée signale comme
-// trop proches l'un de l'autre.
+// qu'un auteur doit voir avant de publier.
 var sols = render.Grounds
 
 // Shapes écrit la planche des formes, chacune sur tous les sols possibles.

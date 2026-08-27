@@ -4,6 +4,7 @@
 package render
 
 import (
+	"slices"
 	"strings"
 	"testing"
 	"testing/fstest"
@@ -11,13 +12,21 @@ import (
 
 // paletteComplete rend un fichier de palette qui couvre le socle obligatoire.
 //
-// Toutes les couleurs y valent la même valeur : ce qui se teste ici est la
-// résolution des noms, jamais leur rendu.
+// Les couleurs y valent toutes la même valeur, sauf les sols : ce qui se teste
+// ici est la résolution des noms, jamais leur rendu. Les sols font exception
+// parce que Validate leur impose un écart de luminance — cinq gris identiques
+// seraient une palette invalide, et le test échouerait sur un défaut qu'il ne
+// cherche pas.
 func paletteComplete() string {
 	var b strings.Builder
 	b.WriteString("shapes_version = 4\n\n[palette]\n")
+	gris := []string{"#e0e0e0", "#b4b4b4", "#888888", "#5c5c5c", "#303030"}
 	for _, nom := range RequiredColors {
-		b.WriteString(nom + " = \"#808080\"\n")
+		valeur := "#808080"
+		if rang := slices.Index(Grounds, nom); rang >= 0 {
+			valeur = gris[rang]
+		}
+		b.WriteString(nom + " = \"" + valeur + "\"\n")
 	}
 	return b.String()
 }
