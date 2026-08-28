@@ -153,13 +153,63 @@ func (p *Game) abilityMoves() []Move {
 			if p.Inspectors[i].Ability != cle || p.Inspectors[i].AbilityUsed {
 				continue
 			}
-			coups = append(coups, Move{
+			base := Move{
 				Turn: p.Turn, Side: SideInspectors, Type: MoveAbility,
 				Piece: i, Ability: cle,
-			})
+			}
+			if !needsCell(c.Effects) {
+				coups = append(coups, base)
+				continue
+			}
+			for _, cible := range p.abilityCells(p.Inspectors[i].Position) {
+				coup := base
+				coup.To = cible
+				coups = append(coups, coup)
+			}
 		}
 	}
 	return coups
+}
+
+// needsCell dit si une capacité attend du coup la case sur laquelle agir.
+//
+// Un effet visant cell la lit dans le contexte, que triggerAbility remplit
+// depuis Move.To. Tant que l'énumération n'a proposé qu'un coup par pion, ce
+// champ restait nul et le Barreur fermait invariablement la case {0,0}.
+//
+// Les effets imbriqués comptent : un differer dont le then vise une case a
+// besoin d'elle au moment de la pose, pas à l'échéance.
+func needsCell(effets []Effect) bool {
+	for _, e := range effets {
+		if e.Target == TargetCell || needsCell(e.Then) {
+			return true
+		}
+	}
+	return false
+}
+
+// abilityCells rend les cases qu'une capacité peut viser depuis un pion.
+//
+// Les huit voisines, et pas n'importe quelle case du plateau : barrer à
+// distance retirerait une case d'entrée d'une zone sans rien dégarnir, quand
+// docs/regles.md §10 fait payer chaque case d'une zone par un pion posté
+// dessus. Les huit et non les quatre parce que le fugitif s'échappe en
+// diagonale — un barrage qui ne couperait que des orthogonales ne refermerait
+// jamais un angle.
+//
+// Sa propre case est exclue : un barrage arrête la vue comme un bâtiment
+// (§13), et le poser sous soi aveuglerait le pion qui vient de le poser.
+//
+// La règle de l'angle fermé ne s'applique pas ici, contrairement à
+// terrainSteps : on pose un obstacle sur une case, on ne s'y déplace pas.
+func (p *Game) abilityCells(depuis Position) []Position {
+	var cases []Position
+	for d := Nord; d <= NordOuest; d++ {
+		if voisine := depuis.Step(d); p.IsWalkable(voisine) {
+			cases = append(cases, voisine)
+		}
+	}
+	return cases
 }
 
 // fugitiveMoves énumère déplacements, dépenses et changement de zone.

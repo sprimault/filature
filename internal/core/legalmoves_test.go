@@ -324,6 +324,84 @@ func TestInspectorStopsAtItsMobility(t *testing.T) {
 	}
 }
 
+// TestAbilityOffersEachTargetCell vérifie qu'une capacité visant une case
+// propose les voisines praticables du pion, et elles seules.
+//
+// Sans case dans le coup, le contexte que reçoit block_cell reste nul et le
+// Barreur ferme toujours {0,0} — soit une case de la zone 0, à l'autre bout du
+// plateau. docs/regles.md §9 lui demande de fermer une case de rue voisine.
+func TestAbilityOffersEachTargetCell(t *testing.T) {
+	b := grid(
+		".....",
+		".#...",
+		".....",
+		".....",
+		".....",
+	)
+	b.zones = []Zone{{Number: 0}}
+	pion := Position{Column: 2, Row: 2}
+	p := gameOn(b, Position{Column: 4, Row: 4}, pion)
+	p.Extensions = testRegistry()
+	p.Phase = PhaseInspectors
+	p.Inspectors[0].Ability = "blocker"
+
+	var cibles []Position
+	for _, c := range p.LegalMoves(SideInspectors) {
+		if c.Type == MoveAbility {
+			cibles = append(cibles, c.To)
+		}
+	}
+
+	// Huit voisines, moins le bâtiment posé en diagonale.
+	if len(cibles) != 7 {
+		t.Errorf("%d cases proposées, attendu 7", len(cibles))
+	}
+	for _, c := range cibles {
+		if c == (Position{Column: 1, Row: 1}) {
+			t.Error("le bâtiment est proposé au barrage")
+		}
+		if c == pion {
+			t.Error("le pion se propose de barrer la case où il se tient")
+		}
+		if ChebyshevDistance(c, pion) != 1 {
+			t.Errorf("case %v proposée, hors des voisines du pion", c)
+		}
+	}
+}
+
+// TestPassiveAbilityCarriesNoCell vérifie qu'une capacité sans cible de case
+// garde un coup unique.
+//
+// L'énumération par case ne vaut que pour qui en a besoin : la multiplier
+// partout donnerait huit coups identiques au Guetteur, que rien ne
+// distinguerait à la lecture du journal.
+func TestPassiveAbilityCarriesNoCell(t *testing.T) {
+	p := gameOn(grid(
+		".....",
+		".....",
+		".....",
+		".....",
+		".....",
+	), Position{Column: 4, Row: 4}, Position{Column: 2, Row: 2})
+	p.Extensions = testRegistry()
+	p.Phase = PhaseInspectors
+	p.Inspectors[0].Ability = "lookout"
+
+	n := 0
+	for _, c := range p.LegalMoves(SideInspectors) {
+		if c.Type != MoveAbility {
+			continue
+		}
+		n++
+		if c.To != (Position{}) {
+			t.Errorf("le Guetteur porte la case %v, qu'aucun de ses effets ne lit", c.To)
+		}
+	}
+	if n != 1 {
+		t.Errorf("%d déclenchements proposés, un seul attendu", n)
+	}
+}
+
 // TestInspectorsOrthogonalOnly vérifie qu'ils n'ont pas les diagonales.
 func TestInspectorsOrthogonalOnly(t *testing.T) {
 	p := gameOn(grid(

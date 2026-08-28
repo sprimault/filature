@@ -433,11 +433,17 @@ elle ne se joue pas et ne s'épuise pas.
 | Guetteur | Portée de vue doublée pendant un tour, quel que soit le préréglage |
 | Coureur | Déplacement de deux cases ce tour |
 | Traqueur | Perçoit les traces à deux cases, en permanence (passif) |
-| Barreur | Ferme une case de rue pendant 3 tours |
+| Barreur | Ferme une case de rue voisine pendant 3 tours |
 | Chef | Ordonne un coup de filet : position révélée dans deux tours |
 
 Le Barreur mérite attention : c'est le seul moyen de créer une impasse là où il
 n'y en a pas. Sur un plateau ouvert, c'est lui qui rend le piégeage possible.
+
+**La case qu'il ferme est l'une des huit voisines de son pion.** Barrer à
+distance retirerait une case d'entrée d'une zone sans rien dégarnir, alors que
+le §10 fait payer chaque case d'une zone par un pion posté dessus. Les huit et
+non les quatre : le fugitif s'échappe en diagonale, et un barrage qui ne
+couperait que des orthogonales ne refermerait jamais un angle.
 
 ---
 
