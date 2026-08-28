@@ -41,6 +41,10 @@ Deux commandes données en exemple ne marchaient pas : celle qu'un test affiche
 en échouant, et le `filature valide` de la feuille de route, que le binaire
 refuse depuis que la sous-commande s'appelle `validate`.
 
+Le générateur de schémas passe enfin aux identifiants anglais, comme le reste du
+dépôt, et perd un champ que rien ne lisait ni n'écrivait. Les schémas qu'il
+produit sont inchangés, octet pour octet.
+
 Deux points en sortent, parce qu'ils touchaient ce qu'on lit pour décider. Les
 chiffres que `plugins/base/palette.toml` commente étaient faux — le contraste
 annoncé sur une zone ouverte l'était de plus de quarante pour cent —, et ils se
@@ -59,6 +63,10 @@ identifiers to English had swept up conjugated verbs.
 Two commands given as examples did not work: the one a test prints when it
 fails, and the roadmap's `filature valide`, which the binary refuses now that the
 subcommand is called `validate`.
+
+The schema generator finally moves to English identifiers, like the rest of the
+repository, and loses a field nothing read or wrote. The schemas it produces are
+unchanged, byte for byte.
 
 Two of them stand out, because they touched what one reads to decide. The
 figures `plugins/base/palette.toml` comments were wrong — the announced contrast

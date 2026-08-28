@@ -25,30 +25,29 @@ import (
 // c'est encoding/json qui décide, et il trie les clés d'une map. Le résultat
 // est donc stable d'une exécution à l'autre.
 type Document struct {
-	Comment     string            `json:"$comment,omitempty"`
-	Schema      string            `json:"$schema"`
-	ID          string            `json:"$id"`
-	Titre       string            `json:"title"`
-	Description string            `json:"description,omitempty"`
-	Ref         string            `json:"$ref"`
-	Defs        map[string]*Noeud `json:"$defs"`
+	Comment     string           `json:"$comment,omitempty"`
+	Schema      string           `json:"$schema"`
+	ID          string           `json:"$id"`
+	Title       string           `json:"title"`
+	Description string           `json:"description,omitempty"`
+	Ref         string           `json:"$ref"`
+	Defs        map[string]*Node `json:"$defs"`
 }
 
-// Noeud est un schéma de type, inline ou référencé.
-type Noeud struct {
-	Ref                  string            `json:"$ref,omitempty"`
-	Type                 string            `json:"type,omitempty"`
-	Description          string            `json:"description,omitempty"`
-	Items                *Noeud            `json:"items,omitempty"`
-	Proprietes           map[string]*Noeud `json:"properties,omitempty"`
-	Requis               []string          `json:"required,omitempty"`
-	ProprietesLibres     *Noeud            `json:"additionalProperties,omitempty"`
-	ProprietesInterdites *bool             `json:"-"`
+// Node est un schéma de type, inline ou référencé.
+type Node struct {
+	Ref                  string           `json:"$ref,omitempty"`
+	Type                 string           `json:"type,omitempty"`
+	Description          string           `json:"description,omitempty"`
+	Items                *Node            `json:"items,omitempty"`
+	Properties           map[string]*Node `json:"properties,omitempty"`
+	Required             []string         `json:"required,omitempty"`
+	AdditionalProperties *Node            `json:"additionalProperties,omitempty"`
 }
 
-// dialecte est la version de JSON Schema produite, la même que les schémas
+// dialect est la version de JSON Schema produite, la même que les schémas
 // écrits à la main du dépôt.
-const dialecte = "https://json-schema.org/draft/2020-12/schema"
+const dialect = "https://json-schema.org/draft/2020-12/schema"
 
 // Generate rend le schéma d'un type, avec ses types imbriqués en $defs.
 //
@@ -56,7 +55,7 @@ const dialecte = "https://json-schema.org/draft/2020-12/schema"
 // sont décrites qu'une fois. C'est aussi ce qui permet à un type récursif de
 // tenir : un effet différé contient des effets.
 func Generate(t reflect.Type, id, titre, description, entete string) ([]byte, error) {
-	g := &generateur{defs: map[string]*Noeud{}, encours: map[string]bool{}}
+	g := &generator{defs: map[string]*Node{}, walking: map[string]bool{}}
 
 	racine := g.node(t)
 	if racine.Ref == "" {
@@ -65,9 +64,9 @@ func Generate(t reflect.Type, id, titre, description, entete string) ([]byte, er
 
 	doc := Document{
 		Comment:     entete,
-		Schema:      dialecte,
+		Schema:      dialect,
 		ID:          id,
-		Titre:       titre,
+		Title:       titre,
 		Description: description,
 		Ref:         racine.Ref,
 		Defs:        g.defs,
@@ -83,14 +82,17 @@ func Generate(t reflect.Type, id, titre, description, entete string) ([]byte, er
 	return tampon.Bytes(), nil
 }
 
-// generateur accumule les définitions rencontrées.
-type generateur struct {
-	defs    map[string]*Noeud
-	encours map[string]bool
+// generator accumule les définitions rencontrées.
+//
+// walking porte les structures en cours de description : c'est le drapeau qui
+// coupe la récursion, un effet différé contenant des effets.
+type generator struct {
+	defs    map[string]*Node
+	walking map[string]bool
 }
 
 // node rend le schéma d'un type, en le plaçant en $defs si c'est une structure.
-func (g *generateur) node(t reflect.Type) *Noeud {
+func (g *generator) node(t reflect.Type) *Node {
 	switch t.Kind() {
 	case reflect.Pointer:
 		// Un pointeur ne change pas la forme, seulement la présence : le champ
@@ -98,23 +100,23 @@ func (g *generateur) node(t reflect.Type) *Noeud {
 		return g.node(t.Elem())
 
 	case reflect.String:
-		return &Noeud{Type: "string"}
+		return &Node{Type: "string"}
 
 	case reflect.Bool:
-		return &Noeud{Type: "boolean"}
+		return &Node{Type: "boolean"}
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return &Noeud{Type: "integer"}
+		return &Node{Type: "integer"}
 
 	case reflect.Float32, reflect.Float64:
-		return &Noeud{Type: "number"}
+		return &Node{Type: "number"}
 
 	case reflect.Slice, reflect.Array:
-		return &Noeud{Type: "array", Items: g.node(t.Elem())}
+		return &Node{Type: "array", Items: g.node(t.Elem())}
 
 	case reflect.Map:
-		return &Noeud{Type: "object", ProprietesLibres: g.node(t.Elem())}
+		return &Node{Type: "object", AdditionalProperties: g.node(t.Elem())}
 
 	case reflect.Struct:
 		return g.structure(t)
@@ -123,27 +125,27 @@ func (g *generateur) node(t reflect.Type) *Noeud {
 	// Une interface ou un canal n'a pas de forme JSON. Le noyau n'en sérialise
 	// pas — Board porte json:"-" — et rencontrer le cas signale un champ
 	// ajouté sans y penser.
-	return &Noeud{Description: "type sans forme JSON : " + t.String()}
+	return &Node{Description: "type sans forme JSON : " + t.String()}
 }
 
 // structure enregistre une structure en $defs et rend la référence.
-func (g *generateur) structure(t reflect.Type) *Noeud {
+func (g *generator) structure(t reflect.Type) *Node {
 	nom := t.Name()
 	if nom == "" {
 		nom = "Anonyme"
 	}
-	ref := &Noeud{Ref: "#/$defs/" + nom}
+	ref := &Node{Ref: "#/$defs/" + nom}
 
 	// Le drapeau coupe la récursion avant qu'elle ne s'emballe : un effet
 	// différé contient des effets, et la définition doit se référencer
 	// elle-même plutôt que se dérouler sans fin.
-	if g.encours[nom] {
+	if g.walking[nom] {
 		return ref
 	}
-	g.encours[nom] = true
-	defer delete(g.encours, nom)
+	g.walking[nom] = true
+	defer delete(g.walking, nom)
 
-	node := &Noeud{Type: "object", Proprietes: map[string]*Noeud{}}
+	node := &Node{Type: "object", Properties: map[string]*Node{}}
 	g.defs[nom] = node
 
 	for i := 0; i < t.NumField(); i++ {
@@ -155,12 +157,12 @@ func (g *generateur) structure(t reflect.Type) *Noeud {
 		if !garde {
 			continue
 		}
-		node.Proprietes[cle] = g.node(champ.Type)
+		node.Properties[cle] = g.node(champ.Type)
 		if requis {
-			node.Requis = append(node.Requis, cle)
+			node.Required = append(node.Required, cle)
 		}
 	}
-	sort.Strings(node.Requis)
+	sort.Strings(node.Required)
 
 	return ref
 }
