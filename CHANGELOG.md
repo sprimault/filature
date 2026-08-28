@@ -30,6 +30,18 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le chargeur applique quatre familles de refus que le contrat publiait sans
+lui.** Une durée ou un rayon négatifs, une annonce posée sur autre chose qu'un
+effet différé, une échéance nulle, un mode sans nom ou sans effet, un
+déclenchement inventé sur une capacité passive : tous entraient. Le schéma les
+refusait déjà, ce qui est le pire des deux mondes — l'auteur qui valide son JSON
+voyait un refus que le jeu ne faisait pas.
+
+**Et deux traducteurs de la même langue se heurtent au lieu de s'écraser.** Le
+code de langue était décodé puis abandonné : il n'entrait pas au registre, donc
+rien ne le comparait, et celui qui chargeait en second gagnait dans l'ordre
+alphabétique des dossiers.
+
 **Rouvrir la dernière zone fermée laissait un état qui se relit autrement.** Le
 retrait au milieu d'une liste ne rendait pas la tranche à nul quand elle se
 vidait, alors que la troncature le faisait : `[]` au journal là où `null` était
@@ -266,6 +278,17 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The loader applies four families of rejection the contract published without
+it.** A negative duration or radius, an announcement on something other than a
+deferred effect, a zero deadline, a mode with no name or no effect, an invented
+trigger on a passive ability: all went through. The schema already refused them,
+which is the worst of both worlds — an author validating their JSON saw a
+rejection the game did not make.
+
+**And two translators of the same language now collide instead of overwriting.**
+The language code was decoded then dropped: it never reached the registry, so
+nothing compared it, and whoever loaded second won by folder order.
 
 **Reopening the last closed zone left a state that reads back differently.**
 Removing from the middle of a list did not return the slice to nil when it

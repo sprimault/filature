@@ -334,7 +334,9 @@ Contrôles appliqués au chargement, plugin local compris :
   sur toute autre primitive ;
 - `target` compatible avec le `camp` déclaré ;
 - champs obligatoires présents pour le type ;
-- `duration` et `radius` positifs, `value` dans les bornes du type ;
+- `duration` et `radius` positifs ou nuls. **`value` n'a pas de bornes** — le
+  négatif est légal, c'est ce qui immobilise un pion ou lui retire de la portée,
+  et aucune primitive n'a de plafond qui vaudrait pour toutes ;
 - pas de `defer` imbriqué dans un `defer` ;
 - une clé de capacité ou de dépense déjà prise est un **conflit**, jamais un
   écrasement silencieux ;

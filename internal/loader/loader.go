@@ -176,9 +176,10 @@ func unPlugin(r *core.Registry, j *render.ShapeSet, source fs.FS, dossier string
 
 // versRegistre projette un manifeste dans ce que le noyau consomme.
 //
-// Les libellés n'y figurent pas : le noyau n'affiche rien, et lui confier un
-// dictionnaire lui donnerait une responsabilité d'interface. Ils se lisent
-// depuis langue.toml par qui en a besoin.
+// D'une langue, le code et son nom seulement. Les libellés n'y figurent pas :
+// le noyau n'affiche rien, et lui confier un dictionnaire lui donnerait une
+// responsabilité d'interface. Ils se lisent depuis language.toml par qui en a
+// besoin.
 func (m *manifeste) versRegistre(somme string) *core.Registry {
 	r := &core.Registry{
 		Manifest: []core.ManifestEntry{{
@@ -211,6 +212,14 @@ func (m *manifeste) versRegistre(somme string) *core.Registry {
 			mode.Key = cle
 			r.Modes[cle] = mode
 		}
+	}
+
+	// Le code de langue et rien d'autre : c'est ce qui rend le conflit
+	// détectable, promis par le schéma et par docs/plugins.md. Il était décodé
+	// puis abandonné, si bien que deux traducteurs de la même langue
+	// s'écrasaient en silence — celui qui chargeait en second gagnait.
+	if m.Langue != nil {
+		r.Languages = map[string]string{m.Langue.Code: m.Langue.Name}
 	}
 
 	return r

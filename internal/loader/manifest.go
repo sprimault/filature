@@ -68,9 +68,9 @@ type manifeste struct {
 	Bot    *bot    `toml:"bot"`
 }
 
-// langue identifie le dictionnaire posé dans langue.toml à côté du manifeste.
-// Les libellés eux-mêmes ne passent pas par le registre : le noyau n'affiche
-// rien.
+// langue identifie le dictionnaire posé dans language.toml à côté du manifeste.
+// Seul ce couple entre au registre, où il rend le conflit détectable ; les
+// libellés eux-mêmes n'y passent pas, le noyau n'affichant rien.
 type langue struct {
 	Code string `toml:"code"`
 	Name string `toml:"name"`
@@ -228,8 +228,16 @@ func (m *manifeste) checkAllEffects(chemin string) []error {
 		manquements = append(manquements,
 			checkAbility(m.Expenses[cle], chemin, "expense."+cle)...)
 	}
+	// Les trois champs d'un mode sont obligatoires au schéma publié, et
+	// seul le déclenchement l'était ici. Un mode sans nom n'a rien à afficher
+	// quand il agit, un mode sans effet ne fait rien : les deux se chargeaient
+	// sans un mot.
 	for _, cle := range sortedKeys(m.Modes) {
 		mode := m.Modes[cle]
+		if mode.Name == "" {
+			manquements = append(manquements,
+				fmt.Errorf("%s: mode.%s: nom manquant", chemin, cle))
+		}
 		switch {
 		case mode.Trigger == "":
 			manquements = append(manquements,
@@ -238,6 +246,10 @@ func (m *manifeste) checkAllEffects(chemin string) []error {
 			manquements = append(manquements,
 				fmt.Errorf("%s: mode.%s: declenchement %q inconnu, attendu l'un de %s",
 					chemin, cle, mode.Trigger, listeDesTriggers()))
+		}
+		if len(mode.Effects) == 0 {
+			manquements = append(manquements,
+				fmt.Errorf("%s: mode.%s: aucun effet", chemin, cle))
 		}
 		manquements = append(manquements,
 			checkEffects(mode.Effects, "", chemin, "mode."+cle, false)...)
@@ -277,8 +289,11 @@ func checkAbility(c core.Ability, chemin, ou string) []error {
 
 	// Le déclenchement n'était contrôlé nulle part : n'importe quelle chaîne
 	// passait, et la capacité n'entrait alors jamais en jeu sans qu'un message
-	// le dise. Une capacité passive n'en déclare pas, elle vaut toute la partie.
-	if !c.Passive && c.Trigger != "" && !triggerConnu(c.Trigger) {
+	// le dise. Une capacité passive n'en déclare pas, elle vaut toute la partie
+	// — mais si elle en déclare un, il doit exister : le schéma ne fait pas
+	// dépendre son énumération de « passive », et une chaîne inventée dit que
+	// l'auteur croit à un déclenchement que rien ne produira.
+	if c.Trigger != "" && !triggerConnu(c.Trigger) {
 		manquements = append(manquements, fmt.Errorf("%s: %s: declenchement %q inconnu, attendu l'un de %s",
 			chemin, ou, c.Trigger, listeDesTriggers()))
 	}
@@ -320,11 +335,22 @@ func cibleHorsDuCamp(cible core.Target, camp core.Side) string {
 	return ""
 }
 
+// maxThen borne les effets d'un differer, comme le schéma publié.
+//
+// Une chaîne sans borne se déroule à l'échéance, dans une résolution qui doit
+// rester finie et dont chaque pas s'annule.
+const maxThen = 8
+
 // checkEffects contrôle une liste d'effets, et refuse un differer imbriqué.
 //
 // Deux durées s'additionnent, donc l'imbrication n'ajoute rien ; et elle
 // permettrait des chaînes qu'aucune annulation ne saurait dérouler, ce qui
 // coûterait l'invariant de réversibilité pour rien.
+//
+// Les bornes numériques sont celles du schéma publié, et docs/plugins.md §8
+// promet que les deux disent la même chose. Sans elles, un auteur obtenait un
+// refus de son validateur JSON là où le jeu acceptait — et c'est alors la
+// partie qui tranche, au pire moment.
 func checkEffects(effets []core.Effect, camp core.Side, chemin, ou string, dansUnDiffere bool) []error {
 	var manquements []error
 
@@ -347,10 +373,19 @@ func checkEffects(effets []core.Effect, camp core.Side, chemin, ou string, dansU
 		if !core.ValueModeKnown(e.Mode) {
 			ajouter("mode %q inconnu, attendu multiply ou rien", e.Mode)
 		}
+		if e.Radius < 0 {
+			ajouter("rayon de %d, attendu positif ou nul", e.Radius)
+		}
 
 		if e.Type != core.EffectDefer {
+			if e.Duration < 0 {
+				ajouter("duree de %d, attendue positive ou nulle", e.Duration)
+			}
 			if len(e.Then) > 0 {
 				ajouter("puis n'a de sens que sur un differer")
+			}
+			if e.Announced {
+				ajouter("annonce n'a de sens que sur un differer")
 			}
 			continue
 		}
@@ -359,6 +394,16 @@ func checkEffects(effets []core.Effect, camp core.Side, chemin, ou string, dansU
 		}
 		if len(e.Then) == 0 {
 			ajouter("differer sans puis")
+		}
+		if len(e.Then) > maxThen {
+			ajouter("%d effets differes, %d au plus", len(e.Then), maxThen)
+		}
+
+		// Une échéance nulle appliquerait à la résolution du tour courant, ce
+		// que le differer existe précisément pour ne pas faire — et le joueur
+		// qui a lu l'annonce compterait sur un tour qui n'arrive jamais.
+		if e.Duration < 1 {
+			ajouter("duree d'un differer de %d, attendue au moins 1", e.Duration)
 		}
 		manquements = append(manquements,
 			checkEffects(e.Then, camp, chemin, place+".then", true)...)
