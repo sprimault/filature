@@ -79,6 +79,15 @@ type Registry struct {
 	Expenses  map[Expense]Ability
 	Modes     map[string]Mode
 
+	// Languages associe un code BCP 47 au nom de la langue dans cette langue.
+	// Les libellés eux-mêmes n'y sont pas : le noyau n'affiche rien, et un
+	// dictionnaire lui donnerait une responsabilité d'interface.
+	//
+	// Seule l'identité y est, comme dans Manifest, et pour la même raison :
+	// c'est ici que deux plugins se rencontrent, donc ici que deux traducteurs
+	// qui publient « de » doivent se heurter au lieu de s'écraser.
+	Languages map[string]string
+
 	// Generators et Brains sont les deux points d'extension qui ne se
 	// décrivent pas en données : un générateur de plateau et une IA. Ils
 	// passent par WebAssembly, jamais par du Go chargé dynamiquement.
@@ -145,6 +154,9 @@ func (r *Registry) Merge(nom string, autre *Registry) error {
 		return err
 	}
 	if err := mergeInto(&r.Brains, autre.Brains, nom, "cerveau"); err != nil {
+		return err
+	}
+	if err := mergeInto(&r.Languages, autre.Languages, nom, "langue"); err != nil {
 		return err
 	}
 

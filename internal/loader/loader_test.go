@@ -162,6 +162,32 @@ func TestKeyConflict(t *testing.T) {
 	}
 }
 
+// TestTwoPluginsOnTheSameLanguageConflict vérifie que deux traducteurs de la
+// même langue se heurtent au lieu de s'écraser.
+//
+// Le schéma publié le promet — « Deux plugins qui declarent le meme code sont
+// un conflit » — et docs/plugins.md le redit. Le code était pourtant décodé
+// puis abandonné : il n'entrait pas au registre, donc rien ne le comparait, et
+// celui qui chargeait en second gagnait dans l'ordre alphabétique des dossiers.
+func TestTwoPluginsOnTheSameLanguageConflict(t *testing.T) {
+	dictionnaire := func(nom string) string {
+		return "name = \"" + nom + "\"\nversion = \"0.1.0\"\n\n" +
+			"[language]\ncode = \"de\"\nname = \"Deutsch\"\n"
+	}
+
+	_, _, err := Load(source(map[string]string{
+		"un/manifest.toml":   dictionnaire("un"),
+		"deux/manifest.toml": dictionnaire("deux"),
+	}), "")
+
+	if err == nil {
+		t.Fatal("deux plugins déclarent la langue « de » sans que rien ne le dise")
+	}
+	if !strings.Contains(err.Error(), "la langue de est deja definie") {
+		t.Errorf("message peu clair : %v", err)
+	}
+}
+
 // TestRejections rassemble les manquements de docs/plugins.md §9.
 //
 // Chacun fait échouer le chargement entier : un plugin à moitié actif est pire
@@ -591,14 +617,19 @@ role = "piece"
 	}
 }
 
-// TestManifestRejectsOneFaultAtATime exerce les trois refus que le chargeur
+// TestManifestRejectsOneFaultAtATime exerce les refus que le chargeur
 // n'appliquait pas, chacun sur un manifeste qui ne porte que cette faute.
 //
-// Ils étaient spécifiés depuis des mois dans docs/plugins.md et publiés par le
-// schéma, sans qu'aucune ligne de Go les applique : un plugin nommé « A_x »,
-// une licence « à voir », un déclenchement inventé passaient tous les trois. Le
-// cas de la licence est celui qui a motivé la liste blanche, et c'est justement
+// Ils étaient spécifiés dans docs/plugins.md et publiés par le schéma, sans
+// qu'aucune ligne de Go les applique : un plugin nommé « A_x », une licence
+// « à voir », un déclenchement inventé passaient tous les trois. Le cas de la
+// licence est celui qui a motivé la liste blanche, et c'est justement
 // l'exemple qu'elle laissait entrer.
+//
+// Le schéma publié refusait déjà tous ceux-là, ce qui est le pire des deux
+// mondes : l'auteur consciencieux qui valide son JSON voit un refus que le jeu
+// ne fait pas, et docs/plugins.md §8 lui promet pourtant que les deux disent la
+// même chose.
 //
 // Une faute par manifeste : cumulées, l'une masquerait l'absence de contrôle
 // sur l'autre.
@@ -680,6 +711,137 @@ side = "inspectors"
 trigger = "strangling"
 `,
 			attendu: "reserve a un mode",
+		},
+		{
+			nom:     "declenchement inconnu sur une capacite passive",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[ability.x]
+name = "X"
+side = "inspectors"
+passive = true
+trigger = "n_importe_quoi"
+`,
+			attendu: "declenchement \"n_importe_quoi\" inconnu",
+		},
+		{
+			nom:     "annonce hors d'un differer",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[ability.x]
+name = "X"
+side = "inspectors"
+trigger = "inspectors_phase"
+
+  [[ability.x.effect]]
+  type = "block_cell"
+  target = "cell"
+  duration = 2
+  announced = true
+`,
+			attendu: "annonce n'a de sens que sur un differer",
+		},
+		{
+			nom:     "differer sans echeance",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[ability.x]
+name = "X"
+side = "inspectors"
+trigger = "inspectors_phase"
+
+  [[ability.x.effect]]
+  type = "defer"
+  duration = 0
+
+    [[ability.x.effect.then]]
+    type = "reveal_position"
+    target = "fugitive"
+`,
+			attendu: "duree d'un differer de 0",
+		},
+		{
+			nom:     "rayon negatif",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[ability.x]
+name = "X"
+side = "inspectors"
+trigger = "inspectors_phase"
+
+  [[ability.x.effect]]
+  type = "reveal_trails"
+  target = "current_piece"
+  radius = -1
+`,
+			attendu: "rayon de -1",
+		},
+		{
+			nom:     "duree negative",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[ability.x]
+name = "X"
+side = "inspectors"
+trigger = "inspectors_phase"
+
+  [[ability.x.effect]]
+  type = "block_cell"
+  target = "cell"
+  duration = -2
+`,
+			attendu: "duree de -2",
+		},
+		{
+			nom:     "mode sans nom",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[mode.x]
+trigger = "strangling"
+
+  [[mode.x.effect]]
+  type = "close_zone"
+  target = "zone"
+`,
+			attendu: "mode.x: nom manquant",
+		},
+		{
+			nom:     "mode sans effet",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[mode.x]
+name = "X"
+trigger = "strangling"
+`,
+			attendu: "mode.x: aucun effet",
 		},
 	}
 
