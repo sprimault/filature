@@ -167,7 +167,7 @@ tours à l'avance monte la tension sans que le hasard tranche.
 | Champ | Rôle |
 |---|---|
 | `duration` | Nombre de tours avant application. Minimum 1 |
-| `announced` | Si vrai, l'effet en attente figure dans la `View` des deux camps |
+| `announced` | Si vrai, l'effet en attente figure dans la `View` des deux camps, celui du fugitif sans son contexte |
 | `then` | Les effets à appliquer, mêmes primitives, **jamais un `defer`** |
 
 L'imbrication d'un `defer` dans un `defer` est refusée au chargement : ça
@@ -181,6 +181,13 @@ fin de tour **avant** le test de fin de partie.
 
 Les effets en attente et annoncés entrent dans `View` — c'est tout leur intérêt.
 Un `defer` non annoncé n'y figure pas.
+
+**Celui qu'un plugin pose du côté fugitif part aux inspecteurs sans son
+contexte : ils apprennent qu'un effet vient et quand, jamais où.** Le contexte
+d'une dépense porte la case exacte du fugitif, et parfois la zone qu'il vient de
+sceller ; le servir tel quel donnerait par la bande ce que la vue tait partout
+ailleurs. Un auteur qui a besoin d'annoncer une case au camp adverse la fait
+donc poser par une capacité d'inspecteur, dont les positions sont publiques.
 
 L'annulation défait la mise en file, pas l'effet : annuler le tour où le
 `defer` a été posé le retire de la file.
