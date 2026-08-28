@@ -46,9 +46,9 @@ to everyone.
 Download a binary from the releases page, extract, run. No runtime, no system
 dependency.
 
-**The archive holds the executable and the licence, nothing else.** Rules,
-shapes and labels are inside it: nothing to install alongside, and moving the
-file breaks nothing.
+**The archive holds the executable and its licence notices, nothing else.**
+Rules, shapes and labels are inside the binary: nothing to install alongside,
+and moving the file breaks nothing.
 
 The Windows binary is not signed: SmartScreen will warn on first launch.
 
@@ -70,8 +70,8 @@ and a window opened from the file explorer closes before anything can be read.
 once rather than one fault at a time. A plugin it accepts will load for whoever
 you give it to.
 
-`preview` writes two files: the shape sheet, each shape on all three possible
-grounds, and a board in situation. The plugin is merged onto shipped content
+`preview` writes two files: the shape sheet, each shape on every ground, and a
+board in situation. The plugin is merged onto shipped content
 before rendering — it only declares what it replaces — and the sheet marks what
 comes from it, which also shows when a misspelled key overrode nothing. A second
 argument says where to write.
@@ -85,7 +85,7 @@ it twice. These are templates to copy under another name.
 ```
 --side fugitive     play the fugitive; inspectors is the default,
                     watch lets two machines play
---preset ville      board size: quartier, faubourg or ville
+--preset city       board size: district, outskirts or city
 --seed 1            the game's seed; the same one replays the same game
 --delay 800ms       pause between turns when nobody plays; without it
                     the whole game scrolls past at once
@@ -105,7 +105,7 @@ Filature is meant to be modified. Four levels, from cheapest to most involved:
 
 | Level | What it is | Format |
 |---|---|---|
-| Data | Abilities, resistance costs, board presets, game modes | TOML |
+| Data | Abilities, resistance expenses, game modes | TOML |
 | Appearance | Shapes and palettes | TOML |
 | Bots | A replacement AI, in any language | separate process |
 | WebAssembly | A board generator or an embedded AI | `.wasm` |

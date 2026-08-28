@@ -30,6 +30,15 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**La première ligne de commande des README fonctionne.** Ils donnaient
+`--preset ville` en exemple — en français jusque dans la version anglaise — et
+listaient trois valeurs que le binaire refuse depuis que les clés sont passées à
+l'anglais. Un test les confronte désormais aux préréglages réels. Trois autres
+points corrigés au passage : l'archive contient aussi ses mentions de licence,
+la planche d'aperçu montre chaque sol et non trois, et les préréglages de
+plateau quittent la liste de ce qu'un plugin peut déclarer — ils sont écrits en
+dur, et un manifeste qui en porterait un est refusé.
+
 **Le vocabulaire des effets annonçait des paramètres qui n'existent pas.** Trois
 primitives de zone déclaraient un champ `zone` qu'un effet ne porte pas — la
 zone vient du coup —, et un manifeste qui l'écrirait est refusé pour champ
@@ -369,7 +378,7 @@ Deux plugins qui redéfinissent la même forme sont un conflit, nommé des deux
 côtés. Surcharger le contenu livré n'en est pas un.
 
 **`filature preview <dossier>` rend un plugin d'apparence en SVG**, sans lancer
-le jeu : la planche de ses formes sur les trois sols possibles, et un plateau en
+le jeu : la planche de ses formes sur chaque sol, et un plateau en
 situation. Le plugin est fusionné sur le contenu livré avant d'être rendu, et la
 planche marque ce qui vient de lui — une clé mal orthographiée passe la
 validation sans rien surcharger, et rien d'autre ne le dirait.
@@ -385,6 +394,14 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The READMEs' first command line works.** They gave `--preset ville` as an
+example — in French even in the English version — and listed three values the
+binary refuses now that the keys are English. A test checks them against the
+real presets. Three more points fixed along the way: the archive also holds its
+licence notices, the preview sheet shows every ground rather than three, and
+board presets leave the list of what a plugin can declare — they are hard-coded,
+and a manifest carrying one is refused.
 
 **The effects vocabulary announced parameters that do not exist.** Three zone
 primitives declared a `zone` field an effect does not carry — the zone comes
@@ -705,7 +722,7 @@ Two plugins redefining the same shape are a conflict, named on both sides.
 Overriding shipped content is not.
 
 **`filature preview <folder>` renders an appearance plugin as SVG**, without
-launching the game: the sheet of its shapes on all three possible grounds, and a
+launching the game: the sheet of its shapes on every ground, and a
 board in situation. The plugin is merged onto shipped content before rendering,
 and the sheet marks what comes from it — a misspelled key passes validation
 while overriding nothing, and nothing else would say so.

@@ -47,9 +47,9 @@ s'appliquent à tout le monde.
 Télécharger un binaire depuis la page des versions, extraire, lancer. Aucun
 runtime, aucune dépendance système.
 
-**L'archive ne contient que l'exécutable**, avec la licence. Les règles, les
-formes et les libellés sont dedans : rien à installer à côté, et déplacer le
-fichier ne casse rien.
+**L'archive ne contient que l'exécutable et ses mentions de licence.** Les
+règles, les formes et les libellés sont dans le binaire : rien à installer à
+côté, et déplacer le fichier ne casse rien.
 
 Le binaire Windows n'est pas signé : SmartScreen affichera un avertissement au
 premier lancement.
@@ -74,8 +74,8 @@ filature preview <dossier>    rend ses formes et un plateau en SVG
 cloche d'un coup plutôt qu'une faute à la fois. Un plugin qu'il accepte se
 chargera chez ceux à qui vous le donnez.
 
-`preview` écrit deux fichiers : la planche des formes, chacune sur les trois
-sols possibles, et un plateau en situation. Le plugin est fusionné sur le
+`preview` écrit deux fichiers : la planche des formes, chacune sur chaque sol,
+et un plateau en situation. Le plugin est fusionné sur le
 contenu livré avant d'être rendu — il ne déclare que ce qu'il remplace — et la
 planche marque ce qui vient de lui, ce qui montre du même coup qu'une clé mal
 orthographiée n'a rien surchargé. Un second argument dit où écrire.
@@ -92,7 +92,7 @@ adversaire.
 ```
 --side fugitive     prend l'autre rôle ; inspectors par défaut,
                     watch regarde deux machines s'affronter
---preset ville      taille du plateau : quartier, faubourg ou ville
+--preset city       taille du plateau : district, outskirts ou city
 --seed 1            la graine ; la même rejoue la même partie
 --delay 800ms       pause entre deux tours quand personne ne joue ; sans
                     elle la partie entière défile d'un bloc
@@ -113,7 +113,7 @@ engageant :
 
 | Niveau | Ce que c'est | Format |
 |---|---|---|
-| Données | Capacités, dépenses, préréglages, modes de jeu | TOML |
+| Données | Capacités, dépenses, modes de jeu | TOML |
 | Apparence | Formes et palettes | TOML |
 | Bots | Une IA de remplacement, dans n'importe quel langage | processus séparé |
 | WebAssembly | Un générateur de plateau ou une IA embarquée | `.wasm` |
