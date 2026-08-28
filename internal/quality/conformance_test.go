@@ -580,9 +580,10 @@ func TestInertMechanicsAreCounted(t *testing.T) {
 	}
 
 	// Le marqueur est reconstitué plutôt qu'écrit d'un bloc : littéral, cette
-	// ligne se compterait elle-même. C'est le défaut qui a fait annoncer
-	// quarante-cinq stubs à la ROADMAP pour vingt et un — le contrôle qui cite
-	// le motif entre dans son propre décompte.
+	// ligne se compterait elle-même. C'est le piège qui avait fait annoncer à la
+	// ROADMAP plus du double des stubs qu'elle avait — le contrôle qui cite le
+	// motif entre dans son propre décompte. Elle ne les compte plus qu'à la
+	// commande, qui ne peut pas se tromper.
 	marqueur := "MECANIQUE INERTE" + " :"
 	n := strings.Count(string(source), marqueur)
 	if n != attendues {

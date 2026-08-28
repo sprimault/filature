@@ -20,8 +20,8 @@ clause du zéro.
 **Les numéros ordonnent les dépendances, pas le calendrier.** Une étape peut
 s'attaquer avant celle qui la précède si rien ne l'en empêche. Ils ne se
 renumérotent jamais : ce sont eux que portent les marqueurs du code, et les
-décaler périmerait quarante-cinq lignes d'un coup. Une étape qui apparaît
-s'ajoute donc à la fin, quelle que soit sa place logique.
+décaler périmerait d'un coup toutes les lignes que la commande ci-dessus compte.
+Une étape qui apparaît s'ajoute donc à la fin, quelle que soit sa place logique.
 
 ---
 
@@ -142,7 +142,7 @@ Deux moyens de jeu, complets l'un comme l'autre :
 Ensemble parce qu'une sauvegarde porte le manifeste des plugins actifs : une
 partie ne se recharge pas sans eux.
 
-Avec `filature valide <chemin>`, qui charge un plugin par **le même code que
+Avec `filature validate <chemin>`, qui charge un plugin par **le même code que
 le jeu** et liste ses manquements en une fois. Deux validateurs finiraient par
 diverger, et c'est alors la partie qui tranche — au pire moment.
 
@@ -173,7 +173,7 @@ conformité.
 ## 10 — IA fugitif
 
 Le miroir : maximiser la masse de croyance résiduelle, arbitrer les dépenses,
-choisir quand tuer. Mode tout-IA, qui est aussi le partenaire d'entraînement.
+choisir quand mentir. Mode tout-IA, qui est aussi le partenaire d'entraînement.
 
 ## 11 — Équilibrage
 
