@@ -142,10 +142,17 @@ notes that must say what a plugin author has to revisit.
 
 ## Language
 
-**Identifiers are in English** — directories, files, packages, types, functions,
-fields: `Fugitive`, `Board`, `Trail`. **Documentation is in French**: godoc,
-comments, error messages and logs. The API reads in English because it is code;
-the reasoning reads in French because it is thought.
+**Identifiers another package can see are in English** — directories, files,
+packages, exported types, exported functions, fields: `Fugitive`, `Board`,
+`Trail`. **Documentation is in French**: godoc, comments, error messages and
+logs. The API reads in English because it is code; the reasoning reads in French
+because it is thought.
+
+**A test helper follows the language of what it tells.** `finirLeTour` and
+`lireDictionnaire` never leave their file: they belong to the story the test
+writes, not to the API. The rule was long written without that caveat, and a
+fifth of the repository's functions broke it without anyone enforcing it — a
+rule nothing holds stops you looking rather than guiding you.
 
 Commit messages are French first, then English, in one text separated by `***`.
 Never `---`: `git am` treats it as a patch separator and truncates everything

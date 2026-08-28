@@ -144,11 +144,18 @@ plugin doit reprendre.
 
 ## Langue
 
-**Les identifiants sont en anglais** — répertoires, fichiers, paquets, types,
-fonctions, champs : `Fugitive`, `Board`, `Trail`. **La documentation est en
-français** : godoc, commentaires, messages d'erreur et journaux. L'API se lit en
-anglais parce que c'est du code ; le raisonnement se lit en français parce que
-c'est de la pensée.
+**Les identifiants qu'un autre paquet peut voir sont en anglais** — répertoires,
+fichiers, paquets, types exportés, fonctions exportées, champs : `Fugitive`,
+`Board`, `Trail`. **La documentation est en français** : godoc, commentaires,
+messages d'erreur et journaux. L'API se lit en anglais parce que c'est du code ;
+le raisonnement se lit en français parce que c'est de la pensée.
+
+**Un helper de test suit la langue de ce qu'il raconte.** `finirLeTour` et
+`lireDictionnaire` ne sortent jamais de leur fichier : ils font partie du récit
+que le test écrit, pas de l'API. La règle a longtemps été écrite sans cette
+réserve, et un cinquième des fonctions du dépôt l'enfreignait sans que personne
+la fasse appliquer — une règle que rien ne tient empêche de chercher plutôt
+qu'elle ne guide.
 
 Messages de commit en français d'abord, anglais ensuite, dans un seul texte
 séparé par `***`. Jamais `---` : `git am` le traite comme un séparateur de patch
