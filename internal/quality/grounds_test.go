@@ -79,6 +79,28 @@ func TestGrainKeepsGroundsInOrder(t *testing.T) {
 	}
 }
 
+// TestGroundRangeIsWhatTheContractSays vérifie l'écart entre le sol le plus
+// clair et le plus sombre, que deux textes publient.
+//
+// Le schéma de formes a dit « du simple au triple » quand le paquet de rendu
+// disait « du simple au double et demi », pour la même palette : c'est le
+// second qui avait raison. L'écart justifie une règle — un contour est
+// nécessaire parce qu'aucun remplissage ne se détache de tous les sols —, donc
+// il ne peut pas dériver sans que la règle change avec lui.
+//
+// Les bornes sont larges à dessein : ce qu'on garde est l'ordre de grandeur
+// que la phrase énonce, pas une valeur au centième que la moindre retouche de
+// palette ferait rougir.
+func TestGroundRangeIsWhatTheContractSays(t *testing.T) {
+	sols := solsLivres(t)
+	rapport := sols[0].l / sols[len(sols)-1].l
+
+	if rapport < 2.4 || rapport >= 3 {
+		t.Errorf("du plus clair au plus sombre, rapport de %.2f : les textes annoncent "+
+			"« du simple au double et demi », qui ne tient plus", rapport)
+	}
+}
+
 // solLivre est un sol de la palette livrée, avec sa luminance.
 type solLivre struct {
 	nom string

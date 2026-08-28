@@ -141,7 +141,7 @@
         "outline": {
           "type": "string",
           "pattern": "^[a-z][a-z0-9_]{1,31}$",
-          "description": "Nom de palette du contour. C'est lui qui détache une forme d'un sol dont la luminance varie du simple au triple ; un remplissage seul ne le fait pas."
+          "description": "Nom de palette du contour. C'est lui qui détache une forme d'un sol dont la luminance va du simple au double et demi ; un remplissage seul ne le fait pas."
         },
         "outline_thickness": {
           "type": "integer",
