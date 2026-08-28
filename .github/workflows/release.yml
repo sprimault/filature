@@ -162,7 +162,12 @@ jobs:
       # les règles du projet exigent en tête.
       - name: Notes de version
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          # La même résolution que pour la version du binaire : sur un essai à
+          # blanc, la référence est « master » et non un tag, et chercher une
+          # section « [master] » faisait échouer l'étape que l'essai sert
+          # justement à éprouver avant de taguer.
+          version="${{ inputs.version }}"
+          version="${version:-${GITHUB_REF_NAME#v}}"
 
           # index et non une expression régulière : les crochets du titre de
           # section y formeraient une classe de caractères, et « [0.1.1] »
