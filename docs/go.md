@@ -71,9 +71,11 @@ n'ayant pas besoin des règles.
 Il n'importe **jamais** Ebitengine. Un test qui exigerait une fenêtre n'a pas sa
 place dans la suite par défaut, les runners d'intégration étant sans écran.
 
-`TestPackagesKeepTheirImportsClean` applique les trois : la feuille du graphe,
-l'absence d'Ebitengine, et celle de `math/rand` — le générateur de `core` est le
-seul autorisé.
+`TestPackagesKeepTheirImportsClean` les applique, et il en refuse deux de plus
+que cette section n'en énonce : `crypto/rand`, pour la même raison que
+`math/rand`, et **`time`** — l'horloge n'entre pas dans le noyau, une décision
+qui en dépendrait ne se rejouant pas. La table du test porte la raison de chaque
+refus ; c'est elle que lit celui dont le test échoue, et c'est elle qui fait foi.
 
 ## 4. La configuration entre par `cmd/`
 
