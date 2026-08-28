@@ -380,8 +380,8 @@ func (j *ShapeSet) validerTrait(cle string, t Stroke, role Role, gabarit Templat
 		manquements = append(manquements,
 			fmt.Errorf("%s.outline_thickness: %d, attendu de 1 à 4", cle, *e))
 	}
-	if t.Opacity < 0 || t.Opacity > 100 {
-		manquements = append(manquements, fmt.Errorf("%s.opacity: %d, attendu de 0 à 100", cle, t.Opacity))
+	if o := t.Opacity; o != nil && (*o < 0 || *o > 100) {
+		manquements = append(manquements, fmt.Errorf("%s.opacity: %d, attendu de 0 à 100", cle, *o))
 	}
 	return manquements
 }

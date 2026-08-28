@@ -40,27 +40,7 @@ func luminance(t *testing.T, hex string) float64 {
 // un document — les deux couleurs de lieu ont vécu des mois à neuf niveaux l'une
 // de l'autre sans que rien ne le dise.
 func TestGroundsStayApartUnderGrain(t *testing.T) {
-	var fichier struct {
-		Palette map[string]string `toml:"palette"`
-	}
-	chemin := filepath.Join(racine, "plugins", "base", "palette.toml")
-	if _, err := toml.DecodeFile(chemin, &fichier); err != nil {
-		t.Fatal(err)
-	}
-
-	type sol struct {
-		nom string
-		l   float64
-	}
-	var sols []sol
-	for _, nom := range render.Grounds {
-		hex, present := fichier.Palette[nom]
-		if !present {
-			t.Fatalf("le sol %s manque de la palette livrée", nom)
-		}
-		sols = append(sols, sol{nom, luminance(t, hex)})
-	}
-	sort.Slice(sols, func(i, j int) bool { return sols[i].l > sols[j].l })
+	sols := solsLivres(t)
 
 	minimal := float64(2 * render.GroundGrainAmplitude)
 	for i := 1; i < len(sols); i++ {
@@ -70,4 +50,62 @@ func TestGroundsStayApartUnderGrain(t *testing.T) {
 				sols[i-1].nom, sols[i].nom, ecart, render.GroundGrainAmplitude)
 		}
 	}
+}
+
+// TestGrainKeepsGroundsInOrder applique le grain tel que le rendu le pose et
+// vérifie qu'aucun sol ne passe devant son voisin.
+//
+// Le test précédent compare des luminances nominales et le seuil qui les borne.
+// Celui-ci compare ce qui s'affiche, et c'est la différence qui compte : le
+// grain a longtemps été appliqué en pourcents, ce qui déplace d'autant moins
+// qu'une couleur est sombre. Sur la palette livrée, la rue passait alors sous
+// un lieu actif et un lieu actif sous une zone ouverte — deux inversions qu'un
+// seuil de dix niveaux ne pouvait pas voir, les écarts nominaux valant
+// dix-sept.
+//
+// Le pire cas suffit et se calcule : le plus clair au grain le plus bas, le
+// plus sombre au plus haut.
+func TestGrainKeepsGroundsInOrder(t *testing.T) {
+	sols := solsLivres(t)
+
+	for i := 1; i < len(sols); i++ {
+		clair := luminance(t, render.ShiftLuminance(sols[i-1].hex, -render.GroundGrainAmplitude))
+		sombre := luminance(t, render.ShiftLuminance(sols[i].hex, render.GroundGrainAmplitude))
+		if clair <= sombre {
+			t.Errorf("sous le grain, %s tombe à %.1f et %s monte à %.1f : "+
+				"le joueur lit l'un pour l'autre",
+				sols[i-1].nom, clair, sols[i].nom, sombre)
+		}
+	}
+}
+
+// solLivre est un sol de la palette livrée, avec sa luminance.
+type solLivre struct {
+	nom string
+	hex string
+	l   float64
+}
+
+// solsLivres rend les sols de la palette livrée, du plus clair au plus sombre.
+func solsLivres(t *testing.T) []solLivre {
+	t.Helper()
+
+	var fichier struct {
+		Palette map[string]string `toml:"palette"`
+	}
+	chemin := filepath.Join(racine, "plugins", "base", "palette.toml")
+	if _, err := toml.DecodeFile(chemin, &fichier); err != nil {
+		t.Fatal(err)
+	}
+
+	var sols []solLivre
+	for _, nom := range render.Grounds {
+		hex, present := fichier.Palette[nom]
+		if !present {
+			t.Fatalf("le sol %s manque de la palette livrée", nom)
+		}
+		sols = append(sols, solLivre{nom, hex, luminance(t, hex)})
+	}
+	sort.Slice(sols, func(i, j int) bool { return sols[i].l > sols[j].l })
+	return sols
 }

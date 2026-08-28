@@ -35,12 +35,20 @@ func trait(s *strings.Builder, t render.Stroke, x, y, k float64, pal render.Pale
 	c := pal[t.Color]
 	mini := minDimension(t)
 
-	epContour := render.StrokeWidth(t.Outlined(), k, mini)
+	// Nulle sans contour à peindre : la couche du liseré est tracée à
+	// epContour + epLisere puis recouverte par le contour, et sans contour rien
+	// ne repeignait cette bande — le liseré faisait alors trois unités au lieu
+	// de deux, six avec une épaisseur de quatre. Son épaisseur devenait pilotée
+	// par le plugin, ce que le contrat exclut.
+	var epContour float64
+	if t.Outline != "" {
+		epContour = render.StrokeWidth(t.Outlined(), k, mini)
+	}
 	epLisere := render.StrokeWidth(render.RimWidth, k, mini)
 
 	op := ""
-	if t.Opacity > 0 {
-		op = fmt.Sprintf(` opacity="%.2f"`, float64(t.Opacity)/100)
+	if o := t.Opaque(); o < render.DefaultOpacity {
+		op = fmt.Sprintf(` opacity="%.2f"`, float64(o)/100)
 	}
 	borde := func(couleur string, epaisseur float64) string {
 		return fmt.Sprintf(` stroke="%s" stroke-width="%.2f" stroke-linejoin="round"`, couleur, 2*epaisseur)
@@ -103,11 +111,11 @@ func prisme(s *strings.Builder, t render.Stroke, x, y, k float64, pal render.Pal
 		x-dx, y-h, x, y+dy-h, x, y+dy, x-dx, y, teinte(c, faces[2]))
 }
 
-// losange trace le sol d'une case, teinté par son grain.
-func losange(s *strings.Builder, x, y, k float64, couleur string, grain float64) {
+// losange trace le sol d'une case, décalé par son grain.
+func losange(s *strings.Builder, x, y, k float64, couleur string, grain int) {
 	dx, dy := render.TileWidth/2*k, render.TileHeight/2*k
 	fmt.Fprintf(s, `<polygon points="%.1f,%.1f %.1f,%.1f %.1f,%.1f %.1f,%.1f" fill="%s"/>`,
-		x-dx, y, x, y-dy, x+dx, y, x, y+dy, teinte(couleur, grain))
+		x-dx, y, x, y-dy, x+dx, y, x, y+dy, render.ShiftLuminance(couleur, grain))
 }
 
 // minDimension renvoie la plus petite dimension d'un trait, en unités de
