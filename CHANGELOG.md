@@ -28,7 +28,24 @@ de version sont ce que lit un auteur de plugin étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
-## [Non publié]
+## [0.6.0] — 2026-08-28 — Le contrat de formes
+
+Étape 6 de la feuille de route. **Les cinq contrats publics du jeu — formes,
+effets, protocole de bot, manifeste, règles — disent enfin ce que le code
+fait.** Chacun annonçait quelque chose qu'il ne tenait pas : un exemple à
+recopier qui ne charge pas, un déclenchement que rien ne déclenche, un refus que
+seul le schéma appliquait, un chiffre qui a dérivé sans que personne le
+remesure. Ce qui les gardait était la relecture ; ce sont maintenant des tests.
+
+**`shapes_version` passe à 4 et `effects_version` à 3 : les plugins publiés sont
+à reprendre.** Le meurtre quitte le vocabulaire avec sa scène de crime, les
+lieux de ressourcement entrent dans la palette obligatoire, `role` devient
+obligatoire dans toute forme, et trois déclenchements inertes sont retirés.
+
+**Les règles refondues s'appliquent toutes** : capture par contact maintenu deux
+résolutions, ressourcement sur quatre lieux du plateau, leurres à la place du
+meurtre, cases surveillées publiques pour les deux camps, palette étagée sur la
+luminance.
 
 **Trois mesures de partie deviennent des tests.** La mobilité que le terrain
 laisse à chaque camp, la part du noyau que cinq inspecteurs couvrent au meilleur
@@ -421,6 +438,22 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+Step 6 of the roadmap. **The game's five public contracts — shapes, effects, bot
+protocol, manifest, rules — finally say what the code does.** Each announced
+something it did not hold: a copy-paste example that would not load, a trigger
+nothing triggers, a rejection only the schema applied, a figure that drifted
+without anyone measuring it again. What guarded them was proofreading; they are
+now guarded by tests.
+
+**`shapes_version` moves to 4 and `effects_version` to 3: published plugins need
+revisiting.** Murder leaves the vocabulary along with its crime scene, respite
+places enter the mandatory palette, `role` becomes mandatory on every shape, and
+three inert triggers are dropped.
+
+**The reworked rules all apply**: capture by contact held across two
+resolutions, respite on four places on the board, decoys in place of murder,
+watched cells public to both sides, palette tiered by luminance.
 
 **Three gameplay measurements become tests.** The mobility the terrain leaves
 each side, the share of the starting core five inspectors cover at their best
