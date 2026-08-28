@@ -30,6 +30,18 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le protocole de bot finit de passer à l'anglais.** Quatre descriptions du
+schéma publié citaient encore des noms retirés — dont deux fois « bonjour » pour
+un message que le même fichier nomme `hello` —, et l'exemple d'un coup montrait
+`pion`, `Colonne` et `Ligne` là où le jeu envoie `piece`, `Column` et `Row`. Un
+bot écrit sur cet exemple produisait un coup qui n'égalait aucune entrée de
+`legal_moves`, alors que la ligne suivante exige qu'il y figure tel quel.
+L'exemple de `hello` annonçait treize réglages pour dix-sept, les quatre absents
+étant ceux du ressourcement et de l'étranglement.
+
+Les exemples du document sont désormais rapprochés des structures que le jeu
+sérialise, comme les énumérations du schéma l'étaient déjà.
+
 **L'aperçu montre ce que le contrat décrit.** Il appliquait le grain du sol en
 pourcents, ce que `docs/contrat-formes.md` §8 écarte nommément : sur la palette
 livrée, ça suffisait à faire passer la rue sous un lieu actif et un lieu actif
@@ -291,7 +303,7 @@ placent plus.** Son rayon valait cinq quelle que soit la ville, pendant que la
 portée de vue, elle, suivait le côté : cinq pions posés autour du centre y
 voyaient le fugitif dès le premier tour dans la quasi-totalité des parties, et
 d'autant mieux que le plateau était grand. `Settings` porte donc un
-`centre_radius`, que les bots reçoivent dans `bonjour`.
+`centre_radius`, que les bots reçoivent dans `hello`.
 
 **Les plugins d'apparence se chargent et se valident.** Un plugin déclare ce
 qu'il remplace, le reste retombe sur le contenu livré. Une forme qui déborde de
@@ -324,6 +336,18 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The bot protocol finishes its move to English.** Four descriptions in the
+published schema still cited retired names — twice "bonjour" for a message the
+same file calls `hello` — and the move example showed `pion`, `Colonne` and
+`Ligne` where the game sends `piece`, `Column` and `Row`. A bot written from
+that example produced a move matching no entry in `legal_moves`, though the very
+next line requires it to appear there as is. The `hello` example announced
+thirteen settings out of seventeen, the four missing ones belonging to respites
+and strangling.
+
+The document's examples are now checked against the structures the game
+serialises, as the schema's enumerations already were.
 
 **The preview shows what the contract describes.** It applied the ground grain
 as a percentage, which `docs/contrat-formes.md` §8 rules out by name: on the
@@ -570,7 +594,7 @@ placed inside it.** Its radius was five whatever the city, while sight range
 followed the board's side: five pieces set around the centre spotted the
 fugitive on the very first turn in nearly every game, and all the more easily
 on a large board. `Settings` therefore carries a `centre_radius`, which bots
-receive in `bonjour`.
+receive in `hello`.
 
 **Appearance plugins now load and validate.** A plugin declares what it
 replaces; everything else falls back on shipped content. A shape overflowing its
