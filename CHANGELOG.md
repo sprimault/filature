@@ -275,9 +275,12 @@ côtés. `filature -preset quartier` devient `filature -preset district`.
 message étaient en français sauf un, que le document et le schéma nommaient
 d'ailleurs différemment : un auteur de bot ne pouvait deviner ni la règle ni
 l'exception. Ils sont désormais `hello`, `ready`, `play`, `move`, `over` et
-`error`, comme tous les identifiants publics du projet. Un bot qui annonce une
-autre version est écarté dès sa réponse à `hello`, sur un message qui porte les
-deux numéros.
+`error`, comme tous les identifiants publics du projet.
+
+Le refus d'un bot qui annoncerait une autre version est écrit et exercé, mais il
+n'entrera en jeu qu'avec le pilote de bots, à l'étape 9 : rien ne l'appelle
+encore, et la suite de tests le compte comme la seule mécanique inerte du
+dépôt.
 
 **Les trois numéros de contrat concordent à nouveau avec ce que le code
 applique.** Le schéma de manifeste figeait `effects_version` à 1 quand le noyau
@@ -614,8 +617,11 @@ French would not have helped either, the key being missing on both sides.
 types were in French except one, which the document and the schema happened to
 name differently: a bot author could guess neither the rule nor the exception.
 They are now `hello`, `ready`, `play`, `move`, `over` and `error`, like every
-other public identifier in the project. A bot announcing any other version is
-turned away on its answer to `hello`, with both numbers in the message.
+other public identifier in the project.
+
+Turning away a bot that announced a different version is written and exercised,
+but it only comes into play with the bot driver, at step 9: nothing calls it
+yet, and the test suite counts it as the repository's only inert mechanism.
 
 **The three contract numbers agree again with what the code applies.** The
 manifest schema pinned `effects_version` to 1 while the core applied 2, and the
