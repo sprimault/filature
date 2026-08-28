@@ -43,6 +43,13 @@ Ajouter une primitive est une décision lourde : elle entre dans le contrat
 public et ne peut plus en sortir sans casser les plugins existants. Avant d'en
 ajouter une, vérifier que la composition des existantes ne suffit pas.
 
+**Une `duration` de 1 vaut le tour courant, et une `duration` absente vaut la
+partie entière.** C'est ce dont la capacité passive du Traqueur a besoin : elle
+n'a pas de déclenchement, donc pas de tour où la reconduire, et une échéance en
+ferait une capacité qui s'oublie. Le `defer` fait exception et exige au moins un
+tour (§3) : une échéance nulle y appliquerait à la résolution du tour même, ce
+qu'il existe précisément pour ne pas faire.
+
 ### Déplacement et position
 
 | Type | Paramètres | Effet |

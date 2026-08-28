@@ -30,6 +30,14 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Deux descriptions du schéma de manifeste disaient le faux.** `duration`
+annonçait que zéro valait le tour courant, quand c'est l'inverse : un vaut le
+tour courant et zéro vaut la partie entière, ce dont la capacité passive du
+Traqueur dépend. Et le bloc de langue renvoyait à un `langue.toml` que le
+chargeur ne lit jamais, le fichier s'appelant `language.toml` partout ailleurs.
+Le vocabulaire des effets porte désormais la règle de durée, qui n'était écrite
+que dans le schéma qui la donnait à l'envers.
+
 **Le protocole de bot finit de passer à l'anglais.** Quatre descriptions du
 schéma publié citaient encore des noms retirés — dont deux fois « bonjour » pour
 un message que le même fichier nomme `hello` —, et l'exemple d'un coup montrait
@@ -336,6 +344,14 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Two manifest schema descriptions said the opposite of the truth.** `duration`
+announced that zero meant the current turn, when it is the other way round: one
+means the current turn and zero means the whole game, which the Tracker's
+passive ability relies on. And the language block pointed at a `langue.toml` the
+loader never reads, the file being called `language.toml` everywhere else. The
+effects vocabulary now carries the duration rule, which was written only in the
+schema that had it backwards.
 
 **The bot protocol finishes its move to English.** Four descriptions in the
 published schema still cited retired names — twice "bonjour" for a message the
