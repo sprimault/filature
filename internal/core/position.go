@@ -19,10 +19,14 @@ type Position struct {
 	Row    int
 }
 
-// Direction indexe les huit directions, dans le sens horaire à partir du nord.
-// Les quatre premières sont les orthogonales, seules autorisées aux
-// inspecteurs. Cet ordre est un contrat : la sérialisation du journal et les
-// manifestes de plugins stockent la valeur numérique.
+// Direction indexe les huit directions : d'abord les quatre orthogonales dans
+// le sens horaire à partir du nord, seules autorisées aux inspecteurs, puis les
+// quatre diagonales dans le même sens. Deux quarts de tour successifs, et non un
+// seul balayage — regrouper les orthogonales est ce qui permet de les découper
+// sans les énumérer.
+//
+// Cet ordre est un contrat : la sérialisation du journal et les manifestes de
+// plugins stockent la valeur numérique.
 type Direction uint8
 
 // Les huit directions, dans l'ordre que Direction fige.

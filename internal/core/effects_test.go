@@ -106,7 +106,7 @@ func gameWithSetups() *Game {
 	return p
 }
 
-// tousLesCas couvre les dix-neuf primitives du vocabulaire. Une primitive
+// tousLesCas couvre chaque primitive du vocabulaire. Une primitive
 // absente d'ici est une primitive dont personne ne vérifie qu'elle se défait.
 func tousLesCas() []casEffet {
 	inspecteur := EffectContext{Side: SideInspectors, Piece: 1}

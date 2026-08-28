@@ -88,9 +88,10 @@ const (
 	// MaxSize borne BoundedBoard, et lui seul.
 	//
 	// Cette implémentation précalcule la vision de chaque case : le coût suit
-	// le nombre de rues multiplié par la portée, soit environ un mégaoctet et
-	// demi à 41, six fois plus à 81. C'est la limite d'un plateau qu'on tient
-	// entier en mémoire, pas celle du jeu.
+	// le nombre de rues et la longueur des lignes que le bâti laisse passer,
+	// jamais la portée — la table n'en dépend pas, voir precomputeSight. Environ
+	// six cents kilooctets à 41, quatre mégaoctets à 81. C'est la limite d'un
+	// plateau qu'on tient entier en mémoire, pas celle du jeu.
 	//
 	// Une carte plus grande ne s'obtient pas en levant ce plafond mais en
 	// écrivant une autre implémentation de Board, qui génère ses tuiles et
