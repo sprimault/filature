@@ -30,6 +30,14 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le document qui fait foi cesse de se contredire.** Le §5 donnait le contact
+pour rompu dès que le fugitif s'écarte, alors que quatre de ses huit pas le
+maintiennent — et c'est un contact maintenu qui capture. Le §11 annonçait quatre
+valeurs dérivées de la taille du plateau : il y en a cinq, et la période
+d'étranglement manquait de son propre tableau de paramètres. Un test tient
+désormais ce compte, que la godoc du noyau donnait faux depuis qu'elle avait
+gagné une dérivée de plus.
+
 **Le bloc de mesures des règles redevient ce que la mesure produit.** Il affirme
 sa propre provenance — réécrit par le harnais, jamais à la main — et trois de ses
 quatre colonnes ne pouvaient pas en venir : les préréglages y portaient leurs
@@ -366,6 +374,13 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The authoritative document stops contradicting itself.** §5 held contact
+broken as soon as the fugitive steps away, when four of his eight steps keep it
+— and it is sustained contact that captures. §11 announced four values derived
+from board size: there are five, and the strangling period was missing from its
+own parameter table. A test now keeps that count, which the core's godoc had
+wrong ever since it gained one more derived value.
 
 **The rules' measurement block becomes what the measurement produces again.** It
 asserts its own provenance — rewritten by the harness, never by hand — and three

@@ -102,6 +102,62 @@ func TestPresetRangeAndLengthFollowSize(t *testing.T) {
 	}
 }
 
+// TestOnlyFiveSettingsFollowTheSize énumère ce qui dépend du côté du plateau,
+// et refuse qu'un sixième s'y ajoute sans être déclaré.
+//
+// docs/regles.md §11 et la godoc de SettingsForSize affirment tous deux un
+// nombre. Ils ont dit quatre alors qu'ils en dérivaient cinq, la période
+// d'étranglement étant calculée dans la même fonction sans être nommée nulle
+// part — et le §11 la citait à la place du début, qui figure dans son tableau.
+//
+// Un quantificateur qui n'a pas de test devant lui empêche de chercher : celui
+// de la godoc a survécu à l'ajout qui l'a rendu faux, ce qui est exactement le
+// motif que docs/go.md §8 décrit.
+func TestOnlyFiveSettingsFollowTheSize(t *testing.T) {
+	petit, grand := SettingsForSize(21), SettingsForSize(41)
+
+	varient := map[string]bool{}
+	for nom, paire := range map[string][2]int{
+		"Size":             {petit.Size, grand.Size},
+		"Range":            {petit.Range, grand.Range},
+		"Turns":            {petit.Turns, grand.Turns},
+		"CentreRadius":     {petit.CentreRadius, grand.CentreRadius},
+		"StranglingStart":  {petit.StranglingStart, grand.StranglingStart},
+		"StranglingPeriod": {petit.StranglingPeriod, grand.StranglingPeriod},
+		"Stamina":          {petit.Stamina, grand.Stamina},
+		"Inspectors":       {petit.Inspectors, grand.Inspectors},
+		"PiecesPerTurn":    {petit.PiecesPerTurn, grand.PiecesPerTurn},
+		"RevealPeriod":     {petit.RevealPeriod, grand.RevealPeriod},
+		"Zones":            {petit.Zones, grand.Zones},
+		"ZonesLeftOpen":    {petit.ZonesLeftOpen, grand.ZonesLeftOpen},
+		"TrailLifetime":    {petit.TrailLifetime, grand.TrailLifetime},
+		"Shelters":         {petit.Shelters, grand.Shelters},
+		"ShelterGain":      {petit.ShelterGain, grand.ShelterGain},
+		"ShelterRecharge":  {petit.ShelterRecharge, grand.ShelterRecharge},
+		"StranglingNotice": {petit.StranglingNotice, grand.StranglingNotice},
+	} {
+		if paire[0] != paire[1] {
+			varient[nom] = true
+		}
+	}
+
+	// Size mis à part, qui est la taille elle-même et non une dérivée.
+	delete(varient, "Size")
+
+	attendus := []string{
+		"CentreRadius", "Range", "StranglingPeriod", "StranglingStart", "Turns",
+	}
+	for _, nom := range attendus {
+		if !varient[nom] {
+			t.Errorf("%s ne suit plus le côté du plateau", nom)
+		}
+		delete(varient, nom)
+	}
+	for reste := range varient {
+		t.Errorf("%s suit le côté sans que la règle ni la godoc le disent", reste)
+	}
+}
+
 // TestStranglingFitsInTheEndgame vérifie que les fermetures tiennent dans ce
 // qui reste de la partie, sur chaque préréglage.
 //
