@@ -3,7 +3,7 @@
 
 package core
 
-// Preset nomme un jeu de paramètres prêt à play.
+// Preset nomme un jeu de paramètres prêt à jouer.
 //
 // La clé est un identifiant, pas un libellé : l'interface cherche
 // « preset_<cle> » dans le dictionnaire actif, et la même partie s'annonce

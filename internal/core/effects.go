@@ -45,7 +45,7 @@ const (
 // EffectTypes énumère le vocabulaire, dans l'ordre de sa déclaration.
 //
 // Le chargeur de plugins en a besoin pour refuser une primitive qu'il ne sait
-// pas appliquer. La list vit ici et pas là-bas : une seconde énumération dans
+// pas appliquer. La liste vit ici et pas là-bas : une seconde énumération dans
 // un autre paquet se désynchroniserait au premier ajout, et un manifeste
 // parfaitement valide serait refusé sans qu'on comprenne pourquoi. Un test de
 // internal/quality la compare aux constantes déclarées.

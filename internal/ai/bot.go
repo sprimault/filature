@@ -22,7 +22,7 @@ const BotProtocol = 3
 // Un bot remplace l'IA du jeu, il ne l'étend pas : le jeu envoie une View, le
 // bot renvoie un Move. L'IA livrée parle ce même protocole, ce qui garantit
 // qu'il est suffisant — s'il manquait quelque chose, le jeu ne pourrait pas
-// play contre lui-même.
+// jouer contre lui-même.
 
 // Message est l'enveloppe échangée en JSON Lines sur les entrée et sortie
 // standard du processus.

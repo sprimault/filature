@@ -77,7 +77,7 @@ func lineOfSight(b Board, depart Position, d Direction, portee int) []Position {
 // IsVisible dit si une case est vue depuis une autre.
 //
 // Trois choses coupent une ligne : un bâtiment, un barrage, et **un autre
-// inspecteur**. Cette dernière règle punit l'alignment des pions et force la
+// inspecteur**. Cette dernière règle punit l'alignement des pions et force la
 // dispersion — cinq inspecteurs en file indienne ne voient qu'avec le premier.
 //
 // D'où la séparation avec precomputeSight : la table ne dépend que du

@@ -11,7 +11,7 @@ import (
 // plateauOuvert est un terrain dégagé de la taille demandée, avec ses zones
 // d'extraction en périphérie.
 //
-// Un vrai plateau viendra de Generate, à l'étape 3. Celui-ci suffit à play une
+// Un vrai plateau viendra de Generate, à l'étape 3. Celui-ci suffit à jouer une
 // partie entière, et c'est justement ce que l'injection du plateau permet.
 type plateauOuvert struct {
 	cote  int

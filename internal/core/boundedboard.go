@@ -114,7 +114,7 @@ const (
 // les laisser produire un plateau invalide ou une partie sans issue.
 //
 // Chaque refus dit la valeur reçue et ce qui était attendu : « côté hors
-// bornes » oblige à open le code pour savoir lesquelles.
+// bornes » oblige à ouvrir le code pour savoir lesquelles.
 func (p Settings) Validate() error {
 	switch {
 	case p.Size < MinSize || p.Size > MaxSize:

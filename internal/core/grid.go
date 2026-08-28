@@ -7,7 +7,7 @@ import "errors"
 
 // Bornes de la génération, toutes tirées de docs/regles.md §3.
 const (
-	// MinAvenueGap et MaxAvenueGap donnent l'irrégularité de la grid. Un
+	// MinAvenueGap et MaxAvenueGap donnent l'irrégularité de la trame. Un
 	// écart constant produirait un damier où toutes les fuites se valent ;
 	// c'est la variation qui crée des rues longues et des recoins.
 	MinAvenueGap = 3
@@ -92,7 +92,7 @@ var ErrNoPlayableBoard = errors.New("aucun plateau jouable pour cette graine")
 // appelant qui n'est pas draw ; en paramètre, celui qui valide dit ce qu'il
 // mesure.
 //
-// Les six étapes de docs/regles.md §3, dans l'ordre : grid, îlots, perçages,
+// Les six étapes de docs/regles.md §3, dans l'ordre : trame, îlots, perçages,
 // impasses, zones, lieux. Trois d'entre elles tirent au sort, chacune sur son
 // propre flux — la trame, les cours, les impasses —, ce qui permet d'en modifier
 // une sans déplacer les tirages des autres. Les trois autres n'en ont pas
@@ -240,7 +240,7 @@ func (b *BoundedBoard) carveDeadEnds(a *Random) {
 		if restantes == 0 {
 			return
 		}
-		// Un couloir déjà creusé a pu open une voisine de cette amorce, qui
+		// Un couloir déjà creusé a pu ouvrir une voisine de cette amorce, qui
 		// déboucherait maintenant.
 		if !b.carvable(d.tete, d.acces) {
 			continue

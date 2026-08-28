@@ -32,7 +32,7 @@ const (
 // doit passer dans sa zone.
 //
 // Deux, et non une : il faut qu'il y soit à la fin de son tour et qu'il y soit
-// encore à la fin du next. C'est ce délai qui donne aux inspecteurs une
+// encore à la fin du suivant. C'est ce délai qui donne aux inspecteurs une
 // chance de venir neutraliser la zone, et qui fait de l'extraction un pari
 // plutôt qu'une arrivée.
 const TurnsToExtract = 2

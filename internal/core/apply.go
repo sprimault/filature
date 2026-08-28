@@ -61,7 +61,7 @@ func (p *Game) Undo() error {
 
 // isLegal compare le coup aux coups légaux, par égalité et rien d'autre.
 //
-// C'est ce qui interdit à un appelant de « presque » play : un coup dont un
+// C'est ce qui interdit à un appelant de « presque » jouer : un coup dont un
 // seul champ diffère est un autre coup, et le noyau ne devine pas lequel.
 func (p *Game) isLegal(c Move) bool {
 	for _, legal := range p.LegalMoves(c.Side) {
@@ -276,7 +276,7 @@ func targetOf(a Side) Target {
 	return TargetCurrentPiece
 }
 
-// triggerAbility applique les effets d'une capacité et la marked employée.
+// triggerAbility applique les effets d'une capacité et la marque employée.
 //
 // Deux marques et non une : le pion ne la rejouera plus de la partie, et le
 // camp ne déclenchera plus rien ce tour-ci. La règle pose les deux limites.
@@ -352,7 +352,7 @@ func (p *Game) applyEffects(effets []Effect, ctx EffectContext) ([]func(), error
 	return faites, nil
 }
 
-// endPhase rend la main au camp next, et résout le tour quand les deux ont
+// endPhase rend la main au camp suivant, et résout le tour quand les deux ont
 // joué.
 //
 // L'ordre est un contrat : la résolution n'a lieu qu'après la phase du fugitif,
