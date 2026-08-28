@@ -464,6 +464,28 @@ func TestNegativeMobilityImmobilises(t *testing.T) {
 	}
 }
 
+// TestFugitiveMobilityIgnoresInspectorEffects vérifie qu'un bonus de mobilité
+// posé sur un inspecteur ne déteint pas sur le fugitif.
+//
+// Les deux camps partagent le compteur, et un pion d'inspecteur est désigné par
+// son rang : sans le filtre sur la cible, le fugitif hériterait du pas gagné au
+// repérage — l'effet le plus fréquent de la partie, puisque le noyau le pose
+// lui-même.
+func TestFugitiveMobilityIgnoresInspectorEffects(t *testing.T) {
+	p := testGame()
+	ctx := EffectContext{Side: SideInspectors, Piece: 0}
+
+	if _, err := p.ApplyOneEffect(Effect{Type: EffectChangeMobility, Target: TargetCurrentPiece, Value: 1, Duration: 1}, ctx); err != nil {
+		t.Fatal(err)
+	}
+	if got := p.MobilityOf(SideInspectors, 0); got != 2 {
+		t.Errorf("mobilité du pion visé %d, attendu 2", got)
+	}
+	if got := p.MobilityOf(SideFugitive, 0); got != 1 {
+		t.Errorf("mobilité du fugitif %d, attendu 1", got)
+	}
+}
+
 // TestStaminaFloor vérifie que la résistance ne passe pas sous zéro, et
 // que l'annulation rend la valeur d'origine malgré ce plafonnement.
 func TestStaminaFloor(t *testing.T) {

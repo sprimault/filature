@@ -345,8 +345,8 @@ func TestTrackerSeesFarther(t *testing.T) {
 		t.Fatal("aucun pion ne porte la capacité tracker : le contenu livré a changé")
 	}
 
-	if got := p.TrailRadiusOf(traqueur); got < 2 {
-		t.Errorf("rayon de traces du Traqueur %d, attendu au moins 2", got)
+	if got := p.TrailRadiusOf(traqueur); got != 2 {
+		t.Errorf("rayon de traces du Traqueur %d, attendu 2", got)
 	}
 
 	// Et lui seul : une capacité passive ne déteint pas sur le camp.

@@ -344,6 +344,40 @@ role = "marker"
   opacity = 150`,
 			fragment: "opacity",
 		},
+		{
+			nom: "cercle sans rayon",
+			formes: `[shape.essai]
+role = "marker"
+  [[shape.essai.stroke]]
+  type = "circle"
+  center = [0, 0]
+  radius = 0
+  color = "trail"`,
+			fragment: "radius",
+		},
+		{
+			nom: "épaisseur de contour hors bornes",
+			formes: `[shape.essai]
+role = "marker"
+  [[shape.essai.stroke]]
+  type = "segment"
+  from = [-5, 0]
+  to = [5, 0]
+  thickness = 2
+  color = "trail"
+  outline = "marker_outline"
+  outline_thickness = 5`,
+			fragment: "outline_thickness",
+		},
+		{
+			nom: "type de trait inconnu",
+			formes: `[shape.essai]
+role = "marker"
+  [[shape.essai.stroke]]
+  type = "ellipse"
+  color = "trail"`,
+			fragment: `"ellipse" inconnu`,
+		},
 	}
 
 	for _, c := range cas {

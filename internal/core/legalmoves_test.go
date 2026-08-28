@@ -271,6 +271,59 @@ func TestStartedPieceContinuesOutsideQuota(t *testing.T) {
 	}
 }
 
+// TestInspectorStopsAtItsMobility vérifie qu'un pion entamé s'arrête à sa
+// mobilité, et que le Coureur s'arrête à la sienne.
+//
+// docs/regles.md §5 donne un déplacement d'une case à l'inspecteur, et le §9
+// deux au Coureur : deux chiffres qui décident. Le test voisin les laisse
+// passer, parce qu'il pose un bonus et regarde le pion continuer — il reste
+// vert si le budget de pas n'est plus compté du tout.
+func TestInspectorStopsAtItsMobility(t *testing.T) {
+	p := gameOn(grid(
+		".....",
+		".....",
+		".....",
+		".....",
+		".....",
+	), Position{Column: 4, Row: 4},
+		Position{Column: 1, Row: 1},
+		Position{Column: 3, Row: 1})
+	p.Phase = PhaseInspectors
+	p.Settings.PiecesPerTurn = 3
+
+	// Le quota laisse deux places libres : rien d'autre que sa propre mobilité
+	// ne peut retenir un pion qui a déjà franchi sa case.
+	p.Inspectors[0].StepsTaken = 1
+	for _, c := range p.LegalMoves(SideInspectors) {
+		if c.Type == MoveStep && c.Piece == 0 {
+			t.Errorf("déplacement vers %v alors que le pas unique est consommé", c.To)
+		}
+	}
+
+	// Le même pion doté du bonus du Coureur reprend un pas, et un seul.
+	p.ActiveEffects = []ActiveEffect{{
+		Effect:        Effect{Type: EffectChangeMobility, Target: TargetCurrentPiece, Value: 1, Duration: 1},
+		EffectContext: EffectContext{Side: SideInspectors, Piece: 0},
+		Echeance:      p.Turn,
+	}}
+	repris := 0
+	for _, c := range p.LegalMoves(SideInspectors) {
+		if c.Type == MoveStep && c.Piece == 0 {
+			repris++
+		}
+	}
+	if repris == 0 {
+		t.Error("le Coureur n'a plus de second pas")
+	}
+
+	p.Inspectors[0].StepsTaken = 2
+	for _, c := range p.LegalMoves(SideInspectors) {
+		if c.Type == MoveStep && c.Piece == 0 {
+			t.Errorf("déplacement vers %v alors que les deux cases sont consommées", c.To)
+		}
+	}
+}
+
 // TestInspectorsOrthogonalOnly vérifie qu'ils n'ont pas les diagonales.
 func TestInspectorsOrthogonalOnly(t *testing.T) {
 	p := gameOn(grid(
