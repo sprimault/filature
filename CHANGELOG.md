@@ -28,7 +28,7 @@ de version sont ce que lit un auteur de plugin étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
-## [Non publié]
+## [0.6.1] — 2026-08-29 — Les textes du dépôt
 
 **Les textes du dépôt disent ce que le code fait.** Rien ici ne change le jeu ni
 les contrats : ce sont des commentaires, des godoc et des messages d'erreur qui
