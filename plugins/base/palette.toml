@@ -45,14 +45,14 @@ building = "#2f333c"
 
 # Les pions. Chaud contre froid, et surtout clair contre sombre : c'est l'écart
 # de luminance qui sépare les deux camps sur une capture en niveaux de gris ou
-# pour un daltonien, pas la teinte. Soixante-neuf niveaux entre les deux.
+# pour un daltonien, pas la teinte. Quatre-vingt-un niveaux entre les deux.
 fugitive_main = "#e47c46"
 inspector_main = "#254b71"
 
 # Les contours. Presque noirs, et c'est le point : un remplissage clair meurt
 # sur la rue, un remplissage sombre meurt sur une zone fermée, mais un contour
-# à ce niveau tient partout — 11,1 sur la rue, 6,2 sur une zone ouverte, 2,2 sur
-# une zone fermée, où le remplissage prend le relais.
+# à ce niveau tient partout — de 11,4 sur la rue à 8,8 sur une zone ouverte, et
+# 2,2 sur une zone fermée, où le remplissage prend le relais.
 #
 # Teintés plutôt que gris neutres : ils bordent aussi la tête du pion, et un
 # gris franc y ferait une tache morte.
@@ -65,9 +65,8 @@ inspector_detail = "#101c2a"
 # lire sur une zone fermée, où elle a autant de sens qu'ailleurs — le fugitif
 # traverse les zones. Son contour la rattrape sur la rue.
 #
-# Un seul contour pour les quatre : un barrage posé sur une zone ouverte et une
-# scène sur une zone fermée sont aussi peu lisibles que la trace l'était, et le
-# premier cas se produit dès qu'une partie dure.
+# Un seul contour pour les deux : un barrage posé sur une zone ouverte est aussi
+# peu lisible que la trace l'était, et le cas se produit dès qu'une partie dure.
 marker_outline = "#241d16"
 trail = "#f0e6c8"
 roadblock = "#877849"
