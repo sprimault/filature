@@ -30,6 +30,18 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Trois mesures de partie deviennent des tests.** La mobilité que le terrain
+laisse à chaque camp, la part du noyau que cinq inspecteurs couvrent au meilleur
+placement, et la longueur du trajet jusqu'à la zone la plus proche : trois
+chiffres sur lesquels `docs/regles.md` fonde des décisions, et qu'aucun contrôle
+ne tenait. Des bornes et non des valeurs, chacune renvoyant à ce qu'elle garde,
+sur vingt graines en routine et deux cents derrière `-mesures`.
+
+Le §2 y perd un chiffre périmé : cinq pions posés au mieux sans l'exclusion du
+noyau en voient de six à neuf dixièmes selon le préréglage, non plus de neuf
+partout. La mesure qui a produit la règle datait d'avant deux changements de
+génération.
+
 **Les exemples de plugin de la documentation se chargent.** Celui des langues
 montrait un dossier `mes-traductions/` et, deux lignes plus bas, un manifeste
 nommé `filature-de` — or le nom d'un plugin est celui de son dossier, et le
@@ -409,6 +421,18 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Three gameplay measurements become tests.** The mobility the terrain leaves
+each side, the share of the starting core five inspectors cover at their best
+placement, and the distance to the nearest extraction zone: three figures
+`docs/regles.md` bases decisions on, and that no check held. Bounds rather than
+values, each pointing at what it guards, over twenty seeds by default and two
+hundred behind `-mesures`.
+
+§2 loses a stale figure along the way: five pieces placed at their best without
+the core exclusion see six to nine tenths of it depending on the preset, not more
+than nine everywhere. The measurement that produced the rule predated two
+generation changes.
 
 **The documentation's plugin examples load.** The language one showed a
 `mes-traductions/` folder and, two lines below, a manifest named `filature-de` —
