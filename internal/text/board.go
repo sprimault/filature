@@ -1,7 +1,7 @@
 // Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
 // SPDX-License-Identifier: Apache-2.0
 
-// Package texte rend une vue de partie en caractères, et relit un coup saisi.
+// Package text rend une vue de partie en caractères, et relit un coup saisi.
 //
 // Il ne connaît que core.View, jamais l'état complet : c'est la même contrainte
 // que pour un bot ou pour le réseau, et elle vaut aussi en partie locale. Ce
@@ -17,11 +17,13 @@ import (
 	"github.com/sprimault/filature/internal/core"
 )
 
-// Les caractères du plateau, du plus prioritaire au moins.
+// Les caractères du plateau, dans l'ordre où ils se lisent et non dans celui de
+// leur priorité — celle-là est l'ordre de peinture, plus bas dans Render.
 //
 // Un pion couvre ce qu'il piétine : savoir qu'un inspecteur se tient sur une
-// trace importe plus que la trace. Les zones passent en dernier parce qu'elles
-// occupent neuf cases et masqueraient tout le reste.
+// trace importe plus que la trace, et le fugitif passe après tout le monde.
+// Le sol vient en premier pour la raison inverse : une zone occupe neuf cases,
+// et la peindre par-dessus masquerait ce qui s'y trouve.
 const (
 	CarBatiment   = '#'
 	CarRue        = '.'
@@ -213,7 +215,7 @@ func numbers(n []int) string {
 	return strings.Join(textes, " ")
 }
 
-// phase rend le nom d'une phase en français.
+// phaseName rend le nom d'une phase en français.
 func phaseName(p core.Phase) string {
 	switch p {
 	case core.PhaseFugitiveSetup:
@@ -231,7 +233,7 @@ func phaseName(p core.Phase) string {
 	}
 }
 
-// camp rend le nom d'un camp en français.
+// sideName rend le nom d'un camp en français.
 func sideName(a core.Side) string {
 	switch a {
 	case core.SideFugitive:

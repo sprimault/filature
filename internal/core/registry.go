@@ -129,7 +129,7 @@ type (
 	BrainFactory func(v View, a *Random) (Move, error)
 )
 
-// Le registre se construit dans internal/plugins, jamais ici : le remplir
+// Le registre se construit dans internal/loader, jamais ici : le remplir
 // demande de lire des manifestes, et ce paquet n'a aucune dépendance disque.
 // C'est ce qui en fait une feuille du graphe de dépendances, et ce qui garantit
 // qu'aucune règle n'attend un fichier pour s'appliquer.

@@ -46,7 +46,7 @@ func nomValide(nom string) bool { return nomDePlugin.MatchString(nom) }
 var codeDeLangue = regexp.MustCompile(`^[a-z]{2,3}(-[A-Za-z]{2,8})*$`)
 
 // manifeste est la forme d'un manifeste.toml, telle que
-// schemas/manifeste-plugin.schema.json la décrit.
+// schemas/plugin-manifest.schema.json la décrit.
 //
 // Les capacités, dépenses et modes se décodent directement dans les types du
 // noyau : ce sont les mêmes structures, et les faire transiter par des doubles

@@ -48,7 +48,7 @@ const (
 // pas appliquer. La list vit ici et pas là-bas : une seconde énumération dans
 // un autre paquet se désynchroniserait au premier ajout, et un manifeste
 // parfaitement valide serait refusé sans qu'on comprenne pourquoi. Un test de
-// internal/qualite la compare aux constantes déclarées.
+// internal/quality la compare aux constantes déclarées.
 func EffectTypes() []EffectType {
 	return []EffectType{
 		EffectMove, EffectChangeRange, EffectChangeMobility,

@@ -1,7 +1,7 @@
 // Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
 // SPDX-License-Identifier: Apache-2.0
 
-// Package ia porte l'adversaire embarqué et le pilotage des bots externes.
+// Package ai porte l'adversaire embarqué et le pilotage des bots externes.
 package ai
 
 import "github.com/sprimault/filature/internal/core"

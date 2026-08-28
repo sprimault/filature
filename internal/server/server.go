@@ -1,7 +1,7 @@
 // Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
 // SPDX-License-Identifier: Apache-2.0
 
-// Package serveur porte le mode réseau.
+// Package server porte le mode réseau.
 //
 // Le même binaire héberge ou rejoint ; rien n'empêche d'héberger une partie
 // tout en en rejoignant une autre, ce sont deux instances du même moteur.
