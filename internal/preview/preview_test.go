@@ -190,6 +190,62 @@ func TestStrokeWidthsFollowTheContract(t *testing.T) {
 	})
 }
 
+// TestTransparentStrokeIsDrawnTransparent vérifie qu'une opacité nulle produit
+// un attribut, et qu'une opacité absente n'en produit pas.
+//
+// Les deux se confondaient sur un entier : une forme déclarée transparente
+// s'affichait pleine, alors que le contrat et le schéma acceptent la valeur.
+func TestTransparentStrokeIsDrawnTransparent(t *testing.T) {
+	segment := func(opacite *int) string {
+		var s strings.Builder
+		trait(&s, render.Stroke{
+			Type: render.StrokeSegment, From: render.Point{X: -5}, To: render.Point{X: 5},
+			Thickness: 2, Color: "trail", Opacity: opacite,
+		}, 0, 0, 1, render.Palette{"trail": "#f0e6c8"})
+		return s.String()
+	}
+
+	zero := 0
+	if got := segment(&zero); !strings.Contains(got, `opacity="0.00"`) {
+		t.Errorf("une opacité nulle se dessine pleine :\n%s", got)
+	}
+	if got := segment(nil); strings.Contains(got, "opacity=") {
+		t.Errorf("une opacité absente pose un attribut :\n%s", got)
+	}
+}
+
+// TestRimKeepsItsWidthWithoutOutline vérifie que le liseré garde son épaisseur
+// quand aucun contour n'est déclaré.
+//
+// La couche du liseré est tracée à contour + liseré puis recouverte par le
+// contour ; sans contour, rien ne repeignait cette bande et le liseré faisait
+// trois unités au lieu de deux — six avec une épaisseur déclarée de quatre.
+// Son épaisseur devenait pilotée par le plugin, ce que le contrat exclut.
+func TestRimKeepsItsWidthWithoutOutline(t *testing.T) {
+	// Un trait assez large pour que le plafond d'épaisseur ne morde pas :
+	// à MaxStrokeRatio, une épaisseur de 4 ne se distingue d'une épaisseur de 1
+	// qu'au-delà de vingt-quatre unités de corps, et un segment fin les rendrait
+	// toutes deux à la même valeur plafonnée.
+	segment := func(epaisseur *int) string {
+		var s strings.Builder
+		trait(&s, render.Stroke{
+			Type: render.StrokeSegment, From: render.Point{X: -20}, To: render.Point{X: 20},
+			Thickness: 4 * render.MaxStrokeRatio, Color: "trail", OutlineThickness: epaisseur,
+		}, 0, 0, 1, render.Palette{"trail": "#f0e6c8"})
+		return s.String()
+	}
+
+	// Une épaisseur qui ne borde rien ne doit rien changer, quelle qu'elle soit.
+	un, quatre := 1, 4
+	nu := segment(nil)
+	for _, e := range []*int{&un, &quatre} {
+		if got := segment(e); got != nu {
+			t.Errorf("outline_thickness = %d change le tracé sans contour à border :\n%s\nattendu :\n%s",
+				*e, got, nu)
+		}
+	}
+}
+
 // TestTintNeverExceedsWhite vérifie qu'un coefficient de face ne déborde pas
 // d'un canal.
 func TestTintNeverExceedsWhite(t *testing.T) {

@@ -92,11 +92,18 @@ type Stroke struct {
 	// DefaultOutline ; écrite, elle doit tenir dans les bornes du contrat.
 	OutlineThickness *int `toml:"outline_thickness"`
 
-	Opacity int `toml:"opacity"`
+	// Opacity est un pointeur pour la même raison qu'OutlineThickness : son
+	// défaut vaut 100 et sa borne basse zéro, donc un entier confondrait « je
+	// n'en déclare pas » avec « je la veux nulle ». L'aperçu traitait les deux
+	// comme opaques, et une forme déclarée transparente s'affichait pleine.
+	Opacity *int `toml:"opacity"`
 }
 
-// DefaultOutline est l'épaisseur d'un contour qui n'en déclare pas.
-const DefaultOutline = 1
+// Les défauts d'un trait qui ne les déclare pas.
+const (
+	DefaultOutline = 1
+	DefaultOpacity = 100
+)
 
 // Outlined rend l'épaisseur de contour effective d'un trait.
 //
@@ -108,6 +115,14 @@ func (s Stroke) Outlined() int {
 		return DefaultOutline
 	}
 	return *s.OutlineThickness
+}
+
+// Opaque rend l'opacité effective d'un trait, de 0 à 100.
+func (s Stroke) Opaque() int {
+	if s.Opacity == nil {
+		return DefaultOpacity
+	}
+	return *s.Opacity
 }
 
 // Role détermine ce qu'un plugin a le droit de redéfinir.
@@ -298,7 +313,15 @@ func StrokeWidth(unites int, echelle float64, minForme int) float64 {
 	return max(e, MinStrokePixels)
 }
 
-// GroundGrainAmplitude est l'écart de luminosité appliqué au sol, en pourcents.
+// GroundGrainAmplitude est l'écart appliqué au sol, en niveaux de luminance sur
+// 255.
+//
+// Absolu et non proportionnel, ce que le contrat écarte nommément : à trois
+// pour cent, le grain vaudrait six niveaux sur la rue et moins de trois sur une
+// zone fermée, donc il disparaîtrait là où les sols sont les plus serrés. C'est
+// aussi l'unité dans laquelle validerEcartDesSols le lit pour poser son seuil,
+// et cette godoc a annoncé des pourcents assez longtemps pour que l'aperçu les
+// applique.
 //
 // Un plateau de couleurs pleines est plat à l'œil sur seize cents cases. Le
 // grain est dérivé de la position et de la graine, donc stable : le retirer au
@@ -342,6 +365,26 @@ func GroundGrain(graine int64, colonne, ligne int) int {
 	}
 
 	return int(h%(2*GroundGrainAmplitude+1)) - GroundGrainAmplitude
+}
+
+// ShiftLuminance décale une couleur d'un nombre de niveaux, en bornant chaque
+// canal. Une valeur mal formée rend du noir plutôt que d'échouer.
+//
+// Le même décalage sur les trois canaux, donc absolu, et c'est ce qui compte :
+// un facteur déplace d'autant moins que la couleur est sombre, si bien qu'il
+// resserre les sols là où ils le sont déjà et peut leur faire échanger leur
+// rang. C'est ce qui arrivait à la rue et au lieu actif sur la palette livrée.
+//
+// Ici et non chez l'appelant : le rendu et l'aperçu doivent poser le même
+// grain, et deux implémentations d'un geste de trois lignes divergent au
+// premier qui le réécrit de mémoire.
+func ShiftLuminance(hexa string, niveaux int) string {
+	var r, v, b int
+	if _, err := fmt.Sscanf(hexa, "#%02x%02x%02x", &r, &v, &b); err != nil {
+		return "#000000"
+	}
+	borne := func(c int) int { return min(max(c+niveaux, 0), 255) }
+	return fmt.Sprintf("#%02x%02x%02x", borne(r), borne(v), borne(b))
 }
 
 // ToScreen projette une case du plateau en coordonnées d'écran.

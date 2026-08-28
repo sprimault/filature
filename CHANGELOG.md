@@ -30,6 +30,18 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**L'aperçu montre ce que le contrat décrit.** Il appliquait le grain du sol en
+pourcents, ce que `docs/contrat-formes.md` §8 écarte nommément : sur la palette
+livrée, ça suffisait à faire passer la rue sous un lieu actif et un lieu actif
+sous une zone ouverte, soit les deux inversions que le refus au chargement
+existe pour empêcher. Une forme d'opacité nulle s'y affichait pleine, et le
+liseré s'épaississait de l'épaisseur d'un contour absent — jusqu'à six unités
+au lieu de deux, son épaisseur passant sous le contrôle du plugin.
+
+La cause commune est nommée : la constante du grain se documentait en pourcents
+et se lisait en niveaux de luminance selon l'endroit. Le décalage vit désormais
+dans un point unique du moteur, que le rendu et l'aperçu partagent.
+
 **Le contrat de formes, son schéma et le chargeur disent enfin la même chose.**
 Ils divergeaient à trois voix sur les variantes d'état : le schéma déclarait
 `highlighted` et `out_of_sight`, le document les montrait, et le jeu décodait
@@ -312,6 +324,18 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The preview shows what the contract describes.** It applied the ground grain
+as a percentage, which `docs/contrat-formes.md` §8 rules out by name: on the
+shipped palette that was enough to push the street below an active respite and
+an active respite below an open zone — the very two rank swaps the load-time
+refusal exists to prevent. A stroke with zero opacity drew solid, and the rim
+thickened by the width of an absent outline, up to six units instead of two,
+putting its width under the plugin's control.
+
+The common cause is named: the grain constant documented itself in percent and
+was read in luminance levels depending on the caller. The shift now lives in one
+place in the engine, shared by the renderer and the preview.
 
 **The shape contract, its schema and the loader now say the same thing.** They
 diverged three ways on state variants: the schema declared `highlighted` and

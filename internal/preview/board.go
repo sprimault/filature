@@ -227,11 +227,18 @@ func ordreDePeintre(cote int) []core.Position {
 	return cases
 }
 
-// grain traduit l'écart de luminosité d'une case en facteur multiplicatif.
+// grain rend l'écart de luminance d'une case, en niveaux sur 255.
 //
 // Le calcul lui-même vit dans render : l'aperçu doit montrer le grain du jeu et
 // non un grain qui lui ressemble, sans quoi il flatterait ou noircirait des
 // formes qu'on cherche justement à juger.
-func grain(graine int64, p core.Position) float64 {
-	return 1 + float64(render.GroundGrain(graine, p.Column, p.Row))/100
+//
+// Un décalage et non un facteur. L'aperçu multipliait les trois canaux de
+// quelques pourcents, ce que docs/contrat-formes.md §8 écarte : sur la palette
+// livrée, ça suffisait à faire passer la rue sous un lieu actif et un lieu
+// actif sous une zone ouverte. Deux inversions de rang, que le refus au
+// chargement existe précisément pour empêcher — et que son seuil de dix
+// niveaux ne pouvait pas voir, les écarts nominaux valant dix-sept.
+func grain(graine int64, p core.Position) int {
+	return render.GroundGrain(graine, p.Column, p.Row)
 }
