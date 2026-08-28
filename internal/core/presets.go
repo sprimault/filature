@@ -49,15 +49,17 @@ func PresetByKey(cle string) (Preset, bool) {
 
 // SettingsForSize dérive un jeu de paramètres d'une taille de plateau.
 //
-// Seuls la portée, la durée, le rayon du noyau et le début de l'étranglement en
-// dépendent. Le reste — résistance, inspecteurs, zones, quota — ne tient pas à
-// la taille du terrain mais à l'équilibre entre les deux camps, et ne bougera
-// qu'à l'étape d'équilibrage.
+// Cinq valeurs en dépendent : la portée, la durée, le rayon du noyau, le début
+// de l'étranglement et sa période. Le reste — résistance, inspecteurs, zones,
+// quota — ne tient pas à la taille du terrain mais à l'équilibre entre les deux
+// camps, et ne bougera qu'à l'étape d'équilibrage.
 //
 // Exportée parce que partir de DefaultSettings et n'y changer que le côté donne
-// un réglage incohérent : quatre valeurs suivent la taille, et les oublier
-// produit un rayon de noyau plus grand que le plateau ou une portée qui voit
-// d'un bord à l'autre.
+// un réglage incohérent : les oublier produit un rayon de noyau plus grand que
+// le plateau, ou une portée qui voit d'un bord à l'autre.
+//
+// TestOnlyFiveSettingsFollowTheSize tient ce compte à jour. Il a dit quatre
+// pendant que la période d'étranglement se calculait vingt lignes plus bas.
 func SettingsForSize(cote int) Settings {
 	p := DefaultSettings()
 	p.Size = cote

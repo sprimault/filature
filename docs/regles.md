@@ -5,9 +5,10 @@ conforme, pas l'inverse.
 
 **Aucun chiffre de ce document n'est estimé.** Il est mesuré ou décidé, et il
 dit lequel. Un document qui fait foi et qui approxime fait foi sur du faux :
-deux chiffres écrits à vue ont été corrigés le 27 août 2026, l'un annonçant dix
-tirages de plateau là où il en faut quinze, l'autre les deux tiers d'une partie
-pour deux cinquièmes.
+deux chiffres écrits à vue l'ont montré, l'un annonçant dix tirages de plateau
+quand la génération en demandait quinze, l'autre les deux tiers d'une partie
+pour deux cinquièmes. Les deux sont corrigés depuis, et le premier ne tient plus
+du tout — le §15 mesure aujourd'hui un tirage et des poussières par plateau.
 
 ---
 
@@ -241,8 +242,14 @@ d'un barrage de pions un barrage : sans cette interdiction, encercler ne
 restreindrait plus rien.
 
 **Mais une case partagée ne le retient pas.** Un inspecteur qui marche sur lui ne
-le cloue pas au sol : le fugitif joue après les inspecteurs, ses huit
-destinations restent ouvertes, et le contact tombe dès qu'il s'écarte.
+le cloue pas au sol : le fugitif joue après les inspecteurs, et ses huit
+destinations restent ouvertes.
+
+S'écarter ne suffit pourtant pas à rompre le contact, qui porte sur la case
+commune **et les quatre orthogonales** (§7) : sur les huit pas, les quatre
+diagonales éloignent assez, les quatre autres laissent le fugitif au contact. La
+distinction compte, parce que c'est un contact maintenu d'une résolution à la
+suivante qui capture (§10).
 
 Rien n'interdit ce déplacement à l'inspecteur, et rien ne doit l'interdire : un
 coup refusé est une information. Empêcher un pion d'entrer sur une case parce
@@ -556,14 +563,15 @@ d'équilibrage.
 | Recharge d'un lieu | 8 tours | Ne suit pas la taille, voir §7 |
 | Contacts consécutifs pour capturer | 2 | |
 | Début de l'étranglement | 3/4 de la durée | Tour 30 sur quarante |
+| Période d'étranglement | 4 tours | Ce qui reste, réparti entre les fermetures (§10) |
 | Préavis d'une fermeture | 2 tours | Constant, mais jamais plus que la période |
 | Zones restantes après étranglement | 3 | |
 
-**Quatre de ces valeurs suivent le côté du plateau au lieu d'être posées** : la
-portée de vue, la durée, le rayon du noyau et la période d'étranglement. Les
-figer donnerait trois jeux différents sous le même nom — c'est ce qui arrivait au
-noyau, dont le rayon fixe laissait la portée de vue le rattraper à mesure que la
-ville grandissait.
+**Cinq de ces valeurs suivent le côté du plateau au lieu d'être posées** : la
+portée de vue, la durée, le rayon du noyau, le début de l'étranglement et sa
+période. Les figer donnerait trois jeux différents sous le même nom — c'est ce
+qui arrivait au noyau, dont le rayon fixe laissait la portée de vue le rattraper
+à mesure que la ville grandissait.
 
 Suspicion à vérifier en simulation : trois déplacements contre un reste peut-être
 trop favorable aux inspecteurs. C'est là qu'il faudra corriger en premier.
@@ -722,7 +730,7 @@ ne serait qu'un mur de déplacement sans effet sur l'information.
   est un préréglage à part entière ou un cas limite maintenu par symétrie** — et
   pas sans les taux de victoire.
 - **Une propriété de génération peut peser sur l'équilibre, et ça n'a jamais été
-  mesuré.** La capture repose sur le talonnage en couloir (§14), que les impasses
+  mesuré.** La capture repose sur le talonnage en couloir (§2), que les impasses
   rendent possible ; si les Quartiers pauvres en impasses donnent une
   distribution de motifs de fin différente des autres, c'est là qu'on le verra.
 
