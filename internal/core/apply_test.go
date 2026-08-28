@@ -254,6 +254,36 @@ func TestOneAbilityPerTurn(t *testing.T) {
 	}
 }
 
+// TestRoadblockLandsOnTheChosenCell vérifie que le barrage se pose là où le
+// coup le dit, et nulle part ailleurs.
+func TestRoadblockLandsOnTheChosenCell(t *testing.T) {
+	p := playableGame()
+	p.Phase = PhaseInspectors
+	p.Inspectors[0].Ability = "blocker"
+
+	c := firstMove(t, p, SideInspectors, MoveAbility)
+	if ChebyshevDistance(c.To, p.Inspectors[0].Position) != 1 {
+		t.Fatalf("le coup porte la case %v, hors des voisines du pion", c.To)
+	}
+	if err := p.Apply(c); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, barre := p.Roadblocks[c.To]; !barre {
+		t.Errorf("barrages %v, attendu un en %v", p.Roadblocks, c.To)
+	}
+	if len(p.Roadblocks) != 1 {
+		t.Errorf("%d barrages posés, un seul attendu", len(p.Roadblocks))
+	}
+
+	if err := p.Undo(); err != nil {
+		t.Fatal(err)
+	}
+	if len(p.Roadblocks) != 0 {
+		t.Errorf("%d barrages après annulation", len(p.Roadblocks))
+	}
+}
+
 // TestAbilitySpentForTheWholeGame vérifie que les deux marques n'ont pas la
 // même portée : le camp retrouve son droit au tour suivant, le pion jamais.
 //

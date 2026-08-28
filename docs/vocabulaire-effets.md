@@ -201,6 +201,13 @@ L'annulation défait la mise en file, pas l'effet : annuler le tour où le
 **Une cible qui ne désigne personne est refusée au chargement** : une dépense du
 fugitif ne vise ni `other_piece` ni `all_pieces`, puisqu'il est seul.
 
+**La case vient du coup, jamais du manifeste**, et c'est le noyau qui énumère
+celles qui sont possibles : une capacité dont un effet vise `cell` est proposée
+une fois par case atteignable, et le joueur choisit parmi ces coups. Un plugin
+n'a donc rien à déclarer pour qu'on choisisse où son effet tombe — et il ne
+choisit pas non plus la portée, qui est une règle de jeu : le voisinage du pion
+pour une capacité d'inspecteur, celui du fugitif pour un leurre.
+
 Viser le camp adverse, en revanche, est le cas ordinaire — le Chef révèle la
 position du fugitif, le Barreur lui ferme une case. Le chargeur ne cherche donc
 pas à distinguer ce qui l'avantage de ce qui le gêne : il faudrait juger chaque

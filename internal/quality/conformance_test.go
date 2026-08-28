@@ -299,21 +299,27 @@ func TestRoadblockExpires(t *testing.T) {
 		t.Fatal("aucun pion ne porte la capacité blocker : le contenu livré a changé")
 	}
 
-	joue := false
+	var barrage core.Move
 	for _, c := range p.LegalMoves(core.SideInspectors) {
 		if c.Type == core.MoveAbility && c.Piece == barreur {
 			if err := p.Apply(c); err != nil {
 				t.Fatalf("déclenchement du Barreur : %v", err)
 			}
-			joue = true
+			barrage = c
 			break
 		}
 	}
-	if !joue {
+	if barrage.Type != core.MoveAbility {
 		t.Fatal("la capacité du Barreur n'est pas proposée en phase inspecteurs")
 	}
-	if len(p.Roadblocks) == 0 {
-		t.Fatal("le Barreur n'a barré aucune case")
+
+	// La case vient du coup, et le contenu livré ne la déclare pas : sans elle,
+	// le barrage tombait en {0,0} quel que soit l'endroit où se tient le pion.
+	if _, barre := p.Roadblocks[barrage.To]; !barre {
+		t.Fatalf("barrages %v, attendu un en %v", p.Roadblocks, barrage.To)
+	}
+	if got := core.ChebyshevDistance(barrage.To, p.Inspectors[barreur].Position); got != 1 {
+		t.Errorf("barrage à %d cases du Barreur, attendu une voisine", got)
 	}
 
 	// La règle donne trois tours : la case est fermée pendant celui où elle est

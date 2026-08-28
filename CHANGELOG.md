@@ -30,6 +30,13 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le Barreur ferme la case que le joueur choisit.** Sa capacité n'en portait
+aucune, et le barrage tombait invariablement dans le coin du plateau, sur la
+zone d'extraction qui s'y trouve. Il pose désormais son obstacle sur l'une des
+huit cases voisines de son pion : barrer à distance retirerait une case d'entrée
+d'une zone sans dégarnir la couverture, que la règle fait payer par un pion
+posté dessus.
+
 **Les sols et les pions se distinguent par leur luminance, et le chargeur le
 vérifie.** Trois couleurs se tenaient en trois niveaux de gris — une zone
 ouverte, un lieu actif et le fugitif — et deux autres en neuf. Les dix sont
@@ -231,6 +238,12 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The Blocker closes the cell the player picks.** Its ability carried none, so
+the roadblock always landed in the board's corner, on the extraction zone that
+sits there. It now drops the obstacle on one of the eight cells around its
+piece: blocking at range would take an entry cell away from a zone without
+thinning the cover, which the rules make you pay for with a piece posted on it.
 
 **Grounds and pieces are told apart by luminance, and the loader checks it.**
 Three colours sat within three grey levels of each other — an open zone, an
