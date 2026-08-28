@@ -191,7 +191,7 @@ Les libellés de l'interface ne sont jamais dans le code : ils viennent d'un
 dictionnaire, et un plugin de langue en fournit un.
 
 ```
-mes-traductions/
+filature-de/
   manifest.toml
   language.toml
 ```
@@ -232,7 +232,7 @@ celui que désigne `--plugins` :
 ```
 filature.exe
 plugins/
-  mes-traductions/   le vôtre, ici
+  filature-de/   le vôtre, ici
 ```
 
 Rien à enregistrer, rien à recompiler : le dossier est lu au démarrage, et la

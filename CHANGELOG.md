@@ -30,6 +30,13 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Les exemples de plugin de la documentation se chargent.** Celui des langues
+montrait un dossier `mes-traductions/` et, deux lignes plus bas, un manifeste
+nommé `filature-de` — or le nom d'un plugin est celui de son dossier, et le
+chargeur refuse leur désaccord. C'était le second exemple à recopier qui ne
+passait pas, après celui du contrat de formes. Les trois manifestes que la
+documentation publie sont désormais passés au chargeur par la suite de tests.
+
 **Le contrat de formes annonçait un liseré deux fois trop fin.** Il le donnait
 pour une unité quand la constante en vaut deux, et se contredisait vingt-cinq
 lignes plus bas en écrivant « deux pixels de liseré ». Le schéma décrivait par
@@ -402,6 +409,13 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The documentation's plugin examples load.** The language one showed a
+`mes-traductions/` folder and, two lines below, a manifest named `filature-de` —
+but a plugin's name is its folder's, and the loader refuses their disagreement.
+It was the second copy-paste example that would not pass, after the shape
+contract's. All three manifests the documentation publishes now go through the
+loader in the test suite.
 
 **The shape contract announced a rim twice too thin.** It gave one unit where
 the constant is two, contradicting itself twenty-five lines later with "two
