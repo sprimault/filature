@@ -21,7 +21,7 @@ type manifesteLivre struct {
 // plateauPlat est un terrain dégagé, de quoi appliquer un effet sans dépendre
 // de la génération.
 //
-// Le test vit ici et non dans internal/noyau parce que celui-ci n'a aucune
+// Le test vit ici et non dans internal/core parce que celui-ci n'a aucune
 // dépendance disque : c'est sa définition, et lire un TOML l'enfreindrait.
 type plateauPlat struct{}
 

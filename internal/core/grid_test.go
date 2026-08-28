@@ -80,7 +80,7 @@ func TestReferenceBoards(t *testing.T) {
 
 			attendu, err := os.ReadFile(chemin)
 			if err != nil {
-				t.Fatalf("%v — lancer « go test ./internal/noyau -maj-attendus »", err)
+				t.Fatalf("%v — lancer « go test ./internal/core -maj-attendus »", err)
 			}
 			if string(attendu) != rendu {
 				t.Error("le plateau a changé — relancer avec -maj-attendus et relire le diff")

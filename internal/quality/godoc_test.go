@@ -1,7 +1,7 @@
 // Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
 // SPDX-License-Identifier: Apache-2.0
 
-// Package qualite porte les contrôles qui valent pour le dépôt entier plutôt
+// Package quality porte les contrôles qui valent pour le dépôt entier plutôt
 // que pour un paquet.
 package quality
 

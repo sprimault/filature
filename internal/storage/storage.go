@@ -1,7 +1,7 @@
 // Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
 // SPDX-License-Identifier: Apache-2.0
 
-// Package stockage persiste les parties dans SQLite.
+// Package storage persiste les parties dans SQLite.
 //
 // Le journal des coups est la source de vérité ; l'instantané n'est qu'un cache
 // de reprise rapide. C'est ce qui donne d'un coup la reprise, le rejeu pas à pas

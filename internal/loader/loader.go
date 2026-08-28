@@ -1,8 +1,12 @@
 // Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
 // SPDX-License-Identifier: Apache-2.0
 
-// Package plugins charge les extensions depuis le disque et les expose au
+// Package loader charge les extensions depuis le disque et les expose au
 // noyau sous forme de registre.
+//
+// Ne pas le nommer « plugins » : c'est le nom d'un paquet réel, à la racine du
+// dépôt, qui porte le contenu livré. Une godoc qui s'en réclamait envoyait son
+// lecteur sur l'autre.
 //
 // Le principe directeur : la donnée d'abord, le code seulement si nécessaire.
 // La grande majorité de ce qu'un moddeur veut faire — une capacité, une
