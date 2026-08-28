@@ -60,7 +60,10 @@ le haut. Le sol est donc `y = 0`, et une forme s'élève en `y` positif.
 | le sol — rue, zones | **aucune** | le losange, figé |
 | `building` | hauteur seule | l'emprise, qui est le losange |
 | `piece` — fugitif, inspecteur | libre, dans le gabarit | rien |
-| `marker` — trace, barrage, scène | libre, dans le gabarit | rien |
+| `marker` — trace, barrage | libre, dans le gabarit | rien |
+
+**Toute forme déclare son `role`**, y compris quand elle en surcharge une du
+contenu livré : c'est lui qui désigne le gabarit, et rien ne le déduit d'un nom.
 
 **Le sol ne se dessine pas.** Le losange est tracé par le moteur ; un plugin
 n'en change que la couleur, par la palette. Il n'existe donc pas de
@@ -183,6 +186,11 @@ captures.
 | `outline` | nom de palette | aucun |
 | `outline_thickness` | 1 à 4 | 1 |
 | `opacity` | 0 à 100 | 100 |
+
+**`outline_thickness = 0` est une faute, pas un raccourci pour « sans
+contour »** : c'est `outline` qui décide s'il y en a un. Une valeur absente vaut
+1, une valeur écrite doit tenir dans les bornes, et zéro est refusé au
+chargement comme au schéma.
 
 **`opacity` se paie.** Une valeur inférieure à 100 compose la couleur avec la
 case en dessous, contour compris : la même forme devient claire sur la rue et
@@ -364,6 +372,8 @@ description = "Le fugitif en voiture, les inspecteurs en gyrophare"
 shapes_version = 4
 
 [shape.fugitive]
+role = "piece"
+
 [[shape.fugitive.stroke]]
 type = "polygon"
 points = [[-16, 0], [16, 0], [14, 8], [8, 8], [4, 15], [-10, 15], [-14, 8]]
@@ -371,19 +381,25 @@ color = "fugitive_main"
 
 [[shape.fugitive.stroke]]
 type = "circle"
-center = [-9, 2]
+center = [-9, 4]
 radius = 3
 color = "fugitive_detail"
 
 [[shape.fugitive.stroke]]
 type = "circle"
-center = [9, 2]
+center = [9, 4]
 radius = 3
 color = "fugitive_detail"
 ```
 
 Rien d'autre n'est nécessaire. Le sol, les bâtiments et les inspecteurs restent
 ceux du jeu.
+
+**`role` se déclare même en surcharge**, et c'est le seul champ qui ne retombe
+pas sur le contenu livré : c'est lui qui décide du gabarit et du plan de
+coordonnées, donc de ce que la validation refuse. Le déduire du nom ferait
+dépendre un contrôle de jeu — une forme qui déborde masque les cases voisines —
+d'une table de noms que le contrat n'a aucune raison de tenir pour fermée.
 
 Deux plugins qui redéfinissent la même forme sont un conflit signalé au
 chargement, pas un écrasement silencieux.
@@ -392,19 +408,29 @@ chargement, pas un écrasement silencieux.
 
 ## 5. États
 
-Les états d'une forme — surlignée, hors de vue, sélectionnée — sont produits par
-le moteur : variation de teinte et contour. **Un plugin n'a rien à en
-déclarer.**
+Les deux états d'une forme — surlignée, hors de vue — sont produits par le
+moteur : variation de teinte et contour. **Un plugin n'a rien à en déclarer.**
 
-Il peut le faire, à titre optionnel, en nommant la variante :
+Il peut le faire, à titre optionnel, en nommant la variante. Les traits s'y
+écrivent comme ceux de l'état normal :
 
 ```toml
-[shape.fugitive.highlighted]
+[[shape.fugitive.highlighted]]
+type = "polygon"
+points = [[-14, 0], [14, 0], [12, 10], [-12, 10]]
+color = "fugitive_main"
 ```
 
 En son absence, la variante automatique s'applique. C'est le défaut recommandé :
 une forme qui déclare tous ses états sera fausse à la première évolution du
 rendu.
+
+**Deux états et pas davantage.** `highlighted` et `out_of_sight` sont des noms
+fixés, pas les clés d'une table ouverte : le moteur ne produit que ces deux-là,
+et accepter un état inventé reviendrait à l'ignorer ensuite en silence. La
+sélection n'en fait pas partie — le halo autour d'un pion est pris par le liseré
+(§2), et ce sont les surcouches `cell_visible` et `cell_playable` qui marquent
+le sol.
 
 ---
 
@@ -433,6 +459,7 @@ couleurs, pas des formes.
 Contrôles appliqués au chargement comme à la publication :
 
 - schéma respecté, `shapes_version` connue ;
+- `role` déclaré et connu — c'est lui qui désigne le gabarit à appliquer ;
 - tout point à l'intérieur du gabarit du rôle ;
 - nombre de traits sous le plafond, polygones de 3 à 32 sommets ;
 - toute `color` et tout `outline` résolus dans la palette active ;

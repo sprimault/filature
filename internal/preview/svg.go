@@ -35,11 +35,7 @@ func trait(s *strings.Builder, t render.Stroke, x, y, k float64, pal render.Pale
 	c := pal[t.Color]
 	mini := minDimension(t)
 
-	ep := t.OutlineThickness
-	if ep == 0 {
-		ep = 1
-	}
-	epContour := render.StrokeWidth(ep, k, mini)
+	epContour := render.StrokeWidth(t.Outlined(), k, mini)
 	epLisere := render.StrokeWidth(render.RimWidth, k, mini)
 
 	op := ""

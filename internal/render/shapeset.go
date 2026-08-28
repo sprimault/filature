@@ -294,8 +294,9 @@ func (j *ShapeSet) validerForme(nom string, f Shape) []error {
 	// Les variantes d'état suivent le même gabarit : une forme qui déborderait
 	// une fois surlignée masquerait ses voisines à ce moment-là, ce qui est le
 	// même avantage de jeu, simplement intermittent.
-	for _, etat := range triees(f.Variants) {
-		for i, t := range f.Variants[etat] {
+	variantes := f.Variants()
+	for _, etat := range triees(variantes) {
+		for i, t := range variantes[etat] {
 			manquements = append(manquements,
 				j.validerTrait(fmt.Sprintf("%s.%s[%d]", cle, etat, i), t, f.Role, gabarit)...)
 		}
@@ -375,8 +376,9 @@ func (j *ShapeSet) validerTrait(cle string, t Stroke, role Role, gabarit Templat
 		manquements = append(manquements, fmt.Errorf("%s.type: le rôle %s n'accepte que prism, reçu %q", cle, RoleBuilding, t.Type))
 	}
 
-	if t.OutlineThickness < 0 || t.OutlineThickness > 4 {
-		manquements = append(manquements, fmt.Errorf("%s.outline_thickness: %d, attendu de 1 à 4", cle, t.OutlineThickness))
+	if e := t.OutlineThickness; e != nil && (*e < 1 || *e > 4) {
+		manquements = append(manquements,
+			fmt.Errorf("%s.outline_thickness: %d, attendu de 1 à 4", cle, *e))
 	}
 	if t.Opacity < 0 || t.Opacity > 100 {
 		manquements = append(manquements, fmt.Errorf("%s.opacity: %d, attendu de 0 à 100", cle, t.Opacity))

@@ -30,6 +30,26 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le contrat de formes, son schéma et le chargeur disent enfin la même chose.**
+Ils divergeaient à trois voix sur les variantes d'état : le schéma déclarait
+`highlighted` et `out_of_sight`, le document les montrait, et le jeu décodait
+une table sous une clé `variant` que ni l'un ni l'autre n'accepte. Le jeu suit
+désormais le contrat publié, et une variante sous l'ancienne clé est refusée au
+lieu d'être perdue en silence. Le message de refus nomme la clé telle qu'elle
+s'écrit — il désignait jusqu'ici un chemin qu'aucun fichier chargeable ne
+pouvait contenir.
+
+**`role` devient obligatoire, y compris en surcharge.** C'est lui qui désigne le
+gabarit, donc ce que la validation refuse : le déduire d'un nom ferait dépendre
+un contrôle de jeu d'une table de noms que le contrat ne tient pas pour fermée.
+L'exemple de surcharge du §4 le déclare désormais — il était refusé au
+chargement pour cette raison, et pour une seconde : un de ses cercles débordait
+sous le sol.
+
+**Et `outline_thickness = 0` est refusé** au lieu d'être traité comme le défaut.
+Le schéma le refusait déjà et le message d'erreur annonçait « de 1 à 4 » ; seul
+le chargeur l'acceptait, faute de distinguer une valeur absente d'un zéro écrit.
+
 **Trois déclenchements que rien ne déclenchait quittent le vocabulaire.** Fin de
 tour, contact et révélation étaient ouverts aux capacités comme aux modes par le
 schéma et décrits un par un dans la documentation, sans qu'aucune ligne du noyau
@@ -292,6 +312,24 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The shape contract, its schema and the loader now say the same thing.** They
+diverged three ways on state variants: the schema declared `highlighted` and
+`out_of_sight`, the document showed them, and the game decoded a table under a
+`variant` key neither accepts. The game now follows the published contract, and
+a variant under the old key is refused instead of silently lost. The rejection
+message names the key as it is written — until now it pointed at a path no
+loadable file could contain.
+
+**`role` becomes mandatory, overrides included.** It designates the template,
+hence what validation refuses: deriving it from a name would make a gameplay
+check depend on a name table the contract does not hold closed. The §4 override
+example now declares it — it was refused at load time for that reason, and for a
+second one: one of its circles dipped below the ground.
+
+**And `outline_thickness = 0` is refused** instead of being treated as the
+default. The schema already refused it and the error message announced "1 to 4";
+only the loader accepted it, unable to tell an absent value from a written zero.
 
 **Three triggers that nothing triggered leave the vocabulary.** Turn end,
 contact and reveal were open to both abilities and modes in the schema and
