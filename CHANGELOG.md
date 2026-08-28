@@ -45,6 +45,13 @@ Le générateur de schémas passe enfin aux identifiants anglais, comme le reste
 dépôt, et perd un champ que rien ne lisait ni n'écrivait. Les schémas qu'il
 produit sont inchangés, octet pour octet.
 
+**`CONTRIBUTING` dit désormais la règle de langue qu'on suit, et non celle qu'on
+croyait suivre.** Elle exigeait des identifiants anglais sans distinguer ce
+qu'un autre paquet voit de ce qui ne quitte jamais son fichier ; un cinquième
+des fonctions du dépôt l'enfreignait, toutes des helpers de test. La contrainte
+porte maintenant sur ce qui est visible depuis l'extérieur, et un helper de test
+suit la langue de ce qu'il raconte.
+
 Deux points en sortent, parce qu'ils touchaient ce qu'on lit pour décider. Les
 chiffres que `plugins/base/palette.toml` commente étaient faux — le contraste
 annoncé sur une zone ouverte l'était de plus de quarante pour cent —, et ils se
@@ -67,6 +74,13 @@ subcommand is called `validate`.
 The schema generator finally moves to English identifiers, like the rest of the
 repository, and loses a field nothing read or wrote. The schemas it produces are
 unchanged, byte for byte.
+
+**`CONTRIBUTING` now states the language rule we follow, not the one we thought
+we followed.** It demanded English identifiers without distinguishing what
+another package sees from what never leaves its file; a fifth of the
+repository's functions broke it, all of them test helpers. The constraint now
+covers what is visible from outside, and a test helper follows the language of
+what it tells.
 
 Two of them stand out, because they touched what one reads to decide. The
 figures `plugins/base/palette.toml` comments were wrong — the announced contrast
