@@ -331,7 +331,15 @@ func (p *Game) expenseMoves() []Move {
 	var coups []Move
 	for _, cle := range cles {
 		d := p.Extensions.Expenses[cle]
-		if d.Camp != SideFugitive || d.Cost >= p.Fugitive.Stamina {
+
+		// Le déclenchement était déclaré par les cinq dépenses livrées et lu
+		// par personne : une dépense marquée « phase inspecteurs » se proposait
+		// quand même au fugitif, et son auteur n'avait aucun moyen de
+		// l'apprendre.
+		if d.Camp != SideFugitive || d.Trigger != OnFugitivePhase {
+			continue
+		}
+		if d.Cost >= p.Fugitive.Stamina {
 			continue
 		}
 		if d.Uses > 0 && p.ExpenseUses[cle] >= d.Uses {

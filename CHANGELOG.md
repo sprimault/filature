@@ -30,6 +30,20 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Trois déclenchements que rien ne déclenchait quittent le vocabulaire.** Fin de
+tour, contact et révélation étaient ouverts aux capacités comme aux modes par le
+schéma et décrits un par un dans la documentation, sans qu'aucune ligne du noyau
+ne les produise : un plugin qui s'y accrochait restait inerte sans un message.
+Les rétablir demandera de trancher ce qu'ils portent — lequel des pions au
+contact, une révélation avant ou après la dépense du silence —, et la première
+mécanique périodique retenue paiera ce coût en le sachant. Restent les deux
+phases pour ce qu'un joueur déclenche, et l'étranglement pour ce que le jeu
+déclenche lui-même, réservé aux modes.
+
+**Et la phase d'une dépense compte enfin.** Les cinq dépenses livrées la
+déclaraient, rien ne la lisait : une dépense annoncée sur la phase des
+inspecteurs se serait proposée au fugitif.
+
 **Le chargeur applique quatre familles de refus que le contrat publiait sans
 lui.** Une durée ou un rayon négatifs, une annonce posée sur autre chose qu'un
 effet différé, une échéance nulle, un mode sans nom ou sans effet, un
@@ -278,6 +292,20 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Three triggers that nothing triggered leave the vocabulary.** Turn end,
+contact and reveal were open to both abilities and modes in the schema and
+described one by one in the documentation, without a single line of the core
+producing them: a plugin hooking onto them stayed inert without a message.
+Restoring them will mean deciding what they carry — which of the pieces in
+contact, a reveal before or after the silence is spent — and the first periodic
+mechanic kept will pay that cost knowingly. What remains: the two phases for
+what a player triggers, and strangling for what the game triggers itself,
+reserved to modes.
+
+**And an expense's phase finally counts.** All five shipped expenses declared
+it, nothing read it: an expense announced on the inspectors' phase would have
+been offered to the fugitive.
 
 **The loader applies four families of rejection the contract published without
 it.** A negative duration or radius, an announcement on something other than a

@@ -94,10 +94,11 @@ func enumDuFichier(t *testing.T, cheminSchema string, chemin ...string) []string
 // son auteur aurait validé contre le contrat publié — et il n'aurait aucun
 // moyen de comprendre pourquoi.
 //
-// Les deux énumérations de déclenchement diffèrent d'un terme, et c'est voulu :
-// strangling est réservé aux modes. Le test le vérifie plutôt que de l'admettre,
-// parce que c'est la seule asymétrie du contrat et qu'elle se perdrait dans un
-// rapprochement à gros grain.
+// Les déclenchements se partagent entre les deux énumérations sans se recouvrir,
+// et c'est ce que le test vérifie : chacun est ouvert là où le noyau le
+// consulte, et leur réunion couvre les constantes. Un déclenchement ouvert des
+// deux côtés serait inerte d'un des deux, un déclenchement ouvert nulle part
+// serait une constante morte — les deux cas ont existé.
 func TestSchemaEnumsMatchTheVocabulary(t *testing.T) {
 	var primitives []string
 	for _, e := range core.EffectTypes() {
@@ -119,20 +120,20 @@ func TestSchemaEnumsMatchTheVocabulary(t *testing.T) {
 	for _, c := range constantesDuType(t, fset, chemin, "Trigger") {
 		declencheurs = append(declencheurs, c.valeur)
 	}
-	comparerListes(t, "les déclenchements d'un mode",
-		declencheurs, enumDuSchema(t, "$defs", "mode", "properties", "trigger", "enum"))
+	// Un mode ne se déclare que sur l'étranglement, seul moment que le jeu
+	// déclenche de lui-même ; une capacité ne s'y déclare jamais, un pion qui
+	// s'y accrocherait agissant sans que son camp l'ait joué.
+	mode := enumDuSchema(t, "$defs", "mode", "properties", "trigger", "enum")
+	comparerListes(t, "les déclenchements d'un mode", []string{string(core.OnStrangling)}, mode)
 
-	// Une capacité ne peut pas se déclarer sur l'étranglement : le jeu le
-	// déclenche de lui-même, et un pion qui s'y accrocherait agirait sans que
-	// son camp l'ait joué.
 	capacite := enumDuSchema(t, "$defs", "ability", "properties", "trigger", "enum")
 	if slices.Contains(capacite, string(core.OnStrangling)) {
 		t.Errorf("le schéma ouvre %q aux capacités, il est réservé aux modes", core.OnStrangling)
 	}
-	attendus := slices.DeleteFunc(slices.Clone(declencheurs), func(d string) bool {
-		return d == string(core.OnStrangling)
-	})
-	comparerListes(t, "les déclenchements d'une capacité", attendus, capacite)
+
+	// La réunion des deux couvre les constantes, sans recouvrement : c'est ce
+	// qui interdit qu'une valeur reste déclarée sans que rien ne la déclenche.
+	comparerListes(t, "les déclenchements", declencheurs, append(slices.Clone(capacite), mode...))
 }
 
 // TestContractVersionsMatchTheirSchemas rapproche les trois numéros de contrat
