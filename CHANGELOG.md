@@ -28,6 +28,36 @@ de version sont ce que lit un auteur de plugin étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
+## [Non publié]
+
+**Les textes internes du dépôt disent ce que le code fait.** Rien ici ne change
+le jeu ni les contrats : ce sont des commentaires, des godoc et des messages
+d'erreur qui avaient dérivé — des noms de paquets qui en désignaient un autre,
+des primitives citées sous leurs anciens noms, un compte de flux aléatoires
+faux, une commande d'aide qui ne marche pas.
+
+Deux points en sortent, parce qu'ils touchaient ce qu'on lit pour décider. Les
+chiffres que `plugins/base/palette.toml` commente étaient faux — le contraste
+annoncé sur une zone ouverte l'était de plus de quarante pour cent —, et ils se
+mesurent désormais sur la palette elle-même. Et la référence qui fige le grain
+du sol remplissait sa table avec la fonction qu'elle devait garder : changer le
+hachage ne la faisait pas rougir.
+
+***
+
+**The repository's internal texts say what the code does.** Nothing here changes
+the game or the contracts: these are comments, godoc and error messages that had
+drifted — package names pointing at a different package, primitives cited under
+their former names, a wrong count of random streams, a help command that does
+not work.
+
+Two of them stand out, because they touched what one reads to decide. The
+figures `plugins/base/palette.toml` comments were wrong — the announced contrast
+on an open zone by more than forty per cent — and they are now measured on the
+palette itself. And the reference freezing the ground grain filled its table
+with the very function it was meant to guard: changing the hash did not turn it
+red.
+
 ## [0.6.0] — 2026-08-28 — Le contrat de formes
 
 Étape 6 de la feuille de route. **Les cinq contrats publics du jeu — formes,
