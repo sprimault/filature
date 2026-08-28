@@ -30,6 +30,13 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Un effet différé annoncé par le fugitif ne livre plus sa position.** Son
+contexte porte sa case exacte, et la vue le servait tel quel aux inspecteurs :
+un plugin de règles qui aurait annoncé une dépense aurait donné la position
+dans le champ le plus discret du programme. Le camp caché annonce désormais
+qu'un effet vient et quand, jamais où — les inspecteurs, dont les positions
+sont publiques, gardent le leur.
+
 **Le silence se voit, se compte et se perd.** Trois défauts du même canal
 d'information. Les inspecteurs n'apprenaient jamais qu'un silence avait été
 payé, le drapeau retombant avant qu'ils reprennent la main : la vue porte
@@ -253,6 +260,13 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**A deferred effect announced by the fugitive no longer gives away his
+position.** Its context carries his exact cell, and the view served it to the
+inspectors as is: a rules plugin announcing a fugitive expense would have handed
+over the position through the quietest field in the program. The hidden side now
+announces that an effect is coming and when, never where — inspectors, whose
+positions are public, keep theirs.
 
 **Silence is seen, counted and lost.** Three faults on the same information
 channel. Inspectors never learnt that a silence had been paid, the flag dropping

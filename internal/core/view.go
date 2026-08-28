@@ -72,9 +72,12 @@ type View struct {
 
 	ZonesAnnoncees []int `json:"announced_zones"`
 
-	// AnnouncedEffects ne porte que les differer déclarés avec annonce, et les
-	// porte à l'identique pour les deux camps. Un differer sans annonce reste
-	// invisible jusqu'à sa résolution, sinon le champ le trahirait.
+	// AnnouncedEffects ne porte que les differer déclarés avec annonce. Un
+	// differer sans annonce reste invisible jusqu'à sa résolution, sinon le
+	// champ le trahirait.
+	//
+	// Celui qu'un fugitif a posé arrive aux inspecteurs sans son contexte : ils
+	// savent qu'un effet vient et quand, jamais où.
 	AnnouncedEffects []PendingEffect `json:"announced_effects"`
 
 	Outcome *Outcome `json:"outcome,omitempty"`
@@ -126,7 +129,7 @@ func (p *Game) ViewFor(a Side) View {
 		LegalMoves:       list(p.LegalMoves(a)),
 		ProchaineReveal:  p.nextReveal(),
 		DernierSilence:   p.Fugitive.SilenceTurn,
-		AnnouncedEffects: list(p.announcedEffects()),
+		AnnouncedEffects: list(p.announcedEffects(a)),
 	}
 	v.ZonesAnnoncees = list(p.announcedZones(v.AnnouncedEffects))
 
@@ -305,16 +308,30 @@ func (p *Game) nextReveal() int {
 	return 0
 }
 
-// announcedEffects rend les différés que les deux camps ont le droit de voir.
+// announcedEffects rend les différés qu'un camp a le droit de voir.
 //
 // Un differer sans annonce n'y figure pas : le champ le trahirait, alors que
 // c'est justement le choix de son auteur de ne pas prévenir.
-func (p *Game) announcedEffects() []PendingEffect {
+//
+// Le contexte d'un differer posé par le fugitif part vidé de tout sauf son
+// camp. Il porte sa case exacte — spend l'y met pour que le leurre sache où
+// poser sa trace — et parfois la zone qu'il vient de sceller : le servir tel
+// quel donnerait aux inspecteurs, par la bande, ce que la vue leur tait
+// partout ailleurs. Ils apprennent qu'un effet arrive et quand, jamais où.
+//
+// Aucun contenu livré n'emprunte ce chemin, le seul differer annoncé étant
+// celui du Chef, côté inspecteurs. C'est un plugin de règles qui l'ouvrirait,
+// et checkEffects ne regarde ni announced ni le camp qui le déclare.
+func (p *Game) announcedEffects(a Side) []PendingEffect {
 	var annonces []PendingEffect
 	for _, e := range p.PendingEffects {
-		if e.Announced {
-			annonces = append(annonces, e)
+		if !e.Announced {
+			continue
 		}
+		if a == SideInspectors && e.EffectContext.Side == SideFugitive {
+			e.EffectContext = EffectContext{Side: SideFugitive}
+		}
+		annonces = append(annonces, e)
 	}
 	return annonces
 }
@@ -334,7 +351,13 @@ func (p *Game) announcedZones(annonces []PendingEffect) []int {
 	if zone, prevue := p.zoneToStrangleAt(p.Turn + p.Settings.StranglingNotice); prevue {
 		zones = append(zones, zone)
 	}
+	// Ceux du fugitif ne comptent pas : leur contexte est vidé avant de partir
+	// aux inspecteurs, donc leur zone y vaut zéro — l'annoncer désignerait la
+	// zone 0 sans que personne l'ait décidé.
 	for _, e := range annonces {
+		if e.EffectContext.Side == SideFugitive {
+			continue
+		}
 		for _, effet := range e.Effects {
 			if effet.Type == EffectCloseZone {
 				zones = append(zones, e.EffectContext.Zone)

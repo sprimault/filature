@@ -198,6 +198,87 @@ func TestTrackerExtendsRange(t *testing.T) {
 	}
 }
 
+// TestAnnouncedDeferHidesTheFugitiveContext vérifie qu'un differer annoncé par
+// le fugitif ne livre pas sa case aux inspecteurs.
+//
+// spend pose la position du fugitif dans le contexte, pour que le leurre sache
+// où poser sa trace. Servi tel quel, il donnerait par la bande ce que la vue
+// tait partout ailleurs — la position exacte, dans le champ le plus discret du
+// programme.
+//
+// La dépense est jouée, pas construite : c'est spend qui remplit ce contexte,
+// et un test qui poserait la file lui-même n'exercerait pas le chemin fautif.
+func TestAnnouncedDeferHidesTheFugitiveContext(t *testing.T) {
+	p := hiddenGame()
+	p.Extensions.Expenses["plot"] = Ability{
+		Name: "Complot", Camp: SideFugitive, Cost: 1,
+		Trigger: OnFugitivePhase,
+		Effects: []Effect{{
+			Type: EffectDefer, Duration: 2, Announced: true,
+			Then: []Effect{{Type: EffectBlockCell, Target: TargetCell, Duration: 1}},
+		}},
+	}
+
+	var achat Move
+	for _, c := range p.LegalMoves(SideFugitive) {
+		if c.Type == MoveExpense && c.Expense == "plot" {
+			achat = c
+			break
+		}
+	}
+	if achat.Type != MoveExpense {
+		t.Fatal("la dépense n'est proposée à aucun coup légal")
+	}
+	if err := p.Apply(achat); err != nil {
+		t.Fatal(err)
+	}
+
+	vues := p.ViewFor(SideInspectors).AnnouncedEffects
+	if len(vues) != 1 {
+		t.Fatalf("%d effet(s) annoncé(s) chez les inspecteurs, un seul attendu", len(vues))
+	}
+	if got := vues[0].EffectContext.Case; got != (Position{}) {
+		t.Errorf("le contexte livre la case %v, qui est celle du fugitif", got)
+	}
+	if got := vues[0].EffectContext; got != (EffectContext{Side: SideFugitive}) {
+		t.Errorf("contexte servi %+v, attendu vide hormis le camp", got)
+	}
+
+	// Le fugitif, lui, garde le sien : c'est le sien.
+	siennes := p.ViewFor(SideFugitive).AnnouncedEffects
+	if len(siennes) != 1 {
+		t.Fatalf("%d effet(s) annoncé(s) chez le fugitif, un seul attendu", len(siennes))
+	}
+	if got := siennes[0].EffectContext.Case; got != p.Fugitive.Position {
+		t.Errorf("le fugitif lit la case %v, attendu la sienne %v", got, p.Fugitive.Position)
+	}
+}
+
+// TestAnnouncedDeferKeepsTheInspectorContext vérifie que le masquage ne porte
+// que sur le camp caché.
+//
+// Les positions des inspecteurs sont publiques : masquer leur contexte
+// retirerait à l'annonce ce qu'elle apporte — un barrage annoncé sans sa case
+// ne se contourne pas, et le fugitif ne pourrait plus rien planifier.
+func TestAnnouncedDeferKeepsTheInspectorContext(t *testing.T) {
+	p := hiddenGame()
+	cible := Position{Column: 3, Row: 1}
+	if _, err := p.ApplyOneEffect(
+		Effect{Type: EffectDefer, Duration: 2, Announced: true,
+			Then: []Effect{{Type: EffectBlockCell, Target: TargetCell, Duration: 3}}},
+		EffectContext{Side: SideInspectors, Piece: 0, Case: cible}); err != nil {
+		t.Fatal(err)
+	}
+
+	vues := p.ViewFor(SideFugitive).AnnouncedEffects
+	if len(vues) != 1 {
+		t.Fatalf("%d effet(s) annoncé(s), un seul attendu", len(vues))
+	}
+	if got := vues[0].EffectContext.Case; got != cible {
+		t.Errorf("case annoncée %v, attendu %v", got, cible)
+	}
+}
+
 // TestNextRevealHitsZeroOnItsTurn vérifie le compte à rebours de révélation,
 // zéro compris.
 //
