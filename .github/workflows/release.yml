@@ -33,18 +33,22 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: windows, arch: amd64, cgo: 0, runner: ubuntu-latest, ext: .exe }
+          # publier est posé sur chaque ligne, jamais laissé absent : une clé
+          # manquante vaut null, que « != false » compare en convertissant les
+          # deux en nombre — null et false valent zéro, donc la condition était
+          # fausse partout et aucune archive n'était téléversée.
+          - { os: windows, arch: amd64, cgo: 0, runner: ubuntu-latest, ext: .exe, publier: true }
           # js/wasm se compile mais ne se publie pas : l'archive serait
           # inutilisable seule, faute de wasm_exec.js et d'une page HTML, et le
           # mode web n'est pas au programme. La cible reste ici parce qu'elle est
           # ce qui empêche une dépendance d'introduire du cgo sans qu'on le voie.
           - { os: js, arch: wasm, cgo: 0, runner: ubuntu-latest, ext: .wasm, publier: false }
-          - { os: linux, arch: amd64, cgo: 1, runner: ubuntu-latest, ext: "" }
-          - { os: linux, arch: arm64, cgo: 1, runner: ubuntu-24.04-arm, ext: "" }
-          - { os: darwin, arch: arm64, cgo: 1, runner: macos-latest, ext: "" }
+          - { os: linux, arch: amd64, cgo: 1, runner: ubuntu-latest, ext: "", publier: true }
+          - { os: linux, arch: arm64, cgo: 1, runner: ubuntu-24.04-arm, ext: "", publier: true }
+          - { os: darwin, arch: arm64, cgo: 1, runner: macos-latest, ext: "", publier: true }
           # macos-15-intel est la dernière image x86_64 des runners, annoncée
           # jusqu'en août 2027. Cette ligne a une date de péremption connue.
-          - { os: darwin, arch: amd64, cgo: 1, runner: macos-15-intel, ext: "" }
+          - { os: darwin, arch: amd64, cgo: 1, runner: macos-15-intel, ext: "", publier: true }
     steps:
       - uses: actions/checkout@v7
 
@@ -101,7 +105,7 @@ jobs:
           fi
 
       - uses: actions/upload-artifact@v7
-        if: matrix.publier != false
+        if: matrix.publier
         with:
           name: archive-${{ matrix.os }}-${{ matrix.arch }}
           path: dist/*
@@ -132,6 +136,15 @@ jobs:
       # l'archive que la personne télécharge, donc ce qu'elle peut vérifier.
       - name: SHA256SUMS
         run: |
+          # Un dossier absent veut dire qu'aucun job de compilation n'a
+          # téléversé son archive, et « cd: No such file or directory » ne le dit
+          # pas — il faut alors remonter au job précédent pour comprendre. C'est
+          # arrivé sur une condition de matrice qui valait faux partout.
+          if [ ! -d recu ] || [ -z "$(ls -A recu)" ]; then
+            echo "aucune archive reçue des jobs de compilation" >&2
+            exit 1
+          fi
+
           cd recu
           sha256sum * > SHA256SUMS
           cat SHA256SUMS
