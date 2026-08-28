@@ -44,11 +44,11 @@
     "EffectContext": {
       "type": "object",
       "properties": {
-        "autre_pion": {
-          "type": "integer"
-        },
         "cell": {
           "$ref": "#/$defs/Position"
+        },
+        "other_piece": {
+          "type": "integer"
         },
         "piece": {
           "type": "integer"
@@ -64,8 +64,8 @@
         }
       },
       "required": [
-        "autre_pion",
         "cell",
+        "other_piece",
         "piece",
         "side",
         "toward",

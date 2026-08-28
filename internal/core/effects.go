@@ -211,7 +211,7 @@ func (a ActiveEffect) Aims(pion int) bool {
 	case TargetCurrentPiece:
 		return a.EffectContext.Piece == pion
 	case TargetOtherPiece:
-		return a.EffectContext.AutrePion == pion
+		return a.EffectContext.OtherPiece == pion
 	}
 	return false
 }
@@ -230,11 +230,11 @@ type EffectContext struct {
 	// Toward, exactement comme un pas réel produit la sienne.
 	Toward Position `json:"toward"`
 
-	// AutrePion est le second pion d'un effet qui en relie deux, celui que
+	// OtherPiece est le second pion d'un effet qui en relie deux, celui que
 	// vise other_piece. Aucune capacité livrée ne l'emploie depuis que le Chef
 	// force une révélation au lieu de partager une vue : la cible reste au
 	// contrat pour les plugins, et Aims la sait lire.
-	AutrePion int `json:"autre_pion"`
+	OtherPiece int `json:"other_piece"`
 }
 
 // ApplyOneEffect exécute un effet et renvoie de quoi le défaire.

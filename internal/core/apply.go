@@ -286,7 +286,7 @@ func (p *Game) triggerAbility(c Move) ([]func(), error) {
 		return nil, fmt.Errorf("capacite inconnue: %s", c.Ability)
 	}
 
-	ctx := EffectContext{Side: c.Side, Piece: c.Piece, Case: c.To, Zone: c.Zone, AutrePion: c.Piece}
+	ctx := EffectContext{Side: c.Side, Piece: c.Piece, Case: c.To, Zone: c.Zone, OtherPiece: c.Piece}
 	defaire, err := p.applyEffects(capacite.Effects, ctx)
 	if err != nil {
 		return nil, err
