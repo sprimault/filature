@@ -377,6 +377,47 @@ func TestUndoRestoresState(t *testing.T) {
 	}
 }
 
+// TestClosedZonesEmptyBackToNil vérifie qu'une liste de zones fermées vidée
+// par une réouverture redevient nulle.
+//
+// Une tranche vide se sérialise en [] là où nil donne null, et ClosedZones part
+// au journal sans omitempty : deux états que rien ne distingue en jeu s'y
+// relisent différemment, et le rejeu cesse d'être identique octet pour octet.
+//
+// Les deux tests voisins ne l'atteignent pas : l'un repart d'un jeu neuf à
+// chaque cas, l'autre prépare une liste qui ne se vide jamais. C'est la seule
+// zone fermée qu'il faut retirer pour que le défaut apparaisse.
+func TestClosedZonesEmptyBackToNil(t *testing.T) {
+	p := testGame()
+	if p.ClosedZones != nil {
+		t.Fatalf("liste de départ %v, attendue nulle", p.ClosedZones)
+	}
+	ctx := EffectContext{Side: SideInspectors, Zone: 2}
+
+	fermer, err := p.ApplyOneEffect(Effect{Type: EffectCloseZone, Target: TargetZone}, ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(p.ClosedZones) != 1 {
+		t.Fatalf("zones fermées %v, attendue la seule 2", p.ClosedZones)
+	}
+
+	rouvrir, err := p.ApplyOneEffect(Effect{Type: EffectOpenZone, Target: TargetZone}, ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.ClosedZones != nil {
+		t.Errorf("après réouverture, liste %#v, attendue nulle", p.ClosedZones)
+	}
+
+	// Et l'aller-retour complet rend l'état de départ, sentinelle comprise.
+	rouvrir()
+	fermer()
+	if p.ClosedZones != nil {
+		t.Errorf("après annulation, liste %#v, attendue nulle", p.ClosedZones)
+	}
+}
+
 // TestUndoInSequence vérifie que plusieurs effets se défont dans l'ordre
 // inverse, ce dont les annulations qui tronquent une tranche dépendent.
 func TestUndoInSequence(t *testing.T) {

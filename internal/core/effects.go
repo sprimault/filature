@@ -359,13 +359,19 @@ func (p *Game) activate(e Effect, ctx EffectContext) func() {
 
 // truncate retire la dernière entrée d'une tranche, et rend nil quand elle se
 // vide.
+func truncate[T any](s []T) []T { return removeAt(s, len(s)-1) }
+
+// removeAt retire l'entrée de rang donné, et rend nil quand la tranche se vide.
 //
 // La remise à nil n'est pas cosmétique : une tranche vide se sérialise en []
 // là où nil donne null. Sans elle, appliquer puis annuler un effet laisserait
 // un état qui se relit différemment, et le rejeu du journal cesserait d'être
 // identique octet pour octet.
-func truncate[T any](s []T) []T {
-	if s = s[:len(s)-1]; len(s) == 0 {
+//
+// Point unique parce que le geste s'oublie : truncate le faisait depuis le
+// début, et la réouverture de zone, qui retire au milieu, ne le faisait pas.
+func removeAt[T any](s []T, i int) []T {
+	if s = append(s[:i], s[i+1:]...); len(s) == 0 {
 		return nil
 	}
 	return s
@@ -484,7 +490,7 @@ func (p *Game) toggleZone(zone int, fermer bool) func() {
 	if rang < 0 {
 		return func() {}
 	}
-	p.ClosedZones = append(p.ClosedZones[:rang], p.ClosedZones[rang+1:]...)
+	p.ClosedZones = removeAt(p.ClosedZones, rang)
 	return func() {
 		p.ClosedZones = append(p.ClosedZones, 0)
 		copy(p.ClosedZones[rang+1:], p.ClosedZones[rang:])

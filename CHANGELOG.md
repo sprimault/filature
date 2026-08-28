@@ -30,6 +30,12 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Rouvrir la dernière zone fermée laissait un état qui se relit autrement.** Le
+retrait au milieu d'une liste ne rendait pas la tranche à nul quand elle se
+vidait, alors que la troncature le faisait : `[]` au journal là où `null` était
+attendu, sur un champ qui décide du rejeu octet pour octet. Le geste est
+désormais écrit une seule fois.
+
 **Un effet différé annoncé par le fugitif ne livre plus sa position.** Son
 contexte porte sa case exacte, et la vue le servait tel quel aux inspecteurs :
 un plugin de règles qui aurait annoncé une dépense aurait donné la position
@@ -260,6 +266,11 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Reopening the last closed zone left a state that reads back differently.**
+Removing from the middle of a list did not return the slice to nil when it
+emptied, where truncation did: `[]` in the journal where `null` was expected, on
+a field that decides byte-for-byte replay. The gesture is now written once.
 
 **A deferred effect announced by the fugitive no longer gives away his
 position.** Its context carries his exact cell, and the view served it to the
