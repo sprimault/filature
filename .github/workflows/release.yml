@@ -198,7 +198,7 @@ jobs:
           cat notes.md
 
       # En brouillon : une dernière relecture avant que la version soit visible,
-      # et c'est là que s'annonce un version_formes ou un version_effets qui
+      # et c'est là que s'annonce un shapes_version ou un effects_version qui
       # change — l'événement le plus coûteux du projet.
       - name: Version en brouillon
         if: startsWith(github.ref, 'refs/tags/')
