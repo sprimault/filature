@@ -105,10 +105,15 @@ n'importe quelle case claire **hors du noyau**, sans connaître sa position exac
 sorties ou resserrer autour du centre.
 
 **Les inspecteurs ne commencent pas dans le quartier où le fugitif se cache.**
-Sans cette interdiction, cinq pions posés au mieux autour du centre voient plus
-de neuf dixièmes du noyau dès le premier tour : l'invisibilité que le §1 promet
-au fugitif n'existe alors pas, et le placement cesse d'être un choix puisque
-resserrer domine.
+Sans cette interdiction, cinq pions posés au mieux voient de six à neuf dixièmes
+du noyau dès le premier tour selon le préréglage, contre un quart à la moitié
+avec elle : l'invisibilité que le §1 promet au fugitif n'existerait pas, et le
+placement cesserait d'être un choix puisque resserrer dominerait.
+
+Ces deux chiffres sont tenus par un test de caractérisation, qui pose le
+placement le plus couvrant que la règle autorise et compte ce qu'il découvre. Le
+premier valait plus de neuf dixièmes quand la mesure a produit la règle ; il a
+baissé depuis, la génération ayant changé de densité et le noyau de rayon.
 
 Le rayon suit le côté pour la même raison. À rayon fixe, la portée de vue
 grandit avec le plateau pendant que le noyau ne bouge pas : c'est la plus grande
