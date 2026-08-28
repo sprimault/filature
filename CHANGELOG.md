@@ -30,6 +30,14 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le vocabulaire des effets annonçait des paramètres qui n'existent pas.** Trois
+primitives de zone déclaraient un champ `zone` qu'un effet ne porte pas — la
+zone vient du coup —, et un manifeste qui l'écrirait est refusé pour champ
+inconnu. `step` annonçait un `value` que le noyau ne consulte jamais. Les
+tableaux du document sont désormais rapprochés des champs que le jeu décode :
+c'était un contrat public de dix-huit primitives dont rien ne gardait les
+colonnes.
+
 **Le document qui fait foi cesse de se contredire.** Le §5 donnait le contact
 pour rompu dès que le fugitif s'écarte, alors que quatre de ses huit pas le
 maintiennent — et c'est un contact maintenu qui capture. Le §11 annonçait quatre
@@ -374,6 +382,13 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The effects vocabulary announced parameters that do not exist.** Three zone
+primitives declared a `zone` field an effect does not carry — the zone comes
+from the move — and a manifest writing it is refused for an unknown field.
+`step` announced a `value` the core never reads. The document's tables are now
+checked against the fields the game decodes: this was a public contract of
+eighteen primitives whose columns nothing guarded.
 
 **The authoritative document stops contradicting itself.** §5 held contact
 broken as soon as the fugitive steps away, when four of his eight steps keep it

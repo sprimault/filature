@@ -43,6 +43,13 @@ Ajouter une primitive est une décision lourde : elle entre dans le contrat
 public et ne peut plus en sortir sans casser les plugins existants. Avant d'en
 ajouter une, vérifier que la composition des existantes ne suffit pas.
 
+**La colonne « Paramètres » nomme les champs de l'effet que la primitive lit, et
+rien d'autre.** Ce qui vient du coup — la case, la zone, le pion visé — n'y
+figure pas : le §4 le décrit une fois pour toutes, et un manifeste qui
+l'écrirait serait refusé pour champ inconnu. Trois lignes ont annoncé un `zone`
+qui n'existe pas dans un effet, et `step` un `value` que rien ne lit ; les deux
+menaient un auteur à écrire ce que le chargeur refuse ou ce que le jeu ignore.
+
 **Une `duration` de 1 vaut le tour courant, et une `duration` absente vaut la
 partie entière.** C'est ce dont la capacité passive du Traqueur a besoin : elle
 n'a pas de déclenchement, donc pas de tour où la reconduire, et une échéance en
@@ -54,7 +61,7 @@ qu'il existe précisément pour ne pas faire.
 
 | Type | Paramètres | Effet |
 |---|---|---|
-| `step` | `target`, `value` (cases) | Déplace un pion, sans consommer son quota de tour |
+| `step` | `target` | Déplace un pion, sans consommer son quota de tour |
 | `teleport` | `target` | Place un pion sur la case du contexte |
 | `change_mobility` | `target`, `value`, `duration`, `mode` | Ajoute des cases de déplacement pour la durée |
 
@@ -103,9 +110,9 @@ partie.
 |---|---|---|
 | `block_cell` | `target`, `duration` | Ferme une case ; bloque le déplacement **et la vue** |
 | `open_cell` | `target`, `duration` | Rouvre une case bâtie |
-| `close_zone` | `target`, `zone` | Neutralise un point d'extraction |
-| `open_zone` | `target`, `zone` | Le rouvre |
-| `seal_zone` | `target`, `zone` | Désigne la zone que le fugitif vise |
+| `close_zone` | `target` | Neutralise un point d'extraction |
+| `open_zone` | `target` | Le rouvre |
+| `seal_zone` | `target` | Désigne la zone que le fugitif vise |
 
 `seal_zone` écrit la zone scellée sans permettre de la lire. C'est la seule
 façon d'exprimer le changement de zone, que la règle facture 2 points, et un
