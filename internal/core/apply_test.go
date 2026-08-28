@@ -68,6 +68,18 @@ func firstMove(t *testing.T, p *Game, a Side, typ MoveType) Move {
 	return Move{}
 }
 
+// stepTo rend le déplacement d'un pion d'inspecteur vers une case donnée.
+func stepTo(t *testing.T, p *Game, pion int, arrivee Position) Move {
+	t.Helper()
+	for _, c := range p.LegalMoves(SideInspectors) {
+		if c.Type == MoveStep && c.Piece == pion && c.To == arrivee {
+			return c
+		}
+	}
+	t.Fatalf("aucun déplacement du pion %d vers %v", pion, arrivee)
+	return Move{}
+}
+
 // TestIllegalMoveRejected vérifie qu'un coup absent de la liste est rejeté, et
 // qu'il ne laisse aucune trace.
 //
@@ -239,6 +251,93 @@ func TestOneAbilityPerTurn(t *testing.T) {
 	}
 	if p.AbilityPlayed || p.Inspectors[c.Piece].AbilityUsed {
 		t.Error("l'annulation n'a pas rendu les marques de capacité")
+	}
+}
+
+// TestAbilitySpentForTheWholeGame vérifie que les deux marques n'ont pas la
+// même portée : le camp retrouve son droit au tour suivant, le pion jamais.
+//
+// docs/regles.md §5 : « une seule par tour, une seule fois par pion et par
+// partie ». Le test voisin ne lit AbilityUsed qu'après une annulation, donc il
+// passerait tout aussi bien si la marque du pion n'était jamais posée.
+func TestAbilitySpentForTheWholeGame(t *testing.T) {
+	p := playableGame()
+	p.Phase = PhaseInspectors
+	p.Inspectors[0].Ability = "lookout"
+	p.Inspectors[1].Ability = "lookout"
+
+	c := firstMove(t, p, SideInspectors, MoveAbility)
+	if err := p.Apply(c); err != nil {
+		t.Fatal(err)
+	}
+	if !p.Inspectors[c.Piece].AbilityUsed {
+		t.Fatalf("le pion %d n'est pas marqué comme ayant employé sa capacité", c.Piece)
+	}
+
+	endTurn(t, p)
+
+	if p.AbilityPlayed {
+		t.Error("le camp n'a pas retrouvé son droit de capacité au tour suivant")
+	}
+	if !p.Inspectors[c.Piece].AbilityUsed {
+		t.Errorf("le pion %d a retrouvé une capacité qui s'épuise pour la partie", c.Piece)
+	}
+
+	// L'autre pion porte la même capacité et ne l'a pas jouée : c'est lui, et
+	// lui seul, que la liste doit offrir.
+	var offerts []int
+	for _, l := range p.LegalMoves(SideInspectors) {
+		if l.Type == MoveAbility {
+			offerts = append(offerts, l.Piece)
+		}
+	}
+	for _, pion := range offerts {
+		if pion == c.Piece {
+			t.Errorf("le pion %d se voit reproposer sa capacité", pion)
+		}
+	}
+	if len(offerts) == 0 {
+		t.Error("le pion qui n'a rien joué n'a plus de capacité non plus")
+	}
+}
+
+// TestSpottingRewardsOncePerTurn vérifie que le pas gagné au repérage ne se
+// gagne qu'une fois par tour et par pion.
+//
+// Sans cette garde, un pion qui entre et sort d'une ligne de vue empocherait un
+// pas à chaque aller : la compensation de la téléportation supprimée
+// (docs/regles.md §2) deviendrait un déplacement illimité.
+func TestSpottingRewardsOncePerTurn(t *testing.T) {
+	p := gameOn(grid(
+		".....",
+		".....",
+		".....",
+		".....",
+		".....",
+	), Position{Column: 4, Row: 2}, Position{Column: 1, Row: 1})
+	p.Phase = PhaseInspectors
+
+	// (1,1) ne voit rien : le fugitif n'est ni sur sa ligne, ni sur sa
+	// colonne, ni sur une de ses diagonales.
+	if err := p.Apply(stepTo(t, p, 0, Position{Column: 1, Row: 2})); err != nil {
+		t.Fatal(err)
+	}
+	if got := p.MobilityOf(SideInspectors, 0); got != 2 {
+		t.Fatalf("mobilité %d après le repérage, attendu 2", got)
+	}
+
+	// Le second pas le laisse en vue, plus près encore. Le pas gagné ne se
+	// regagne pas.
+	if err := p.Apply(stepTo(t, p, 0, Position{Column: 2, Row: 2})); err != nil {
+		t.Fatal(err)
+	}
+	if got := p.MobilityOf(SideInspectors, 0); got != 2 {
+		t.Errorf("mobilité %d après un second repérage, attendu 2", got)
+	}
+	for _, c := range p.LegalMoves(SideInspectors) {
+		if c.Type == MoveStep && c.Piece == 0 {
+			t.Errorf("troisième déplacement vers %v offert au même pion", c.To)
+		}
 	}
 }
 
