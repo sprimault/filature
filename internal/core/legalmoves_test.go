@@ -402,6 +402,35 @@ func TestPassiveAbilityCarriesNoCell(t *testing.T) {
 	}
 }
 
+// TestExpenseNeedsTheFugitivePhase vérifie qu'une dépense déclarée sur un autre
+// moment n'est pas proposée.
+//
+// Le déclenchement était écrit par les cinq dépenses livrées et lu par
+// personne : celle qui aurait annoncé la phase des inspecteurs se serait quand
+// même proposée au fugitif, et son auteur n'avait aucun moyen de l'apprendre.
+func TestExpenseNeedsTheFugitivePhase(t *testing.T) {
+	p := playableGame()
+	p.Extensions.Expenses["ailleurs"] = Ability{
+		Name: "Ailleurs", Camp: SideFugitive, Cost: 1,
+		Trigger: OnInspectorsPhase,
+		Effects: []Effect{{Type: EffectCostStamina, Target: TargetFugitive, Value: 1}},
+	}
+
+	proposees := map[Expense]bool{}
+	for _, c := range p.LegalMoves(SideFugitive) {
+		if c.Type == MoveExpense {
+			proposees[c.Expense] = true
+		}
+	}
+
+	if proposees["ailleurs"] {
+		t.Error("une dépense déclarée sur la phase des inspecteurs est proposée au fugitif")
+	}
+	if !proposees[ExpenseSilence] {
+		t.Error("le silence, déclaré sur la bonne phase, n'est plus proposé")
+	}
+}
+
 // TestInspectorsOrthogonalOnly vérifie qu'ils n'ont pas les diagonales.
 func TestInspectorsOrthogonalOnly(t *testing.T) {
 	p := gameOn(grid(

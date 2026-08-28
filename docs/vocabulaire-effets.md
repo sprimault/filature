@@ -231,17 +231,30 @@ plugins, et le noyau sait la lire.
 
 ## 5. Déclenchements
 
-| Déclenchement | Quand |
-|---|---|
-| `inspectors_phase` | Pendant leur phase, au choix du joueur |
-| `fugitive_phase` | Pendant la sienne |
-| `turn_end` | Automatique, à la résolution |
-| `contact` | Quand le fugitif est adjacent à un inspecteur |
-| `reveal` | Au tour d'une révélation périodique |
-| `strangling` | Au tour où une zone se ferme — **réservé aux modes** |
+| Déclenchement | Quand | Où |
+|---|---|---|
+| `inspectors_phase` | Pendant leur phase, au choix du joueur | capacité |
+| `fugitive_phase` | Pendant la sienne, au choix du joueur | dépense |
+| `strangling` | Au tour où une zone se ferme | **mode seulement** |
 
 Une capacité `passive = true` n'a pas de déclenchement : elle s'applique en
 permanence, tant que le pion est en jeu.
+
+**Trois et pas davantage, un par endroit où le noyau consulte le registre.** Les
+deux phases portent ce qu'un joueur choisit ; l'étranglement est le seul moment
+que le jeu déclenche de lui-même, d'où sa réserve aux modes — un pion qui s'y
+accrocherait agirait sans que son camp l'ait joué.
+
+**La cadence est en dur dans le noyau.** Le vocabulaire ne sait exprimer que
+celle de l'étranglement, dont le début et la période sont des paramètres de
+partie ; rien ne dit « tous les cinq tours » ni « à chaque fin de tour ». Ce
+document a listé pendant des mois trois déclenchements de plus — `turn_end`,
+`contact`, `reveal` — que le noyau ne produisait nulle part : un plugin qui s'y
+accrochait restait inerte sans un message. Ils ont été retirés plutôt que
+branchés, parce que les brancher demande de trancher ce qu'ils portent —
+lequel des trois pions au contact, une révélation avant ou après la dépense du
+silence —, et qu'un déclenchement entre au contrat public sans en ressortir. La
+première mécanique périodique retenue paiera ce coût, en connaissance de cause.
 
 ---
 

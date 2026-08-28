@@ -18,14 +18,19 @@ const EffectsVersion = 3
 // Trigger dit quand une capacité ou un mode entre en jeu.
 type Trigger string
 
-// Les six moments de déclenchement. OnContact et OnReveal n'ont aucun
-// usage dans le contenu livré : ils existent pour les plugins de règles.
+// Les trois moments de déclenchement, un par endroit où le noyau consulte le
+// registre : les deux phases pour ce qu'un joueur déclenche, l'étranglement
+// pour ce que le jeu déclenche lui-même.
+//
+// Ils étaient six. Fin de tour, contact et révélation n'apparaissaient qu'ici
+// et dans Triggers : aucun code ne les produisait, donc un plugin qui s'y
+// accrochait restait inerte sans un mot. Les rétablir demandera de trancher ce
+// qu'ils portent — lequel des trois pions au contact, une révélation avant ou
+// après la dépense du silence —, et c'est une décision de contrat public, pas
+// du câblage.
 const (
 	OnInspectorsPhase Trigger = "inspectors_phase"
 	OnFugitivePhase   Trigger = "fugitive_phase"
-	OnTurnEnd         Trigger = "turn_end"
-	OnContact         Trigger = "contact"
-	OnReveal          Trigger = "reveal"
 	OnStrangling      Trigger = "strangling"
 )
 
@@ -37,11 +42,11 @@ const (
 // manifeste pouvait poser n'importe quelle chaîne dans trigger — le contrôle
 // n'existait pas, et une capacité mal déclarée n'entrait jamais en jeu sans
 // qu'un message le dise.
+//
+// Ce qu'elle rend est ce que le noyau déclenche, et rien d'autre : une valeur
+// qu'il ignore rend la promesse fausse au moment même où elle est faite.
 func Triggers() []Trigger {
-	return []Trigger{
-		OnInspectorsPhase, OnFugitivePhase, OnTurnEnd,
-		OnContact, OnReveal, OnStrangling,
-	}
+	return []Trigger{OnInspectorsPhase, OnFugitivePhase, OnStrangling}
 }
 
 // Ability est une entrée déclarative, chargée depuis un manifeste. Les cinq

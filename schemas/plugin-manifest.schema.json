@@ -174,12 +174,9 @@
         "trigger": {
           "enum": [
             "inspectors_phase",
-            "fugitive_phase",
-            "turn_end",
-            "contact",
-            "reveal"
+            "fugitive_phase"
           ],
-          "description": "Moment ou la capacite entre en jeu."
+          "description": "Phase pendant laquelle la capacite ou la depense est proposee au joueur."
         },
         "effect": {
           "type": "array",
@@ -206,14 +203,9 @@
         },
         "trigger": {
           "enum": [
-            "inspectors_phase",
-            "fugitive_phase",
-            "turn_end",
-            "contact",
-            "reveal",
             "strangling"
           ],
-          "description": "Moment ou le mode agit. etranglement n'est ouvert qu'a un mode."
+          "description": "Moment ou le mode agit. L'etranglement est le seul que le jeu declenche de lui-meme, et il n'est ouvert qu'a un mode."
         },
         "effect": {
           "type": "array",
