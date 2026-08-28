@@ -13,7 +13,7 @@ import (
 //
 // Le symétrique de drawAsText, et c'est ce qui rend les cas de vision
 // relisibles — un angle en équerre se voit dans le croquis, jamais dans une
-// list de coordonnées.
+// liste de coordonnées.
 func drawnBoard(t *testing.T, croquis string) *BoundedBoard {
 	t.Helper()
 

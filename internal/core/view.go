@@ -344,7 +344,7 @@ func (p *Game) announcedEffects(a Side) []PendingEffect {
 // est le choix de son auteur.
 //
 // Dérivé plutôt que stocké : c'est la même information sous une forme que
-// l'interface consomme sans walk des effets imbriqués.
+// l'interface consomme sans parcourir les effets imbriqués.
 func (p *Game) announcedZones(annonces []PendingEffect) []int {
 	var zones []int
 	if zone, prevue := p.zoneToStrangleAt(p.Turn + p.Settings.StranglingNotice); prevue {

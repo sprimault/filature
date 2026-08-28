@@ -17,7 +17,7 @@ import (
 // ErrQuit dit que le joueur a demandé à sortir, ce qui n'est pas une panne.
 var ErrQuit = errors.New("partie interrompue")
 
-// Moves list les coups légaux, numérotés à partir de un.
+// Moves énumère les coups légaux, numérotés à partir de un.
 //
 // Numérotés et non décrits par une syntaxe à apprendre : la liste vient de
 // LegalMoves, donc tout ce qui s'y trouve est jouable et rien d'autre ne
@@ -85,7 +85,7 @@ func direction(de, vers core.Position) string {
 
 // ReadMove demande un numéro jusqu'à en obtenir un valide.
 //
-// Une saisie hors list est redemandée plutôt que refusée : c'est une faute de
+// Une saisie hors liste est redemandée plutôt que refusée : c'est une faute de
 // frappe, pas une tentative de tricher, et le noyau n'a jamais à voir un coup
 // illégal. La fin d'entrée vaut abandon, ce qui rend le mode texte pilotable
 // par un fichier.
