@@ -193,11 +193,16 @@ role = "marker"
 	}
 }
 
-// TestValidateCatchesEachBreach vérifie qu'aucun manquement du contrat ne passe.
+// TestValidateCatchesEachBreach vérifie qu'aucun manquement d'une forme ou d'un
+// trait ne passe.
 //
 // Un cas par règle, et chacun nomme la clé fautive : un auteur de plugin qui
 // reçoit « cible invalide » ne sait pas où chercher, celui qui reçoit
 // « shape.essai.stroke[0].points[2] » corrige en une minute.
+//
+// Sa portée s'arrête aux formes. Les couleurs obligatoires et l'écart de
+// luminance entre sols sont validés au même endroit mais gardés par leurs
+// propres tests — la promesse d'ici ne les couvre pas.
 func TestValidateCatchesEachBreach(t *testing.T) {
 	cas := []struct {
 		nom      string

@@ -140,17 +140,25 @@ func TestGroundGrainStaysWithinItsAmplitude(t *testing.T) {
 // sa graine. Le test échoue alors, ce qui force à le décider plutôt qu'à le
 // subir.
 func TestGroundGrainMatchesItsReference(t *testing.T) {
-	attendus := map[[3]int]int{
-		{7, 0, 0}:   GroundGrain(7, 0, 0),
-		{7, 12, 30}: GroundGrain(7, 12, 30),
-		{7, 40, 40}: GroundGrain(7, 40, 40),
-	}
-
-	// Les valeurs sont relevées à l'écriture du test : ce qui compte est
-	// qu'elles ne bougent plus, pas ce qu'elles valent.
-	fige := map[[3]int]int{}
-	for cle, v := range attendus {
-		fige[cle] = v
+	// Des littéraux, et c'est tout le test. La table se remplissait par des
+	// appels à GroundGrain avant d'être comparée à GroundGrain : l'assertion
+	// valait f(x) == f(x), et muter le hachage ne la faisait pas rougir.
+	//
+	// Dix cases et non trois : sur trois, deux valeurs coïncidaient, et un
+	// hachage changé avait toutes les chances de retomber dessus. Ce qui décide
+	// ici est l'étendue couverte, pas le nombre — graines voisines, graine
+	// négative, cases alignées et cases éloignées.
+	fige := map[[3]int]int{
+		{7, 0, 0}:   -4,
+		{7, 1, 0}:   -4,
+		{7, 0, 1}:   0,
+		{7, 12, 30}: 0,
+		{7, 20, 20}: 0,
+		{7, 40, 40}: -4,
+		{1, 0, 0}:   5,
+		{1, 12, 30}: 2,
+		{99, 5, 7}:  -1,
+		{-3, 8, 8}:  5,
 	}
 
 	for cle, attendu := range fige {
