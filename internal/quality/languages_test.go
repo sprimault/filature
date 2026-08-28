@@ -6,11 +6,15 @@ package quality
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/BurntSushi/toml"
 	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/filature/internal/loader"
+	"github.com/sprimault/filature/plugins"
 )
 
 // dictionnaire est la forme d'un language.toml.
@@ -104,4 +108,78 @@ func TestPresetKeysHaveALabel(t *testing.T) {
 				p.Key, cle)
 		}
 	}
+}
+
+// TestShippedKeysMatchWhatTheGameProduces rapproche le dictionnaire de repli de
+// ce que le contenu livré déclare et de ce que le noyau produit.
+//
+// Dans les deux sens, et c'est ce qui compte : une clé manquante laisse une
+// mécanique sans libellé, une clé de trop survit à la mécanique qu'elle
+// nommait. Les deux étaient là — le leurre et la capture n'avaient rien à
+// afficher, et « expense_murder » nommait une dépense retirée du jeu.
+//
+// TestShippedLanguagesCoverKeys ne pouvait pas les voir : il aligne les autres
+// langues sur celle-ci, et l'anglais portait exactement le même trou. Un
+// contrôle qui compare deux copies ne dit rien de ce qu'elles copient.
+func TestShippedKeysMatchWhatTheGameProduces(t *testing.T) {
+	base := lireDictionnaire(t, langueDeBase)
+	registre, _, err := loader.Load(plugins.Shipped(), "")
+	if err != nil {
+		t.Fatalf("chargement du contenu livré : %v", err)
+	}
+
+	cas := []struct {
+		quoi     string
+		prefixe  string
+		attendus []string
+	}{
+		{"dépense", "expense_", triees(registre.Expenses)},
+		{"capacité", "piece_", triees(registre.Abilities)},
+		{"motif de fin", "end_", motifsDeFin()},
+	}
+
+	for _, c := range cas {
+		libelles := map[string]bool{}
+		for cle := range base {
+			if apres, coupe := strings.CutPrefix(cle, c.prefixe); coupe {
+				libelles[apres] = true
+			}
+		}
+
+		for _, attendu := range c.attendus {
+			if !libelles[attendu] {
+				t.Errorf("la %s %q n'a pas de libellé : %s%s manque du dictionnaire de repli",
+					c.quoi, attendu, c.prefixe, attendu)
+			}
+			delete(libelles, attendu)
+		}
+		for reste := range libelles {
+			t.Errorf("%s%s nomme une %s que le jeu ne produit plus",
+				c.prefixe, reste, c.quoi)
+		}
+	}
+}
+
+// motifsDeFin rend les motifs que le jeu de base produit.
+//
+// OutcomePlugin en est écarté : il vient d'un plugin de règles, qui livre son
+// libellé avec sa condition de victoire. Le lui donner ici reviendrait à
+// nommer d'avance ce qu'on ne connaît pas.
+func motifsDeFin() []string {
+	motifs := []string{
+		core.OutcomeExtraction, core.OutcomeCaptured, core.OutcomeStaminaSpent,
+		core.OutcomeCornered, core.OutcomeTimeUp,
+	}
+	slices.Sort(motifs)
+	return motifs
+}
+
+// triees rend les clés d'une table dans un ordre stable.
+func triees[K ~string, V any](table map[K]V) []string {
+	cles := make([]string, 0, len(table))
+	for cle := range table {
+		cles = append(cles, string(cle))
+	}
+	slices.Sort(cles)
+	return cles
 }

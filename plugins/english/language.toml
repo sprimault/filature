@@ -42,13 +42,14 @@ term_stamina = "Stamina"
 term_trail = "Trail"
 term_zone = "Extraction zone"
 term_roadblock = "Roadblock"
+term_shelter = "Respite"
 term_turn = "Turn"
 
 # Fugitive's expenses
 expense_double_step = "Double move"
 expense_silence = "Silence"
 expense_wipe_trails = "Wipe trail"
-expense_murder = "Murder"
+expense_decoy = "Decoy"
 expense_change_zone = "Change zone"
 
 # Flow
@@ -61,6 +62,7 @@ action_undo = "Undo"
 
 # Endgame
 end_extraction = "The fugitive got out"
+end_captured = "The fugitive is captured"
 end_stamina_spent = "The fugitive is spent"
 end_fugitive_cornered = "The fugitive is cornered"
 end_time_up = "Time is up"
