@@ -257,9 +257,9 @@ const RimWidth = 2
 // passe sous le pixel au dézoom : l'antialiasing la mêle à ce qu'elle devait
 // séparer, et le contraste réel s'effondre bien avant la valeur calculée. Sans
 // plafond, une épaisseur fixe finit par occuper la forme entière — à 24 pixels
-// par case, la tête d'un pion en fait quatre et demi, et deux pixels de liseré
-// n'en détachent plus rien : ils avalent la couleur, qui est le seul signal
-// d'appartenance à un camp.
+// par case, les deux têtes livrées font 5,25 et 3,75 pixels, et deux pixels de
+// liseré n'en détachent plus rien : ils avalent la couleur, qui est le seul
+// signal d'appartenance à un camp.
 //
 // Le plafond porte sur la plus petite dimension du trait et non sur la case ni
 // sur la forme entière : c'est ce trait-là que le contour doit laisser voir, et

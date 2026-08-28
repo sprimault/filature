@@ -101,7 +101,7 @@ Le calcul est celui des marqueurs, pas celui des pions. Une case cachée par le
 bâtiment devant elle l'est sur `[0, h]` d'un losange qui va de 0 à 32 : un pion
 dépasse dans tous les cas, mais le sommet d'un marqueur est à 28. À 24 il en
 reste 4 de visible, à 32 plus rien — et selon le préréglage, 64 à 72 % des cases
-de rue ont du bâti juste devant. Trace, barrage et scène y disparaîtraient.
+de rue ont du bâti juste devant. Trace et barrage y disparaîtraient.
 
 **Tous les bâtiments d'une partie ont la même hauteur, et rien ne s'empile.**
 C'est ce qui rend l'occlusion prévisible : un joueur doit pouvoir dire d'un coup
@@ -201,7 +201,7 @@ d'indice, c'est sa finesse et le fait qu'il reste au sol, pas son effacement.
 ### Le liseré, posé par le moteur
 
 Sous le contour de toute forme de rôle `piece` ou `marker`, le moteur pose un
-liseré clair d'une unité. **Rien à déclarer, et rien à retirer.**
+liseré clair de deux unités. **Rien à déclarer, et rien à retirer.**
 
 Un contour seul ne suffit pas, et c'est le point le moins évident du contrat. Il
 tient contre le sol, qui est clair. Mais un pion se dessine par-dessus les cubes
@@ -232,7 +232,7 @@ Les deux bornes traitent le même défaut par ses deux bouts. Sans plancher, une
 à ce qu'elle devait séparer, et le contraste réel s'effondre bien avant la valeur
 calculée — or c'est au plateau entier qu'on cherche où sont les pions. Sans
 plafond, une épaisseur fixe finit par occuper la forme entière : à 24 pixels par
-case, la tête d'un pion en fait quatre et demi, et deux pixels de liseré n'en
+case, les deux têtes livrées en font 5,25 et 3,75, et deux pixels de liseré n'en
 détachent plus rien. Ils avalent la couleur, qui est le seul signal
 d'appartenance à un camp.
 

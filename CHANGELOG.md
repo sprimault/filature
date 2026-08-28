@@ -30,6 +30,14 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le contrat de formes annonçait un liseré deux fois trop fin.** Il le donnait
+pour une unité quand la constante en vaut deux, et se contredisait vingt-cinq
+lignes plus bas en écrivant « deux pixels de liseré ». Le schéma décrivait par
+ailleurs des sols « du simple au triple » pour un rapport de 2,5, et la taille
+de tête qui justifie le plafond d'épaisseur n'était celle d'aucun des deux
+pions. Les deux derniers chiffres se mesurent désormais sur le contenu livré ;
+la scène de crime, elle, quitte le dernier endroit qui la nommait encore.
+
 **La première ligne de commande des README fonctionne.** Ils donnaient
 `--preset ville` en exemple — en français jusque dans la version anglaise — et
 listaient trois valeurs que le binaire refuse depuis que les clés sont passées à
@@ -394,6 +402,13 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The shape contract announced a rim twice too thin.** It gave one unit where
+the constant is two, contradicting itself twenty-five lines later with "two
+pixels of rim". The schema also described grounds ranging "one to three" for a
+ratio of 2.5, and the head size justifying the thickness cap belonged to neither
+piece. The last two figures are now measured on the shipped content; the crime
+scene leaves the final place that still named it.
 
 **The READMEs' first command line works.** They gave `--preset ville` as an
 example — in French even in the English version — and listed three values the
