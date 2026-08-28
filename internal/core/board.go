@@ -62,6 +62,23 @@ type Shelter struct {
 	Cells  []Position
 }
 
+// shelterAt rend le rang du lieu qui couvre une case, NoShelter s'il n'y en a
+// pas.
+//
+// Point unique parce que la mise en place et la résolution de tour posent la
+// même question : la première pour savoir si le fugitif naît sur un lieu, la
+// seconde pour savoir s'il vient d'y entrer. Deux parcours séparés donneraient
+// deux réponses le jour où un lieu cesserait d'être un bloc.
+func shelterAt(b Board, at Position) int {
+	abris := b.Shelters()
+	for i := range abris {
+		if abris[i].Contains(at) {
+			return i
+		}
+	}
+	return NoShelter
+}
+
 // Contains dit si une case appartient au lieu.
 func (s Shelter) Contains(p Position) bool {
 	for _, c := range s.Cells {

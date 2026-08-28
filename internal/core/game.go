@@ -237,10 +237,15 @@ func NewGame(plateau Board, graine int64, p Settings, r *Registry) (*Game, error
 		Board:    plateau,
 		Phase:    PhaseFugitiveSetup,
 		Fugitive: Fugitive{
-			Position:    depart,
-			Stamina:     p.Stamina,
-			SealedZone:  -1,
-			LastShelter: NoShelter,
+			Position:   depart,
+			Stamina:    p.Stamina,
+			SealedZone: -1,
+
+			// Le lieu où le tirage le pose, s'il y en a un : il n'y est pas
+			// entré, il y est né. À NoShelter, la première résolution lirait sa
+			// case de départ comme une entrée et lui rendrait deux points au
+			// tour un, sans qu'il ait bougé.
+			LastShelter: shelterAt(plateau, depart),
 		},
 		ShelterReady: abris,
 		Extensions:   r,

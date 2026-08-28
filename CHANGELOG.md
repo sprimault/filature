@@ -30,6 +30,12 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Naître sur un lieu de ressourcement n'est pas y entrer.** Le fugitif dont le
+tirage de départ tombait sur un lieu y gagnait deux points à la première
+résolution sans avoir bougé, et consommait le lieu pour huit tours. La règle
+attache le gain à l'entrée : il n'a rien payé pour être là, donc le lieu reste
+actif jusqu'à ce qu'il en reparte et y revienne.
+
 **Le Barreur ferme la case que le joueur choisit.** Sa capacité n'en portait
 aucune, et le barrage tombait invariablement dans le coin du plateau, sur la
 zone d'extraction qui s'y trouve. Il pose désormais son obstacle sur l'une des
@@ -238,6 +244,12 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Being born on a respite is not entering it.** A fugitive whose starting draw
+landed on a respite gained two points at the first resolution without having
+moved, and spent the place for eight turns. The rule ties the gain to entering:
+he paid nothing to be there, so the respite stays active until he leaves and
+comes back.
 
 **The Blocker closes the cell the player picks.** Its ability carried none, so
 the roadblock always landed in the board's corner, on the extraction zone that

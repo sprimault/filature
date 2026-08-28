@@ -75,6 +75,62 @@ func gameWithShelter(fugitif Position, inspecteurs ...Position) *Game {
 	return p
 }
 
+// setUp joue la mise en place — zone scellée, puis les cinq pions posés — en
+// prenant le premier coup légal à chaque fois.
+func setUp(t *testing.T, p *Game) {
+	t.Helper()
+	for p.Phase == PhaseFugitiveSetup || p.Phase == PhaseInspectorsSetup {
+		acteur := SideFugitive
+		if p.Phase == PhaseInspectorsSetup {
+			acteur = SideInspectors
+		}
+		legaux := p.LegalMoves(acteur)
+		if len(legaux) == 0 {
+			t.Fatalf("aucun coup légal en phase %s", p.Phase)
+		}
+		if err := p.Apply(legaux[0]); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// TestBeingBornOnAShelterIsNotEntering vérifie qu'un fugitif dont le tirage
+// tombe sur un lieu n'y gagne rien, et ne le consomme pas.
+//
+// docs/regles.md §7 attache le gain à l'entrée et non à la présence. La partie
+// se monte par NewGame : c'est lui qui posait le souvenir à NoShelter, donc un
+// test qui construirait l'état à la main ne verrait rien.
+func TestBeingBornOnAShelterIsNotEntering(t *testing.T) {
+	params := testSettings()
+	params.CentreRadius = 1
+
+	// Le lieu couvre le noyau entier : quelle que soit la graine, le tirage y
+	// pose le fugitif.
+	b := ouvert(params.Size)
+	centre := Position{Column: params.Size / 2, Row: params.Size / 2}
+	b.abris = []Shelter{{Number: 0, Cells: b.CellsWithin(centre, params.CentreRadius)}}
+
+	p, err := NewGame(b, 1, params, testRegistry())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.Fugitive.LastShelter != 0 {
+		t.Errorf("souvenir de lieu %d, attendu 0", p.Fugitive.LastShelter)
+	}
+
+	setUp(t, p)
+	endTurn(t, p)
+
+	if p.Fugitive.Stamina != params.Stamina {
+		t.Errorf("résistance %d au bout d'un tour immobile, attendu %d",
+			p.Fugitive.Stamina, params.Stamina)
+	}
+	if p.ShelterReady[0] != ShelterActive {
+		t.Errorf("le lieu passe en recharge jusqu'au tour %d sans que personne y soit entré",
+			p.ShelterReady[0])
+	}
+}
+
 // TestShelterRestoresThenRecharges vérifie qu'un lieu rend ses points une fois,
 // puis se tait le temps de sa recharge.
 func TestShelterRestoresThenRecharges(t *testing.T) {

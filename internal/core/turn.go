@@ -178,14 +178,7 @@ func (p *Game) useShelter() []func() {
 		return nil
 	}
 
-	sur := NoShelter
-	abris := p.Board.Shelters()
-	for i := range abris {
-		if abris[i].Contains(p.Fugitive.Position) {
-			sur = i
-			break
-		}
-	}
+	sur := shelterAt(p.Board, p.Fugitive.Position)
 
 	// Le souvenir se met à jour même quand rien n'est rendu : sortir d'un lieu
 	// doit s'enregistrer, sinon y revenir ne compterait plus comme une entrée.

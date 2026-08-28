@@ -365,6 +365,12 @@ ressource pas à chaque recharge : ce serait la récupération à l'immobilité,
 écartée au §2 parce qu'elle récompense le campement. Il doit repartir et
 revenir, donc s'exposer entre-temps.
 
+**Un fugitif dont le tirage de départ tombe sur un lieu n'y est pas entré.** Il
+n'a rien payé pour y être, et le lieu reste actif : il le consommera en
+repartant et en revenant, comme n'importe quel autre. Sans cette précision, la
+première résolution lirait sa case de départ comme une entrée et lui rendrait
+deux points au tour un, au-dessus de la réserve que ce paragraphe lui donne.
+
 C'est la seule source de résistance de la partie, et elle se paie en
 information. Un lieu en recharge est visible des deux camps avec le tour où il
 reviendra : les inspecteurs y lisent que le fugitif est passé là, et savent où
