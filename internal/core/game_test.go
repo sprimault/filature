@@ -16,6 +16,7 @@ import (
 type plateauOuvert struct {
 	cote  int
 	zones []Zone
+	abris []Shelter
 }
 
 // ouvert construit un plateau dégagé et ses six zones aux quatre coins et sur
@@ -44,9 +45,8 @@ func (b *plateauOuvert) IsStreet(p Position) bool {
 // Zones renvoie les six points d'extraction.
 func (b *plateauOuvert) Zones() []Zone { return b.zones }
 
-// Shelters reste vide : ce plateau sert aux règles de partie, pas au
-// ressourcement.
-func (b *plateauOuvert) Shelters() []Shelter { return nil }
+// Shelters rend les lieux que le cas de test pose, aucun par défaut.
+func (b *plateauOuvert) Shelters() []Shelter { return b.abris }
 
 // Seed est figée : le tirage vient de la partie, pas du plateau.
 func (b *plateauOuvert) Seed() int64 { return 1 }
