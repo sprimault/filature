@@ -30,6 +30,14 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Les dictionnaires livrés rattrapent le jeu.** Le leurre et la capture
+n'avaient rien à afficher, et une clé nommait encore le meurtre, retiré des
+règles. La langue de repli n'a pas le droit d'avoir de trou — c'est sur elle que
+retombe toute traduction incomplète —, et le contrôle qui l'alignait sur
+l'anglais ne pouvait rien voir : les deux portaient le même. Le dictionnaire se
+compare désormais à ce que le contenu livré déclare et à ce que le noyau
+produit, dans les deux sens.
+
 **Deux descriptions du schéma de manifeste disaient le faux.** `duration`
 annonçait que zéro valait le tour courant, quand c'est l'inverse : un vaut le
 tour courant et zéro vaut la partie entière, ce dont la capacité passive du
@@ -344,6 +352,13 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The shipped dictionaries catch up with the game.** The decoy and the capture
+had nothing to display, and one key still named murder, dropped from the rules.
+The fallback language is not allowed to have holes — every incomplete
+translation falls back on it — and the check aligning it with English could see
+nothing: both had the same hole. The dictionary is now compared against what the
+shipped content declares and what the core produces, both ways.
 
 **Two manifest schema descriptions said the opposite of the truth.** `duration`
 announced that zero meant the current turn, when it is the other way round: one

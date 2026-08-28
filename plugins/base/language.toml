@@ -45,13 +45,14 @@ term_stamina = "Résistance"
 term_trail = "Trace"
 term_zone = "Zone d'extraction"
 term_roadblock = "Barrage"
+term_shelter = "Lieu de ressourcement"
 term_turn = "Tour"
 
 # Dépenses du fugitif
 expense_double_step = "Double déplacement"
 expense_silence = "Silence"
 expense_wipe_trails = "Effacement"
-expense_murder = "Meurtre"
+expense_decoy = "Leurre"
 expense_change_zone = "Changer de zone"
 
 # Déroulement
@@ -64,6 +65,7 @@ action_undo = "Revenir en arrière"
 
 # Fin de partie
 end_extraction = "Le fugitif s'est extrait"
+end_captured = "Le fugitif est capturé"
 end_stamina_spent = "Le fugitif est à bout"
 end_fugitive_cornered = "Le fugitif est pris"
 end_time_up = "Le temps est écoulé"
