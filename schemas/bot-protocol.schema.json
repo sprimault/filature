@@ -88,7 +88,7 @@
       }
     },
     "play": {
-      "description": "jeu -> bot, à chaque tour. vue est l'objet que reçoit l'interface : le bot ne voit jamais la position cachée du fugitif ni sa zone scellée.",
+      "description": "jeu -> bot, à chaque tour. view est l'objet que reçoit l'interface : le bot ne voit jamais la position cachée du fugitif ni sa zone scellée.",
       "type": "object",
       "required": [
         "type",
@@ -135,7 +135,7 @@
         },
         "reason": {
           "type": "string",
-          "description": "Le jeu de base en produit cinq : extraction, captured, stamina_spent, fugitive_cornered, time_up. Un plugin de regles peut en produire d'autres, d'ou l'absence de liste fermee ; les plugins actifs sont annonces dans bonjour."
+          "description": "Le jeu de base en produit cinq : extraction, captured, stamina_spent, fugitive_cornered, time_up. Un plugin de regles peut en produire d'autres, d'ou l'absence de liste fermee ; les plugins actifs sont annonces dans hello."
         },
         "turn": {
           "type": "integer"
@@ -143,7 +143,7 @@
       }
     },
     "ready": {
-      "description": "bot -> jeu, en réponse à bonjour.",
+      "description": "bot -> jeu, en réponse à hello.",
       "type": "object",
       "required": [
         "type",
@@ -183,7 +183,7 @@
       }
     },
     "move": {
-      "description": "bot -> jeu. Le coup doit figurer tel quel dans coups_legaux : le jeu ne corrige ni n'interprète rien.",
+      "description": "bot -> jeu. Le coup doit figurer tel quel dans legal_moves : le jeu ne corrige ni n'interprète rien.",
       "type": "object",
       "required": [
         "type",

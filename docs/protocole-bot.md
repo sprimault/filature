@@ -64,7 +64,8 @@ trois messages plus loin.
 {"type":"hello","protocol":3,"side":"inspectors","seed":178342119,
  "settings":{"size":41,"range":8,"turns":40,"centre_radius":10,"stamina":10,
  "inspectors":5,"pieces_per_turn":3,"reveal_period":4,"zones":6,
- "trail_lifetime":6,"strangling_start":30,"strangling_period":4,
+ "zones_left_open":3,"trail_lifetime":6,"shelters":4,"shelter_gain":2,
+ "shelter_recharge":8,"strangling_start":30,"strangling_period":4,
  "strangling_notice":2},
  "plugins":[{"name":"base","version":"0.1.0","fingerprint":"…","rules":true}]}
 ```
@@ -132,7 +133,7 @@ Un `protocol` qui n'est pas celui du jeu écarte le bot ici, avant tout autre
 
 ```json
 {"type":"move","move":{"turn":7,"side":"inspectors","type":"step",
- "pion":2,"from":{"Colonne":18,"Ligne":9},"to":{"Colonne":19,"Ligne":9}}}
+ "piece":2,"from":{"Column":18,"Row":9},"to":{"Column":19,"Row":9}}}
 ```
 
 Le coup doit figurer tel quel dans `legal_moves`. Le jeu ne corrige rien et

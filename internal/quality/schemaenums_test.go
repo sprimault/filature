@@ -177,20 +177,24 @@ func TestContractVersionsMatchTheirSchemas(t *testing.T) {
 
 // comparerListes signale ce qu'une énumération oublie et ce qu'elle invente,
 // sans tenir compte de l'ordre.
-func comparerListes(t *testing.T, quoi string, noyau, schema []string) {
+//
+// « Le contrat publié » et non « le schéma » : les exemples d'un document en
+// sont un autant qu'un fichier de schemas/, et un auteur de bot construit sur
+// l'un comme sur l'autre.
+func comparerListes(t *testing.T, quoi string, noyau, publie []string) {
 	t.Helper()
 
 	publiees := map[string]bool{}
-	for _, v := range schema {
+	for _, v := range publie {
 		publiees[v] = true
 	}
 	for _, v := range noyau {
 		if !publiees[v] {
-			t.Errorf("le schéma oublie %q parmi %s", v, quoi)
+			t.Errorf("le contrat publié oublie %q parmi %s", v, quoi)
 		}
 		delete(publiees, v)
 	}
 	for reste := range publiees {
-		t.Errorf("le schéma publie %q parmi %s, que le noyau ne connaît pas", reste, quoi)
+		t.Errorf("le contrat publié porte %q parmi %s, que le noyau ne connaît pas", reste, quoi)
 	}
 }
