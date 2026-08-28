@@ -198,6 +198,32 @@ func TestTrackerExtendsRange(t *testing.T) {
 	}
 }
 
+// TestNextRevealHitsZeroOnItsTurn vérifie le compte à rebours de révélation,
+// zéro compris.
+//
+// Elle se déclenche en fin de résolution, donc après la phase du fugitif :
+// annoncer une période entière à ce moment serait faux à l'instant précis où il
+// décide d'acheter le silence ou de se montrer. La sentinelle sépare « c'est
+// maintenant » de « jamais », que zéro confondrait.
+func TestNextRevealHitsZeroOnItsTurn(t *testing.T) {
+	p := hiddenGame()
+	p.Settings.RevealPeriod = 4
+
+	for _, c := range []struct{ tour, attendu int }{
+		{1, 3}, {2, 2}, {3, 1}, {4, 0}, {5, 3}, {8, 0},
+	} {
+		p.Turn = c.tour
+		if got := p.ViewFor(SideInspectors).ProchaineReveal; got != c.attendu {
+			t.Errorf("au tour %d, révélation dans %d, attendu %d", c.tour, got, c.attendu)
+		}
+	}
+
+	p.Settings.RevealPeriod = 0
+	if got := p.ViewFor(SideInspectors).ProchaineReveal; got != -1 {
+		t.Errorf("sans période, révélation dans %d, attendu -1", got)
+	}
+}
+
 // TestViewCarriesPublicInformation vérifie que ce qui doit être partagé
 // l'est, dans les deux vues.
 func TestViewCarriesPublicInformation(t *testing.T) {

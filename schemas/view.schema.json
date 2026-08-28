@@ -330,6 +330,9 @@
             "$ref": "#/$defs/Trail"
           }
         },
+        "last_silence": {
+          "type": "integer"
+        },
         "legal_moves": {
           "type": "array",
           "items": {
@@ -372,9 +375,6 @@
         "side": {
           "type": "string"
         },
-        "silence_paid": {
-          "type": "boolean"
-        },
         "stamina": {
           "type": "integer"
         },
@@ -405,6 +405,7 @@
         "announced_zones",
         "inspectors",
         "known_trails",
+        "last_silence",
         "legal_moves",
         "next_reveal",
         "phase",
@@ -413,7 +414,6 @@
         "shelter_ready",
         "shelters",
         "side",
-        "silence_paid",
         "streets",
         "turn",
         "visible_cells",

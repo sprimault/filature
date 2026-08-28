@@ -276,18 +276,20 @@ func (p *Game) ApplyOneEffect(e Effect, ctx EffectContext) (annulation func(), e
 	// et la règle couvre les cas qu'un plugin inventera.
 	case EffectRevealPosition:
 		if ctx.Side == SideInspectors && p.Fugitive.SilenceBought {
-			precedent := p.Fugitive.SilenceUsed
-			p.Fugitive.SilenceUsed = true
-			return func() { p.Fugitive.SilenceUsed = precedent }, nil
+			return func() {}, nil
 		}
 		precedent := p.Fugitive.Visible
 		p.Fugitive.Visible = true
 		return func() { p.Fugitive.Visible = precedent }, nil
 
+	// L'achat se date au passage : le drapeau retombe en fin de tour, la date
+	// reste, et c'est elle que les inspecteurs lisent au tour suivant.
 	case EffectCancelReveal:
-		precedent := p.Fugitive.SilenceBought
-		p.Fugitive.SilenceBought = true
-		return func() { p.Fugitive.SilenceBought = precedent }, nil
+		achete, quand := p.Fugitive.SilenceBought, p.Fugitive.SilenceTurn
+		p.Fugitive.SilenceBought, p.Fugitive.SilenceTurn = true, p.Turn
+		return func() {
+			p.Fugitive.SilenceBought, p.Fugitive.SilenceTurn = achete, quand
+		}, nil
 
 	case EffectCostStamina:
 		return p.adjustStamina(-e.Value), nil

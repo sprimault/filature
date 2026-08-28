@@ -394,7 +394,7 @@ func TestSilenceConsumesTheReveal(t *testing.T) {
 	p.Extensions = testRegistry()
 	p.Settings.RevealPeriod = 4
 	p.Turn = 4
-	p.Fugitive.SilenceBought = true
+	p.Fugitive.SilenceBought, p.Fugitive.SilenceTurn = true, 4
 
 	endTurn(t, p)
 
@@ -403,6 +403,64 @@ func TestSilenceConsumesTheReveal(t *testing.T) {
 	}
 	if p.Fugitive.SilenceBought {
 		t.Error("le silence n'a pas été consommé : il couvrirait toutes les révélations")
+	}
+}
+
+// TestSilenceIsLostIfNothingRevealed vérifie qu'un silence acheté hors d'un
+// tour de révélation est perdu, et qu'il ne protège pas le tour suivant.
+//
+// docs/regles.md §7 lui donne un tour. Reporté sans borne, il deviendrait une
+// assurance sans date qu'il vaudrait toujours mieux acheter dès qu'on a les
+// points — et une dépense qu'on ne peut pas jouer trop tôt n'arbitre rien.
+func TestSilenceIsLostIfNothingRevealed(t *testing.T) {
+	p := gameOn(grid(".....", ".....", ".....", ".....", "....."),
+		Position{Column: 2, Row: 2})
+	p.Extensions = testRegistry()
+	p.Settings.RevealPeriod = 4
+	p.Turn = 3
+	p.Fugitive.SilenceBought, p.Fugitive.SilenceTurn = true, 3
+
+	endTurn(t, p)
+	if p.Fugitive.SilenceBought {
+		t.Error("le silence court encore alors qu'il n'a rien eu à couvrir")
+	}
+
+	endTurn(t, p)
+	if !p.Fugitive.Visible {
+		t.Error("le silence du tour 3 a couvert la révélation du tour 4")
+	}
+}
+
+// TestInspectorsLearnTheSilenceWasPaid vérifie que la date d'un silence acheté
+// parvient aux inspecteurs, qui jouent avant le fugitif.
+//
+// docs/regles.md §6 : ils ne savent pas où il est, ils savent qu'il s'est
+// appauvri. Un drapeau ne le leur dirait pas — il retombe à la résolution du
+// tour où il a servi, donc avant qu'ils reprennent la main.
+func TestInspectorsLearnTheSilenceWasPaid(t *testing.T) {
+	p := gameOn(grid(".....", ".....", ".....", ".....", "....."),
+		Position{Column: 2, Row: 2}, Position{Column: 0, Row: 0})
+	p.Extensions = testRegistry()
+	p.Settings.RevealPeriod = 4
+	p.Turn = 4
+
+	var achat Move
+	for _, c := range p.LegalMoves(SideFugitive) {
+		if c.Type == MoveExpense && c.Expense == ExpenseSilence {
+			achat = c
+			break
+		}
+	}
+	if achat.Type != MoveExpense {
+		t.Fatal("le silence n'est proposé à aucun coup légal")
+	}
+	if err := p.Apply(achat); err != nil {
+		t.Fatal(err)
+	}
+	endTurn(t, p)
+
+	if got := p.ViewFor(SideInspectors).DernierSilence; got != 4 {
+		t.Errorf("les inspecteurs lisent %d, attendu le tour 4 où l'achat a eu lieu", got)
 	}
 }
 

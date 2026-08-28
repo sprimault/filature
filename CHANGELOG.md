@@ -30,6 +30,15 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le silence se voit, se compte et se perd.** Trois défauts du même canal
+d'information. Les inspecteurs n'apprenaient jamais qu'un silence avait été
+payé, le drapeau retombant avant qu'ils reprennent la main : la vue porte
+désormais le tour de l'achat. Le compte à rebours annonçait une période entière
+au tour même de la révélation, c'est-à-dire à l'instant où le fugitif décide de
+payer. Et un silence sans emploi se reportait sans borne, ce qui en faisait une
+assurance qu'il valait toujours mieux prendre tôt — il couvre le tour de son
+achat, et se perd s'il n'a rien couvert.
+
 **Naître sur un lieu de ressourcement n'est pas y entrer.** Le fugitif dont le
 tirage de départ tombait sur un lieu y gagnait deux points à la première
 résolution sans avoir bougé, et consommait le lieu pour huit tours. La règle
@@ -244,6 +253,14 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**Silence is seen, counted and lost.** Three faults on the same information
+channel. Inspectors never learnt that a silence had been paid, the flag dropping
+before they took their turn: the view now carries the turn it was bought on. The
+countdown announced a full period on the very turn of the reveal, that is, at
+the moment the fugitive decides whether to pay. And an unused silence carried
+over indefinitely, making it insurance always worth buying early — it now covers
+the turn it is bought on, and is lost if it covered nothing.
 
 **Being born on a respite is not entering it.** A fugitive whose starting draw
 landed on a respite gained two points at the first resolution without having

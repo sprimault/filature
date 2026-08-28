@@ -53,18 +53,26 @@ type Fugitive struct {
 	// entrer de s'y tenir : sans lui, un fugitif immobile se ressourcerait à
 	// chaque recharge, ce qui est la récupération à l'immobilité que
 	// docs/regles.md §2 écarte.
-	LastShelter   int  `json:"last_shelter"`
-	SealedZone    int  `json:"sealed_zone"`
-	TurnsInZone   int  `json:"turns_in_zone"`
+	LastShelter int `json:"last_shelter"`
+	SealedZone  int `json:"sealed_zone"`
+	TurnsInZone int `json:"turns_in_zone"`
+
+	// SilenceBought dit qu'un silence court. Il couvre le tour entier et non
+	// une révélation : le fugitif choisit le tour où il paie, jamais qu'une
+	// révélation forcée y tombe en même temps que la périodique. Le faire payer
+	// deux fois pour cette coïncidence serait une punition, pas un arbitrage.
+	//
+	// Il retombe à chaque résolution, qu'il ait servi ou non : un silence
+	// reporté sans borne serait une assurance sans date, qu'il vaudrait
+	// toujours mieux acheter dès qu'on a les points.
 	SilenceBought bool `json:"silence_bought"`
 
-	// SilenceUsed dit qu'une révélation a été neutralisée ce tour. Un silence
-	// couvre le tour et non une révélation : le fugitif paie avant que les
-	// inspecteurs décident, donc il ne peut pas prévoir qu'une révélation
-	// forcée tombera le même tour que la périodique. Le faire payer deux fois
-	// pour une coïncidence qu'il ne pouvait pas anticiper serait une punition,
-	// pas un arbitrage.
-	SilenceUsed bool `json:"silence_used"`
+	// SilenceTurn est le tour du dernier silence payé, zéro s'il n'y en a
+	// jamais eu. C'est ce que les inspecteurs lisent : docs/regles.md §6 leur
+	// promet d'apprendre qu'il s'est appauvri, et SilenceBought ne le leur dit
+	// pas — il retombe avant qu'ils reprennent la main, puisqu'ils jouent en
+	// premier.
+	SilenceTurn int `json:"silence_turn"`
 
 	// StepsTaken est remis à zéro à chaque tour, comme celui des
 	// inspecteurs. Le fugitif n'a pas de quota de pions, mais une mobilité

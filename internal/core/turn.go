@@ -287,20 +287,19 @@ func (p *Game) wipeOldTrails() []func() {
 // partie devient une loterie. C'est aussi ce qui borne la carte de croyance de
 // l'IA quelle que soit la taille du plateau.
 //
-// Le silence acheté consomme la révélation sans la subir. Les inspecteurs
-// apprennent qu'il a payé, pas où il est : ils savent qu'il s'est appauvri.
+// Le silence acheté absorbe la révélation sans la subir. Les inspecteurs
+// apprennent qu'il a payé, pas où il est : ils savent qu'il s'est appauvri, et
+// c'est la date de l'achat qui le leur dit.
 //
-// Il n'est pas dépensé ici mais marqué : consumeSilence le retire en fin de
-// résolution, une fois que tout ce qui pouvait révéler a été tenté.
+// Il n'est pas dépensé ici : consumeSilence le retire en fin de résolution, une
+// fois que tout ce qui pouvait révéler a été tenté.
 func (p *Game) revealIfDue() []func() {
 	if p.Settings.RevealPeriod <= 0 || p.Turn%p.Settings.RevealPeriod != 0 {
 		return nil
 	}
 
 	if p.Fugitive.SilenceBought {
-		precedent := p.Fugitive.SilenceUsed
-		p.Fugitive.SilenceUsed = true
-		return []func(){func() { p.Fugitive.SilenceUsed = precedent }}
+		return nil
 	}
 
 	if p.Fugitive.Visible {
@@ -310,7 +309,7 @@ func (p *Game) revealIfDue() []func() {
 	return []func(){func() { p.Fugitive.Visible = false }}
 }
 
-// consumeSilence dépense le silence si quelque chose l'a mis à contribution.
+// consumeSilence éteint le silence, qu'il ait servi ou non.
 //
 // En dernier, une fois que la révélation périodique et les effets différés ont
 // été tentés : un silence couvre le tour, pas une révélation. Le fugitif paie
@@ -318,19 +317,19 @@ func (p *Game) revealIfDue() []func() {
 // révélation forcée tombera le même tour que la périodique — le faire payer
 // deux fois pour cette coïncidence serait une punition, pas un arbitrage.
 //
-// Un silence qui n'a rien bloqué reste : il neutralise la prochaine révélation,
-// quel que soit le tour où elle vient. Le consommer au tour plutôt qu'à l'effet
-// ferait perdre trois points sans que rien se produise, et le joueur n'aurait
-// aucun moyen de comprendre pourquoi sa protection a disparu — il a payé, rien
-// n'est arrivé, et le tour suivant il est découvert.
+// Un silence qui n'a rien bloqué est perdu, et c'est ce qui en fait une
+// décision. Reporté sans borne, il neutraliserait la prochaine révélation quel
+// que soit le tour où elle vient : il vaudrait alors toujours mieux l'acheter
+// dès qu'on a les points, et une dépense qu'on ne peut pas jouer trop tôt
+// n'arbitre rien. Le fugitif a de quoi viser juste — il joue après les
+// inspecteurs, la vue porte le compte à rebours, et un coup de filet s'annonce
+// deux tours à l'avance.
 func (p *Game) consumeSilence() []func() {
-	if !p.Fugitive.SilenceUsed {
+	if !p.Fugitive.SilenceBought {
 		return nil
 	}
-	p.Fugitive.SilenceBought, p.Fugitive.SilenceUsed = false, false
-	return []func(){func() {
-		p.Fugitive.SilenceBought, p.Fugitive.SilenceUsed = true, true
-	}}
+	p.Fugitive.SilenceBought = false
+	return []func(){func() { p.Fugitive.SilenceBought = true }}
 }
 
 // resolveDeferred applique les effets arrivés à échéance et vide la file de

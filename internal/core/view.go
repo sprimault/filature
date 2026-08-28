@@ -57,11 +57,20 @@ type View struct {
 	// découvert. Le fugitif, lui, voit les siennes.
 	KnownTrails map[string]Trail `json:"known_trails"`
 
-	CasesVisibles   []Position `json:"visible_cells"`
-	LegalMoves      []Move     `json:"legal_moves"`
-	ProchaineReveal int        `json:"next_reveal"`
-	SilencePaye     bool       `json:"silence_paid"`
-	ZonesAnnoncees  []int      `json:"announced_zones"`
+	CasesVisibles []Position `json:"visible_cells"`
+	LegalMoves    []Move     `json:"legal_moves"`
+
+	// ProchaineReveal vaut zéro quand la révélation tombe à la fin du tour
+	// courant, -1 quand aucune n'est prévue.
+	ProchaineReveal int `json:"next_reveal"`
+
+	// DernierSilence est le tour du dernier silence payé, zéro s'il n'y en a
+	// jamais eu. C'est ce que le §6 promet aux inspecteurs : ils ne savent pas
+	// où il est, ils savent qu'il s'est appauvri. Un booléen ne le dirait pas,
+	// puisqu'ils jouent en premier et que le drapeau retombe entre-temps.
+	DernierSilence int `json:"last_silence"`
+
+	ZonesAnnoncees []int `json:"announced_zones"`
 
 	// AnnouncedEffects ne porte que les differer déclarés avec annonce, et les
 	// porte à l'identique pour les deux camps. Un differer sans annonce reste
@@ -116,7 +125,7 @@ func (p *Game) ViewFor(a Side) View {
 		CasesVisibles:    list(p.visibleCellsFor()),
 		LegalMoves:       list(p.LegalMoves(a)),
 		ProchaineReveal:  p.nextReveal(),
-		SilencePaye:      p.Fugitive.SilenceBought,
+		DernierSilence:   p.Fugitive.SilenceTurn,
 		AnnouncedEffects: list(p.announcedEffects()),
 	}
 	v.ZonesAnnoncees = list(p.announcedZones(v.AnnouncedEffects))
@@ -275,16 +284,25 @@ func (p *Game) visibleCellsFor() []Position {
 	return cases
 }
 
-// nextReveal rend le nombre de tours avant la prochaine révélation.
+// nextReveal rend le nombre de tours avant la prochaine révélation, zéro quand
+// elle tombe à la fin du tour courant et -1 quand aucune n'est prévue.
+//
+// Zéro et non la période : revealIfDue déclenche au tour multiple, en fin de
+// résolution, donc après la phase du fugitif. Annoncer une période entière à
+// cet instant serait faux au pire moment — c'est celui où il décide d'acheter
+// le silence ou de se montrer.
+//
+// Une sentinelle plutôt qu'un second zéro : sans elle, « c'est maintenant » et
+// « jamais » se liraient pareil, et un bot ne peut pas départager.
 func (p *Game) nextReveal() int {
 	periode := p.Settings.RevealPeriod
 	if periode <= 0 {
-		return 0
+		return -1
 	}
 	if reste := p.Turn % periode; reste != 0 {
 		return periode - reste
 	}
-	return periode
+	return 0
 }
 
 // announcedEffects rend les différés que les deux camps ont le droit de voir.
