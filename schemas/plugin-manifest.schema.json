@@ -61,7 +61,7 @@
     },
     "language": {
       "$ref": "#/$defs/language",
-      "description": "Dictionnaire de libelles, dans langue.toml a cote du manifeste."
+      "description": "Dictionnaire de libelles, dans language.toml a cote du manifeste."
     },
     "license": {
       "enum": [
@@ -317,7 +317,7 @@
         "duration": {
           "type": "integer",
           "minimum": 0,
-          "description": "Nombre de tours pendant lesquels l'effet tient ; zero vaut le tour courant."
+          "description": "Nombre de tours pendant lesquels l'effet tient ; un vaut le tour courant, zero vaut la partie entiere."
         },
         "radius": {
           "type": "integer",

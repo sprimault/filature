@@ -13,7 +13,7 @@ import (
 	"github.com/sprimault/filature/internal/core"
 )
 
-// dictionnaire est la forme d'un langue.toml.
+// dictionnaire est la forme d'un language.toml.
 type dictionnaire struct {
 	Libelle map[string]string `toml:"label"`
 }
