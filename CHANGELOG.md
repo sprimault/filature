@@ -30,6 +30,11 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**La dernière clé française du schéma de vue passe à l'anglais.** Le contexte
+d'un effet publiait `autre_pion` là où la cible qui le lit s'appelle
+`other_piece` — seul nom que le passage des contrats à l'anglais avait laissé
+derrière lui, dans une structure dont il avait traduit tous les autres.
+
 **Les dictionnaires livrés rattrapent le jeu.** Le leurre et la capture
 n'avaient rien à afficher, et une clé nommait encore le meurtre, retiré des
 règles. La langue de repli n'a pas le droit d'avoir de trou — c'est sur elle que
@@ -352,6 +357,11 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The last French key in the view schema turns English.** An effect's context
+published `autre_pion` where the target reading it is called `other_piece` — the
+only name the contracts' move to English had left behind, in a structure whose
+every other field it had translated.
 
 **The shipped dictionaries catch up with the game.** The decoy and the capture
 had nothing to display, and one key still named murder, dropped from the rules.

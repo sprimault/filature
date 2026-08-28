@@ -105,11 +105,11 @@ func TestShippedEffectsApply(t *testing.T) {
 // inspectorContext est ce dont dispose une capacité au déclenchement.
 func inspectorContext() core.EffectContext {
 	return core.EffectContext{
-		Side:      core.SideInspectors,
-		Piece:     0,
-		AutrePion: 1,
-		Case:      core.Position{Column: 5, Row: 5},
-		Zone:      2,
+		Side:       core.SideInspectors,
+		Piece:      0,
+		OtherPiece: 1,
+		Case:       core.Position{Column: 5, Row: 5},
+		Zone:       2,
 	}
 }
 
