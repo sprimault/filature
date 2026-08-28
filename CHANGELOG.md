@@ -30,6 +30,15 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**Le bloc de mesures des règles redevient ce que la mesure produit.** Il affirme
+sa propre provenance — réécrit par le harnais, jamais à la main — et trois de ses
+quatre colonnes ne pouvaient pas en venir : les préréglages y portaient leurs
+anciens noms français, la trame agrégeait les plateaux que la validation jette,
+et l'échantillon annoncé valait quatre fois celui d'une des colonnes. La trame
+publiée tient désormais dans la fourchette du §3, comme la règle le promet ; la
+génération, elle, n'a pas bougé. Un contrôle garde les noms — pas les chiffres,
+qui sont des conséquences.
+
 **La dernière clé française du schéma de vue passe à l'anglais.** Le contexte
 d'un effet publiait `autre_pion` là où la cible qui le lit s'appelle
 `other_piece` — seul nom que le passage des contrats à l'anglais avait laissé
@@ -357,6 +366,14 @@ redistribution, et les versions précédentes ne le faisaient pas. Le fichier es
 généré depuis les dépendances réelles ; un test échoue quand il vieillit.
 
 ***
+
+**The rules' measurement block becomes what the measurement produces again.** It
+asserts its own provenance — rewritten by the harness, never by hand — and three
+of its four columns could not have come from it: the presets carried their old
+French names, the street ratio aggregated boards validation throws away, and the
+announced sample was four times one column's own. The published ratio now sits
+inside the §3 range, as the rule promises; generation itself has not changed. A
+check guards the names — not the figures, which are consequences.
 
 **The last French key in the view schema turns English.** An effect's context
 published `autre_pion` where the target reading it is called `other_piece` — the

@@ -30,6 +30,14 @@ var majMesures = flag.Bool("maj-mesures", false, "refaire les mesures de génér
 // sous cinq impasses se comptaient sur les doigts d'une main.
 const grainesMesurees = 2000
 
+// grainesEssais est l'échantillon des seuls tirages par plateau, plus court :
+// cette mesure-là génère jusqu'à obtenir un plateau valide, donc elle coûte ce
+// que Generate coûte à un joueur, et non ce que coûte un tirage.
+//
+// Le bloc annonce les deux nombres. Il n'en annonçait qu'un, et une colonne sur
+// quatre reposait donc sur un quart de l'échantillon publié.
+const grainesEssais = 500
+
 // Les bornes du bloc réécrit dans docs/regles.md. Ce sont des commentaires
 // HTML : Markdown ne les rend pas, et un lecteur du document ne les voit pas.
 const (
@@ -60,8 +68,8 @@ func TestRulesMeasurementsAreReproducible(t *testing.T) {
 
 	var bloc strings.Builder
 	fmt.Fprintf(&bloc, "%s\n", debutDesMesures)
-	fmt.Fprintf(&bloc, "*Mesuré le %s sur %d graines par préréglage.*\n\n",
-		time.Now().Format("2006-01-02"), grainesMesurees)
+	fmt.Fprintf(&bloc, "*Mesuré le %s sur %d graines par préréglage, %d pour les tirages.*\n\n",
+		time.Now().Format("2006-01-02"), grainesMesurees, grainesEssais)
 	fmt.Fprintf(&bloc, "| Préréglage | Trame | Praticable | Tirages par plateau | Impasses |\n")
 	fmt.Fprintf(&bloc, "|---|---|---|---|---|\n")
 
@@ -108,11 +116,16 @@ func mesurer(p Settings) mesures {
 	for g := int64(1); g <= grainesMesurees; g++ {
 		b, trame := draw(g, p)
 		total := p.Size * p.Size
-		trames = append(trames, trame*100/total)
 
+		// Après le refus et non avant : le bloc publie ce que la génération
+		// retient, pas ce qu'elle jette. Compté en amont, il annonçait une
+		// trame allant jusqu'à 56 % pour une borne haute de 50, ce qui n'a de
+		// sens que si l'on sait que les plateaux rejetés y sont — et la légende
+		// disait l'inverse.
 		if b.validate(p, trame) != nil {
 			continue
 		}
+		trames = append(trames, trame*100/total)
 		praticables = append(praticables, b.countStreets()*100/total)
 
 		n := deadEnds(b)
@@ -122,10 +135,6 @@ func mesurer(p Settings) mesures {
 		}
 	}
 
-	// Les tirages par plateau se comptent sur un échantillon plus court : la
-	// mesure demande de générer jusqu'à obtenir un plateau, donc elle coûte ce
-	// que Generate coûte à un joueur.
-	const grainesEssais = 500
 	for g := int64(1); g <= grainesEssais; g++ {
 		n := 1
 		for {

@@ -740,20 +740,26 @@ main : un chiffre corrigé sans avoir été remesuré redevient ce que le préam
 proscrit.
 
 <!-- mesures:début -->
-*Mesuré le 2026-08-27 sur 2000 graines par préréglage.*
+*Mesuré le 2026-08-28 sur 2000 graines par préréglage, 500 pour les tirages.*
 
 | Préréglage | Trame | Praticable | Tirages par plateau | Impasses |
 |---|---|---|---|---|
-| quartier | 46 % en médiane, de 37 à 56 | 52 % en médiane, 57 au plus | 1,21 en moyenne, 5 au pire | 2 au moins, 1,4 % sous 5 |
-| faubourg | 46 % en médiane, de 38 à 54 | 49 % en médiane, 54 au plus | 1,04 en moyenne, 2 au pire | 13 au moins, 0,0 % sous 7 |
-| ville | 45 % en médiane, de 39 à 54 | 47 % en médiane, 52 au plus | 1,02 en moyenne, 2 au pire | 30 au moins, 0,0 % sous 10 |
+| district | 46 % en médiane, de 38 à 50 | 52 % en médiane, 57 au plus | 1,21 en moyenne, 5 au pire | 2 au moins, 1,4 % sous 5 |
+| outskirts | 46 % en médiane, de 38 à 50 | 49 % en médiane, 54 au plus | 1,04 en moyenne, 2 au pire | 13 au moins, 0,0 % sous 7 |
+| city | 45 % en médiane, de 39 à 50 | 47 % en médiane, 52 au plus | 1,02 en moyenne, 2 au pire | 30 au moins, 0,0 % sous 10 |
 <!-- mesures:fin -->
 
+**Toutes ces colonnes portent sur les plateaux retenus**, jamais sur ceux que la
+validation jette — sauf « Tirages par plateau », dont c'est le sujet. Une
+distribution qui mêlerait les deux ne décrirait aucune partie jouable.
+
 **Trame** est la part de cases praticables avant que les zones et les lieux
-soient percés, celle que le taux du §3 borne. **Praticable** est la part finale,
-blocs compris, qui n'est bornée par rien. **Tirages par plateau** dit ce que la
-génération jette avant de retenir. **Impasses** compte les rues à voisine
-unique, contre le quart du côté qu'on attendait de l'étape 4.
+soient percés, celle que le taux du §3 borne. Son étendue tient donc dans la
+fourchette par construction : ce qu'elle montre est où la distribution se tasse
+contre le plafond, et les trois préréglages l'atteignent. **Praticable** est la
+part finale, blocs compris, qui n'est bornée par rien. **Tirages par plateau**
+dit ce que la génération jette avant de retenir. **Impasses** compte les rues à
+voisine unique, contre le quart du côté qu'on attendait de l'étape 4.
 
 ---
 
