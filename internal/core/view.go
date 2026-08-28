@@ -113,12 +113,11 @@ func (p *Game) ViewFor(a Side) View {
 
 		ShelterReady: list(append([]int(nil), p.ShelterReady...)),
 		// Recopie de structure : tout est public chez un inspecteur, comme dans
-		// une zone, un lieu ou une scène de crime — les quatre types que cette
-		// fonction prend entiers. Le corollaire est un piège : **tout champ
-		// ajouté à l'un d'eux devient visible des deux camps sans que personne
-		// ne l'ait décidé.** Ce qui dépend de la position du fugitif ne vit donc
-		// pas dans Inspector mais dans Game, hors de ce qui se recopie : voir
-		// LastContacts.
+		// une zone et dans un lieu — les types que cette fonction prend entiers.
+		// Le corollaire est un piège : **tout champ ajouté à l'un d'eux devient
+		// visible des deux camps sans que personne ne l'ait décidé.** Ce qui
+		// dépend de la position du fugitif ne vit donc pas dans Inspector mais
+		// dans Game, hors de ce qui se recopie : voir LastContacts.
 		//
 		// TestBulkCopiedTypesAreDeclared épingle leurs champs et échoue à
 		// l'ajout. Le rappel ci-dessus ne se relit pas quand on ajoute un champ
@@ -162,7 +161,7 @@ func (p *Game) ViewFor(a Side) View {
 // list garantit une tranche non nulle.
 //
 // Une tranche vide se sérialise en null, pas en tableau vide : un bot devrait
-// alors traiter les deux formes pour chacune des neuf listes de la vue, et
+// alors traiter les deux formes pour chaque liste de la vue, et
 // celui qui ne le ferait que pour certaines tomberait sur les autres. Le
 // contrat promet un tableau, il en rend un.
 func list[T any](s []T) []T {

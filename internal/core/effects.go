@@ -128,10 +128,10 @@ type Effect struct {
 	// Mode dit comment Value s'applique. Absent vaut ModeAdd, donc tout
 	// manifeste écrit avant ce champ garde son sens.
 	//
-	// Un champ plutôt qu'une primitive de plus : il vaut pour les dix-neuf d'un
-	// coup, là où un change_range_multiply aurait laissé change_mobility
-	// entier. Un champ nommé plutôt qu'un booléen : une troisième forme se
-	// déclare en ajoutant une valeur, sans toucher au contrat.
+	// Un champ plutôt qu'une primitive de plus : il vaut pour toutes d'un coup,
+	// là où un change_range_multiply aurait laissé change_mobility entier. Un
+	// champ nommé plutôt qu'un booléen : une troisième forme se déclare en
+	// ajoutant une valeur, sans toucher au contrat.
 	Mode ValueMode `toml:"mode" json:"mode,omitempty"`
 }
 

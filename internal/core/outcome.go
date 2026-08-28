@@ -14,11 +14,11 @@ type Outcome struct {
 	Turn   int    `json:"turn"`
 }
 
-// Les motifs de fin. Ils partent dans le journal et dans le message `fin` du
+// Les motifs de fin. Ils partent dans le journal et dans le message `over` du
 // protocole de bot : les renommer périmerait les parties enregistrées.
 //
 // OutcomePlugin est le seul que le jeu de base ne produit jamais : il vient d'un
-// effet fin_partie, dont le noyau ignore la condition.
+// effet end_game, dont le noyau ignore la condition.
 const (
 	OutcomeExtraction   = "extraction"
 	OutcomeCaptured     = "captured"

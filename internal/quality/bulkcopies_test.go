@@ -28,10 +28,11 @@ var recopiesEnBloc = map[string][]string{
 // recopie sans les filtrer.
 //
 // L'invariant de la vue filtrée est tenu au niveau de Game, où chaque champ est
-// copié explicitement. Un cran plus bas, il ne l'est pas : quatre structures
-// partent entières, et le commentaire qui garde cette règle en annonçait une
-// seule — il disait vrai le jour où il a été écrit, les lieux et les scènes de
-// crime sont arrivés depuis.
+// copié explicitement. Un cran plus bas, il ne l'est pas : plusieurs structures
+// partent entières, et le commentaire qui garde cette règle en a longtemps
+// annoncé un nombre faux — d'abord une seule, quand les lieux étaient arrivés,
+// puis quatre, quand les scènes de crime en étaient reparties. C'est la table
+// ci-dessus qui fait foi, pas la phrase.
 //
 // Un commentaire ne se relit pas au moment où on ajoute un champ ailleurs. Ce
 // test, si : il échoue à l'ajout, ce qui force la décision quand elle se prend

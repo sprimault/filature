@@ -93,9 +93,11 @@ var ErrNoPlayableBoard = errors.New("aucun plateau jouable pour cette graine")
 // mesure.
 //
 // Les six étapes de docs/regles.md §3, dans l'ordre : grid, îlots, perçages,
-// impasses, zones, lieux. Les quatre premières tirent chacune sur leur propre
-// flux, ce qui permet d'en modifier une sans déplacer les tirages des autres ;
-// les deux dernières ne tirent pas, leur position se déduisant de la géométrie.
+// impasses, zones, lieux. Trois d'entre elles tirent au sort, chacune sur son
+// propre flux — la trame, les cours, les impasses —, ce qui permet d'en modifier
+// une sans déplacer les tirages des autres. Les trois autres n'en ont pas
+// besoin : le remplissage des îlots suit la trame, et la position des zones
+// comme des lieux se déduit de la géométrie.
 func draw(graine int64, p Settings) (*BoundedBoard, int) {
 	b := &BoundedBoard{
 		graine: graine,

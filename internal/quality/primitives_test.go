@@ -100,7 +100,7 @@ type constante struct {
 //
 // Les déclarations groupées ne répètent pas le type sur chaque ligne : il est
 // porté par la première, et les suivantes en héritent. Sans mémoriser le
-// dernier type vu, le contrôle ne verrait qu'une primitive sur dix-neuf.
+// dernier type vu, le contrôle ne verrait qu'une seule primitive sur toutes.
 func constantesDuType(t *testing.T, fset *token.FileSet, chemin, typeVoulu string) []constante {
 	t.Helper()
 

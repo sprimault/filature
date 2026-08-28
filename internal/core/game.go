@@ -170,7 +170,7 @@ type Game struct {
 
 	// ExpenseUses compte les emplois des dépenses plafonnées. Générique
 	// parce que « usages » est un champ du contrat de plugin : le noyau n'a
-	// pas à savoir que celle qui plafonne à deux s'appelle meurtre.
+	// pas à savoir laquelle plafonne, ni à combien.
 	ExpenseUses map[Expense]int `json:"expense_uses"`
 
 	// PendingEffects est la file des differer posés, résolue en fin de tour
@@ -275,7 +275,7 @@ func fugitiveStart(plateau Board, graine int64, p Settings) (Position, error) {
 
 // IsWalkable dit si une case peut être occupée et traversée du regard.
 //
-// Trois couches, dans cet ordre : le terrain, les percements d'un ouvrir_case,
+// Trois couches, dans cet ordre : le terrain, les percements d'un open_cell,
 // les barrages. Un barrage l'emporte sur tout — sans quoi rouvrir une case déjà
 // barrée dépendrait de l'ordre d'application, et le rejeu du journal cesserait
 // d'être reproductible.
