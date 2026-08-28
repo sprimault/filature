@@ -33,9 +33,9 @@ publié, et explique les conventions du dépôt à qui y contribue.
 **Les textes du dépôt disent ce que le code fait.** Rien ici ne change le jeu ni
 les contrats : ce sont des commentaires, des godoc et des messages d'erreur qui
 avaient dérivé — des noms de paquets qui en désignaient un autre, des primitives
-citées sous leurs anciens noms, un compte de flux aléatoires faux, et des godoc
-françaises où le passage des identifiants à l'anglais avait emporté des verbes
-conjugués.
+et des numéros de contrat cités sous leurs anciens noms jusque dans les
+workflows, un compte de flux aléatoires faux, et des godoc françaises où le
+passage des identifiants à l'anglais avait emporté des verbes conjugués.
 
 Deux commandes données en exemple ne marchaient pas : celle qu'un test affiche
 en échouant, et le `filature valide` de la feuille de route, que le binaire
@@ -63,9 +63,10 @@ hachage ne la faisait pas rougir.
 
 **The repository's texts say what the code does.** Nothing here changes the game
 or the contracts: these are comments, godoc and error messages that had drifted —
-package names pointing at a different package, primitives cited under their
-former names, a wrong count of random streams, and French godoc where the move of
-identifiers to English had swept up conjugated verbs.
+package names pointing at a different package, primitives and contract numbers
+cited under their former names down to the workflows, a wrong count of random
+streams, and French godoc where the move of identifiers to English had swept up
+conjugated verbs.
 
 Two commands given as examples did not work: the one a test prints when it
 fails, and the roadmap's `filature valide`, which the binary refuses now that the
