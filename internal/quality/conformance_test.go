@@ -597,10 +597,10 @@ func TestInertMechanicsAreCounted(t *testing.T) {
 // TestSilenceCoversTheWholeTurn vérifie qu'un silence acheté neutralise toutes
 // les révélations du tour, pas seulement la première.
 //
-// Le fugitif paie avant que les inspecteurs jouent : il ne peut pas prévoir
-// qu'un coup de filet tombera le même tour que la révélation périodique. Le
-// faire payer deux fois pour cette coïncidence serait une punition, pas un
-// arbitrage.
+// Trois points sont le prix d'un tour, pas d'une révélation. Le fugitif joue
+// après les inspecteurs et voit le coup de filet annoncé deux tours plus tôt :
+// il achète donc au bon tour, mais il ne choisit pas que la périodique tombe le
+// même — le faire payer deux fois pour cette coïncidence serait une punition.
 //
 // La coïncidence est obtenue en jouant, pas en posant un effet en attente : le
 // Chef est déclenché au tour qui place son échéance sur une révélation
@@ -641,11 +641,17 @@ func TestSilenceCoversTheWholeTurn(t *testing.T) {
 		t.Fatal("la capacité du Chef n'est proposée à aucun coup légal")
 	}
 
-	// Le fugitif paie son silence pendant sa phase, sans savoir que les deux
-	// révélations tomberont ensemble.
+	// Le silence se joue au tour qu'il couvre : avancer jusqu'à celui où les
+	// deux révélations tombent, puis laisser les inspecteurs rendre la main.
+	for p.Turn < echeance && p.Phase != core.PhaseOver {
+		p.Fugitive.Visible = false
+		finirLeTour(t, p)
+	}
 	for p.Phase == core.PhaseInspectors {
 		finirLaPhase(t, p)
 	}
+	p.Fugitive.Visible = false
+
 	achete := false
 	for _, c := range p.LegalMoves(core.SideFugitive) {
 		if c.Type == core.MoveExpense && c.Expense == core.ExpenseSilence {
@@ -660,15 +666,18 @@ func TestSilenceCoversTheWholeTurn(t *testing.T) {
 		t.Fatal("le silence n'est proposé à aucun coup légal")
 	}
 
-	for p.Turn <= echeance && p.Phase != core.PhaseOver {
-		p.Fugitive.Visible = false
-		finirLeTour(t, p)
+	for p.Phase == core.PhaseFugitive {
+		finirLaPhase(t, p)
 	}
 
 	if p.Fugitive.Visible {
 		t.Error("le silence n'a pas couvert les deux révélations du tour")
 	}
 	if p.Fugitive.SilenceBought {
-		t.Error("le silence n'a pas été dépensé alors qu'il a servi")
+		t.Error("le silence court encore après la résolution qu'il couvrait")
+	}
+	if p.Fugitive.SilenceTurn != echeance {
+		t.Errorf("silence daté du tour %d, attendu %d : c'est cette date que les "+
+			"inspecteurs lisent", p.Fugitive.SilenceTurn, echeance)
 	}
 }

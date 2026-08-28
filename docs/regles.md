@@ -330,14 +330,21 @@ converge jamais et la partie devient une loterie. C'est aussi ce qui borne la
 carte de croyance de l'IA quelle que soit la taille du plateau.
 
 Le fugitif peut acheter le silence (3 points) pour sauter une révélation — mais
-les inspecteurs sont informés qu'il a payé. Ils ne savent pas où il est, ils
-savent qu'il s'est appauvri.
+les inspecteurs sont informés qu'il a payé, et de quel tour date l'achat. Ils ne
+savent pas où il est, ils savent qu'il s'est appauvri.
 
-**Un silence couvre le tour, pas une révélation.** Le coup de filet du Chef (§9)
-peut tomber le même tour que la révélation périodique, et le fugitif paie avant
-que les inspecteurs jouent : il ne peut pas anticiper la coïncidence, donc il
-n'a pas à la payer deux fois. Il s'achète contre être trouvé, jamais contre se
-montrer — une révélation qu'il s'inflige lui-même reste en vigueur.
+**Un silence couvre le tour où il est acheté, et se perd s'il n'a rien à
+couvrir.** Reporté jusqu'à la prochaine révélation, il serait une assurance sans
+date qu'il vaudrait toujours mieux prendre dès qu'on a les points, et une
+dépense qu'on ne peut pas jouer trop tôt ne se décide pas. Le fugitif a de quoi
+viser juste : il joue après les inspecteurs, la révélation périodique se compte
+d'avance, et le coup de filet du Chef s'annonce deux tours plus tôt.
+
+**Mais il couvre le tour entier, pas une révélation.** Le coup de filet peut
+tomber le même tour que la révélation périodique : le fugitif choisit le tour où
+il paie, jamais la coïncidence, et un seul silence les neutralise toutes deux.
+Il s'achète contre être trouvé, jamais contre se montrer — une révélation qu'il
+s'inflige lui-même reste en vigueur.
 
 ---
 
@@ -348,7 +355,7 @@ montrer — une révélation qu'il s'inflige lui-même reste en vigueur.
 | Dépense | Coût | Effet |
 |---|---|---|
 | Double déplacement | 2 | Deux cases au lieu d'une, ce tour |
-| Silence | 3 | Annule les révélations d'un tour, périodique ou forcée |
+| Silence | 3 | Annule les révélations du tour où il est payé, périodique ou forcée |
 | Effacement | 1 | Supprime toutes ses traces de moins de 3 tours |
 | Changement de zone | 2 | Rescelle une autre zone d'extraction |
 | Leurre | 1 | Falsifie la trace du tour, 3 fois par partie (§12) |

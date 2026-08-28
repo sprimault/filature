@@ -166,11 +166,14 @@ func Status(v core.View) string {
 	if len(v.ZonesAnnoncees) > 0 {
 		fmt.Fprintf(&s, "Zones annoncées : %s\n", numbers(v.ZonesAnnoncees))
 	}
-	if v.ProchaineReveal > 0 {
+	switch {
+	case v.ProchaineReveal == 0:
+		s.WriteString("Révélation à la fin de ce tour\n")
+	case v.ProchaineReveal > 0:
 		fmt.Fprintf(&s, "Révélation dans %d tour(s)\n", v.ProchaineReveal)
 	}
-	if v.SilencePaye {
-		s.WriteString("Le fugitif a payé le silence\n")
+	if v.DernierSilence > 0 {
+		fmt.Fprintf(&s, "Silence payé au tour %d\n", v.DernierSilence)
 	}
 
 	for i, insp := range v.Inspectors {
