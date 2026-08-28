@@ -74,18 +74,40 @@ func (p *Point) UnmarshalTOML(v any) error {
 // zéro, comme pour core.Effect et pour la même raison : un enregistrement plat
 // se lit et se valide sans hiérarchie de types.
 type Stroke struct {
-	Type             StrokeType `toml:"type"`
-	Points           []Point    `toml:"points"`
-	Center           Point      `toml:"center"`
-	Radius           int        `toml:"radius"`
-	From             Point      `toml:"from"`
-	To               Point      `toml:"to"`
-	Thickness        int        `toml:"thickness"`
-	Height           int        `toml:"height"`
-	Color            string     `toml:"color"`
-	Outline          string     `toml:"outline"`
-	OutlineThickness int        `toml:"outline_thickness"`
-	Opacity          int        `toml:"opacity"`
+	Type      StrokeType `toml:"type"`
+	Points    []Point    `toml:"points"`
+	Center    Point      `toml:"center"`
+	Radius    int        `toml:"radius"`
+	From      Point      `toml:"from"`
+	To        Point      `toml:"to"`
+	Thickness int        `toml:"thickness"`
+	Height    int        `toml:"height"`
+	Color     string     `toml:"color"`
+	Outline   string     `toml:"outline"`
+
+	// OutlineThickness est un pointeur pour séparer « absent » de « zéro ».
+	// Sur un entier, les deux se confondaient : le chargeur acceptait donc un
+	// zéro écrit à la main, que le schéma refuse depuis toujours et que son
+	// propre message annonçait hors bornes. Absent, l'épaisseur vaut
+	// DefaultOutline ; écrite, elle doit tenir dans les bornes du contrat.
+	OutlineThickness *int `toml:"outline_thickness"`
+
+	Opacity int `toml:"opacity"`
+}
+
+// DefaultOutline est l'épaisseur d'un contour qui n'en déclare pas.
+const DefaultOutline = 1
+
+// Outlined rend l'épaisseur de contour effective d'un trait.
+//
+// Point unique parce que le défaut se réapplique partout où un contour se
+// dessine, et qu'un oubli y donnerait un trait d'épaisseur nulle plutôt que le
+// contour attendu.
+func (s Stroke) Outlined() int {
+	if s.OutlineThickness == nil {
+		return DefaultOutline
+	}
+	return *s.OutlineThickness
 }
 
 // Role détermine ce qu'un plugin a le droit de redéfinir.
@@ -160,8 +182,34 @@ type Shape struct {
 	// est insensible à la casse mais pas à la langue : elle a laissé passer
 	// des formes vides quand « trait » est devenu « stroke », sans que rien
 	// ne le signale — un TOML dont on ignore une table se décode sans erreur.
-	Strokes  []Stroke            `toml:"stroke"`
-	Variants map[string][]Stroke `toml:"variant"`
+	Strokes []Stroke `toml:"stroke"`
+
+	// Les deux variantes d'état, facultatives. Nommées et non rassemblées dans
+	// une table : le moteur n'en produit que deux, et une map aurait accepté
+	// un état inventé pour l'ignorer ensuite en silence — l'auteur n'aurait
+	// appris son erreur qu'en ne la voyant pas à l'écran.
+	//
+	// Les trois voix du contrat divergeaient ici : le schéma déclarait ces deux
+	// propriétés, le document les montrait, et le Go décodait une table sous la
+	// clé « variant ». Aucune n'acceptait ce que les deux autres écrivaient.
+	Highlighted []Stroke `toml:"highlighted"`
+	OutOfSight  []Stroke `toml:"out_of_sight"`
+}
+
+// Variants rend les variantes d'état déclarées, indexées par leur nom.
+//
+// Un accesseur plutôt que le champ : la validation les parcourt toutes de la
+// même façon, et l'ordre est fixe pour que deux chargements du même fichier
+// signalent le même manquement en premier.
+func (s Shape) Variants() map[string][]Stroke {
+	variantes := map[string][]Stroke{}
+	if len(s.Highlighted) > 0 {
+		variantes["highlighted"] = s.Highlighted
+	}
+	if len(s.OutOfSight) > 0 {
+		variantes["out_of_sight"] = s.OutOfSight
+	}
+	return variantes
 }
 
 // RimColor est le liseré que le moteur pose sous le contour des pions et des

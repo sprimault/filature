@@ -262,6 +262,17 @@ role = "marker"
 			fragment: "outline",
 		},
 		{
+			nom: "rôle absent",
+			formes: `[shape.essai]
+  [[shape.essai.stroke]]
+  type = "segment"
+  from = [-5, 0]
+  to = [5, 0]
+  thickness = 2
+  color = "trail"`,
+			fragment: "role",
+		},
+		{
 			nom: "rôle inconnu",
 			formes: `[shape.essai]
 role = "sol"
@@ -305,7 +316,7 @@ role = "building"
 		},
 		{
 			nom: "marqueur au-dessus de son plafond de traits",
-			formes: strings.Repeat(`[[shape.essai.stroke]]
+			formes: "[shape.essai]\nrole = \"marker\"\n" + strings.Repeat(`[[shape.essai.stroke]]
 type = "segment"
 from = [-5, 0]
 to = [5, 0]
@@ -370,6 +381,20 @@ role = "marker"
 			fragment: "outline_thickness",
 		},
 		{
+			nom: "épaisseur de contour nulle",
+			formes: `[shape.essai]
+role = "marker"
+  [[shape.essai.stroke]]
+  type = "segment"
+  from = [-5, 0]
+  to = [5, 0]
+  thickness = 2
+  color = "trail"
+  outline = "marker_outline"
+  outline_thickness = 0`,
+			fragment: "outline_thickness",
+		},
+		{
 			nom: "type de trait inconnu",
 			formes: `[shape.essai]
 role = "marker"
@@ -382,12 +407,10 @@ role = "marker"
 
 	for _, c := range cas {
 		t.Run(c.nom, func(t *testing.T) {
-			formes := "shapes_version = 4\n\n" + c.formes
-			if !strings.Contains(formes, "role =") {
-				formes = "shapes_version = 4\n\n[shape.essai]\nrole = \"marker\"\n" + c.formes
-			}
-
-			j, err := Read(source(formes, paletteComplete()), "essai")
+			// Le rôle n'est plus injecté quand il manque : c'est un champ
+			// obligatoire, et un harnais qui le complète masquerait le seul
+			// contrôle qui le vérifie.
+			j, err := Read(source("shapes_version = 4\n\n"+c.formes, paletteComplete()), "essai")
 			if err != nil {
 				t.Fatalf("lecture : %v", err)
 			}
@@ -442,14 +465,57 @@ role = "marker"
   thickness = 2
   color = "trail"
 
-  [[shape.essai.variant.highlighted]]
+  [[shape.essai.highlighted]]
   type = "polygon"
   points = [[-10, 0], [10, 0], [0, 40]]
   color = "trail"
 `)
 
-	if !manquement(j.Validate(), "highlighted") {
+	manquements := j.Validate()
+	if !manquement(manquements, "highlighted") {
 		t.Error("une variante hors gabarit passe")
+	}
+
+	// Le chemin nommé doit être celui d'un fichier chargeable : le message
+	// désignait « shape.essai.highlighted » sous une clé « variant » que
+	// personne ne pouvait écrire, et renvoyait donc l'auteur nulle part.
+	if !manquement(manquements, "shape.essai.highlighted[0]") {
+		t.Errorf("manquements %v, attendu qu'un nomme la clé telle qu'elle s'écrit", manquements)
+	}
+}
+
+// TestVariantUnderAnUnknownKeyIsRefused vérifie que l'ancienne écriture ne
+// passe plus en silence.
+//
+// Le Go décodait les variantes sous « variant.<état> » quand le schéma et le
+// document déclaraient deux propriétés nommées. Une forme écrite d'après le
+// contrat perdait donc sa variante sans un mot ; l'inverse vaut désormais, et
+// il vaut mieux qu'il se dise.
+func TestVariantUnderAnUnknownKeyIsRefused(t *testing.T) {
+	_, err := Read(source(`shapes_version = 4
+
+[shape.essai]
+role = "marker"
+
+  [[shape.essai.stroke]]
+  type = "segment"
+  from = [-5, 0]
+  to = [5, 0]
+  thickness = 2
+  color = "trail"
+
+  [[shape.essai.variant.highlighted]]
+  type = "circle"
+  center = [0, 0]
+  radius = 2
+  color = "trail"
+`, paletteComplete()), "essai")
+
+	if err == nil {
+		t.Fatal("une variante sous une clé inconnue est acceptée")
+	}
+	if !strings.Contains(err.Error(), "variant") {
+		t.Errorf("refusé, mais sans nommer la clé fautive :\n%v", err)
 	}
 }
 
