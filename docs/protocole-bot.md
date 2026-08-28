@@ -10,6 +10,11 @@ L'IA livrée avec le jeu parle ce protocole comme les autres. C'est ce qui
 garantit qu'il est suffisant : s'il manquait quelque chose, le jeu ne pourrait
 pas jouer contre lui-même.
 
+**Ce document décrit le protocole en entier ; le pilote qui l'exécute arrive à
+l'étape 9** de `ROADMAP.md`, avec l'IA. Un bot écrit contre ces pages sera
+correct le jour où le jeu le lancera — c'est ce à quoi sert un contrat publié
+d'avance —, mais rien ne le lance encore aujourd'hui.
+
 ---
 
 ## 1. Transport
