@@ -252,7 +252,7 @@ Les deux bornes traitent le même défaut par ses deux bouts. Sans plancher, une
 à ce qu'elle devait séparer, et le contraste réel s'effondre bien avant la valeur
 calculée — or c'est au plateau entier qu'on cherche où sont les pions. Sans
 plafond, une épaisseur fixe finit par occuper la forme entière : à 24 pixels par
-case, les deux têtes livrées en font 5,25 et 3,75, et deux pixels de liseré n'en
+case, les deux têtes livrées en font 5,25 et 4,50, et deux pixels de liseré n'en
 détachent plus rien. Ils avalent la couleur, qui est le seul signal
 d'appartenance à un camp.
 
@@ -264,9 +264,24 @@ liseré dès que le plafond mord, alors que c'est lui qui porte le contraste sur
 le bâti.
 
 Ce que les deux bornes garantissent, c'est qu'**un pion garde un remplissage
-majoritaire** : 64 % de sa tête à 64 et 32 pixels par case, 57 % à 24. C'est la
-couleur qui dit à quel camp il appartient, et elle ne doit pas se faire manger
-par ce qui sert à la détacher.
+majoritaire**. C'est la couleur qui dit à quel camp il appartient, et elle ne
+doit pas se faire manger par ce qui sert à la détacher.
+
+Les chiffres sont ceux de la plus petite tête livrée, celle d'un inspecteur, et
+non de la plus grande : il y a cinq inspecteurs sur le plateau contre un fugitif,
+et c'est la forme la moins favorable qui décide de ce que le contrat peut
+promettre.
+
+| Pixels par case | Fugitif | Inspecteur |
+|---|---|---|
+| 64 | 64 % | 60 % |
+| 48 | 64 % | 60 % |
+| 32 | 64 % | 60 % |
+| 24 | 57 % | 53 % |
+
+La tête de l'inspecteur est passée de cinq à six unités de rayon pour cela : à
+cinq, elle tombait à 48 % au plancher, sous la moitié que cette section
+garantit — et le contrôle qui la gardait ne mesurait que le fugitif.
 
 **La propriété ne vaut que pour le rôle `piece`.** Un marqueur peut être plus
 fin que ses bordures — la trace l'est, à 27 % de son épaisseur à 24 pixels par

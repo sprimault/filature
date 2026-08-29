@@ -76,25 +76,11 @@ func TestStrokeWidthStaysWithinItsBounds(t *testing.T) {
 	}
 }
 
-// TestStrokeWidthLeavesTheCoreVisible vérifie la propriété que les deux bornes
-// existent pour tenir : un pion garde un remplissage majoritaire.
-//
-// C'est la couleur qui dit à quel camp il appartient. Un noyau minoritaire ne
-// serait pas un défaut d'esthétique mais une perte d'information.
-func TestStrokeWidthLeavesTheCoreVisible(t *testing.T) {
-	// La tête du fugitif, la plus petite forme d'un pion livré.
-	const diametre = 14
-
-	for _, taille := range []int{64, 48, 32, 24} {
-		echelle := float64(taille) / TileWidth
-		noyau := diametre * echelle
-		bordure := StrokeWidth(2, echelle, diametre) + StrokeWidth(RimWidth, echelle, diametre)
-
-		if part := noyau / (noyau + 2*bordure); part <= 0.5 {
-			t.Errorf("à %d px par case, le noyau ne fait que %.0f %% du pion", taille, 100*part)
-		}
-	}
-}
+// La propriété que les deux bornes existent pour tenir — un pion garde un
+// remplissage majoritaire — se vérifie dans internal/quality, sur les formes
+// réellement livrées. Elle vivait ici avec un diamètre de quatorze en dur,
+// présenté comme la plus petite tête d'un pion livré : c'est celle du fugitif,
+// et le test n'exerçait donc que la forme la plus favorable.
 
 // TestRequiredColorsCoverBothOutlines vérifie que le socle porte les contours.
 //

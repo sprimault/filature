@@ -330,7 +330,7 @@ func Lit(hexa string, face int) string {
 // passe sous le pixel au dézoom : l'antialiasing la mêle à ce qu'elle devait
 // séparer, et le contraste réel s'effondre bien avant la valeur calculée. Sans
 // plafond, une épaisseur fixe finit par occuper la forme entière — à 24 pixels
-// par case, les deux têtes livrées font 5,25 et 3,75 pixels, et deux pixels de
+// par case, les deux têtes livrées font 5,25 et 4,50 pixels, et deux pixels de
 // liseré n'en détachent plus rien : ils avalent la couleur, qui est le seul
 // signal d'appartenance à un camp.
 //

@@ -64,10 +64,14 @@ role = "piece"
   outline = "inspector_detail"
   outline_thickness = 2
 
+  # Rayon six et non cinq : à cinq, le noyau tombait à 48 % de la largeur du
+  # pion au plancher de rendu, sous la moitié que le contrat garantit. C'est la
+  # couleur du noyau qui dit le camp, et il y a cinq inspecteurs sur le plateau
+  # contre un fugitif — la plus petite tête livrée est celle qu'on lit le plus.
   [[shape.inspector.stroke]]
   type = "circle"
   center = [0, 23]
-  radius = 5
+  radius = 6
   color = "inspector_main"
   outline = "inspector_detail"
   outline_thickness = 2
