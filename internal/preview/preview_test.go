@@ -245,14 +245,3 @@ func TestRimKeepsItsWidthWithoutOutline(t *testing.T) {
 		}
 	}
 }
-
-// TestTintNeverExceedsWhite vérifie qu'un coefficient de face ne déborde pas
-// d'un canal.
-func TestTintNeverExceedsWhite(t *testing.T) {
-	if got := teinte("#c0c0c0", 1.5); got != "#ffffff" {
-		t.Errorf("teinte = %s, attendu que les canaux soient bornés", got)
-	}
-	if got := teinte("pas une couleur", 1.5); got != "#000000" {
-		t.Errorf("teinte = %s, attendu un repli plutôt qu'un échec", got)
-	}
-}

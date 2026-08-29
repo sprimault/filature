@@ -178,10 +178,12 @@ l'ordre des faces, ni la forme au sol.
 | droite | × 1,14 |
 | gauche | × 0,72 |
 
-Le coefficient s'applique aux trois canaux, ce qui préserve la teinte. Il est
+Le coefficient s'applique aux trois canaux, ce qui préserve la teinte, et un
+canal qui déborde se borne au blanc plutôt que de reboucler. Il est
 écrit ici parce que c'est exactement le genre de détail que deux implémentations
 règlent différemment sans que personne ne s'en aperçoive avant de comparer deux
-captures.
+captures. Un contrôle compare désormais cette table aux coefficients du moteur,
+que les deux implémentations partagent.
 
 ### Attributs communs
 

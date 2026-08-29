@@ -129,6 +129,13 @@ trois autres runners, et l'archive d'une plateforme serait partie sans la notice
 de ce qu'elle incorpore sans les autres. Sans effet aujourd'hui, le binaire ne
 liant que du Go pur, et posé pour la dépendance suivante.
 
+Les coefficients d'éclairage d'un prisme vivent dans `internal/render`, avec les
+autres constantes du moteur. Le contrat les publie comme une règle, en disant que
+c'est le genre de détail que deux implémentations règlent différemment sans qu'on
+s'en aperçoive — et leur seule implémentation était une variable interne à
+l'aperçu, que rien ne comparait au document : porter le dessus à 2,50 laissait la
+suite verte. Un contrôle compare désormais les deux.
+
 `internal/render` sort de l'exclusion `unused` du linter, comme le commentaire de
 cette exclusion le prévoyait dès que son étape serait écrite. Aucun manquement
 n'apparaît : c'était la dernière occasion où le retrait ne coûtait rien, le
@@ -228,6 +235,13 @@ the suite fail on the three other runners, and one platform's archive would have
 shipped without the notice for what it incorporates and the others do not. No
 effect today, the binary linking nothing but pure Go, and in place for the next
 dependency.
+
+A prism's face-lighting coefficients now live in `internal/render`, with the
+engine's other constants. The contract publishes them as a rule, saying they are
+the kind of detail two implementations settle differently without anyone
+noticing — and their only implementation was a variable private to the preview,
+which nothing compared to the document: setting the top face to 2.50 left the
+suite green. A check now compares the two.
 
 `internal/render` leaves the linter's `unused` exclusion, as that exclusion's own
 comment planned once its step was written. Nothing is reported: this was the last
