@@ -101,6 +101,41 @@ func TestGroundRangeIsWhatTheContractSays(t *testing.T) {
 	}
 }
 
+// TestGroundsAreListedFromLightestToDarkest vérifie que render.Grounds est dans
+// l'ordre que sa godoc annonce.
+//
+// Rien ne le gardait : les autres contrôles retrient par luminance avant de
+// mesurer, et la liste a passé deux versions avec ses rangs deux et trois
+// inversés — le lot qui a reposé les couleurs a corrigé l'énoncé de la palette
+// et laissé la liste. La planche d'aperçu s'y adosse et sortait donc avec ses
+// bandes du milieu permutées.
+func TestGroundsAreListedFromLightestToDarkest(t *testing.T) {
+	sols := solsDeLaPalette(t)
+
+	for i := 1; i < len(render.Grounds); i++ {
+		precedent, courant := render.Grounds[i-1], render.Grounds[i]
+		if sols[precedent] <= sols[courant] {
+			t.Errorf("render.Grounds place %s (%.1f) avant %s (%.1f) : la liste "+
+				"se dit du plus clair au plus sombre",
+				precedent, sols[precedent], courant, sols[courant])
+		}
+	}
+}
+
+// solsDeLaPalette rend la luminance de chaque sol livré, sans les trier.
+//
+// solsLivres trie, ce qui convient à ce qui mesure des écarts et interdit de
+// vérifier un rang.
+func solsDeLaPalette(t *testing.T) map[string]float64 {
+	t.Helper()
+
+	luminances := make(map[string]float64, len(render.Grounds))
+	for _, sol := range solsLivres(t) {
+		luminances[sol.nom] = sol.l
+	}
+	return luminances
+}
+
 // solLivre est un sol de la palette livrée, avec sa luminance.
 type solLivre struct {
 	nom string
