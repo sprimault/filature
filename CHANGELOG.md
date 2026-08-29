@@ -45,6 +45,13 @@ jamais donnée à personne — le noyau ne distribue que celles des inspecteurs.
 dispense d'une passive porte sur la phase qu'elle n'attend pas, jamais sur le
 camp qu'elle sert.
 
+Le rôle déduit du nom se borne aux cinq surcharges que le contrat nomme, au lieu
+de fermer tout l'espace `inspector_`. Une forme appelée `inspector_halo` était
+refusée au chargement — pas signalée, refusée — au nom d'une règle dont le
+contrat promet deux fois qu'elle ne s'applique pas à un nom qu'un plugin ajoute.
+C'est l'espace le plus naturel pour une surcouche par inspecteur, et il était
+fermé sans que rien ne le dise.
+
 ***
 
 The check that rejects unsupported claims about quantity in the notes now
@@ -59,6 +66,13 @@ without doing: its check returned on passivity before looking at the side. A
 passive ability declared on the fugitive's side loaded, validated, and was never
 handed to anyone — the core only distributes the inspectors'. A passive's
 exemption covers the phase it does not wait for, never the side it serves.
+
+The role inferred from a name is now limited to the five overrides the contract
+lists, instead of closing the whole `inspector_` space. A shape named
+`inspector_halo` was rejected at load time — not warned about, rejected — in the
+name of a rule the contract twice promises does not apply to a name a plugin
+adds. It is the most natural space for a per-inspector overlay, and it was closed
+without anything saying so.
 
 ## [0.6.2] — 2026-08-29 — Les promesses tenues
 
