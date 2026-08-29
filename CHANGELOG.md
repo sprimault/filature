@@ -93,6 +93,17 @@ génération écarte nommément. Le seuil publié en valait la moitié sur les d
 grands préréglages, si bien que ses « 0,0 % » ne disaient rien. Un plateau de
 Quartier sur vingt-quatre passe sous la cible, un sur mille en Périphérie.
 
+La note de la 0.6.1 sur la règle de langue est rectifiée, dans le journal comme
+sur la version publiée. Elle chiffrait l'écart et le donnait pour un défaut de
+tests seulement : la proportion venait d'un comptage partiel, et dix-huit
+fonctions hors test enfreignent la règle — dont `validerForme`, `poseUneTrace` et
+`cibleHorsDuCamp`. `CONTRIBUTING` portait la même phrase.
+
+Un contrôle refuse désormais une affirmation de nombre non tenue dans les notes
+non publiées. La règle existait pour les godoc, les règles, les README et la
+palette ; le journal en était dispensé, alors qu'il devient une page publique
+sans relecture.
+
 ***
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
@@ -154,6 +165,17 @@ generation rules out by name. The published threshold was half the real one on
 both large presets, so its "0.0 %" said nothing. One district board in
 twenty-four falls below the target, one in a thousand on the outskirts.
 
+The 0.6.1 note about the language rule is corrected, in the changelog and on the
+published release. It put a figure on the gap and presented it as a test-only
+defect: the proportion came from a partial count, and eighteen non-test functions
+break the rule — among them `validerForme`, `poseUneTrace` and
+`cibleHorsDuCamp`. `CONTRIBUTING` carried the same sentence.
+
+A check now rejects an unsupported claim about quantity in the unreleased notes.
+The rule already covered godoc, the rules document, the READMEs and the palette;
+the changelog was exempt, though it becomes a public page with no further
+review.
+
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 
 **Les textes du dépôt disent ce que le code fait.** Rien ici ne change le jeu ni
@@ -173,10 +195,10 @@ produit sont inchangés, octet pour octet.
 
 **`CONTRIBUTING` dit désormais la règle de langue qu'on suit, et non celle qu'on
 croyait suivre.** Elle exigeait des identifiants anglais sans distinguer ce
-qu'un autre paquet voit de ce qui ne quitte jamais son fichier ; un cinquième
-des fonctions du dépôt l'enfreignait, toutes des helpers de test. La contrainte
-porte maintenant sur ce qui est visible depuis l'extérieur, et un helper de test
-suit la langue de ce qu'il raconte.
+qu'un autre paquet voit de ce qui ne quitte jamais son fichier, et personne ne la
+faisait appliquer — ni dans les tests, ni dans le code livré. La contrainte porte
+maintenant sur ce qui est visible depuis l'extérieur, et un helper de test suit
+la langue de ce qu'il raconte.
 
 Deux points en sortent, parce qu'ils touchaient ce qu'on lit pour décider. Les
 chiffres que `plugins/base/palette.toml` commente étaient faux — le contraste
@@ -204,10 +226,9 @@ unchanged, byte for byte.
 
 **`CONTRIBUTING` now states the language rule we follow, not the one we thought
 we followed.** It demanded English identifiers without distinguishing what
-another package sees from what never leaves its file; a fifth of the
-repository's functions broke it, all of them test helpers. The constraint now
-covers what is visible from outside, and a test helper follows the language of
-what it tells.
+another package sees from what never leaves its file, and nobody enforced it —
+neither in tests nor in shipped code. The constraint now covers what is visible
+from outside, and a test helper follows the language of what it tells.
 
 Two of them stand out, because they touched what one reads to decide. The
 figures `plugins/base/palette.toml` comments were wrong — the announced contrast
