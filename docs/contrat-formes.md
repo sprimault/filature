@@ -318,10 +318,12 @@ que soient leurs teintes ; les écarter en luminosité coûte moins qu'un jeu de
 teintes savant, et se vérifie sur une capture désaturée.
 
 **L'écart se juge après le grain, pas sur les valeurs déclarées.** Le moteur
-déplace chaque case de sol de quelques pourcents (§8), donc deux couleurs
-séparées de douze niveaux de gris se recouvrent partiellement une fois posées
-sur le plateau. Lire la palette ne suffit pas : c'est le rendu qu'il faut
-regarder, ce que `filature preview` donne sans lancer le jeu.
+déplace chaque case de sol de cinq niveaux de luminance dans un sens ou dans
+l'autre (§8), donc deux couleurs séparées de dix niveaux ou moins se rejoignent
+une fois posées sur le plateau — et le chargeur les refuse pour cette raison.
+Au-delà, elles restent distinctes, mais leur écart perçu n'est pas celui que la
+palette affiche : c'est le rendu qu'il faut regarder, ce que `filature preview`
+donne sans lancer le jeu.
 
 Les noms en `_detail` et `marker_outline` sont des **contours**, pas des nuances
 d'accompagnement, et c'est la contrainte la moins évidente de la palette. Une
@@ -487,8 +489,8 @@ posé à la main se charge tel quel.
 ## 8. Le grain du sol
 
 Un plateau de couleurs pleines est plat à l'œil sur seize cents cases. Le moteur
-applique donc à chaque case de sol un écart de luminosité de quelques pourcents,
-dérivé de sa position et de la graine du plateau.
+applique donc à chaque case de sol un écart de luminance de cinq niveaux dans un
+sens ou dans l'autre, dérivé de sa position et de la graine du plateau.
 
 **Ce n'est pas une primitive et ça ne se déclare pas.** Aucun plugin n'a à en
 tenir compte, et tous en bénéficient — y compris ceux qui ne changent que la
