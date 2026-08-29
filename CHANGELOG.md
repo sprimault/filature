@@ -61,6 +61,12 @@ l'adversaire doit voir. Les noms du §6 imposent désormais leur rôle ; un nom
 ajouté par un plugin garde le sien. `shapes_version` ne bouge pas : ces deux
 contrôles resserrent ce qui était déjà écrit.
 
+**`block_cell` et `open_cell` exigent désormais leur `duration`.** Le vocabulaire
+promettait qu'une durée absente vaut la partie entière ; c'est vrai d'un effet
+actif, faux du terrain, que la résolution purge à l'échéance — omettre le champ
+donnait un tour, comme une durée de 1. Le contrat n'admet plus qu'on le taise
+plutôt que de définir un défaut que personne ne devinerait.
+
 ***
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
@@ -90,6 +96,12 @@ footprint instead of the imposed diamond — which the contract rules out by nam
 so that no plugin can hide what the opponent must see. Names listed in §6 now
 impose their role; a name a plugin adds keeps its own. `shapes_version` does not
 move: both checks tighten what was already written.
+
+**`block_cell` and `open_cell` now require their `duration`.** The vocabulary
+promised that a missing duration means the whole game; that holds for an active
+effect, not for terrain, which turn resolution clears at its due date — omitting
+the field gave one turn, same as a duration of 1. The contract no longer lets it
+go unsaid, rather than defining a default nobody would guess.
 
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 
