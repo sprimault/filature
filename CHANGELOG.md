@@ -57,7 +57,8 @@ pouvait en déclarer vingt-quatre une fois surligné. Et le contrôle portait su
 `role` quand le rendu choisit par le nom, si bien qu'une forme `building`
 déclarée `piece` recevait l'emprise libre d'un pion au lieu du losange imposé —
 ce que le contrat écarte nommément pour qu'un plugin ne puisse pas masquer ce que
-l'adversaire doit voir. Les noms du §6 imposent désormais leur rôle ; un nom
+l'adversaire doit voir. Les noms de formes que `contrat-formes.md` §6 énumère
+imposent désormais leur rôle ; un nom
 ajouté par un plugin garde le sien. `shapes_version` ne bouge pas : ces deux
 contrôles resserrent ce qui était déjà écrit.
 
@@ -78,13 +79,15 @@ plaçait `y` vers le bas quand le schéma et le moteur le placent vers le haut. 
 flèche asymétrique écrite d'après le diagramme passait la validation et ressortait
 retournée.
 
-Les chiffres du liseré sont remesurés sur la palette livrée. Le tableau du §2
-dataient d'avant la refonte des couleurs et n'énumérait pas les deux lieux de
+Les chiffres du liseré sont remesurés sur la palette livrée. Le tableau de
+`contrat-formes.md` §2 datait d'avant la refonte des couleurs et n'énumérait pas
+les deux lieux de
 ressourcement, dont le pire fond de tous : un pion y tient à 4,49, ce que le
 document donnait pour 5,92 sur une zone fermée. Les trois faces d'un bâtiment y
 figurent désormais séparément, et un contrôle mesure chaque ligne.
 
-La colonne des impasses du §15 se mesure contre la cible de l'étape 4 — une par
+La colonne des impasses du bloc de mesures de `regles.md` §15 se mesure contre la
+cible de l'étape 4 — une par
 carré de huit cases — et non contre le quart du côté du plateau, que la
 génération écarte nommément. Le seuil publié en valait la moitié sur les deux
 grands préréglages, si bien que ses « 0,0 % » ne disaient rien. Un plateau de
@@ -116,7 +119,8 @@ cap only applied to the normal state: a building with one stroke could declare
 twenty-four once highlighted. And the check keyed off `role` while rendering keys
 off the name, so a `building` shape declared `piece` was given a piece's free
 footprint instead of the imposed diamond — which the contract rules out by name,
-so that no plugin can hide what the opponent must see. Names listed in §6 now
+so that no plugin can hide what the opponent must see. The shape names listed in
+`contrat-formes.md` §6 now
 impose their role; a name a plugin adds keeps its own. `shapes_version` does not
 move: both checks tighten what was already written.
 
@@ -136,13 +140,15 @@ them on the ground and then in the vertical plane, and its ground-plane diagram
 put `y` downwards where the schema and the engine put it upwards. An asymmetric
 arrow written from the diagram passed validation and came out flipped.
 
-The rim figures are measured again on the shipped palette. The §2 table predated
+The rim figures are measured again on the shipped palette. The table in
+`contrat-formes.md` §2 predated
 the colour rework and did not list the two shelter grounds, one of which is the
 worst background of all: a piece holds at 4.49 there, where the document gave
 5.92 on a closed zone. A building's three faces now appear separately, and a
 check measures every row.
 
-The dead-end column in §15 is now measured against the target of step 4 — one per
+The dead-end column of the measurement block in `regles.md` §15 is now measured
+against the target of step 4 — one per
 eight-by-eight square — rather than a quarter of the board's side, which
 generation rules out by name. The published threshold was half the real one on
 both large presets, so its "0.0 %" said nothing. One district board in
