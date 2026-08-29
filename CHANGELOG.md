@@ -51,6 +51,16 @@ reposé les couleurs de la palette a rendu le lieu actif plus clair que la zone
 ouverte, corrigé l'énoncé de la palette et laissé la liste. La planche d'aperçu
 s'y adosse, et sortait ses deux bandes du milieu permutées.
 
+**Le contrat de formes tient enfin les deux gabarits qu'il promet.** Le plafond
+de traits par rôle ne portait que sur l'état normal : un bâtiment à un trait
+pouvait en déclarer vingt-quatre une fois surligné. Et le contrôle portait sur le
+`role` quand le rendu choisit par le nom, si bien qu'une forme `building`
+déclarée `piece` recevait l'emprise libre d'un pion au lieu du losange imposé —
+ce que le contrat écarte nommément pour qu'un plugin ne puisse pas masquer ce que
+l'adversaire doit voir. Les noms du §6 imposent désormais leur rôle ; un nom
+ajouté par un plugin garde le sien. `shapes_version` ne bouge pas : ces deux
+contrôles resserrent ce qui était déjà écrit.
+
 ***
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
@@ -71,6 +81,15 @@ Rejecting an unknown trigger only closed one side of the same defect.
 the palette colours made the active shelter lighter than the open zone, fixed the
 palette's own wording and left the list alone. The preview board relies on it,
 and was printing its two middle bands swapped.
+
+**The shapes contract now holds both templates it promises.** The per-role stroke
+cap only applied to the normal state: a building with one stroke could declare
+twenty-four once highlighted. And the check keyed off `role` while rendering keys
+off the name, so a `building` shape declared `piece` was given a piece's free
+footprint instead of the imposed diamond — which the contract rules out by name,
+so that no plugin can hide what the opponent must see. Names listed in §6 now
+impose their role; a name a plugin adds keeps its own. `shapes_version` does not
+move: both checks tighten what was already written.
 
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 

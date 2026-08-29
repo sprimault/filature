@@ -460,8 +460,15 @@ Contrôles appliqués au chargement comme à la publication :
 
 - schéma respecté, `shapes_version` connue ;
 - `role` déclaré et connu — c'est lui qui désigne le gabarit à appliquer ;
+- `role` **imposé par le nom**, pour les formes du §6 : le jeu va les chercher
+  sous leur nom, et un `building` déclaré `piece` recevrait l'emprise libre d'un
+  pion là où le losange lui est imposé. Un nom hors du §6 garde le rôle qu'il
+  déclare ;
 - tout point à l'intérieur du gabarit du rôle ;
-- nombre de traits sous le plafond, polygones de 3 à 32 sommets ;
+- nombre de traits sous le plafond, **variantes d'état comprises et comptées
+  chacune pour soi** — une forme qui ne déborde qu'une fois surlignée masque ses
+  voisines à ce moment-là ;
+- polygones de 3 à 32 sommets ;
 - toute `color` et tout `outline` résolus dans la palette active ;
 - aucune valeur hexadécimale dans une forme ;
 - pour un plugin d'apparence, `rules = false` **et** absence de toute

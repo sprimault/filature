@@ -337,6 +337,23 @@ role = "marker"`,
 			fragment: "aucun trait",
 		},
 		{
+			nom: "marqueur au-dessus de son plafond une fois surligné",
+			formes: "[shape.essai]\nrole = \"marker\"\n" + `[[shape.essai.stroke]]
+type = "segment"
+from = [-5, 0]
+to = [5, 0]
+thickness = 2
+color = "trail"
+` + strings.Repeat(`[[shape.essai.highlighted]]
+type = "segment"
+from = [-5, 0]
+to = [5, 0]
+thickness = 2
+color = "trail"
+`, 9),
+			fragment: "highlighted: 9 traits",
+		},
+		{
 			nom: "cercle qui déborde par son rayon",
 			formes: `[shape.essai]
 role = "marker"
@@ -486,6 +503,45 @@ role = "marker"
 	// personne ne pouvait écrire, et renvoyait donc l'auteur nulle part.
 	if !manquement(manquements, "shape.essai.highlighted[0]") {
 		t.Errorf("manquements %v, attendu qu'un nomme la clé telle qu'elle s'écrit", manquements)
+	}
+}
+
+// TestShapeNameImposesItsRole vérifie qu'une forme que le jeu va chercher par
+// son nom ne peut pas se déclarer sous un autre rôle.
+//
+// Le gabarit se choisit sur le rôle et le rendu sur le nom : un « building »
+// déclaré « piece » recevait l'emprise libre d'un pion et couvrait les cases
+// bâties de rectangles, là où le contrat impose le losange pour qu'un plugin ne
+// puisse pas masquer ce que l'adversaire doit voir.
+func TestShapeNameImposesItsRole(t *testing.T) {
+	j := lire(t, `
+shapes_version = 4
+
+[shape.building]
+role = "piece"
+
+  [[shape.building.stroke]]
+  type = "polygon"
+  points = [[-24, 0], [24, 0], [24, 40], [-24, 40]]
+  color = "building"
+
+[shape.mon_decor]
+role = "piece"
+
+  [[shape.mon_decor.stroke]]
+  type = "polygon"
+  points = [[-24, 0], [24, 0], [24, 40], [-24, 40]]
+  color = "building"
+`)
+
+	manquements := j.Validate()
+	if !manquement(manquements, `shape.building.role: "piece", attendu "building"`) {
+		t.Errorf("manquements %v, attendu qu'un refuse le rôle du bâtiment", manquements)
+	}
+	// Un nom libre garde le rôle qu'il déclare : la table ne vaut que pour ce
+	// que le jeu va chercher lui-même.
+	if manquement(manquements, "shape.mon_decor.role") {
+		t.Errorf("manquements %v, attendu qu'un nom libre garde son rôle", manquements)
 	}
 }
 
