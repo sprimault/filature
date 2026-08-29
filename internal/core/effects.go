@@ -196,6 +196,11 @@ type ActiveEffect struct {
 	// Echeance est le dernier tour où l'effet vaut. Zéro pour un effet
 	// permanent — la capacité passive du Traqueur en est une.
 	Echeance int `json:"due_turn"`
+
+	// FromSpotting distingue le pas gagné au repérage d'un effet de mobilité
+	// venu d'ailleurs. Les deux sont des EffectChangeMobility sur le même pion,
+	// et seule cette marque permet à rewardSpotting de reconnaître le sien.
+	FromSpotting bool `json:"from_spotting,omitempty"`
 }
 
 // AppliesAt dit si l'effet court encore au tour donné.

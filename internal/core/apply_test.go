@@ -371,6 +371,54 @@ func TestSpottingRewardsOncePerTurn(t *testing.T) {
 	}
 }
 
+// TestSpottingRewardsDespiteAnotherMobilityEffect vérifie que le pas gagné au
+// repérage s'ajoute à celui du Coureur, quel que soit l'ordre des deux coups.
+func TestSpottingRewardsDespiteAnotherMobilityEffect(t *testing.T) {
+	depart := func(t *testing.T) *Game {
+		t.Helper()
+		p := gameOn(grid(
+			".....",
+			".....",
+			".....",
+			".....",
+			".....",
+		), Position{Column: 4, Row: 2}, Position{Column: 1, Row: 1})
+		p.Phase = PhaseInspectors
+		return p
+	}
+
+	// Le Coureur du contenu livré : change_mobility, current_piece, valeur 1,
+	// durée 1. Posé par le même chemin qu'une capacité de plugin.
+	coureur := func(p *Game, pion int) {
+		p.activate(
+			Effect{Type: EffectChangeMobility, Target: TargetCurrentPiece, Value: 1, Duration: 1},
+			EffectContext{Side: SideInspectors, Piece: pion},
+		)
+	}
+
+	t.Run("capacité puis repérage", func(t *testing.T) {
+		p := depart(t)
+		coureur(p, 0)
+		if err := p.Apply(stepTo(t, p, 0, Position{Column: 1, Row: 2})); err != nil {
+			t.Fatal(err)
+		}
+		if got := p.MobilityOf(SideInspectors, 0); got != 3 {
+			t.Errorf("mobilité %d, attendu 3 : un pas de base, un du Coureur, un du repérage", got)
+		}
+	})
+
+	t.Run("repérage puis capacité", func(t *testing.T) {
+		p := depart(t)
+		if err := p.Apply(stepTo(t, p, 0, Position{Column: 1, Row: 2})); err != nil {
+			t.Fatal(err)
+		}
+		coureur(p, 0)
+		if got := p.MobilityOf(SideInspectors, 0); got != 3 {
+			t.Errorf("mobilité %d, attendu 3", got)
+		}
+	})
+}
+
 // TestTurnEndResetsQuotas vérifie que la résolution remet les compteurs à
 // zéro, et que l'annulation les rétablit.
 func TestTurnEndResetsQuotas(t *testing.T) {

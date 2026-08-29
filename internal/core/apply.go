@@ -248,6 +248,11 @@ func (p *Game) step(c Move) ([]func(), error) {
 //
 // Une fois par tour et par pion. Sans cette garde, un pion qui va et vient dans
 // une ligne de vue gagnerait un pas à chaque aller.
+//
+// La garde ne reconnaît que les pas qu'elle a posés elle-même. Elle a d'abord
+// refusé le bonus dès qu'un EffectChangeMobility visait le pion, ce qui vaut
+// aussi pour le Coureur : le pas se perdait ou non selon qu'on jouait la
+// capacité avant ou après le déplacement qui repère.
 func (p *Game) rewardSpotting(pion int) []func() {
 	occupees := p.occupiedCells()
 	if !IsVisible(p.Board, p.Inspectors[pion].Position, p.Fugitive.Position,
@@ -256,16 +261,17 @@ func (p *Game) rewardSpotting(pion int) []func() {
 	}
 
 	for _, actif := range p.ActiveEffects {
-		if actif.Effect.Type == EffectChangeMobility && actif.Aims(pion) &&
-			actif.AppliesAt(p.Turn) {
+		if actif.FromSpotting && actif.Aims(pion) && actif.AppliesAt(p.Turn) {
 			return nil
 		}
 	}
 
-	return []func(){p.activate(
+	defaire := p.activate(
 		Effect{Type: EffectChangeMobility, Target: TargetCurrentPiece, Value: 1, Duration: 1},
 		EffectContext{Side: SideInspectors, Piece: pion},
-	)}
+	)
+	p.ActiveEffects[len(p.ActiveEffects)-1].FromSpotting = true
+	return []func(){defaire}
 }
 
 // targetOf traduit un camp en cible d'effet.
