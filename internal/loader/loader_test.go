@@ -761,6 +761,21 @@ trigger = "inspectors_phase"
 			attendu: "duree manquante sur \"block_cell\"",
 		},
 		{
+			nom:     "capacite passive declaree du cote du fugitif",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[ability.x]
+name = "X"
+side = "fugitive"
+passive = true
+`,
+			attendu: "camp \"fugitive\", attendu \"inspectors\"",
+		},
+		{
 			nom:     "capacite declaree du cote du fugitif",
 			dossier: "essai",
 			contenu: `name = "essai"
