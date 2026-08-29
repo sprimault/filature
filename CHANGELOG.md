@@ -69,6 +69,17 @@ n'atteint 49. Le chiffre a été faux deux fois de suite — d'abord donné pour
 tiers, puis remesuré de travers dans le lot qui corrigeait les godoc comptant
 faux. Un contrôle le tient désormais, formule contre document.
 
+Deux affirmations de nombre de la note 0.6.2 sont rectifiées, et la version est
+renommée. Le seuil des impasses valait 5, 7 et 10 pour une cible de 6, 15 et 26 :
+la fraction annoncée n'en décrivait qu'un préréglage sur deux. Et le compte des
+fonctions au nom français perd son quantificateur plutôt que d'être corrigé une
+troisième fois — il n'y a pas de test qui le tienne, et la règle du dépôt dit
+alors de ne pas l'écrire. `CONTRIBUTING` avait pris ce parti dès l'origine.
+
+**La version s'appelle désormais « Avant le rendu ».** « Les promesses tenues »
+affirmait une exhaustivité qu'une relecture de son propre diff a démentie
+quelques heures après sa publication.
+
 ***
 
 The check that rejects unsupported claims about quantity in the notes now
@@ -107,7 +118,17 @@ wrong twice in a row — first given as a third, then measured wrong in the very
 batch that fixed godoc counting wrong. A check now holds it, formula against
 document.
 
-## [0.6.2] — 2026-08-29 — Les promesses tenues
+Two claims about quantity in the 0.6.2 note are corrected, and the release is
+renamed. The dead-end threshold was 5, 7 and 10 against a target of 6, 15 and 26:
+"half" described only one of the two presets it named. And the count of
+French-named functions loses its quantifier rather than being corrected a third
+time — no test holds it, and the repository's rule then says not to write it.
+`CONTRIBUTING` took that view from the start.
+
+**The release is now called "Avant le rendu".** "Les promesses tenues" claimed a
+completeness that a review of its own diff disproved hours after publication.
+
+## [0.6.2] — 2026-08-29 — Avant le rendu
 
 **`protocol` passe à 4.** Un bot écrit contre la version 3 continue de jouer,
 mais deux champs apparaissent dans la vue du fugitif et lui étaient jusqu'ici
@@ -186,15 +207,15 @@ figurent désormais séparément, et un contrôle mesure chaque ligne.
 La colonne des impasses du bloc de mesures de `regles.md` §15 se mesure contre la
 cible de l'étape 4 — une par
 carré de huit cases — et non contre le quart du côté du plateau, que la
-génération écarte nommément. Le seuil publié en valait la moitié sur les deux
-grands préréglages, si bien que ses « 0,0 % » ne disaient rien. Un plateau de
+génération écarte nommément. Le seuil publié valait 5, 7 et 10 quand la cible en
+demande 6, 15 et 26, si bien que ses « 0,0 % » ne disaient rien. Un plateau de
 Quartier sur vingt-quatre passe sous la cible, un sur mille en Périphérie.
 
 La note de la 0.6.1 sur la règle de langue est rectifiée, dans le journal comme
 sur la version publiée. Elle chiffrait l'écart et le donnait pour un défaut de
-tests seulement : la proportion venait d'un comptage partiel, et dix-huit
-fonctions hors test enfreignent la règle — dont `validerForme`, `poseUneTrace` et
-`cibleHorsDuCamp`. `CONTRIBUTING` portait la même phrase.
+tests seulement : la proportion venait d'un comptage partiel, et des fonctions
+hors test enfreignent la règle — `validerForme`, `poseUneTrace`,
+`cibleHorsDuCamp` et d'autres. `CONTRIBUTING` portait la même phrase.
 
 Un contrôle refuse désormais une affirmation de nombre non tenue dans les notes
 non publiées. La règle existait pour les godoc, les règles, les README et la
@@ -318,15 +339,15 @@ check measures every row.
 The dead-end column of the measurement block in `regles.md` §15 is now measured
 against the target of step 4 — one per
 eight-by-eight square — rather than a quarter of the board's side, which
-generation rules out by name. The published threshold was half the real one on
-both large presets, so its "0.0 %" said nothing. One district board in
+generation rules out by name. The published threshold was 5, 7 and 10 where the
+target asks for 6, 15 and 26, so its "0.0 %" said nothing. One district board in
 twenty-four falls below the target, one in a thousand on the outskirts.
 
 The 0.6.1 note about the language rule is corrected, in the changelog and on the
 published release. It put a figure on the gap and presented it as a test-only
-defect: the proportion came from a partial count, and eighteen non-test functions
-break the rule — among them `validerForme`, `poseUneTrace` and
-`cibleHorsDuCamp`. `CONTRIBUTING` carried the same sentence.
+defect: the proportion came from a partial count, and non-test functions do break
+the rule — `validerForme`, `poseUneTrace`, `cibleHorsDuCamp` and others.
+`CONTRIBUTING` carried the same sentence.
 
 A check now rejects an unsupported claim about quantity in the unreleased notes.
 The rule already covered godoc, the rules document, the READMEs and the palette;
