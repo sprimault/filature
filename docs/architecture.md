@@ -187,8 +187,8 @@ déclenche jamais en jeu normal.
 
 La portée qui entre dans ce calcul est celle du **préréglage**, pas celle du
 tour. Une capacité qui double la vue ferait autrement sauter l'échelle de près de
-la moitié à son déclenchement — 47 % sur le plus petit préréglage, 49 % sur le
-plus grand —, puis la rendrait au tour suivant.
+la moitié à son déclenchement — la chute vaut `2r/(4r+1)`, soit 47 % sur le plus
+petit préréglage et 48 % sur les deux autres —, puis la rendrait au tour suivant.
 
 **La garantie porte sur le pion sélectionné, pas sur tous.** Un inspecteur au
 bord du panneau a sa ligne de vue tronquée à l'écran, et à cinq pions dispersés
