@@ -78,6 +78,12 @@ plaçait `y` vers le bas quand le schéma et le moteur le placent vers le haut. 
 flèche asymétrique écrite d'après le diagramme passait la validation et ressortait
 retournée.
 
+Les chiffres du liseré sont remesurés sur la palette livrée. Le tableau du §2
+dataient d'avant la refonte des couleurs et n'énumérait pas les deux lieux de
+ressourcement, dont le pire fond de tous : un pion y tient à 4,49, ce que le
+document donnait pour 5,92 sur une zone fermée. Les trois faces d'un bâtiment y
+figurent désormais séparément, et un contrôle mesure chaque ligne.
+
 ***
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
@@ -123,6 +129,12 @@ The section defining the two planes contradicted itself about markers, placing
 them on the ground and then in the vertical plane, and its ground-plane diagram
 put `y` downwards where the schema and the engine put it upwards. An asymmetric
 arrow written from the diagram passed validation and came out flipped.
+
+The rim figures are measured again on the shipped palette. The §2 table predated
+the colour rework and did not list the two shelter grounds, one of which is the
+worst background of all: a piece holds at 4.49 there, where the document gave
+5.92 on a closed zone. A building's three faces now appear separately, and a
+check measures every row.
 
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 

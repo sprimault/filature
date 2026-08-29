@@ -272,12 +272,13 @@ func (s Shape) Variants() map[string][]Stroke {
 // Un contour seul ne suffit pas, et c'est contre-intuitif. Il tient contre le
 // sol, qui est clair, mais un pion se dessine par-dessus les cubes situés
 // devant lui : sa moitié supérieure est en permanence sur du bâti sombre, où un
-// contour sombre ne se voit plus — 1,25 sur une face latérale. L'inverse est
-// vrai d'un contour clair, qui meurt sur la rue. Aucune couleur unique ne
-// couvre une plage de fonds qui va de 17 à 230 en luminance.
+// contour sombre ne se voit plus — 1,07 sur la face gauche. L'inverse est vrai
+// d'un contour clair, qui meurt sur la rue. Aucune couleur unique ne couvre une
+// plage de fonds qui va de 17 à 230 en luminance.
 //
 // Les deux ensemble la couvrent : quel que soit le fond, l'un des deux traits
-// tranche, et le pire cas remonte de 1,10 à 5,03.
+// tranche, et le pire cas remonte de 1,07 à 4,49 — sur un lieu en recharge, et
+// non sur le bâti auquel on penserait.
 //
 // Valeur fixe et non nom de palette : c'est de l'éclairage, au même titre que
 // les coefficients de faces d'un prisme. Une palette qui pourrait la déplacer
