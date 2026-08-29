@@ -280,24 +280,34 @@ func (j *ShapeSet) validerForme(nom string, f Shape) []error {
 	}
 
 	var manquements []error
+	if attendu, impose := RoleOf(nom); impose && f.Role != attendu {
+		manquements = append(manquements, fmt.Errorf(
+			"%s.role: %q, attendu %q : le jeu va chercher cette forme sous son nom, "+
+				"et lui appliquerait alors le gabarit d'un autre rôle",
+			cle, f.Role, attendu))
+	}
 	if len(f.Strokes) == 0 {
 		manquements = append(manquements, fmt.Errorf("%s.stroke: aucun trait", cle))
 	}
-	if len(f.Strokes) > gabarit.MaxStrokes {
-		manquements = append(manquements, fmt.Errorf("%s.stroke: %d traits, le rôle %s en accepte %d",
-			cle, len(f.Strokes), f.Role, gabarit.MaxStrokes))
-	}
 
-	for i, t := range f.Strokes {
-		manquements = append(manquements, j.validerTrait(fmt.Sprintf("%s.stroke[%d]", cle, i), t, f.Role, gabarit)...)
-	}
-
-	// Les variantes d'état suivent le même gabarit : une forme qui déborderait
-	// une fois surlignée masquerait ses voisines à ce moment-là, ce qui est le
-	// même avantage de jeu, simplement intermittent.
+	// Les variantes d'état suivent le même gabarit, plafond compris : une forme
+	// qui déborderait une fois surlignée masquerait ses voisines à ce
+	// moment-là, ce qui est le même avantage de jeu, simplement intermittent.
+	// Le plafond ne portait que sur l'état normal, et un bâtiment à un trait
+	// pouvait en déclarer vingt-quatre en surligné.
 	variantes := f.Variants()
-	for _, etat := range triees(variantes) {
-		for i, t := range variantes[etat] {
+	jeux := map[string][]Stroke{"stroke": f.Strokes}
+	for etat, traits := range variantes {
+		jeux[etat] = traits
+	}
+
+	for _, etat := range triees(jeux) {
+		traits := jeux[etat]
+		if len(traits) > gabarit.MaxStrokes {
+			manquements = append(manquements, fmt.Errorf("%s.%s: %d traits, le rôle %s en accepte %d",
+				cle, etat, len(traits), f.Role, gabarit.MaxStrokes))
+		}
+		for i, t := range traits {
 			manquements = append(manquements,
 				j.validerTrait(fmt.Sprintf("%s.%s[%d]", cle, etat, i), t, f.Role, gabarit)...)
 		}

@@ -56,7 +56,7 @@
             "building",
             "marker"
           ],
-          "description": "Il n'existe pas de rôle « sol » : le losange est tracé par le moteur et ne se redessine pas. Rue et zones sont des noms de couleurs. Un bâtiment n'accepte qu'un trait de type prism, sans emprise : son emprise est le losange de la case."
+          "description": "Il n'existe pas de rôle « sol » : le losange est tracé par le moteur et ne se redessine pas. Rue et zones sont des noms de couleurs. Un bâtiment n'accepte qu'un trait de type prism, sans emprise : son emprise est le losange de la case. Les noms que le jeu va chercher lui-même imposent leur rôle, vérifié au chargement : building est un bâtiment, fugitive et inspector des pions, trail, roadblock et les surcouches des marqueurs."
         },
         "stroke": {
           "$ref": "#/$defs/strokes",
@@ -74,7 +74,7 @@
     },
     "strokes": {
       "type": "array",
-      "description": "Suite de traits. Le plafond réel dépend du rôle et est vérifié au chargement : 24 pour un pion, 8 pour un marqueur, 1 pour un bâtiment.",
+      "description": "Suite de traits. Le plafond réel dépend du rôle et est vérifié au chargement : 24 pour un pion, 8 pour un marqueur, 1 pour un bâtiment. Chaque variante d'état est comptée pour elle-même, sans quoi une forme déborderait une fois surlignée.",
       "minItems": 1,
       "maxItems": 24,
       "items": {

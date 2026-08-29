@@ -11,6 +11,7 @@ package render
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Dimensions du losange, en unités du contrat de formes. Non modifiables : le
@@ -183,6 +184,40 @@ var templates = map[Role]Template{
 	// losange de la case. Une emprise libre permettrait de déborder sur les
 	// voisines et de masquer ce que l'adversaire doit voir.
 	RoleBuilding: {PlaneVertical, 0, 0, 0, 0, 1, 24},
+}
+
+// RoleOf impose son rôle à un nom de forme que le jeu consomme, et dit faux
+// pour un nom libre.
+//
+// Le gabarit se choisit sur le rôle déclaré, et le rendu va chercher la forme
+// par son nom : sans cette table, une forme « building » déclarée « piece »
+// recevait le gabarit d'un pion — emprise libre au lieu du losange imposé — et
+// couvrait les cases bâties de rectangles. Le contrat écarte ce cas nommément,
+// au motif qu'une emprise libre permettrait « de masquer ce que l'adversaire
+// doit voir » ; c'est le nom, et non le rôle, qui décidait de ce qui serait
+// dessiné.
+//
+// Un nom absent est libre : un plugin qui ajoute ses propres formes choisit leur
+// rôle, et rien ne va les chercher sous un nom convenu.
+func RoleOf(nom string) (Role, bool) {
+	if strings.HasPrefix(nom, "inspector_") {
+		return RolePiece, true
+	}
+	role, impose := ShapeRoles[nom]
+	return role, impose
+}
+
+// ShapeRoles porte la table de docs/contrat-formes.md §6, les surcharges par
+// pion en moins : « inspector_1 » à « inspector_5 » suivent un motif, que RoleOf
+// traite à part.
+var ShapeRoles = map[string]Role{
+	"building":      RoleBuilding,
+	"fugitive":      RolePiece,
+	"inspector":     RolePiece,
+	"trail":         RoleMarker,
+	"roadblock":     RoleMarker,
+	"cell_visible":  RoleMarker,
+	"cell_playable": RoleMarker,
 }
 
 // Shape est un dessin nommé, plus ses variantes d'état facultatives.
