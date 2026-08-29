@@ -5,8 +5,11 @@ package quality
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
+	"strconv"
 	"testing"
 
 	"github.com/BurntSushi/toml"
@@ -98,6 +101,33 @@ func TestGroundRangeIsWhatTheContractSays(t *testing.T) {
 	if rapport < 2.4 || rapport >= 3 {
 		t.Errorf("du plus clair au plus sombre, rapport de %.2f : les textes annoncent "+
 			"« du simple au double et demi », qui ne tient plus", rapport)
+	}
+}
+
+// TestGrainAmplitudeIsWhatTheContractSays vérifie que l'amplitude publiée par le
+// contrat de formes est celle du moteur.
+//
+// Le grain a été décrit en pourcents pendant des mois, alors qu'il est absolu :
+// la godoc de la constante garde trace que la formulation fautive est restée
+// « assez longtemps pour que l'aperçu les applique ». C'est le chiffre du §8 qui
+// se garde ici, tout le reste du document en découlant.
+func TestGrainAmplitudeIsWhatTheContractSays(t *testing.T) {
+	contenu, err := os.ReadFile(filepath.Join(racine, "docs", "contrat-formes.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	trouvaille := regexp.MustCompile(`±(\d+) niveaux de luminance`).FindStringSubmatch(string(contenu))
+	if trouvaille == nil {
+		t.Fatal("le contrat n'annonce plus l'amplitude du grain en niveaux de luminance")
+	}
+	annonce, err := strconv.Atoi(trouvaille[1])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if annonce != render.GroundGrainAmplitude {
+		t.Errorf("le contrat annonce ±%d niveaux, le moteur en applique %d",
+			annonce, render.GroundGrainAmplitude)
 	}
 }
 

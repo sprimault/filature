@@ -67,6 +67,11 @@ actif, faux du terrain, que la résolution purge à l'échéance — omettre le 
 donnait un tour, comme une durée de 1. Le contrat n'admet plus qu'on le taise
 plutôt que de définir un défaut que personne ne devinerait.
 
+Le contrat de formes dit le grain du sol en niveaux de luminance partout. Deux
+phrases le décrivaient encore en pourcents, dont une avec une conséquence fausse
+— deux couleurs séparées de douze niveaux ne se recouvrent pas, et le chargeur
+les accepte. Il refuse dix niveaux et moins, ce que le document dit désormais.
+
 ***
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
@@ -102,6 +107,11 @@ promised that a missing duration means the whole game; that holds for an active
 effect, not for terrain, which turn resolution clears at its due date — omitting
 the field gave one turn, same as a duration of 1. The contract no longer lets it
 go unsaid, rather than defining a default nobody would guess.
+
+The shapes contract now states the ground grain in luminance levels throughout.
+Two sentences still described it as a percentage, one of them with a false
+consequence — two colours twelve levels apart do not overlap, and the loader
+accepts them. It rejects ten levels and below, which the document now says.
 
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 
