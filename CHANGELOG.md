@@ -104,6 +104,13 @@ non publiées. La règle existait pour les godoc, les règles, les README et la
 palette ; le journal en était dispensé, alors qu'il devient une page publique
 sans relecture.
 
+**`THIRD-PARTY-NOTICES` porte l'union des six cibles de publication**, et non ce
+que lie la machine qui l'a produit. Le jeu de modules dépend du système : sans
+`GOOS` fixé, le fichier régénéré sur un poste aurait fait rougir la suite sur les
+trois autres runners, et l'archive d'une plateforme serait partie sans la notice
+de ce qu'elle incorpore sans les autres. Sans effet aujourd'hui, le binaire ne
+liant que du Go pur, et posé pour la dépendance suivante.
+
 ***
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
@@ -175,6 +182,14 @@ A check now rejects an unsupported claim about quantity in the unreleased notes.
 The rule already covered godoc, the rules document, the READMEs and the palette;
 the changelog was exempt, though it becomes a public page with no further
 review.
+
+**`THIRD-PARTY-NOTICES` now carries the union of the six release targets**, not
+what the machine that produced it happens to link. The set of modules depends on
+the system: with no `GOOS` set, a file regenerated on one machine would have made
+the suite fail on the three other runners, and one platform's archive would have
+shipped without the notice for what it incorporates and the others do not. No
+effect today, the binary linking nothing but pure Go, and in place for the next
+dependency.
 
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 

@@ -9,6 +9,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -98,34 +100,49 @@ type module struct {
 	origine string
 }
 
-// modulesLies interroge le compilateur plutôt que go.mod.
+// cible est un couple de la matrice de publication.
+type cible struct{ os, arch, cgo string }
+
+// ciblesPubliees suit la matrice de .github/workflows/release.yml, js/wasm
+// compris : il ne se publie pas, mais il est ce qui empêche une dépendance
+// d'introduire du cgo sans qu'on le voie, et ses modules liés sont les plus
+// pauvres — les omettre ne changerait rien, les garder coûte une seconde.
+//
+// Un test compare cette liste au workflow : deux définitions finiraient par
+// diverger, et c'est celle du workflow qu'on ne peut pas essayer avant de
+// pousser.
+var ciblesPubliees = []cible{
+	{"windows", "amd64", "0"},
+	{"js", "wasm", "0"},
+	{"linux", "amd64", "1"},
+	{"linux", "arm64", "1"},
+	{"darwin", "arm64", "1"},
+	{"darwin", "amd64", "1"},
+}
+
+// modulesLies interroge le compilateur plutôt que go.mod, pour chaque cible
+// publiée.
 //
 // go.mod porte aussi ce que seuls les tests et l'outillage utilisent ; ce qui
 // compte ici est ce que le binaire publié incorpore, et « go list -deps » sur la
 // commande le donne exactement.
+//
+// **L'union des cibles, et non celle de la machine qui exécute.** Le jeu de
+// modules liés dépend du système : un pilote de fenêtre n'existe que sur Linux,
+// un paquet système disparaît sur WebAssembly. Sans GOOS fixé, le fichier valait
+// pour le poste qui l'a produit, la suite rougissait sur les trois autres
+// runners, et l'archive d'une plateforme serait partie sans la notice de ce
+// qu'elle seule incorpore — soit l'obligation même que ce fichier existe pour
+// tenir.
+//
+// Rien ne peut encore l'éprouver : la seule dépendance du binaire est en Go pur
+// et rend la même liste sur les six cibles. C'est la dépendance suivante qui
+// fera la différence, et c'est pour elle que le mécanisme est posé maintenant.
 func modulesLies() ([]module, error) {
-	sortie, err := exec.Command("go", "list", "-deps",
-		"-f", "{{if .Module}}{{.Module.Path}}\t{{.Module.Version}}\t{{.Module.Dir}}{{end}}",
-		"github.com/sprimault/filature/cmd/filature").Output()
-	if err != nil {
-		return nil, fmt.Errorf("liste des dépendances : %w", err)
-	}
-
 	vus := map[string]module{}
-	for _, ligne := range strings.Split(strings.ReplaceAll(string(sortie), "\r\n", "\n"), "\n") {
-		champs := strings.Split(strings.TrimSpace(ligne), "\t")
-		if len(champs) != 3 || champs[0] == "" {
-			continue
-		}
-		// Le module du jeu lui-même porte sa propre licence, dans LICENSE.
-		if champs[0] == "github.com/sprimault/filature" {
-			continue
-		}
-		vus[champs[0]] = module{
-			chemin:  champs[0],
-			version: champs[1],
-			dossier: champs[2],
-			origine: "https://" + champs[0],
+	for _, c := range ciblesPubliees {
+		if err := listerPour(c, vus); err != nil {
+			return nil, err
 		}
 	}
 
@@ -144,6 +161,68 @@ func modulesLies() ([]module, error) {
 		modules = append(modules, vus[c])
 	}
 	return modules, nil
+}
+
+// listerPour ajoute à vus les modules que le binaire lie sur une cible.
+//
+// Une même dépendance vue sur deux cibles y entre une fois : c'est le même
+// module à la même version, et son fichier de licence est le même.
+func listerPour(c cible, vus map[string]module) error {
+	commande := exec.Command("go", "list", "-deps",
+		"-f", "{{if .Module}}{{.Module.Path}}\t{{.Module.Version}}\t{{.Module.Dir}}{{end}}",
+		"github.com/sprimault/filature/cmd/filature")
+	commande.Env = append(os.Environ(),
+		"GOOS="+c.os, "GOARCH="+c.arch, "CGO_ENABLED="+c.cgo)
+
+	sortie, err := commande.Output()
+	if err != nil {
+		return fmt.Errorf("liste des dépendances pour %s/%s : %w", c.os, c.arch, err)
+	}
+
+	for _, ligne := range strings.Split(strings.ReplaceAll(string(sortie), "\r\n", "\n"), "\n") {
+		champs := strings.Split(strings.TrimSpace(ligne), "\t")
+		if len(champs) != 3 || champs[0] == "" {
+			continue
+		}
+		// Le module du jeu lui-même porte sa propre licence, dans LICENSE.
+		if champs[0] == "github.com/sprimault/filature" {
+			continue
+		}
+		vus[champs[0]] = module{
+			chemin:  champs[0],
+			version: champs[1],
+			dossier: champs[2],
+			origine: "https://" + champs[0],
+		}
+	}
+	return nil
+}
+
+// TestNoticeTargetsMatchTheWorkflow vérifie que les cibles interrogées sont
+// celles que la publication construit.
+//
+// Deux listes qui décrivent la même matrice divergent, et c'est celle du
+// workflow qu'on ne peut pas essayer avant de pousser : une cible ajoutée là-bas
+// et oubliée ici ferait partir son archive sans les notices de ce qu'elle seule
+// incorpore.
+func TestNoticeTargetsMatchTheWorkflow(t *testing.T) {
+	brut, err := os.ReadFile(filepath.Join(racine, ".github", "workflows", "release.yml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ligne := regexp.MustCompile(`\{\s*os:\s*(\w+),\s*arch:\s*(\w+),\s*cgo:\s*(\d)`)
+	var publiees []cible
+	for _, trouvaille := range ligne.FindAllStringSubmatch(string(brut), -1) {
+		publiees = append(publiees, cible{trouvaille[1], trouvaille[2], trouvaille[3]})
+	}
+	if len(publiees) == 0 {
+		t.Fatal("aucune cible lue dans release.yml : le contrôle ne dirait rien")
+	}
+
+	if !slices.Equal(publiees, ciblesPubliees) {
+		t.Errorf("release.yml construit %v, les notices interrogent %v", publiees, ciblesPubliees)
+	}
 }
 
 // licenceDe lit le fichier de licence d'un module.

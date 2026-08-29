@@ -104,6 +104,14 @@ réelles à chaque exécution de la suite et échoue quand il vieillit, faute de
 une bibliothèque ajoutée entrerait dans les archives sans sa notice, et personne
 ne s'en apercevrait.
 
+**Il porte l'union des six cibles de la matrice, pas ce que lie la machine qui le
+produit.** Le jeu de modules dépend du système — un pilote de fenêtre n'existe
+que sur Linux, un paquet système disparaît sur WebAssembly. Un fichier par cible
+serait plus juste au sens strict ; l'union est retenue parce qu'un lecteur reçoit
+alors la même liste quelle que soit son archive, et qu'une notice de trop n'a
+jamais fait de tort à personne. Un test compare la liste des cibles à celle du
+workflow de publication, sans quoi les deux divergeraient.
+
 **L'archive ne contient rien d'autre que le binaire et ces trois fichiers.** Le
 contenu livré — règles, formes, palette, français et anglais — est embarqué dans
 l'exécutable par `//go:embed` : un binaire déplacé continue de fonctionner, et
