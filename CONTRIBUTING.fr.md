@@ -153,9 +153,9 @@ le raisonnement se lit en français parce que c'est de la pensée.
 **Un helper de test suit la langue de ce qu'il raconte.** `finirLeTour` et
 `lireDictionnaire` ne sortent jamais de leur fichier : ils font partie du récit
 que le test écrit, pas de l'API. La règle a longtemps été écrite sans cette
-réserve, et un cinquième des fonctions du dépôt l'enfreignait sans que personne
-la fasse appliquer — une règle que rien ne tient empêche de chercher plutôt
-qu'elle ne guide.
+réserve, et personne ne la faisait appliquer — ni dans les tests, ni dans le code
+livré, où `validerForme`, `poseUneTrace` et `cibleHorsDuCamp` l'enfreignent
+encore. Une règle que rien ne tient empêche de chercher plutôt qu'elle ne guide.
 
 Messages de commit en français d'abord, anglais ensuite, dans un seul texte
 séparé par `***`. Jamais `---` : `git am` le traite comme un séparateur de patch

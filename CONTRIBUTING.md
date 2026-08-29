@@ -150,9 +150,10 @@ because it is thought.
 
 **A test helper follows the language of what it tells.** `finirLeTour` and
 `lireDictionnaire` never leave their file: they belong to the story the test
-writes, not to the API. The rule was long written without that caveat, and a
-fifth of the repository's functions broke it without anyone enforcing it — a
-rule nothing holds stops you looking rather than guiding you.
+writes, not to the API. The rule was long written without that caveat, and nobody
+enforced it — neither in tests nor in shipped code, where `validerForme`,
+`poseUneTrace` and `cibleHorsDuCamp` still break it. A rule nothing holds stops
+you looking rather than guiding you.
 
 Commit messages are French first, then English, in one text separated by `***`.
 Never `---`: `git am` treats it as a patch separator and truncates everything
