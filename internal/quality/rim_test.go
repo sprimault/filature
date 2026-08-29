@@ -21,6 +21,12 @@ import (
 // situés devant lui, donc sa moitié supérieure est sur du bâti, dont les trois
 // faces ont trois luminances. Le hors plateau en fait partie — le pourtour est
 // rendu, et une pièce peut s'y trouver.
+//
+// **Les deux marqueurs aussi, et c'est ce que cette liste oubliait.** L'ordre de
+// peinture pose le pion par-dessus la trace ou le barrage de sa case, et le
+// Barreur peut fermer une case occupée. Le pire fond du plateau se trouve être
+// l'un d'eux, si bien que le plancher publié valait celui du neuvième fond et
+// non du onzième.
 func fondsSousUnPion(t *testing.T) map[string]string {
 	t.Helper()
 
@@ -32,6 +38,8 @@ func fondsSousUnPion(t *testing.T) map[string]string {
 		"lieu en recharge": palette["shelter_used"],
 		"zone fermée":      palette["zone_closed"],
 		"hors plateau":     palette["backdrop"],
+		"trace":            palette["trail"],
+		"barrage":          palette["roadblock"],
 	}
 
 	// Par render.Lit et non par les trois nombres recopiés : le bâti n'est pas
@@ -69,9 +77,9 @@ func tenus(t *testing.T, fond string) (contourSeul, avecLisere float64) {
 //
 // C'est la seule justification d'une couleur fixe que nul plugin ne peut
 // déplacer, et rien ne la mesurait — le contrôle des contours ne voyait ni le
-// liseré, ni les faces du bâti, ni les lieux de ressourcement. Les deux lieux
-// sont arrivés dans la palette après le tableau du contrat, et le pire fond se
-// trouve être l'un d'eux.
+// liseré, ni les faces du bâti, ni les lieux de ressourcement. Il a ensuite
+// ignoré les deux marqueurs, sur lesquels un pion se dessine pourtant : le pire
+// fond du plateau est l'un d'eux.
 func TestRimHoldsOnEveryBackground(t *testing.T) {
 	// WCAG 2.1, critère 1.4.11 : trois pour un sur un élément non textuel. Le
 	// 4,5 souvent cité est celui du texte courant, et ne s'applique pas à un
@@ -96,13 +104,24 @@ func TestRimHoldsOnEveryBackground(t *testing.T) {
 // porte les valeurs qu'on mesure sur la palette livrée.
 //
 // Il ne les portait plus : ses chiffres dataient de la palette d'avant le lot
-// qui a reposé les dix couleurs, et il n'énumérait pas les deux lieux de
-// ressourcement, arrivés après lui — dont celui qui se trouve être le pire fond
-// de tous.
+// qui a reposé les dix couleurs, et il a manqué deux fois des fonds — les lieux
+// de ressourcement d'abord, les deux marqueurs ensuite. Le tableau et la liste
+// mesurée se contrôlent l'un l'autre : un fond ajouté ici sans y être fait
+// rougir ce test.
 func TestRimTableMatchesTheMeasure(t *testing.T) {
 	publie := tableauDuLisere(t)
+	mesures := fondsSousUnPion(t)
 
-	for nom, fond := range fondsSousUnPion(t) {
+	// Le sens qui manquait : sans lui, retirer un fond de la liste mesurée
+	// laissait sa ligne au tableau sans que rien ne le dise — soit exactement la
+	// façon dont les deux marqueurs en sont restés absents.
+	for nom := range publie {
+		if _, present := mesures[nom]; !present {
+			t.Errorf("le tableau du liseré publie %q, qui n'est pas un fond mesuré", nom)
+		}
+	}
+
+	for nom, fond := range mesures {
 		ligne, present := publie[nom]
 		if !present {
 			t.Errorf("le fond %q ne figure pas dans le tableau du liseré", nom)
@@ -172,4 +191,48 @@ func tableauDuLisere(t *testing.T) map[string]ligneDuLisere {
 		t.Fatal("aucune ligne lue dans le tableau du liseré : le contrôle ne dirait rien")
 	}
 	return lignes
+}
+
+// TestBackgroundRangeMatchesTheMeasure vérifie la plage de luminance que le
+// contrat annonce pour les fonds.
+//
+// C'est l'argument qui justifie de poser deux traits plutôt qu'un : aucune
+// couleur unique ne couvre cette plage. Elle n'était juste que par accident —
+// sa borne haute est la trace, que le tableau voisin n'énumérait pas.
+func TestBackgroundRangeMatchesTheMeasure(t *testing.T) {
+	contenu, err := os.ReadFile(filepath.Join(racine, "docs", "contrat-formes.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	trouvaille := regexp.MustCompile(`fonds possibles vont de (\d+) à (\d+) en luminance`).
+		FindStringSubmatch(string(contenu))
+	if trouvaille == nil {
+		t.Fatal("le contrat n'annonce plus la plage des fonds")
+	}
+
+	bas, haut := 255.0, 0.0
+	for _, fond := range fondsSousUnPion(t) {
+		l := luminance(t, fond)
+		bas, haut = min(bas, l), max(haut, l)
+	}
+
+	for _, cas := range []struct {
+		bout    string
+		annonce string
+		mesure  float64
+	}{
+		{"basse", trouvaille[1], bas},
+		{"haute", trouvaille[2], haut},
+	} {
+		annonce, err := strconv.Atoi(cas.annonce)
+		if err != nil {
+			t.Fatal(err)
+		}
+		// Une unité de tolérance : le document arrondit, et la plage sert un
+		// ordre de grandeur, pas un calcul.
+		if ecart := float64(annonce) - cas.mesure; ecart > 1 || ecart < -1 {
+			t.Errorf("borne %s : le contrat annonce %d, la mesure donne %.1f",
+				cas.bout, annonce, cas.mesure)
+		}
+	}
 }

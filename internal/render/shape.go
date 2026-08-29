@@ -286,8 +286,9 @@ func (s Shape) Variants() map[string][]Stroke {
 // plage de fonds qui va de 17 à 230 en luminance.
 //
 // Les deux ensemble la couvrent : quel que soit le fond, l'un des deux traits
-// tranche, et le pire cas remonte de 1,07 à 4,49 — sur un lieu en recharge, et
-// non sur le bâti auquel on penserait.
+// tranche, et le pire cas remonte de 1,07 à 3,81. Ce pire cas est un barrage, et
+// non le bâti auquel on penserait : un pion se dessine par-dessus le marqueur de
+// sa case, ce qui fait des deux marqueurs des fonds à part entière.
 //
 // Valeur fixe et non nom de palette : c'est de l'éclairage, au même titre que
 // les coefficients de faces d'un prisme. Une palette qui pourrait la déplacer

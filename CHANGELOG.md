@@ -52,6 +52,17 @@ contrat promet deux fois qu'elle ne s'applique pas à un nom qu'un plugin ajoute
 C'est l'espace le plus naturel pour une surcouche par inspecteur, et il était
 fermé sans que rien ne le dise.
 
+**Le plancher de lisibilité d'un pion est de 3,81, sur un barrage, et non de 4,49
+sur un lieu en recharge.** Le tableau du contrat énumérait neuf fonds quand il y
+en a onze : l'ordre de peinture pose le pion par-dessus le marqueur de sa case,
+et le Barreur peut fermer une case occupée. Le contrôle censé mesurer la garantie
+héritait de la même omission et passait au vert. Le plancher reste au-dessus des
+trois pour un que WCAG demande à un élément non textuel, mais de peu — et c'est
+désormais le barrage qu'il faut regarder en premier si une palette resserre ses
+couleurs. La phrase voisine, qui donne les fonds « de 17 à 230 en luminance »,
+n'était juste que par accident : sa borne haute est la trace, absente du tableau.
+Un contrôle la mesure à son tour.
+
 ***
 
 The check that rejects unsupported claims about quantity in the notes now
@@ -73,6 +84,16 @@ lists, instead of closing the whole `inspector_` space. A shape named
 name of a rule the contract twice promises does not apply to a name a plugin
 adds. It is the most natural space for a per-inspector overlay, and it was closed
 without anything saying so.
+
+**A piece's legibility floor is 3.81, on a roadblock, not 4.49 on a recharging
+shelter.** The contract's table listed nine backgrounds where there are eleven:
+the paint order puts the piece above its cell's marker, and the Blocker can close
+an occupied cell. The check meant to measure the guarantee inherited the same
+omission and passed. The floor stays above the three-to-one WCAG asks of a
+non-text element, but not by much — and the roadblock is now the first thing to
+look at if a palette tightens its colours. The neighbouring sentence, giving
+backgrounds "from 17 to 230 in luminance", was only right by accident: its upper
+bound is the trail, absent from the table. A check now measures it too.
 
 ## [0.6.2] — 2026-08-29 — Les promesses tenues
 
