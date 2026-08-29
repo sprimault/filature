@@ -42,7 +42,7 @@
         "protocol": {
           "type": "integer",
           "enum": [
-            3
+            4
           ],
           "description": "Version du protocole. Un bot qui en annonce une autre est ecarte des la poignee de main, avec le numero attendu."
         },
@@ -167,7 +167,7 @@
         "protocol": {
           "type": "integer",
           "enum": [
-            3
+            4
           ],
           "description": "Version du protocole. Un bot qui en annonce une autre est ecarte des la poignee de main, avec le numero attendu."
         },

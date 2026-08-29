@@ -33,10 +33,27 @@ type View struct {
 
 	Inspectors []Inspector `json:"inspectors"`
 
-	// PositionFugitif n'est renseigné que pour le camp fugitif, ou pour les
+	// FugitivePosition n'est renseigné que pour le camp fugitif, ou pour les
 	// inspecteurs quand il est visible ou révélé.
-	PositionFugitif *Position `json:"fugitive_position,omitempty"`
-	SealedZone      *int      `json:"sealed_zone,omitempty"`
+	FugitivePosition *Position `json:"fugitive_position,omitempty"`
+	SealedZone       *int      `json:"sealed_zone,omitempty"`
+
+	// ExpenseUses n'est renseigné que pour le fugitif, et ne porte que les
+	// dépenses plafonnées : les autres n'ont pas de compte à afficher.
+	//
+	// Le plafond accompagne le compte, sans quoi celui-ci ne veut rien dire :
+	// « deux employés » ne se planifie pas sans savoir s'il en reste un ou
+	// huit. LegalMoves cessait simplement de proposer la dépense une fois le
+	// plafond atteint, ce qui ne se distingue pas d'une résistance trop basse.
+	ExpenseUses []ExpenseUse `json:"expense_uses,omitempty"`
+
+	// Decoy est la fausse trace armée, absente tant qu'aucune ne l'est, et
+	// jamais donnée aux inspecteurs.
+	//
+	// Elle n'est posée qu'à la résolution, et le fugitif joue encore entre
+	// l'achat et elle : sans ce champ, l'écran ne peut pas lui montrer ce qu'il
+	// vient de payer, ni qu'un second achat écraserait le premier.
+	Decoy *Decoy `json:"decoy,omitempty"`
 
 	// Stamina n'est renseignée que pour le fugitif.
 	//
@@ -57,20 +74,20 @@ type View struct {
 	// découvert. Le fugitif, lui, voit les siennes.
 	KnownTrails map[string]Trail `json:"known_trails"`
 
-	CasesVisibles []Position `json:"visible_cells"`
-	LegalMoves    []Move     `json:"legal_moves"`
+	VisibleCells []Position `json:"visible_cells"`
+	LegalMoves   []Move     `json:"legal_moves"`
 
-	// ProchaineReveal vaut zéro quand la révélation tombe à la fin du tour
+	// NextReveal vaut zéro quand la révélation tombe à la fin du tour
 	// courant, -1 quand aucune n'est prévue.
-	ProchaineReveal int `json:"next_reveal"`
+	NextReveal int `json:"next_reveal"`
 
-	// DernierSilence est le tour du dernier silence payé, zéro s'il n'y en a
+	// LastSilence est le tour du dernier silence payé, zéro s'il n'y en a
 	// jamais eu. C'est ce que le §6 promet aux inspecteurs : ils ne savent pas
 	// où il est, ils savent qu'il s'est appauvri. Un booléen ne le dirait pas,
 	// puisqu'ils jouent en premier et que le drapeau retombe entre-temps.
-	DernierSilence int `json:"last_silence"`
+	LastSilence int `json:"last_silence"`
 
-	ZonesAnnoncees []int `json:"announced_zones"`
+	AnnouncedZones []int `json:"announced_zones"`
 
 	// AnnouncedEffects ne porte que les differer déclarés avec annonce. Un
 	// differer sans annonce reste invisible jusqu'à sa résolution, sinon le
@@ -81,6 +98,17 @@ type View struct {
 	AnnouncedEffects []PendingEffect `json:"announced_effects"`
 
 	Outcome *Outcome `json:"outcome,omitempty"`
+}
+
+// ExpenseUse dit ce qu'une dépense plafonnée a consommé et ce qu'elle permet.
+//
+// Les deux ensemble, jamais l'un sans l'autre : le plafond vient du manifeste
+// d'un plugin, que le client ne lit pas, et un compte sans son échelle ne se
+// planifie pas.
+type ExpenseUse struct {
+	Expense Expense `json:"expense"`
+	Used    int     `json:"used"`
+	Limit   int     `json:"limit"`
 }
 
 // ViewFor projette l'état pour un camp.
@@ -124,21 +152,27 @@ func (p *Game) ViewFor(a Side) View {
 		// ailleurs ; le test, si.
 		Inspectors:       list(append([]Inspector(nil), p.Inspectors...)),
 		KnownTrails:      p.trailsFor(a),
-		CasesVisibles:    list(p.visibleCellsFor()),
+		VisibleCells:     list(p.visibleCellsFor()),
 		LegalMoves:       list(p.LegalMoves(a)),
-		ProchaineReveal:  p.nextReveal(),
-		DernierSilence:   p.Fugitive.SilenceTurn,
+		NextReveal:       p.nextReveal(),
+		LastSilence:      p.Fugitive.SilenceTurn,
 		AnnouncedEffects: list(p.announcedEffects(a)),
 	}
-	v.ZonesAnnoncees = list(p.announcedZones(v.AnnouncedEffects))
+	v.AnnouncedZones = list(p.announcedZones(v.AnnouncedEffects))
 
 	// Le fugitif voit tout de lui-même. Les inspecteurs ne voient sa position
 	// que s'il est repéré ou révélé, et sa zone jamais.
 	if a == SideFugitive {
 		position := p.Fugitive.Position
 		resistance := p.Fugitive.Stamina
-		v.PositionFugitif = &position
+		v.FugitivePosition = &position
 		v.Stamina = &resistance
+		v.ExpenseUses = p.expenseUses()
+
+		if d := p.Fugitive.Decoy; d != nil {
+			leurre := *d
+			v.Decoy = &leurre
+		}
 
 		// Tant qu'il n'a pas scellé, le champ reste absent plutôt que de
 		// porter la sentinelle du noyau : « -1 » ne veut rien dire pour qui
@@ -149,13 +183,36 @@ func (p *Game) ViewFor(a Side) View {
 		}
 	} else if p.Fugitive.Visible {
 		position := p.Fugitive.Position
-		v.PositionFugitif = &position
+		v.FugitivePosition = &position
 	}
 
 	if r, fini := p.Outcome(); fini {
 		v.Outcome = &r
 	}
 	return v
+}
+
+// expenseUses rend le compte et le plafond de chaque dépense plafonnée.
+//
+// Trié par clé : le parcours d'une map n'a pas d'ordre stable, et la vue se
+// sérialise dans le journal comme dans le protocole.
+//
+// Rend nil quand aucune dépense n'est plafonnée — le champ est alors absent du
+// JSON, ce qui dit exactement ce qui est vrai plutôt qu'un tableau vide.
+func (p *Game) expenseUses() []ExpenseUse {
+	if p.Extensions == nil {
+		return nil
+	}
+
+	var comptes []ExpenseUse
+	for cle, d := range p.Extensions.Expenses {
+		if d.Uses <= 0 {
+			continue
+		}
+		comptes = append(comptes, ExpenseUse{cle, p.ExpenseUses[cle], d.Uses})
+	}
+	sort.Slice(comptes, func(i, j int) bool { return comptes[i].Expense < comptes[j].Expense })
+	return comptes
 }
 
 // list garantit une tranche non nulle.

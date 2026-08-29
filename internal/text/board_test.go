@@ -83,7 +83,7 @@ func TestPiecesCoverTheRest(t *testing.T) {
 func TestFugitiveAbsentFromInspectorsView(t *testing.T) {
 	v := testView()
 	v.Side = core.SideInspectors
-	v.PositionFugitif = nil
+	v.FugitivePosition = nil
 
 	if strings.ContainsRune(Board(v), CarFugitif) {
 		t.Error("le fugitif apparaît alors que la vue ne le porte pas")
@@ -143,7 +143,7 @@ func TestMergeGivesWatcherWhatNobodyKnows(t *testing.T) {
 	resistance := 7
 
 	fugitif := testView()
-	fugitif.PositionFugitif = &cache
+	fugitif.FugitivePosition = &cache
 	fugitif.SealedZone = &zone
 	fugitif.Stamina = &resistance
 	fugitif.KnownTrails = map[string]core.Trail{
@@ -160,7 +160,7 @@ func TestMergeGivesWatcherWhatNobodyKnows(t *testing.T) {
 
 	v := Merge(fugitif, inspecteurs)
 
-	if v.PositionFugitif == nil || *v.PositionFugitif != cache {
+	if v.FugitivePosition == nil || *v.FugitivePosition != cache {
 		t.Error("le spectateur ne voit pas le fugitif")
 	}
 	if v.SealedZone == nil || *v.SealedZone != zone {
