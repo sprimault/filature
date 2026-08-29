@@ -215,13 +215,26 @@ où un contour sombre ne se voit plus. L'inverse vaut pour un contour clair, qui
 meurt sur la rue. Les fonds possibles vont de 17 à 230 en luminance ; aucune
 couleur unique ne les couvre.
 
+Les neuf fonds, mesurés sur la palette livrée. Les trois faces d'un bâtiment y
+figurent séparément : ce sont trois luminances, et le contour ne meurt pas sur
+les trois de la même façon.
+
 | Fond | Contour seul | Avec liseré |
 |---|---|---|
 | hors plateau | 1,10 | **14,62** |
-| face latérale d'un bâtiment | 1,11 | **12,03** |
-| dessus d'un bâtiment | 2,00 | **6,66** |
-| zone fermée | 2,25 | **5,92** |
-| rue | 11,74 | 11,74 |
+| face gauche d'un bâtiment | 1,07 | **12,03** |
+| face droite d'un bâtiment | 1,46 | **8,84** |
+| dessus d'un bâtiment | 1,93 | **6,66** |
+| zone fermée | 2,18 | **5,92** |
+| lieu en recharge | 2,87 | **4,49** |
+| zone ouverte | 8,81 | 8,81 |
+| lieu actif | 9,62 | 9,62 |
+| rue | 11,36 | 11,36 |
+
+**Le plancher est de 4,49, sur un lieu en recharge**, largement au-dessus des
+trois pour un que WCAG 2.1 demande à un élément non textuel. C'est le seul
+chiffre du tableau qui compte vraiment : il dit ce qu'un pion garde de lisible
+dans le pire cas, et un contrôle le mesure à chaque suite de tests.
 
 C'est de l'éclairage et non une couleur de plugin, au même titre que les
 coefficients de faces. Une palette qui pourrait le déplacer pourrait rendre les
