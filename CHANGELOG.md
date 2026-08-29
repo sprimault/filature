@@ -35,12 +35,21 @@ le même pion. Les deux touchent la mobilité, et la garde contre le double bonu
 refusait l'un dès que l'autre était actif : le pas se gagnait ou non selon qu'on
 jouait la capacité avant ou après le déplacement.
 
+Les coups de capacité et de dépense nomment la case qu'ils désignent. Le Barreur
+propose un barrage par voisine praticable et le leurre une trace par couple de
+cases, mais la liste affichait autant de lignes identiques : le joueur choisissait
+à l'aveugle.
+
 ***
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
 active on the same piece. Both touch mobility, and the guard against a double
 bonus refused one as soon as the other was running: the step was gained or not
 depending on whether the ability was played before or after the move.
+
+Ability and expense moves now name the cell they target. The Blocker offers one
+roadblock per walkable neighbour and the decoy one trail per pair of cells, but
+the list showed that many identical lines: the player was choosing blind.
 
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 

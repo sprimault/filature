@@ -32,6 +32,11 @@ func Moves(coups []core.Move) string {
 }
 
 // Describe rend un coup en une ligne lisible.
+//
+// Une capacité et une dépense nomment la case qu'elles désignent, quand elles en
+// désignent une : le Barreur propose un coup par voisine praticable et le leurre
+// un par couple de cases, et sans elle la liste offre au joueur des lignes
+// identiques entre lesquelles il ne peut pas choisir.
 func Describe(c core.Move) string {
 	switch c.Type {
 	case core.MovePlace:
@@ -50,10 +55,18 @@ func Describe(c core.Move) string {
 			qui, c.To.Column, c.To.Row, direction(c.From, c.To))
 
 	case core.MoveAbility:
-		return fmt.Sprintf("capacité %s de %s", c.Ability, PieceLetter(c.Piece))
+		rendu := fmt.Sprintf("capacité %s de %s", c.Ability, PieceLetter(c.Piece))
+		if c.From != c.To {
+			rendu += fmt.Sprintf(" sur (%d,%d) %s", c.To.Column, c.To.Row, direction(c.From, c.To))
+		}
+		return rendu
 
 	case core.MoveExpense:
-		return fmt.Sprintf("dépenser %s", c.Expense)
+		rendu := fmt.Sprintf("dépenser %s", c.Expense)
+		if c.From != c.To {
+			rendu += fmt.Sprintf(" en (%d,%d) %s", c.From.Column, c.From.Row, direction(c.From, c.To))
+		}
+		return rendu
 
 	case core.MoveChangeZone:
 		return fmt.Sprintf("resceller vers la zone %d", c.Zone)
