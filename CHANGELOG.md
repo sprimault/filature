@@ -28,6 +28,20 @@ de version sont ce que lit un auteur de plugin étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
+## [Non publié]
+
+Le pas gagné en repérant le fugitif n'est plus perdu quand le Coureur court sur
+le même pion. Les deux touchent la mobilité, et la garde contre le double bonus
+refusait l'un dès que l'autre était actif : le pas se gagnait ou non selon qu'on
+jouait la capacité avant ou après le déplacement.
+
+***
+
+The step gained by spotting the fugitive is no longer lost when the Runner is
+active on the same piece. Both touch mobility, and the guard against a double
+bonus refused one as soon as the other was running: the step was gained or not
+depending on whether the ability was played before or after the move.
+
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 
 **Les textes du dépôt disent ce que le code fait.** Rien ici ne change le jeu ni
