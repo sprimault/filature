@@ -161,9 +161,13 @@ func (p *Game) abilityMoves() []Move {
 				coups = append(coups, base)
 				continue
 			}
+			// From porte la case du pion, comme pour un déplacement : sans
+			// elle, rien ne distingue une capacité visant (0,0) d'une capacité
+			// qui ne vise aucune case, et l'interface ne peut pas nommer le
+			// sens de la cible.
 			for _, cible := range p.abilityCells(p.Inspectors[i].Position) {
 				coup := base
-				coup.To = cible
+				coup.From, coup.To = p.Inspectors[i].Position, cible
 				coups = append(coups, coup)
 			}
 		}
