@@ -85,8 +85,8 @@ func TestStrokeWidthStaysWithinItsBounds(t *testing.T) {
 // TestRequiredColorsCoverBothOutlines vérifie que le socle porte les contours.
 //
 // Ce sont eux qui détachent une forme d'un sol dont la luminance varie du
-// simple au triple ; les oublier ne casse rien au chargement et rend les pièces
-// illisibles à l'écran.
+// simple au double et demi ; les oublier ne casse rien au chargement et rend les
+// pièces illisibles à l'écran.
 func TestRequiredColorsCoverBothOutlines(t *testing.T) {
 	presentes := map[string]bool{}
 	for _, c := range RequiredColors {

@@ -520,9 +520,9 @@ func TestSealAZone(t *testing.T) {
 // TestSetupExcludesCentre vérifie qu'aucun inspecteur ne se place dans le noyau
 // de départ.
 //
-// Sans cette exclusion, cinq pions posés au mieux autour du centre voient plus
-// de neuf dixièmes du noyau dès le premier tour, et l'invisibilité que
-// docs/regles.md §1 promet au fugitif n'existe pas.
+// Sans cette exclusion, cinq pions posés au mieux autour du centre en voient de
+// six à neuf dixièmes dès le premier tour selon le préréglage, et l'invisibilité
+// que docs/regles.md §1 promet au fugitif n'existe pas.
 func TestSetupExcludesCentre(t *testing.T) {
 	p := gameOn(grid(".....", ".....", ".....", ".....", "....."), Position{Column: 0, Row: 0})
 	p.Phase = PhaseInspectorsSetup

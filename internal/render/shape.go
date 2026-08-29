@@ -138,8 +138,8 @@ func (s Stroke) Opaque() int {
 // par forme, et invaliderait le tri par ordre de peintre.
 type Role string
 
-// Les trois rôles. Le sol n'en est pas un : rue, zone_ouverte et zone_fermee
-// sont des noms de couleurs, et le losange est tracé par le moteur.
+// Les trois rôles. Le sol n'en est pas un : les cinq noms de Grounds sont des
+// couleurs, et le losange est tracé par le moteur.
 const (
 	RolePiece    Role = "piece"
 	RoleBuilding Role = "building"
@@ -385,8 +385,9 @@ const (
 // préréglage —, soit le double du plancher.
 //
 // Cette portée est la portée **nominale** du préréglage, jamais celle du tour
-// en cours. Une capacité qui double la vue ferait sinon tomber le plafond d'un
-// tiers, donc dézoomerait tout le plateau au moment de son déclenchement pour
+// en cours. Une capacité qui double la vue ferait sinon tomber le plafond de
+// près de la moitié — mesuré à 47 % sur le plus petit préréglage et 49 % sur le
+// plus grand —, donc dézoomerait tout le plateau au moment de son déclenchement pour
 // le rezoomer au tour suivant : une caméra qui bouge seule quand on active une
 // capacité est déroutante, et c'est la carte à plat qui montre ce que la vue
 // isométrique ne peut plus contenir.

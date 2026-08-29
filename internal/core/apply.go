@@ -322,8 +322,8 @@ func (p *Game) spend(c Move) ([]func(), error) {
 	faites := []func(){p.adjustStamina(-depense.Cost)}
 
 	// Le compteur d'emplois est générique : « usages » est un champ du
-	// contrat, et le noyau n'a pas à savoir que la dépense plafonnée s'appelle
-	// meurtre.
+	// contrat, et le noyau n'a pas à savoir laquelle des dépenses plafonne, ni
+	// à combien.
 	if depense.Uses > 0 {
 		faites = append(faites, setIn(&p.ExpenseUses, cle, p.ExpenseUses[cle]+1))
 	}

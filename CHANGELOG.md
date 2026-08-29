@@ -129,6 +129,16 @@ trois autres runners, et l'archive d'une plateforme serait partie sans la notice
 de ce qu'elle incorpore sans les autres. Sans effet aujourd'hui, le binaire ne
 liant que du Go pur, et posé pour la dépendance suivante.
 
+Quatre godoc du noyau et du rendu comptaient faux ou nommaient ce qui n'existe
+plus. Une capacité qui double la vue fait tomber le plafond d'échelle de 47 à
+49 % selon le préréglage, quand la godoc annonçait une fraction deux fois plus
+faible — remesuré, l'argument qu'elle servait en sort renforcé. Un sol allait
+« du simple au triple » là où le
+reste du dépôt dit « double et demi ». L'exclusion du noyau se justifiait par un
+chiffre que les règles ont déjà corrigé. Et `Game.spend` nommait encore le
+meurtre, retiré du jeu, quand `internal/text` renvoyait à une fonction que le
+paquet n'a pas.
+
 Les trois bornes du panneau de carte à plat vivent dans `internal/render` au lieu
 d'un document, et un contrôle les compare à la taille du plus grand plateau. Il a
 corrigé le minimum au passage : 320 pixels donnaient 7,8 pixels par case, sous
@@ -251,6 +261,15 @@ the suite fail on the three other runners, and one platform's archive would have
 shipped without the notice for what it incorporates and the others do not. No
 effect today, the binary linking nothing but pure Go, and in place for the next
 dependency.
+
+Four godoc in the core and the renderer counted wrong or named what no longer
+exists. An ability that doubles sight brings the scale ceiling down by nearly
+half, not by a third — measured again at 47 and 49 % depending on the preset,
+which strengthens the argument it served. A ground went "from single to triple"
+where the rest of the repository says "double and a half". The core exclusion was
+justified by a figure the rules have already corrected. And `Game.spend` still
+named the murder, removed from the game, while `internal/text` referred to a
+function the package does not have.
 
 The flat map panel's three bounds now live in `internal/render` rather than in a
 document, and a check compares them to the largest board's size. It corrected the

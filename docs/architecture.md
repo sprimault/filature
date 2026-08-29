@@ -186,8 +186,9 @@ donne 55 pixels par case : le plafond commande partout et le plancher ne se
 déclenche jamais en jeu normal.
 
 La portée qui entre dans ce calcul est celle du **préréglage**, pas celle du
-tour. Une capacité qui double la vue ferait autrement sauter l'échelle d'un
-tiers à son déclenchement, puis la rendrait au tour suivant.
+tour. Une capacité qui double la vue ferait autrement sauter l'échelle de près de
+la moitié à son déclenchement — 47 % sur le plus petit préréglage, 49 % sur le
+plus grand —, puis la rendrait au tour suivant.
 
 **La garantie porte sur le pion sélectionné, pas sur tous.** Un inspecteur au
 bord du panneau a sa ligne de vue tronquée à l'écran, et à cinq pions dispersés
