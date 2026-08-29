@@ -46,6 +46,11 @@ Un déclenchement manquant, pris à l'autre phase, ou un camp qui ne correspond 
 jamais proposés. Le refus du déclenchement inconnu ne fermait qu'un côté du même
 défaut.
 
+`render.Grounds` retrouve l'ordre de luminance qu'il annonce : le lot qui a
+reposé les couleurs de la palette a rendu le lieu actif plus clair que la zone
+ouverte, corrigé l'énoncé de la palette et laissé la liste. La planche d'aperçu
+s'y adosse, et sortait ses deux bandes du milieu permutées.
+
 ***
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
@@ -61,6 +66,11 @@ the list showed that many identical lines: the player was choosing blind.
 A missing trigger, one taken from the other phase, or a side that does not match
 what is being declared: all three loaded without a word and were never offered.
 Rejecting an unknown trigger only closed one side of the same defect.
+
+`render.Grounds` is back in the luminance order it claims: the batch that reset
+the palette colours made the active shelter lighter than the open zone, fixed the
+palette's own wording and left the list alone. The preview board relies on it,
+and was printing its two middle bands swapped.
 
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 
