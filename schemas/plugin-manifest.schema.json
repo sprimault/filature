@@ -317,7 +317,7 @@
         "duration": {
           "type": "integer",
           "minimum": 0,
-          "description": "Nombre de tours pendant lesquels l'effet tient ; un vaut le tour courant, zero vaut la partie entiere."
+          "description": "Nombre de tours pendant lesquels l'effet tient ; un vaut le tour courant, zero vaut la partie entiere. block_cell et open_cell font exception et l'exigent : une case fermee l'est pour un nombre de tours, et l'omettre est refuse au chargement."
         },
         "radius": {
           "type": "integer",

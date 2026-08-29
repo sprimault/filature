@@ -57,6 +57,13 @@ ferait une capacité qui s'oublie. Le `defer` fait exception et exige au moins u
 tour (§3) : une échéance nulle y appliquerait à la résolution du tour même, ce
 qu'il existe précisément pour ne pas faire.
 
+**`block_cell` et `open_cell` exigent leur `duration`, et l'omettre est refusé au
+chargement.** Une case fermée l'est pour un nombre de tours, jamais pour la
+partie : le terrain se date à la pose et la résolution le purge à l'échéance, si
+bien qu'une durée absente donnait un tour comme une durée de 1. Plutôt que de
+laisser une valeur par défaut que personne ne devinerait, le contrat n'admet pas
+qu'on la taise.
+
 ### Déplacement et position
 
 | Type | Paramètres | Effet |

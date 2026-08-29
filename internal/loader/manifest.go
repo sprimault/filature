@@ -428,6 +428,17 @@ func checkEffects(effets []core.Effect, camp core.Side, chemin, ou string, dansU
 			ajouter("rayon de %d, attendu positif ou nul", e.Radius)
 		}
 
+		// Une durée absente vaut la partie entière pour un effet actif, dont la
+		// passive du Traqueur a besoin. Les deux primitives de terrain n'ont pas
+		// ce sens-là : alter date l'échéance à « tour + duree - 1 », que la
+		// résolution purge dès qu'elle est atteinte, si bien qu'une durée
+		// absente donne un tour comme une durée de 1. Plutôt que de définir un
+		// défaut que personne ne devinerait, on l'exige.
+		if e.Duration == 0 && (e.Type == core.EffectBlockCell || e.Type == core.EffectOpenCell) {
+			ajouter("duree manquante sur %q : une case fermee ou ouverte l'est pour un nombre de tours, "+
+				"et l'omettre ne vaut pas la partie entiere", e.Type)
+		}
+
 		if e.Type != core.EffectDefer {
 			if e.Duration < 0 {
 				ajouter("duree de %d, attendue positive ou nulle", e.Duration)
