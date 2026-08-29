@@ -4,7 +4,6 @@
 package quality
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -35,27 +34,17 @@ func fondsSousUnPion(t *testing.T) map[string]string {
 		"hors plateau":     palette["backdrop"],
 	}
 
-	// Les coefficients de faces du §5. Le bâti n'est pas un fond mais trois.
-	for nom, coefficient := range map[string]float64{
-		"dessus d'un bâtiment":      1.50,
-		"face droite d'un bâtiment": 1.14,
-		"face gauche d'un bâtiment": 0.72,
+	// Par render.Lit et non par les trois nombres recopiés : le bâti n'est pas
+	// un fond mais trois, et un contrôle qui les réécrit ne mesure plus que
+	// lui-même.
+	for nom, face := range map[string]int{
+		"dessus d'un bâtiment":      render.FaceTop,
+		"face droite d'un bâtiment": render.FaceRight,
+		"face gauche d'un bâtiment": render.FaceLeft,
 	} {
-		fonds[nom] = eclaire(t, palette["building"], coefficient)
+		fonds[nom] = render.Lit(palette["building"], face)
 	}
 	return fonds
-}
-
-// eclaire applique un coefficient de face à une couleur, comme le rendu.
-func eclaire(t *testing.T, hexa string, k float64) string {
-	t.Helper()
-
-	var r, v, b int
-	if _, err := fmt.Sscanf(hexa, "#%02x%02x%02x", &r, &v, &b); err != nil {
-		t.Fatalf("couleur %q illisible : %v", hexa, err)
-	}
-	borne := func(n int) int { return min(int(float64(n)*k), 255) }
-	return fmt.Sprintf("#%02x%02x%02x", borne(r), borne(v), borne(b))
 }
 
 // tenus rend, pour chaque fond, ce que le contour seul garde et ce que le

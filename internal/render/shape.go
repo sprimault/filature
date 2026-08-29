@@ -289,6 +289,39 @@ const RimColor = "#e8e2d4"
 // épaisseur de trait, elle est encadrée par StrokeWidth.
 const RimWidth = 2
 
+// Les trois faces d'un prisme, dans l'ordre où PrismFaces les rend.
+const (
+	FaceTop = iota
+	FaceRight
+	FaceLeft
+)
+
+// PrismFaces porte les coefficients d'éclairage des trois faces d'un prisme.
+//
+// Ici et non dans le paquet qui dessine : docs/contrat-formes.md §5 les publie
+// comme une règle du moteur, en disant que c'est « exactement le genre de détail
+// que deux implémentations règlent différemment sans que personne ne s'en
+// aperçoive avant de comparer deux captures ». L'aperçu en est une, le rendu de
+// l'étape 7 sera la seconde, et elles ne peuvent les partager que depuis ici —
+// c'est preview qui importe render, jamais l'inverse.
+//
+// Le coefficient s'applique aux trois canaux, ce qui préserve la teinte.
+var PrismFaces = [3]float64{1.50, 1.14, 0.72}
+
+// Lit applique le coefficient d'une face à une couleur.
+//
+// Le débordement se borne à 255 plutôt que de reboucler : un canal saturé reste
+// saturé, là qu'un modulo rendrait un dessus de bâtiment plus sombre que ses
+// côtés dès que la palette monte.
+func Lit(hexa string, face int) string {
+	var r, v, b int
+	if _, err := fmt.Sscanf(hexa, "#%02x%02x%02x", &r, &v, &b); err != nil {
+		return "#000000"
+	}
+	borne := func(n int) int { return min(int(float64(n)*PrismFaces[face]), 255) }
+	return fmt.Sprintf("#%02x%02x%02x", borne(r), borne(v), borne(b))
+}
+
 // MinStrokePixels et MaxStrokeRatio encadrent l'épaisseur de tout trait de
 // contour, celui d'un plugin comme le liseré du moteur.
 //

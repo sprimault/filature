@@ -21,10 +21,6 @@ import (
 	"github.com/sprimault/filature/internal/render"
 )
 
-// faces sont les coefficients des trois faces d'un prisme, tels que le contrat
-// de formes les énonce.
-var faces = [3]float64{1.50, 1.14, 0.72}
-
 // trait rend une primitive à l'échelle donnée, liseré compris.
 //
 // L'ordre compte : liseré, contour, puis remplissage. Un tracé SVG est centré
@@ -106,9 +102,9 @@ func prisme(s *strings.Builder, t render.Stroke, x, y, k float64, pal render.Pal
 		`<polygon points="%.1f,%.1f %.1f,%.1f %.1f,%.1f %.1f,%.1f" fill="%s"/>`+
 			`<polygon points="%.1f,%.1f %.1f,%.1f %.1f,%.1f %.1f,%.1f" fill="%s"/>`+
 			`<polygon points="%.1f,%.1f %.1f,%.1f %.1f,%.1f %.1f,%.1f" fill="%s"/>`,
-		x-dx, y-h, x, y-dy-h, x+dx, y-h, x, y+dy-h, teinte(c, faces[0]),
-		x+dx, y-h, x, y+dy-h, x, y+dy, x+dx, y, teinte(c, faces[1]),
-		x-dx, y-h, x, y+dy-h, x, y+dy, x-dx, y, teinte(c, faces[2]))
+		x-dx, y-h, x, y-dy-h, x+dx, y-h, x, y+dy-h, render.Lit(c, render.FaceTop),
+		x+dx, y-h, x, y+dy-h, x, y+dy, x+dx, y, render.Lit(c, render.FaceRight),
+		x-dx, y-h, x, y+dy-h, x, y+dy, x-dx, y, render.Lit(c, render.FaceLeft))
 }
 
 // losange trace le sol d'une case, décalé par son grain.
@@ -139,22 +135,6 @@ func minDimension(t render.Stroke) int {
 		return min(xmax-xmin, ymax-ymin)
 	}
 	return 1
-}
-
-// teinte applique un coefficient à une couleur, en bornant chaque canal.
-//
-// Une couleur illisible rend du noir plutôt que d'échouer : un aperçu sert à
-// voir ce qui ne va pas, et s'interrompre sur une valeur mal formée priverait
-// de la vue d'ensemble pour un défaut que la validation nomme déjà.
-func teinte(hexa string, k float64) string {
-	var r, v, b int
-	if _, err := fmt.Sscanf(hexa, "#%02x%02x%02x", &r, &v, &b); err != nil {
-		return "#000000"
-	}
-	borne := func(n int) int {
-		return min(int(float64(n)*k), 255)
-	}
-	return fmt.Sprintf("#%02x%02x%02x", borne(r), borne(v), borne(b))
 }
 
 // etiquette écrit un libellé lisible sur un fond quelconque.
