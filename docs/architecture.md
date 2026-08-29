@@ -173,8 +173,10 @@ faire, et on a besoin des deux en même temps.
 - **la carte à plat** tient dans un panneau latéral, en permanence. Elle porte
   la vue d'ensemble, que l'isométrique abandonne : le fugitif y planifie un
   itinéraire vers une zone, les inspecteurs y répartissent une couverture. Elle
-  superpose aussi les lignes de vue, la carte de croyance de l'IA et les cases
-  atteignables, illisibles en isométrique.
+  superpose aussi les lignes de vue et les cases atteignables, illisibles en
+  isométrique — les unes et les autres viennent de la vue filtrée, qui les porte
+  déjà. **La carte de croyance de l'IA s'y ajoute à l'étape 9** : rien ne la
+  produit avant, et l'étape 7 livre donc la carte sans elle.
 
 **L'échelle isométrique est un intervalle fermé, fixé par la règle et non par le
 confort.** Par le bas, `MinRenderScale`. Par le haut, la vue doit contenir en
@@ -194,11 +196,14 @@ de la carte à plat : elle porte la couverture d'ensemble du camp inspecteurs,
 qui est leur information la plus stratégique et que l'isométrique ne peut pas
 montrer.
 
-Le panneau vaut 26 % de la largeur, borné entre 320 et 520 pixels — dimensionné
-par ce qu'il doit montrer, soit douze pixels par case sur le plus grand
-préréglage. Cette couverture s'y rend **en teinte de fond de case, jamais en
-halo autour d'un pion** : à huit pixels par case, un halo déborderait sur les
-huit voisines.
+Le panneau vaut 26 % de la largeur, borné entre 328 et 520 pixels — dimensionné
+par ce qu'il doit montrer, soit de huit à treize pixels par case sur le plus
+grand préréglage selon la largeur de la fenêtre. Les trois valeurs sont dans
+`internal/render`, où un contrôle les compare à la taille du plus grand plateau.
+
+C'est la borne basse qui commande la suite : cette couverture se rend **en teinte
+de fond de case, jamais en halo autour d'un pion**, parce qu'à huit pixels par
+case un halo déborderait sur les huit voisines.
 
 **La carte à plat passe par `ViewFor` comme tout le reste.** C'est une vue de
 plus, pas un accès privilégié : celle des inspecteurs ne montre pas le fugitif,
