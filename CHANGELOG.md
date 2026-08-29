@@ -80,6 +80,11 @@ alors de ne pas l'écrire. `CONTRIBUTING` avait pris ce parti dès l'origine.
 affirmait une exhaustivité qu'une relecture de son propre diff a démentie
 quelques heures après sa publication.
 
+Le §3 de `regles.md` ne donne plus au Quartier une exclusivité que le §15 du même
+document dément. Le lot qui a changé le seuil des impasses a régénéré le bloc de
+mesures et corrigé la phrase jumelle du §14, sans toucher celle-ci : un plateau
+de Périphérie sur mille passe lui aussi sous la cible.
+
 ***
 
 The check that rejects unsupported claims about quantity in the notes now
@@ -127,6 +132,11 @@ time — no test holds it, and the repository's rule then says not to write it.
 
 **The release is now called "Avant le rendu".** "Les promesses tenues" claimed a
 completeness that a review of its own diff disproved hours after publication.
+
+§3 of `regles.md` no longer grants the district an exclusivity that §15 of the
+same document contradicts. The batch that changed the dead-end threshold
+regenerated the measurement block and fixed the twin sentence in §14, without
+touching this one: one outskirts board in a thousand also falls below the target.
 
 ## [0.6.2] — 2026-08-29 — Avant le rendu
 
