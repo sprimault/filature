@@ -113,8 +113,8 @@ func mesurer(p Settings) mesures {
 	// La cible de l'étape 4, et non le quart du côté : carveDeadEnds en creuse
 	// une par carré de huit cases, et grid.go écarte nommément la règle
 	// proportionnelle au côté, qui rendrait la Ville deux fois moins piégeuse
-	// qu'un Quartier. Le seuil publié en valait la moitié sur les deux grands
-	// préréglages, si bien que la colonne ne mesurait rien.
+	// qu'un Quartier. Le seuil publié valait 5, 7 et 10 quand la cible en demande
+	// 6, 15 et 26, si bien que la colonne ne mesurait rien.
 	plancher := p.Size * p.Size / AreaPerDeadEnd
 	var sousPlancher int
 
