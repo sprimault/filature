@@ -141,6 +141,13 @@ Une cible qui ne désigne personne est refusée au chargement : une dépense du
 fugitif ne vise ni `other_piece` ni `all_pieces`, puisqu'il est seul. Viser le
 camp adverse, en revanche, est le cas ordinaire — voir §9.
 
+**Une capacité appartient aux inspecteurs et se déclenche en
+`inspectors_phase` ; une dépense appartient au fugitif et se déclenche en
+`fugitive_phase`.** Les deux sont refusées au chargement autrement, déclenchement
+manquant compris : le jeu n'énumère rien d'autre, et une déclaration acceptée que
+personne ne peut jouer ne se distingue pas d'une déclaration qui ne fait rien.
+Une capacité `passive = true` échappe à la règle, n'attendant aucune phase.
+
 ---
 
 ## 4. Modes

@@ -254,6 +254,11 @@ plugins, et le noyau sait la lire.
 Une capacité `passive = true` n'a pas de déclenchement : elle s'applique en
 permanence, tant que le pion est en jeu.
 
+**La troisième colonne est tenue au chargement**, camp compris : une capacité
+déclarée sous `fugitive_phase`, du côté du fugitif, ou sans déclenchement du
+tout, est refusée. Le noyau ne l'énumérerait jamais, et une déclaration inerte ne
+se distingue pas d'une déclaration qui ne fait rien.
+
 **Trois et pas davantage, un par endroit où le noyau consulte le registre.** Les
 deux phases portent ce qu'un joueur choisit ; l'étranglement est le seul moment
 que le jeu déclenche de lui-même, d'où sa réserve aux modes — un pion qui s'y

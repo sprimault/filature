@@ -220,13 +220,16 @@ func (m *manifeste) validate(chemin, dossier string) []error {
 func (m *manifeste) checkAllEffects(chemin string) []error {
 	var manquements []error
 
+	// Le camp est passé plutôt que lu : une capacité appartient aux inspecteurs
+	// et une dépense au fugitif, c'est ce que le noyau énumère, et le contrôle
+	// n'aurait rien à quoi comparer le camp déclaré s'il le tenait du manifeste.
 	for _, cle := range sortedKeys(m.Abilities) {
 		manquements = append(manquements,
-			checkAbility(m.Abilities[cle], chemin, "ability."+cle)...)
+			checkAbility(m.Abilities[cle], core.SideInspectors, chemin, "ability."+cle)...)
 	}
 	for _, cle := range sortedKeys(m.Expenses) {
 		manquements = append(manquements,
-			checkAbility(m.Expenses[cle], chemin, "expense."+cle)...)
+			checkAbility(m.Expenses[cle], core.SideFugitive, chemin, "expense."+cle)...)
 	}
 	// Les trois champs d'un mode sont obligatoires au schéma publié, et
 	// seul le déclenchement l'était ici. Un mode sans nom n'a rien à afficher
@@ -276,7 +279,7 @@ func listeDesTriggers() string {
 
 // checkAbility contrôle une capacité ou une dépense, qui partagent leur
 // forme.
-func checkAbility(c core.Ability, chemin, ou string) []error {
+func checkAbility(c core.Ability, camp core.Side, chemin, ou string) []error {
 	var manquements []error
 
 	if c.Name == "" {
@@ -303,7 +306,55 @@ func checkAbility(c core.Ability, chemin, ou string) []error {
 				"un pion qui s'y accroche agirait sans que son camp l'ait joue",
 			chemin, ou, core.OnStrangling))
 	}
+	manquements = append(manquements, checkPlayable(c, camp, chemin, ou)...)
+
 	return append(manquements, checkEffects(c.Effects, c.Camp, chemin, ou, false)...)
+}
+
+// checkPlayable refuse ce qu'aucun camp ne pourra jamais jouer.
+//
+// Le noyau n'énumère une capacité que pour les inspecteurs sous
+// « inspectors_phase », et une dépense que pour le fugitif sous
+// « fugitive_phase ». Toute autre combinaison — déclenchement absent, pris à
+// l'autre phase, ou camp qui ne correspond pas à la nature de la déclaration —
+// laisse la chose chargée, validée, et jamais proposée. C'est le défaut que le
+// refus du déclenchement inconnu avait fermé d'un seul côté : une chaîne
+// inventée était nommée, une chaîne juste mais hors phase passait, et l'auteur
+// n'avait pas plus de moyen de l'apprendre.
+//
+// Une capacité passive en est dispensée : elle vaut toute la partie et n'attend
+// aucune phase. Un déclenchement déjà refusé ailleurs sort aussi, pour ne pas
+// doubler le message qu'il a produit.
+func checkPlayable(c core.Ability, camp core.Side, chemin, ou string) []error {
+	if c.Passive || c.Trigger == core.OnStrangling {
+		return nil
+	}
+
+	attendu := core.OnFugitivePhase
+	if camp == core.SideInspectors {
+		attendu = core.OnInspectorsPhase
+	}
+
+	var manquements []error
+	if c.Camp != camp {
+		manquements = append(manquements, fmt.Errorf(
+			"%s: %s: camp %q, attendu %q : le jeu ne la propose jamais a l'autre camp",
+			chemin, ou, c.Camp, camp))
+	}
+
+	switch {
+	case c.Trigger != "" && !triggerConnu(c.Trigger):
+		// Déjà nommé par le contrôle du vocabulaire.
+	case c.Trigger == "":
+		manquements = append(manquements, fmt.Errorf(
+			"%s: %s: declenchement manquant, attendu %q : sans lui le jeu ne la propose jamais",
+			chemin, ou, attendu))
+	case c.Trigger != attendu:
+		manquements = append(manquements, fmt.Errorf(
+			"%s: %s: declenchement %q, attendu %q : le jeu ne la propose jamais",
+			chemin, ou, c.Trigger, attendu))
+	}
+	return manquements
 }
 
 // cibleHorsDuCamp dit pourquoi une cible ne convient pas au camp qui la déclare,

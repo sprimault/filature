@@ -713,6 +713,50 @@ trigger = "strangling"
 			attendu: "reserve a un mode",
 		},
 		{
+			nom:     "declenchement manquant sur une capacite active",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[ability.x]
+name = "X"
+side = "inspectors"
+`,
+			attendu: "declenchement manquant",
+		},
+		{
+			nom:     "declenchement pris a l'autre camp",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[expense.x]
+name = "X"
+side = "fugitive"
+trigger = "inspectors_phase"
+`,
+			attendu: "declenchement \"inspectors_phase\", attendu \"fugitive_phase\"",
+		},
+		{
+			nom:     "capacite declaree du cote du fugitif",
+			dossier: "essai",
+			contenu: `name = "essai"
+version = "0.1.0"
+rules = true
+effects_version = 3
+
+[ability.x]
+name = "X"
+side = "fugitive"
+trigger = "fugitive_phase"
+`,
+			attendu: "camp \"fugitive\", attendu \"inspectors\"",
+		},
+		{
 			nom:     "declenchement inconnu sur une capacite passive",
 			dossier: "essai",
 			contenu: `name = "essai"

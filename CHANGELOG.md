@@ -40,6 +40,12 @@ propose un barrage par voisine praticable et le leurre une trace par couple de
 cases, mais la liste affichait autant de lignes identiques : le joueur choisissait
 à l'aveugle.
 
+**Le chargeur refuse une capacité ou une dépense que personne ne pourra jouer.**
+Un déclenchement manquant, pris à l'autre phase, ou un camp qui ne correspond pas
+à la nature de la déclaration : les trois se chargeaient sans un mot et n'étaient
+jamais proposés. Le refus du déclenchement inconnu ne fermait qu'un côté du même
+défaut.
+
 ***
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
@@ -50,6 +56,11 @@ depending on whether the ability was played before or after the move.
 Ability and expense moves now name the cell they target. The Blocker offers one
 roadblock per walkable neighbour and the decoy one trail per pair of cells, but
 the list showed that many identical lines: the player was choosing blind.
+
+**The loader now rejects an ability or expense nobody will ever be able to play.**
+A missing trigger, one taken from the other phase, or a side that does not match
+what is being declared: all three loaded without a word and were never offered.
+Rejecting an unknown trigger only closed one side of the same defect.
 
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 
