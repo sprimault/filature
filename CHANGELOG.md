@@ -28,7 +28,7 @@ de version sont ce que lit un auteur de plugin étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
-## [Non publié]
+## [0.6.3] — 2026-08-29 — La relecture du diff
 
 Le contrôle qui refuse une affirmation de nombre non tenue dans les notes
 reconnaît enfin les deux tournures de sa table qui se terminent par un `é`. Son
