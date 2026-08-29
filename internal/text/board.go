@@ -108,8 +108,8 @@ func Board(v core.View) string {
 	for i, insp := range v.Inspectors {
 		poser(insp.Position, CarInspecteur+rune(i))
 	}
-	if v.PositionFugitif != nil {
-		poser(*v.PositionFugitif, CarFugitif)
+	if v.FugitivePosition != nil {
+		poser(*v.FugitivePosition, CarFugitif)
 	}
 
 	var sortie strings.Builder
@@ -165,17 +165,17 @@ func Status(v core.View) string {
 	if fermees := closedZones(v); fermees != "" {
 		fmt.Fprintf(&s, "Zones fermées : %s\n", fermees)
 	}
-	if len(v.ZonesAnnoncees) > 0 {
-		fmt.Fprintf(&s, "Zones annoncées : %s\n", numbers(v.ZonesAnnoncees))
+	if len(v.AnnouncedZones) > 0 {
+		fmt.Fprintf(&s, "Zones annoncées : %s\n", numbers(v.AnnouncedZones))
 	}
 	switch {
-	case v.ProchaineReveal == 0:
+	case v.NextReveal == 0:
 		s.WriteString("Révélation à la fin de ce tour\n")
-	case v.ProchaineReveal > 0:
-		fmt.Fprintf(&s, "Révélation dans %d tour(s)\n", v.ProchaineReveal)
+	case v.NextReveal > 0:
+		fmt.Fprintf(&s, "Révélation dans %d tour(s)\n", v.NextReveal)
 	}
-	if v.DernierSilence > 0 {
-		fmt.Fprintf(&s, "Silence payé au tour %d\n", v.DernierSilence)
+	if v.LastSilence > 0 {
+		fmt.Fprintf(&s, "Silence payé au tour %d\n", v.LastSilence)
 	}
 
 	for i, insp := range v.Inspectors {
@@ -282,7 +282,7 @@ func Merge(fugitif, inspecteurs core.View) core.View {
 	v := inspecteurs
 	v.Side = ""
 
-	v.PositionFugitif = fugitif.PositionFugitif
+	v.FugitivePosition = fugitif.FugitivePosition
 	v.SealedZone = fugitif.SealedZone
 	v.Stamina = fugitif.Stamina
 	v.LegalMoves = nil

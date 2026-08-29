@@ -46,8 +46,8 @@ func TestInspectorsViewLeaksNothing(t *testing.T) {
 
 	v := p.ViewFor(SideInspectors)
 
-	if v.PositionFugitif != nil {
-		t.Errorf("la position du fugitif est dans la vue : %v", *v.PositionFugitif)
+	if v.FugitivePosition != nil {
+		t.Errorf("la position du fugitif est dans la vue : %v", *v.FugitivePosition)
 	}
 	if v.SealedZone != nil {
 		t.Errorf("la zone scellée est dans la vue : %d", *v.SealedZone)
@@ -91,7 +91,7 @@ func TestFugitiveViewSeesAll(t *testing.T) {
 	p := hiddenGame()
 	v := p.ViewFor(SideFugitive)
 
-	if v.PositionFugitif == nil || *v.PositionFugitif != p.Fugitive.Position {
+	if v.FugitivePosition == nil || *v.FugitivePosition != p.Fugitive.Position {
 		t.Error("le fugitif ne voit pas sa propre position")
 	}
 	if v.SealedZone == nil || *v.SealedZone != 3 {
@@ -130,11 +130,11 @@ func TestViewShowsSpottedFugitive(t *testing.T) {
 	p.Fugitive.Visible = true
 
 	v := p.ViewFor(SideInspectors)
-	if v.PositionFugitif == nil {
+	if v.FugitivePosition == nil {
 		t.Fatal("un fugitif repéré reste caché dans la vue")
 	}
-	if *v.PositionFugitif != p.Fugitive.Position {
-		t.Errorf("position %v, attendu %v", *v.PositionFugitif, p.Fugitive.Position)
+	if *v.FugitivePosition != p.Fugitive.Position {
+		t.Errorf("position %v, attendu %v", *v.FugitivePosition, p.Fugitive.Position)
 	}
 
 	// Repéré ne veut pas dire déshabillé : sa zone et sa jauge restent à lui.
@@ -294,13 +294,13 @@ func TestNextRevealHitsZeroOnItsTurn(t *testing.T) {
 		{1, 3}, {2, 2}, {3, 1}, {4, 0}, {5, 3}, {8, 0},
 	} {
 		p.Turn = c.tour
-		if got := p.ViewFor(SideInspectors).ProchaineReveal; got != c.attendu {
+		if got := p.ViewFor(SideInspectors).NextReveal; got != c.attendu {
 			t.Errorf("au tour %d, révélation dans %d, attendu %d", c.tour, got, c.attendu)
 		}
 	}
 
 	p.Settings.RevealPeriod = 0
-	if got := p.ViewFor(SideInspectors).ProchaineReveal; got != -1 {
+	if got := p.ViewFor(SideInspectors).NextReveal; got != -1 {
 		t.Errorf("sans période, révélation dans %d, attendu -1", got)
 	}
 }
@@ -367,8 +367,8 @@ func TestOnlyAnnouncedEffects(t *testing.T) {
 	if len(v.AnnouncedEffects) != 1 {
 		t.Fatalf("%d effets annoncés, attendu 1", len(v.AnnouncedEffects))
 	}
-	if !reflect.DeepEqual(v.ZonesAnnoncees, []int{3}) {
-		t.Errorf("zones annoncées %v, attendu [3]", v.ZonesAnnoncees)
+	if !reflect.DeepEqual(v.AnnouncedZones, []int{3}) {
+		t.Errorf("zones annoncées %v, attendu [3]", v.AnnouncedZones)
 	}
 }
 
@@ -415,7 +415,7 @@ func TestViewSerialises(t *testing.T) {
 	if err := json.Unmarshal(brut, &relue); err != nil {
 		t.Fatalf("la vue ne se relit pas : %v", err)
 	}
-	if relue.PositionFugitif == nil || *relue.PositionFugitif != p.Fugitive.Position {
+	if relue.FugitivePosition == nil || *relue.FugitivePosition != p.Fugitive.Position {
 		t.Error("la position ne survit pas à l'aller-retour")
 	}
 	if len(relue.KnownTrails) != len(p.Trails) {
@@ -452,12 +452,12 @@ func TestOutcomeInTheView(t *testing.T) {
 func TestWatchedCellsReachBothSides(t *testing.T) {
 	p := hiddenGame()
 
-	inspecteurs := p.ViewFor(SideInspectors).CasesVisibles
+	inspecteurs := p.ViewFor(SideInspectors).VisibleCells
 	if len(inspecteurs) == 0 {
 		t.Fatal("les inspecteurs ne voient aucune case")
 	}
 
-	fugitif := p.ViewFor(SideFugitive).CasesVisibles
+	fugitif := p.ViewFor(SideFugitive).VisibleCells
 	if len(fugitif) != len(inspecteurs) {
 		t.Errorf("%d cases surveillées côté fugitif, %d côté inspecteurs",
 			len(fugitif), len(inspecteurs))

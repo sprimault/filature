@@ -1,6 +1,6 @@
 # Protocole de bot
 
-Version du protocole : **3**
+Version du protocole : **4**
 
 Un bot **remplace** l'IA du jeu, il ne l'étend pas. Le jeu lui transmet une vue
 de la partie, il renvoie un coup. Aucune API interne à respecter, aucun plugin
@@ -66,7 +66,7 @@ trois messages plus loin.
 ### hello
 
 ```json
-{"type":"hello","protocol":3,"side":"inspectors","seed":178342119,
+{"type":"hello","protocol":4,"side":"inspectors","seed":178342119,
  "settings":{"size":41,"range":8,"turns":40,"centre_radius":10,"stamina":10,
  "inspectors":5,"pieces_per_turn":3,"reveal_period":4,"zones":6,
  "zones_left_open":3,"trail_lifetime":6,"shelters":4,"shelter_gain":2,
@@ -108,6 +108,21 @@ donc rien à savoir des règles pour être correct : il ne peut pas jouer un cou
 illégal s'il choisit dans cette liste. C'est aussi ce qui fait qu'un plugin de
 règles ajoutant une dépense est utilisable par un bot qui l'ignore.
 
+**La version 4 ajoute deux champs à la vue du fugitif**, tous deux absents de
+celle des inspecteurs :
+
+- `expense_uses` donne, pour chaque dépense plafonnée, ce qu'elle a consommé et
+  ce qu'elle permet. `legal_moves` cessait de proposer la dépense une fois le
+  plafond atteint, ce qui ne se distingue pas d'une résistance trop basse, et le
+  plafond lui-même vient du manifeste, que le bot ne lit pas ;
+- `decoy` porte la fausse trace armée, absente tant qu'aucune ne l'est. Elle
+  n'est posée qu'à la résolution, et le fugitif joue encore entre l'achat et
+  elle : un bot qui achète deux fois écrase le premier leurre et perd le point
+  de résistance qu'il avait coûté.
+
+Aucun des deux n'était déductible d'une vue de la version 3 — deux états qui
+donnent des vues indiscernables ne se recalculent pas.
+
 ### over
 
 ```json
@@ -128,7 +143,7 @@ actifs. Traiter le champ comme une chaîne, jamais comme une énumération.
 
 ```json
 {"type":"ready","name":"traqueur-glouton","version":"0.3.1",
- "protocol":3,"deterministic":true,"author":"…"}
+ "protocol":4,"deterministic":true,"author":"…"}
 ```
 
 Un `protocol` qui n'est pas celui du jeu écarte le bot ici, avant tout autre
@@ -248,7 +263,7 @@ for ligne in sys.stdin:
     message = json.loads(ligne)
     if message["type"] == "hello":
         reponse = {"type": "ready", "name": "hasard", "version": "1.0.0",
-                   "protocol": 3, "deterministic": False}
+                   "protocol": 4, "deterministic": False}
     elif message["type"] == "play":
         reponse = {"type": "move",
                    "move": random.choice(message["view"]["legal_moves"])}

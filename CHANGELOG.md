@@ -30,6 +30,24 @@ publié, et explique les conventions du dépôt à qui y contribue.
 
 ## [Non publié]
 
+**`protocol` passe à 4.** Un bot écrit contre la version 3 continue de jouer,
+mais deux champs apparaissent dans la vue du fugitif et lui étaient jusqu'ici
+indéductibles : `expense_uses`, qui donne pour chaque dépense plafonnée ce
+qu'elle a consommé et ce qu'elle permet, et `decoy`, qui porte la fausse trace
+armée. Les inspecteurs ne reçoivent ni l'un ni l'autre.
+
+Les deux manquaient. `legal_moves` cessait de proposer une dépense
+épuisée exactement comme il cesse d'en proposer une trop chère : mesuré, les
+états « trois, deux ou un leurre restant » donnaient des vues indiscernables. Et
+un leurre acheté n'est posé qu'à la résolution, le fugitif jouant encore
+entre-temps — échanger sa case et sa direction laissait la vue identique octet
+pour octet, si bien qu'un second achat écrasait le premier sans que rien puisse
+le dire.
+
+Les cinq champs de `core.View` restés en français passent à l'anglais dans le
+même passage. Leurs noms JSON étaient déjà anglais : la sérialisation ne bouge
+pas d'un octet.
+
 Le pas gagné en repérant le fugitif n'est plus perdu quand le Coureur court sur
 le même pion. Les deux touchent la mobilité, et la garde contre le double bonus
 refusait l'un dès que l'autre était actif : le pas se gagnait ou non selon qu'on
@@ -117,6 +135,21 @@ n'apparaît : c'était la dernière occasion où le retrait ne coûtait rien, le
 moteur de rendu n'étant pas encore là pour y laisser des champs abandonnés.
 
 ***
+
+**`protocol` moves to 4.** A bot written against version 3 keeps playing, but two
+fields appear in the fugitive's view that it could not deduce: `expense_uses`,
+giving for each capped expense what it has consumed and what it allows, and
+`decoy`, carrying the armed false trail. Inspectors receive neither.
+
+Both were missing. `legal_moves` stopped offering an exhausted expense exactly as
+it stops offering one that costs too much: measured, the states "three, two or
+one decoy left" gave indistinguishable views. And a bought decoy is only laid at
+turn resolution, the fugitive still playing in between — swapping its cell and
+its direction left the view identical byte for byte, so a second purchase
+overwrote the first with nothing able to say so.
+
+The five `core.View` fields still in French move to English in the same pass.
+Their JSON names were already English: serialisation does not move by one byte.
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
 active on the same piece. Both touch mobility, and the guard against a double

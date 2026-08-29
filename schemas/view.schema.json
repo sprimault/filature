@@ -6,6 +6,21 @@
   "description": "Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis core.View : ne pas modifier a la main.",
   "$ref": "#/$defs/View",
   "$defs": {
+    "Decoy": {
+      "type": "object",
+      "properties": {
+        "at": {
+          "$ref": "#/$defs/Position"
+        },
+        "toward": {
+          "$ref": "#/$defs/Position"
+        }
+      },
+      "required": [
+        "at",
+        "toward"
+      ]
+    },
     "Effect": {
       "type": "object",
       "properties": {
@@ -70,6 +85,25 @@
         "side",
         "toward",
         "zone"
+      ]
+    },
+    "ExpenseUse": {
+      "type": "object",
+      "properties": {
+        "expense": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "used": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "expense",
+        "limit",
+        "used"
       ]
     },
     "Inspector": {
@@ -313,6 +347,15 @@
           "type": "array",
           "items": {
             "type": "integer"
+          }
+        },
+        "decoy": {
+          "$ref": "#/$defs/Decoy"
+        },
+        "expense_uses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpenseUse"
           }
         },
         "fugitive_position": {

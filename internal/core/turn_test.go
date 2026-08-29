@@ -459,7 +459,7 @@ func TestInspectorsLearnTheSilenceWasPaid(t *testing.T) {
 	}
 	endTurn(t, p)
 
-	if got := p.ViewFor(SideInspectors).DernierSilence; got != 4 {
+	if got := p.ViewFor(SideInspectors).LastSilence; got != 4 {
 		t.Errorf("les inspecteurs lisent %d, attendu le tour 4 où l'achat a eu lieu", got)
 	}
 }

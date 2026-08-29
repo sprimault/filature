@@ -17,7 +17,12 @@ import (
 // versions 1 et 2 nommaient un coup « coup » dans le schéma et « move » dans la
 // documentation, et les cinq autres types en français : un auteur de bot ne
 // pouvait deviner ni la règle ni l'exception.
-const BotProtocol = 3
+//
+// Passée à 4 quand la vue du fugitif a gagné le compte de ses dépenses
+// plafonnées et le leurre qu'il vient d'armer. Un bot de la version 3 ne voit ni
+// l'un ni l'autre, et il ne pouvait pas les recalculer : deux états qui laissent
+// des vues indiscernables ne se déduisent pas.
+const BotProtocol = 4
 
 // Un bot remplace l'IA du jeu, il ne l'étend pas : le jeu envoie une View, le
 // bot renvoie un Move. L'IA livrée parle ce même protocole, ce qui garantit

@@ -161,7 +161,7 @@ func TestStranglingClosesOnScheduleAndAnnouncesAhead(t *testing.T) {
 
 			for p.Phase != core.PhaseOver {
 				tour := p.Turn
-				for _, zone := range p.ViewFor(core.SideFugitive).ZonesAnnoncees {
+				for _, zone := range p.ViewFor(core.SideFugitive).AnnouncedZones {
 					if _, vue := annonce[zone]; !vue {
 						annonce[zone] = tour
 					}
