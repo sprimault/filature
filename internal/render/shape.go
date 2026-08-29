@@ -11,7 +11,6 @@ package render
 
 import (
 	"fmt"
-	"strings"
 )
 
 // Dimensions du losange, en unités du contrat de formes. Non modifiables : le
@@ -204,12 +203,22 @@ var Templates = map[Role]Template{
 // Un nom absent est libre : un plugin qui ajoute ses propres formes choisit leur
 // rôle, et rien ne va les chercher sous un nom convenu.
 func RoleOf(nom string) (Role, bool) {
-	if strings.HasPrefix(nom, "inspector_") {
-		return RolePiece, true
+	// Les cinq noms exactement, et non le préfixe : « inspector_ » fermait tout
+	// son espace, si bien qu'un plugin ne pouvait plus déclarer « inspector_halo »
+	// en marqueur — refusé au chargement, au nom d'une règle dont le contrat dit
+	// deux fois qu'elle ne s'applique pas à lui.
+	for i := 1; i <= InspectorOverrides; i++ {
+		if nom == fmt.Sprintf("inspector_%d", i) {
+			return RolePiece, true
+		}
 	}
 	role, impose := ShapeRoles[nom]
 	return role, impose
 }
+
+// InspectorOverrides est le nombre de surcharges par pion que le §6 du contrat
+// nomme, « inspector_1 » à « inspector_5 » — une par inspecteur.
+const InspectorOverrides = 5
 
 // ShapeRoles porte la table de docs/contrat-formes.md §6, les surcharges par
 // pion en moins : « inspector_1 » à « inspector_5 » suivent un motif, que RoleOf

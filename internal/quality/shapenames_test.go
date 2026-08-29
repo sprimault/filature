@@ -4,6 +4,7 @@
 package quality
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -30,6 +31,29 @@ func TestShapeNamesMatchTheContract(t *testing.T) {
 	for nom := range dansLeDocument {
 		if _, impose := render.RoleOf(nom); !impose {
 			t.Errorf("le §6 du contrat nomme %q, dont render.RoleOf n'impose pas le rôle", nom)
+		}
+	}
+
+	// Les cinq surcharges par pion suivent un motif que le tableau abrège en
+	// citant ses deux bornes : la boucle ci-dessus ne voit donc pas les trois du
+	// milieu, et ne verrait pas davantage un motif trop large.
+	for i := 1; i <= render.InspectorOverrides; i++ {
+		nom := fmt.Sprintf("inspector_%d", i)
+		if role, impose := render.RoleOf(nom); !impose || role != render.RolePiece {
+			t.Errorf("%q devrait recevoir le rôle d'un pion", nom)
+		}
+	}
+
+	// Et rien au-delà : le contrat promet deux fois qu'un nom hors du §6 garde
+	// le rôle qu'il déclare. Le motif a fermé tout l'espace « inspector_ »
+	// pendant une version, refusant au chargement un marqueur légalement nommé.
+	for _, libre := range []string{
+		"inspector_halo",
+		"inspector_0",
+		fmt.Sprintf("inspector_%d", render.InspectorOverrides+1),
+	} {
+		if _, impose := render.RoleOf(libre); impose {
+			t.Errorf("%q est hors du §6 : son rôle ne doit pas être imposé", libre)
 		}
 	}
 }

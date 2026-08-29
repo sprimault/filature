@@ -486,6 +486,10 @@ le sol.
 `inspector_1` à `5` n'existent que pour qui veut distinguer les cinq
 capacités. En leur absence, `inspector` sert aux cinq, teinté.
 
+**Ces cinq noms-là, et pas le préfixe.** `inspector_halo` n'est pas un nom
+réservé : il est hors de ce tableau, donc il garde le rôle qu'il déclare, comme
+n'importe quel nom qu'un plugin ajoute.
+
 Les cases de rue et les zones d'extraction n'apparaissent pas : ce sont des
 couleurs, pas des formes.
 
