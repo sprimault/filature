@@ -22,26 +22,28 @@ Une case fait **64 unités de large et 32 de haut** : c'est le losange
 isométrique en rapport 2:1, et il n'est pas modifiable.
 
 Les coordonnées se lisent dans l'un de deux plans, selon ce qu'on décrit. Les
-confondre est l'erreur à ne pas faire.
+confondre est l'erreur à ne pas faire. **Dans les deux, `x` va vers la droite de
+l'écran et `y` vers le haut** : ce qui change est ce que « haut » désigne — le
+fond du losange à plat, l'élévation au-dessus du sol dans l'autre.
 
-**Plan du sol** — pour les marqueurs posés à plat sur une case. `x` et `y`
-couvrent le losange vu en projection. Rien ne s'élève, tout est à plat.
+**Plan du sol** — pour les formes de rôle `marker`, posées à plat sur une case.
+`x` et `y` couvrent le losange vu en projection. Rien ne s'élève, tout est à
+plat, et `y` positif s'enfonce vers le sommet arrière.
 
 ```
-         (0,-16)
+         (0,16)
            /\
           /  \
  (-32,0) /    \ (32,0)      losange de la case
          \    /
           \  /
            \/
-         (0,16)
+         (0,-16)
 ```
 
-**Plan vertical** — pour les formes de rôle `piece` et `marker`, et pour la
-`height` d'un prisme. L'origine est le **point d'ancrage au sol**, centre du
-losange sur lequel la forme repose. `x` va vers la droite de l'écran, `y` vers
-le haut. Le sol est donc `y = 0`, et une forme s'élève en `y` positif.
+**Plan vertical** — pour les formes de rôle `piece`, et pour la `height` d'un
+prisme. L'origine est le **point d'ancrage au sol**, centre du losange sur lequel
+la forme repose. Le sol est donc `y = 0`, et une forme s'élève en `y` positif.
 
 ```
               y
@@ -63,7 +65,10 @@ le haut. Le sol est donc `y = 0`, et une forme s'élève en `y` positif.
 | `marker` — trace, barrage | libre, dans le gabarit | rien |
 
 **Toute forme déclare son `role`**, y compris quand elle en surcharge une du
-contenu livré : c'est lui qui désigne le gabarit, et rien ne le déduit d'un nom.
+contenu livré : c'est lui qui désigne le gabarit. Pour les noms du §6, que le jeu
+va chercher lui-même, le rôle déclaré doit être celui qui leur revient — un
+`building` déclaré `piece` est refusé au chargement. Un nom qu'un plugin ajoute
+garde le rôle qu'il annonce.
 
 **Le sol ne se dessine pas.** Le losange est tracé par le moteur ; un plugin
 n'en change que la couleur, par la palette. Il n'existe donc pas de

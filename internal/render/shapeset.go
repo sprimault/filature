@@ -274,7 +274,7 @@ func (j *ShapeSet) validerEcartDesSols() []error {
 func (j *ShapeSet) validerForme(nom string, f Shape) []error {
 	cle := "shape." + nom
 
-	gabarit, connu := templates[f.Role]
+	gabarit, connu := Templates[f.Role]
 	if !connu {
 		return []error{fmt.Errorf("%s.role: %q inconnu, attendu %s", cle, f.Role, rolesConnus())}
 	}
@@ -445,8 +445,8 @@ func triees[V any](m map[string]V) []string {
 // rolesConnus énonce les rôles acceptés, pour qu'une erreur donne la liste
 // plutôt qu'un adjectif.
 func rolesConnus() string {
-	noms := make([]string, 0, len(templates))
-	for r := range templates {
+	noms := make([]string, 0, len(Templates))
+	for r := range Templates {
 		noms = append(noms, string(r))
 	}
 	slices.Sort(noms)

@@ -72,6 +72,12 @@ phrases le décrivaient encore en pourcents, dont une avec une conséquence faus
 — deux couleurs séparées de douze niveaux ne se recouvrent pas, et le chargeur
 les accepte. Il refuse dix niveaux et moins, ce que le document dit désormais.
 
+La section qui définit les deux plans se contredisait sur le marqueur, qu'elle
+rangeait au sol puis dans le plan vertical, et son diagramme du plan du sol
+plaçait `y` vers le bas quand le schéma et le moteur le placent vers le haut. Une
+flèche asymétrique écrite d'après le diagramme passait la validation et ressortait
+retournée.
+
 ***
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
@@ -112,6 +118,11 @@ The shapes contract now states the ground grain in luminance levels throughout.
 Two sentences still described it as a percentage, one of them with a false
 consequence — two colours twelve levels apart do not overlap, and the loader
 accepts them. It rejects ten levels and below, which the document now says.
+
+The section defining the two planes contradicted itself about markers, placing
+them on the ground and then in the vertical plane, and its ground-plane diagram
+put `y` downwards where the schema and the engine put it upwards. An asymmetric
+arrow written from the diagram passed validation and came out flipped.
 
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 

@@ -176,8 +176,12 @@ const (
 	PlaneVertical Plane = "vertical"
 )
 
-// templates borne ce que chaque rôle a le droit d'occuper.
-var templates = map[Role]Template{
+// Templates borne ce que chaque rôle a le droit d'occuper.
+//
+// Exportée pour que la table des gabarits de docs/contrat-formes.md se compare à
+// elle : le document a donné le marqueur pour vertical alors qu'il est au sol,
+// et un contrôle qui lit les deux l'aurait dit.
+var Templates = map[Role]Template{
 	RolePiece:  {PlaneVertical, -24, 24, 0, 40, 24, 0},
 	RoleMarker: {PlaneGround, -24, 24, -12, 12, 8, 0},
 	// Un bâtiment ne déclare qu'une hauteur et une couleur : son emprise est le
