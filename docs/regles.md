@@ -731,7 +731,8 @@ ne serait qu'un mur de déplacement sans effet sur l'information.
   dans le taux en faisaient jeter la plupart (§15). Reste que c'est le format où toutes les valeurs
   constantes touchent leur limite : le préavis d'étranglement y égale la
   période, la couronne intermédiaire n'y a qu'un rayon de libre, et c'est le
-  seul où des plateaux passent sous cinq impasses. **Décider à l'étape 11 s'il
+  seul où des plateaux passent nettement sous la cible d'impasses — un sur vingt-
+  quatre, contre un sur mille en Périphérie. **Décider à l'étape 11 s'il
   est un préréglage à part entière ou un cas limite maintenu par symétrie** — et
   pas sans les taux de victoire.
 - **Une propriété de génération peut peser sur l'équilibre, et ça n'a jamais été
@@ -753,13 +754,13 @@ main : un chiffre corrigé sans avoir été remesuré redevient ce que le préam
 proscrit.
 
 <!-- mesures:début -->
-*Mesuré le 2026-08-28 sur 2000 graines par préréglage, 500 pour les tirages.*
+*Mesuré le 2026-08-29 sur 2000 graines par préréglage, 500 pour les tirages.*
 
 | Préréglage | Trame | Praticable | Tirages par plateau | Impasses |
 |---|---|---|---|---|
-| district | 46 % en médiane, de 38 à 50 | 52 % en médiane, 57 au plus | 1,21 en moyenne, 5 au pire | 2 au moins, 1,4 % sous 5 |
-| outskirts | 46 % en médiane, de 38 à 50 | 49 % en médiane, 54 au plus | 1,04 en moyenne, 2 au pire | 13 au moins, 0,0 % sous 7 |
-| city | 45 % en médiane, de 39 à 50 | 47 % en médiane, 52 au plus | 1,02 en moyenne, 2 au pire | 30 au moins, 0,0 % sous 10 |
+| district | 46 % en médiane, de 38 à 50 | 52 % en médiane, 57 au plus | 1,21 en moyenne, 5 au pire | 2 au moins, 4,2 % sous 6 |
+| outskirts | 46 % en médiane, de 38 à 50 | 49 % en médiane, 54 au plus | 1,04 en moyenne, 2 au pire | 13 au moins, 0,1 % sous 15 |
+| city | 45 % en médiane, de 39 à 50 | 47 % en médiane, 52 au plus | 1,02 en moyenne, 2 au pire | 30 au moins, 0,0 % sous 26 |
 <!-- mesures:fin -->
 
 **Toutes ces colonnes portent sur les plateaux retenus**, jamais sur ceux que la
@@ -772,7 +773,9 @@ fourchette par construction : ce qu'elle montre est où la distribution se tasse
 contre le plafond, et les trois préréglages l'atteignent. **Praticable** est la
 part finale, blocs compris, qui n'est bornée par rien. **Tirages par plateau**
 dit ce que la génération jette avant de retenir. **Impasses** compte les rues à
-voisine unique, contre le quart du côté qu'on attendait de l'étape 4.
+voisine unique, contre la cible de l'étape 4 : une par carré de huit cases de
+côté, comme au §3. Un seuil proportionnel au côté du plateau rendrait la Ville
+deux fois moins piégeuse qu'un Quartier, ce que la génération écarte.
 
 ---
 

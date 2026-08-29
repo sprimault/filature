@@ -84,6 +84,12 @@ ressourcement, dont le pire fond de tous : un pion y tient à 4,49, ce que le
 document donnait pour 5,92 sur une zone fermée. Les trois faces d'un bâtiment y
 figurent désormais séparément, et un contrôle mesure chaque ligne.
 
+La colonne des impasses du §15 se mesure contre la cible de l'étape 4 — une par
+carré de huit cases — et non contre le quart du côté du plateau, que la
+génération écarte nommément. Le seuil publié en valait la moitié sur les deux
+grands préréglages, si bien que ses « 0,0 % » ne disaient rien. Un plateau de
+Quartier sur vingt-quatre passe sous la cible, un sur mille en Périphérie.
+
 ***
 
 The step gained by spotting the fugitive is no longer lost when the Runner is
@@ -135,6 +141,12 @@ the colour rework and did not list the two shelter grounds, one of which is the
 worst background of all: a piece holds at 4.49 there, where the document gave
 5.92 on a closed zone. A building's three faces now appear separately, and a
 check measures every row.
+
+The dead-end column in §15 is now measured against the target of step 4 — one per
+eight-by-eight square — rather than a quarter of the board's side, which
+generation rules out by name. The published threshold was half the real one on
+both large presets, so its "0.0 %" said nothing. One district board in
+twenty-four falls below the target, one in a thousand on the outskirts.
 
 ## [0.6.1] — 2026-08-29 — Les textes du dépôt
 
