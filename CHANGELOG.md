@@ -38,6 +38,13 @@ mortes à la naissance, et l'une a traversé huit lots sans être vue.
 La table des tournures est sortie du motif, où rien ne pouvait l'atteindre, et un
 test les éprouve désormais une par une.
 
+Le chargeur tient le camp d'une capacité **passive**, ce que la 0.6.2 annonçait
+sans le faire : son contrôle sortait sur la passivité avant de regarder le camp.
+Une capacité passive déclarée côté fugitif se chargeait, se validait, et n'était
+jamais donnée à personne — le noyau ne distribue que celles des inspecteurs. La
+dispense d'une passive porte sur la phase qu'elle n'attend pas, jamais sur le
+camp qu'elle sert.
+
 ***
 
 The check that rejects unsupported claims about quantity in the notes now
@@ -46,6 +53,12 @@ a word boundary, and Go's regular expressions only know the ASCII one: those two
 therefore never matched anything. They were dead on arrival, and one went through
 eight batches unseen. The table of phrases has moved out of the
 pattern, where nothing could reach it, and a test now exercises them one by one.
+
+The loader now holds the side of a **passive** ability, which 0.6.2 announced
+without doing: its check returned on passivity before looking at the side. A
+passive ability declared on the fugitive's side loaded, validated, and was never
+handed to anyone — the core only distributes the inspectors'. A passive's
+exemption covers the phase it does not wait for, never the side it serves.
 
 ## [0.6.2] — 2026-08-29 — Les promesses tenues
 

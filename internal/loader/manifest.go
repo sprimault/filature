@@ -326,20 +326,26 @@ func checkAbility(c core.Ability, camp core.Side, chemin, ou string) []error {
 // aucune phase. Un déclenchement déjà refusé ailleurs sort aussi, pour ne pas
 // doubler le message qu'il a produit.
 func checkPlayable(c core.Ability, camp core.Side, chemin, ou string) []error {
+	var manquements []error
+
+	// Le camp se contrôle d'abord, et pour toute déclaration. Une capacité
+	// passive côté fugitif n'est pas plus distribuée qu'une active : abilityFor
+	// ne parcourt que les inspecteurs. La dispense qui suit porte sur le
+	// déclenchement, et le déclenchement seul — c'est la phase qu'une passive
+	// n'attend pas, pas le camp qu'elle sert.
+	if c.Camp != camp {
+		manquements = append(manquements, fmt.Errorf(
+			"%s: %s: camp %q, attendu %q : le jeu ne la donne jamais a l'autre camp",
+			chemin, ou, c.Camp, camp))
+	}
+
 	if c.Passive || c.Trigger == core.OnStrangling {
-		return nil
+		return manquements
 	}
 
 	attendu := core.OnFugitivePhase
 	if camp == core.SideInspectors {
 		attendu = core.OnInspectorsPhase
-	}
-
-	var manquements []error
-	if c.Camp != camp {
-		manquements = append(manquements, fmt.Errorf(
-			"%s: %s: camp %q, attendu %q : le jeu ne la propose jamais a l'autre camp",
-			chemin, ou, c.Camp, camp))
 	}
 
 	switch {
