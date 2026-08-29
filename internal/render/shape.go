@@ -289,6 +289,25 @@ const RimColor = "#e8e2d4"
 // épaisseur de trait, elle est encadrée par StrokeWidth.
 const RimWidth = 2
 
+// Le panneau de la carte à plat, en pixels d'écran.
+//
+// Une part de la largeur, bornée des deux côtés : trop étroit, le plus grand
+// préréglage n'a plus assez de pixels par case pour qu'on y suive un itinéraire ;
+// trop large, il mange l'isométrique, qui est la vue de jeu.
+//
+// Les bornes se lisent en pixels par case sur le plus grand préréglage — de huit
+// à treize. C'est le huit qui commande la règle du fond de case : à cette
+// échelle, un halo autour d'un pion déborderait sur les huit voisines.
+//
+// 328 et non 320, qui était le chiffre rond posé d'abord : il donnait 7,8 pixels
+// par case sur un plateau de 41, soit moins que le huit dont l'argument dépend.
+// Un contrôle le mesure, et suivra le jour où le plus grand préréglage bougera.
+const (
+	MapPanelRatio = 0.26
+	MapPanelMin   = 328
+	MapPanelMax   = 520
+)
+
 // Les trois faces d'un prisme, dans l'ordre où PrismFaces les rend.
 const (
 	FaceTop = iota

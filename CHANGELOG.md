@@ -129,6 +129,14 @@ trois autres runners, et l'archive d'une plateforme serait partie sans la notice
 de ce qu'elle incorpore sans les autres. Sans effet aujourd'hui, le binaire ne
 liant que du Go pur, et posé pour la dépendance suivante.
 
+Les trois bornes du panneau de carte à plat vivent dans `internal/render` au lieu
+d'un document, et un contrôle les compare à la taille du plus grand plateau. Il a
+corrigé le minimum au passage : 320 pixels donnaient 7,8 pixels par case, sous
+les huit dont dépend la décision de rendre la couverture en fond de case plutôt
+qu'en halo. `docs/architecture.md` acte par ailleurs que la carte de croyance de
+l'IA, qu'il rangeait parmi les couches de la carte, arrive à l'étape 9 — rien ne
+la produit avant.
+
 **La tête d'un inspecteur passe de cinq à six unités de rayon.** Le contrat
 garantit qu'un pion garde un remplissage majoritaire ; à cinq, le noyau tombait à
 48 % de la largeur du pion au plancher de rendu, sous la moitié promise. Le
@@ -243,6 +251,13 @@ the suite fail on the three other runners, and one platform's archive would have
 shipped without the notice for what it incorporates and the others do not. No
 effect today, the binary linking nothing but pure Go, and in place for the next
 dependency.
+
+The flat map panel's three bounds now live in `internal/render` rather than in a
+document, and a check compares them to the largest board's size. It corrected the
+minimum along the way: 320 pixels gave 7.8 pixels per cell, below the eight the
+decision to render coverage as a cell background rather than a halo depends on.
+`docs/architecture.md` also records that the AI's belief map, which it listed
+among the map's layers, arrives at step 9 — nothing produces it before then.
 
 **An inspector's head goes from five to six units of radius.** The contract
 guarantees that a piece keeps a majority fill; at five, the core dropped to 48 %
