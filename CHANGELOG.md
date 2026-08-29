@@ -129,6 +129,14 @@ trois autres runners, et l'archive d'une plateforme serait partie sans la notice
 de ce qu'elle incorpore sans les autres. Sans effet aujourd'hui, le binaire ne
 liant que du Go pur, et posé pour la dépendance suivante.
 
+**La tête d'un inspecteur passe de cinq à six unités de rayon.** Le contrat
+garantit qu'un pion garde un remplissage majoritaire ; à cinq, le noyau tombait à
+48 % de la largeur du pion au plancher de rendu, sous la moitié promise. Le
+contrôle qui gardait la propriété codait en dur le diamètre de la tête du
+fugitif, présenté comme la plus petite forme livrée — c'était la plus grande, et
+il n'exerçait donc que le cas le plus favorable. Il mesure désormais chaque pion
+du contenu livré, et le tableau que le contrat publie est comparé à la mesure.
+
 Les coefficients d'éclairage d'un prisme vivent dans `internal/render`, avec les
 autres constantes du moteur. Le contrat les publie comme une règle, en disant que
 c'est le genre de détail que deux implémentations règlent différemment sans qu'on
@@ -235,6 +243,14 @@ the suite fail on the three other runners, and one platform's archive would have
 shipped without the notice for what it incorporates and the others do not. No
 effect today, the binary linking nothing but pure Go, and in place for the next
 dependency.
+
+**An inspector's head goes from five to six units of radius.** The contract
+guarantees that a piece keeps a majority fill; at five, the core dropped to 48 %
+of the piece's width at the render floor, below the half that was promised. The
+check guarding the property hard-coded the fugitive's head diameter, described as
+the smallest shape shipped — it was the largest, so the check only exercised the
+most favourable case. It now measures every shipped piece, and the table the
+contract publishes is compared against the measurement.
 
 A prism's face-lighting coefficients now live in `internal/render`, with the
 engine's other constants. The contract publishes them as a rule, saying they are
