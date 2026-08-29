@@ -173,8 +173,9 @@ zones seules le portaient déjà au-dessus du plafond, si bien que la générati
 n'y retenait que les trames les plus denses.
 
 **L'étape 4 vise une impasse par carré de huit cases, elle ne la garantit
-pas** : le creusement dépense ce que les amorces permettent, et le Quartier est
-le seul préréglage où des plateaux passent sous le plancher qu'on en attendait.
+pas** : le creusement dépense ce que les amorces permettent, et des plateaux
+passent sous la cible — un sur vingt-quatre en Quartier, un sur mille en
+Périphérie, aucun en Ville.
 
 Les chiffres de tout cela sont mesurés et datés au §15.
 
