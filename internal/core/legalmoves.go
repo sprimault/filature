@@ -65,8 +65,10 @@ func (p *Game) sealMoves() []Move {
 // par hasard, et c'est un résultat de partie, pas un coup illégal.
 //
 // Le noyau central en est exclu, et c'est une règle de jeu et non une commodité
-// : cinq pions posés autour du départ y voient plus de neuf dixièmes des cases
-// dès le premier tour, et l'invisibilité du fugitif n'existe alors pas.
+// : cinq pions posés autour du départ en voient de six à neuf dixièmes dès le
+// premier tour selon le préréglage, et l'invisibilité du fugitif n'existe alors
+// pas. Le chiffre valait plus de neuf dixièmes partout quand la mesure a produit
+// la règle ; il a baissé depuis, le noyau ayant changé de rayon.
 // L'exclusion ne porte que sur le placement — rien n'empêche d'y entrer au
 // premier tour.
 func (p *Game) placeMoves() []Move {

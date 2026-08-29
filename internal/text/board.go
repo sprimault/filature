@@ -18,7 +18,7 @@ import (
 )
 
 // Les caractères du plateau, dans l'ordre où ils se lisent et non dans celui de
-// leur priorité — celle-là est l'ordre de peinture, plus bas dans Render.
+// leur priorité — celle-là est l'ordre de peinture, plus bas dans Board.
 //
 // Un pion couvre ce qu'il piétine : savoir qu'un inspecteur se tient sur une
 // trace importe plus que la trace, et le fugitif passe après tout le monde.
