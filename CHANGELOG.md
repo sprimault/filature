@@ -28,7 +28,7 @@ de version sont ce que lit un auteur de plugin étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
-## [Non publié]
+## [0.6.2] — 2026-08-29 — Les promesses tenues
 
 **`protocol` passe à 4.** Un bot écrit contre la version 3 continue de jouer,
 mais deux champs apparaissent dans la vue du fugitif et lui étaient jusqu'ici
