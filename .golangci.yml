@@ -24,11 +24,17 @@ linters:
     rules:
       # Les corps sont encore des stubs : unused remonte les champs et les
       # fonctions que personne n'appelle. Retirer un chemin de cette liste dès
-      # que son étape est écrite — 6 pour render, 9 et 10 pour ai, 13 pour le
-      # bac à sable de loader.
+      # que son étape est écrite — 9 et 10 pour ai, 13 pour le bac à sable de
+      # loader. render en est sorti quand l'étape 6 a été publiée, sans qu'un
+      # seul manquement apparaisse : c'était la dernière occasion où le retrait
+      # ne coûtait rien, le moteur de rendu n'étant pas encore écrit.
+      #
+      # core n'a pas d'étape associée : son exclusion ne tient qu'au champ alea
+      # de Game, déclaré et que rien n'assigne ni ne lit. Le retirer permettrait
+      # de sortir core de cette liste, ce qui est à trancher à part.
       - linters:
           - unused
-        path: internal/(core|render|loader|ai)/
+        path: internal/(core|loader|ai)/
 
 formatters:
   enable:
