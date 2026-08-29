@@ -4,6 +4,10 @@
 package quality
 
 import (
+	"os"
+	"path/filepath"
+	"regexp"
+	"strconv"
 	"testing"
 
 	"github.com/sprimault/filature/internal/core"
@@ -45,5 +49,45 @@ func TestMapPanelHoldsItsPixelsPerCell(t *testing.T) {
 	}
 	if render.MapPanelRatio <= 0 || render.MapPanelRatio >= 0.5 {
 		t.Errorf("le panneau prend %.0f %% de la largeur", 100*render.MapPanelRatio)
+	}
+}
+
+// TestSightDoublingDropMatchesTheFormula vérifie la chute d'échelle qu'une
+// capacité de vision doublée provoque, telle que deux textes l'annoncent.
+//
+// Le chiffre a été faux deux fois : « d'un tiers » d'abord, puis « 47 et 49 % »
+// alors qu'aucun préréglage n'atteint 49. Il justifie de calculer l'échelle sur
+// la portée nominale plutôt que sur celle du tour, et c'est sur lui que l'étape 7
+// réglera sa caméra — il vaut mieux qu'un test le porte.
+//
+// Span étant linéaire en cases, la chute vaut exactement 2r/(4r+1) : ni la
+// fenêtre ni la dimension qui contraint n'y entrent.
+func TestSightDoublingDropMatchesTheFormula(t *testing.T) {
+	contenu, err := os.ReadFile(filepath.Join(racine, "docs", "architecture.md"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	trouvaille := regexp.MustCompile(`(\d+) % sur le plus\s+petit préréglage et (\d+) % sur les deux autres`).
+		FindStringSubmatch(string(contenu))
+	if trouvaille == nil {
+		t.Fatal("docs/architecture.md n'annonce plus la chute d'échelle")
+	}
+
+	for _, pre := range core.Presets() {
+		r := float64(pre.Settings.Range)
+		chute := int(100*2*r/(4*r+1) + 0.5)
+
+		rang := 2
+		if pre.Key == "district" {
+			rang = 1
+		}
+		annonce, err := strconv.Atoi(trouvaille[rang])
+		if err != nil {
+			t.Fatal(err)
+		}
+		if annonce != chute {
+			t.Errorf("%s : le document annonce %d %%, la formule donne %d %%",
+				pre.Key, annonce, chute)
+		}
 	}
 }

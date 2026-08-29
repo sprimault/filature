@@ -396,8 +396,10 @@ const (
 //
 // Cette portée est la portée **nominale** du préréglage, jamais celle du tour
 // en cours. Une capacité qui double la vue ferait sinon tomber le plafond de
-// près de la moitié — mesuré à 47 % sur le plus petit préréglage et 49 % sur le
-// plus grand —, donc dézoomerait tout le plateau au moment de son déclenchement pour
+// près de la moitié. La chute vaut exactement 2r/(4r+1), Span étant linéaire en
+// cases : 47 % sur le plus petit préréglage, 48 % sur les deux autres, et elle ne
+// dépend ni de la fenêtre ni de la dimension qui contraint. Elle
+// dézoomerait donc tout le plateau au moment du déclenchement pour
 // le rezoomer au tour suivant : une caméra qui bouge seule quand on active une
 // capacité est déroutante, et c'est la carte à plat qui montre ce que la vue
 // isométrique ne peut plus contenir.

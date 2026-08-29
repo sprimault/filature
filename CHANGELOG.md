@@ -63,6 +63,12 @@ couleurs. La phrase voisine, qui donne les fonds « de 17 à 230 en luminance »
 n'était juste que par accident : sa borne haute est la trace, absente du tableau.
 Un contrôle la mesure à son tour.
 
+La chute d'échelle qu'une capacité de vision doublée provoque passe de « 47 et
+49 % » à « 47 puis 48 % » : elle vaut exactement `2r/(4r+1)`, et aucun préréglage
+n'atteint 49. Le chiffre a été faux deux fois de suite — d'abord donné pour un
+tiers, puis remesuré de travers dans le lot qui corrigeait les godoc comptant
+faux. Un contrôle le tient désormais, formule contre document.
+
 ***
 
 The check that rejects unsupported claims about quantity in the notes now
@@ -94,6 +100,12 @@ non-text element, but not by much — and the roadblock is now the first thing t
 look at if a palette tightens its colours. The neighbouring sentence, giving
 backgrounds "from 17 to 230 in luminance", was only right by accident: its upper
 bound is the trail, absent from the table. A check now measures it too.
+
+The scale drop caused by a doubled sight ability goes from "47 and 49 %" to "47
+then 48 %": it is exactly `2r/(4r+1)`, and no preset reaches 49. The figure was
+wrong twice in a row — first given as a third, then measured wrong in the very
+batch that fixed godoc counting wrong. A check now holds it, formula against
+document.
 
 ## [0.6.2] — 2026-08-29 — Les promesses tenues
 
@@ -198,8 +210,8 @@ liant que du Go pur, et posé pour la dépendance suivante.
 
 Quatre godoc du noyau et du rendu comptaient faux ou nommaient ce qui n'existe
 plus. Une capacité qui double la vue fait tomber le plafond d'échelle de 47 à
-49 % selon le préréglage, quand la godoc annonçait une fraction deux fois plus
-faible — remesuré, l'argument qu'elle servait en sort renforcé. Un sol allait
+48 % selon le préréglage, quand la godoc annonçait un tiers — remesuré,
+l'argument qu'elle servait en sort renforcé. Un sol allait
 « du simple au triple » là où le
 reste du dépôt dit « double et demi ». L'exclusion du noyau se justifiait par un
 chiffre que les règles ont déjà corrigé. Et `Game.spend` nommait encore le
@@ -331,7 +343,7 @@ dependency.
 
 Four godoc in the core and the renderer counted wrong or named what no longer
 exists. An ability that doubles sight brings the scale ceiling down by nearly
-half, not by a third — measured again at 47 and 49 % depending on the preset,
+half, not by a third — measured again at 47 to 48 % depending on the preset,
 which strengthens the argument it served. A ground went "from single to triple"
 where the rest of the repository says "double and a half". The core exclusion was
 justified by a figure the rules have already corrected. And `Game.spend` still
