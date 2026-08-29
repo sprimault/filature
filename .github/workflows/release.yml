@@ -89,6 +89,11 @@ jobs:
       # permissives, exige que sa notice accompagne toute copie du logiciel, et
       # un binaire qui la compile en est une.
       #
+      # Un fichier unique et non un par cible : il porte l'union des six lignes
+      # de cette matrice, qu'un test tient à jour. Copié tel quel dans chaque
+      # archive, il couvre donc ce que la plateforme incorpore, plus ce que les
+      # autres incorporent — voir docs/construction.md.
+      #
       # Rien d'autre : le contenu livré est embarqué dans le binaire, qui se
       # suffit donc à lui-même.
       - name: Archive
