@@ -36,6 +36,10 @@ Aucun numéro de contrat ne bouge : un plugin ou un bot écrit contre la version
 précédente reste valide, l'`$id` d'un schéma étant un identifiant et non une
 adresse à télécharger. L'ancien nom de dépôt redirige.
 
+L'accroche du dépôt et des README dit désormais ce que le fugitif cherche, là
+où elle n'annonçait qu'une poursuite : le nouveau nom promet une sortie, et le
+texte n'en nommait aucune.
+
 ***
 
 The game is now called Evasion. The repository, the Go module, the binary and
@@ -43,6 +47,10 @@ its subcommands are renamed, and the `$id` of the schemas under `schemas/`
 follows. No contract number changes: a plugin or bot written against the
 previous release stays valid, since a schema's `$id` is an identifier rather
 than a download address. The old repository name redirects.
+
+The repository and README taglines now say what the fugitive is after, where
+they only announced a chase: the new name promises a way out, and the text
+named none.
 
 ## [0.6.3] — 2026-08-29 — La relecture du diff
 

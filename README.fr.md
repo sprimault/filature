@@ -4,8 +4,8 @@ English: [README.md](README.md)
 
 [![CI](https://github.com/sprimault/evasion/actions/workflows/ci.yml/badge.svg)](https://github.com/sprimault/evasion/actions/workflows/ci.yml)
 
-Un jeu de plateau au tour par tour, à déplacement caché. Un fugitif contre cinq
-inspecteurs, sur une ville de rues et de bâtiments.
+Un jeu de plateau au tour par tour, à déplacement caché. Un fugitif cherche sa
+sortie, cinq inspecteurs la lui ferment, sur une ville de rues et de bâtiments.
 
 Apache 2.0 — [`LICENSE`](LICENSE), et [`THIRD-PARTY-NOTICES`](THIRD-PARTY-NOTICES)
 pour les bibliothèques liées au binaire.
