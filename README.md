@@ -4,8 +4,8 @@ Français : [README.fr.md](README.fr.md)
 
 [![CI](https://github.com/sprimault/evasion/actions/workflows/ci.yml/badge.svg)](https://github.com/sprimault/evasion/actions/workflows/ci.yml)
 
-A turn-based board game of hidden movement. One fugitive against five
-inspectors, on a city of streets and buildings.
+A turn-based board game of hidden movement. One fugitive after a way out, five
+inspectors closing it off, on a city of streets and buildings.
 
 Apache 2.0 — [`LICENSE`](LICENSE), and [`THIRD-PARTY-NOTICES`](THIRD-PARTY-NOTICES)
 for the libraries linked into the binary.
