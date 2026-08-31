@@ -11,9 +11,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/loader"
-	"github.com/sprimault/filature/internal/render"
-	"github.com/sprimault/filature/plugins"
+	"github.com/sprimault/evasion/internal/loader"
+	"github.com/sprimault/evasion/internal/render"
+	"github.com/sprimault/evasion/plugins"
 )
 
 // TestPieceHeadsAtTheFloorScale vérifie la taille des têtes de pions au

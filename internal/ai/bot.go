@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // BotProtocol est la version parlée par ce binaire.

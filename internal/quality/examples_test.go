@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/loader"
+	"github.com/sprimault/evasion/internal/loader"
 )
 
 // TestDocumentedManifestsLoad passe au chargeur chaque manifeste que la

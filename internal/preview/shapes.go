@@ -9,7 +9,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/sprimault/filature/internal/render"
+	"github.com/sprimault/evasion/internal/render"
 )
 
 // Dimensions de la planche, en pixels. La colonne est large parce qu'un pion

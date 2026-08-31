@@ -14,11 +14,11 @@ import (
 	"io"
 	"time"
 
-	"github.com/sprimault/filature/internal/ai"
-	"github.com/sprimault/filature/internal/core"
-	"github.com/sprimault/filature/internal/loader"
-	"github.com/sprimault/filature/internal/text"
-	"github.com/sprimault/filature/plugins"
+	"github.com/sprimault/evasion/internal/ai"
+	"github.com/sprimault/evasion/internal/core"
+	"github.com/sprimault/evasion/internal/loader"
+	"github.com/sprimault/evasion/internal/text"
+	"github.com/sprimault/evasion/plugins"
 )
 
 // coupsMax borne une partie contre un cerveau qui n'avancerait pas.

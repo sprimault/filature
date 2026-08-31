@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // threeMoves rend une liste courte mais variée, de quoi exercer la description

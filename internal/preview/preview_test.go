@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
-	"github.com/sprimault/filature/internal/loader"
-	"github.com/sprimault/filature/internal/render"
-	"github.com/sprimault/filature/plugins"
+	"github.com/sprimault/evasion/internal/core"
+	"github.com/sprimault/evasion/internal/loader"
+	"github.com/sprimault/evasion/internal/render"
+	"github.com/sprimault/evasion/plugins"
 )
 
 // livre charge l'apparence du contenu embarqué, telle qu'une partie l'utilise.

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/render"
+	"github.com/sprimault/evasion/internal/render"
 )
 
 // TestTemplateTableMatchesTheCode vérifie que la table des gabarits du contrat

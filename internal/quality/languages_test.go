@@ -12,9 +12,9 @@ import (
 	"testing"
 
 	"github.com/BurntSushi/toml"
-	"github.com/sprimault/filature/internal/core"
-	"github.com/sprimault/filature/internal/loader"
-	"github.com/sprimault/filature/plugins"
+	"github.com/sprimault/evasion/internal/core"
+	"github.com/sprimault/evasion/internal/loader"
+	"github.com/sprimault/evasion/plugins"
 )
 
 // dictionnaire est la forme d'un language.toml.

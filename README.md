@@ -1,8 +1,8 @@
-# Filature
+# Evasion
 
 Français : [README.fr.md](README.fr.md)
 
-[![CI](https://github.com/sprimault/filature/actions/workflows/ci.yml/badge.svg)](https://github.com/sprimault/filature/actions/workflows/ci.yml)
+[![CI](https://github.com/sprimault/evasion/actions/workflows/ci.yml/badge.svg)](https://github.com/sprimault/evasion/actions/workflows/ci.yml)
 
 A turn-based board game of hidden movement. One fugitive against five
 inspectors, on a city of streets and buildings.
@@ -32,7 +32,7 @@ refused at startup.
 
 ## How this game is written
 
-*Filature* is also an experiment in method: the game is written alongside an
+*Evasion* is also an experiment in method: the game is written alongside an
 assistant, under explicit repository rules versioned with the code.
 
 Design decisions are argued and measured rather than guessed —
@@ -55,11 +55,11 @@ The Windows binary is not signed: SmartScreen will warn on first launch.
 ### Commands
 
 ```
-filature                      plays a game, in text
-filature version              the installed version number
-filature examples <folder>    writes the shipped plugins, as templates
-filature validate <folder>    checks a plugin and prints its fingerprint
-filature preview <folder>     renders its shapes and a board as SVG
+evasion                      plays a game, in text
+evasion version              the installed version number
+evasion examples <folder>    writes the shipped plugins, as templates
+evasion validate <folder>    checks a plugin and prints its fingerprint
+evasion preview <folder>     renders its shapes and a board as SVG
 ```
 
 The last three belong in a terminal, not a double-click — their output is text,
@@ -101,7 +101,7 @@ not in the current directory — so a shortcut behaves like a direct launch. Use
 
 ## Extending
 
-Filature is meant to be modified. Four levels, from cheapest to most involved:
+Evasion is meant to be modified. Four levels, from cheapest to most involved:
 
 | Level | What it is | Format |
 |---|---|---|
@@ -139,12 +139,13 @@ Outside the catalogue, nothing is restricted. Your machine, your rules.
 
 ## Where the name comes from
 
-*Filature* is French for a tail — following someone without being seen. It names
-both camps at once: you tail, and you are tailed.
+In French, an evasion is a breakout: what the fugitive is after, and what the
+five inspectors exist to prevent. The English word carries the other half —
+slipping away, never being where they look. The game asks for both.
 
 ## License
 
-Apache 2.0. **The name Filature, its visual identity and its palette are not
+Apache 2.0. **The name Evasion, its visual identity and its palette are not
 part of it** — forks are welcome under a different name.
 
 The binary embeds third-party libraries whose licences require their notices to

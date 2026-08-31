@@ -79,7 +79,7 @@ jobs:
           mkdir -p paquet
           go build -trimpath \
             -ldflags "-s -w -X main.version=${{ steps.version.outputs.valeur }}" \
-            -o "paquet/filature${{ matrix.ext }}" ./cmd/filature
+            -o "paquet/evasion${{ matrix.ext }}" ./cmd/evasion
 
       # LICENSE et NOTICE vont dans l'archive et non à côté : Apache 2.0 les
       # exige à la redistribution, et personne ne télécharge un asset séparé.
@@ -100,7 +100,7 @@ jobs:
         shell: bash
         run: |
           cp LICENSE NOTICE THIRD-PARTY-NOTICES paquet/
-          nom="filature_${{ steps.version.outputs.valeur }}_${{ matrix.os }}_${{ matrix.arch }}"
+          nom="evasion_${{ steps.version.outputs.valeur }}_${{ matrix.os }}_${{ matrix.arch }}"
           mkdir -p dist
           cd paquet
           if [ "${{ matrix.os }}" = "windows" ]; then

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // TestFugitiveSeesWhatOnlyHeCanKnow vérifie que la vue du fugitif porte le

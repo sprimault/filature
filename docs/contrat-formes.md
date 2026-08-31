@@ -366,7 +366,7 @@ déplace chaque case de sol de cinq niveaux de luminance dans un sens ou dans
 l'autre (§8), donc deux couleurs séparées de dix niveaux ou moins se rejoignent
 une fois posées sur le plateau — et le chargeur les refuse pour cette raison.
 Au-delà, elles restent distinctes, mais leur écart perçu n'est pas celui que la
-palette affiche : c'est le rendu qu'il faut regarder, ce que `filature preview`
+palette affiche : c'est le rendu qu'il faut regarder, ce que `evasion preview`
 donne sans lancer le jeu.
 
 Les noms en `_detail` et `marker_outline` sont des **contours**, pas des nuances

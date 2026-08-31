@@ -30,7 +30,7 @@ var cheminNotices = filepath.Join(racine, "THIRD-PARTY-NOTICES")
 const enTeteNotices = `Notices des logiciels tiers
 ===========================
 
-Le binaire Filature incorpore les bibliothèques ci-dessous. Leurs licences
+Le binaire Evasion incorpore les bibliothèques ci-dessous. Leurs licences
 exigent que ces notices accompagnent toute redistribution, forme binaire
 comprise.
 
@@ -170,7 +170,7 @@ func modulesLies() ([]module, error) {
 func listerPour(c cible, vus map[string]module) error {
 	commande := exec.Command("go", "list", "-deps",
 		"-f", "{{if .Module}}{{.Module.Path}}\t{{.Module.Version}}\t{{.Module.Dir}}{{end}}",
-		"github.com/sprimault/filature/cmd/filature")
+		"github.com/sprimault/evasion/cmd/evasion")
 	commande.Env = append(os.Environ(),
 		"GOOS="+c.os, "GOARCH="+c.arch, "CGO_ENABLED="+c.cgo)
 
@@ -185,7 +185,7 @@ func listerPour(c cible, vus map[string]module) error {
 			continue
 		}
 		// Le module du jeu lui-même porte sa propre licence, dans LICENSE.
-		if champs[0] == "github.com/sprimault/filature" {
+		if champs[0] == "github.com/sprimault/evasion" {
 			continue
 		}
 		vus[champs[0]] = module{

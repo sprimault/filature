@@ -9,9 +9,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sprimault/filature/internal/ai"
-	"github.com/sprimault/filature/internal/core"
-	"github.com/sprimault/filature/internal/render"
+	"github.com/sprimault/evasion/internal/ai"
+	"github.com/sprimault/evasion/internal/core"
+	"github.com/sprimault/evasion/internal/render"
 )
 
 // Réglages de l'aperçu de plateau. La graine est figée : deux exécutions sur le

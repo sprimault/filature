@@ -12,7 +12,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // Depot ouvre la base et sert les opérations de partie.

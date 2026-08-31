@@ -14,7 +14,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // Hote sert une partie à un client distant.

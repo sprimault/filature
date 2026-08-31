@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sprimault/filature/internal/render"
+	"github.com/sprimault/evasion/internal/render"
 )
 
 // trait rend une primitive à l'échelle donnée, liseré compris.

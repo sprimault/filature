@@ -24,7 +24,7 @@ var interdits = map[string][]struct {
 	raison  string
 }{
 	"internal/core": {
-		{"github.com/sprimault/filature/internal/", "le noyau est une feuille du graphe : il applique des règles à un terrain, il ne dépend de rien du dépôt"},
+		{"github.com/sprimault/evasion/internal/", "le noyau est une feuille du graphe : il applique des règles à un terrain, il ne dépend de rien du dépôt"},
 		{"math/rand", "core.Random est le seul générateur autorisé, sans quoi un rejeu diverge de son journal"},
 		{"crypto/rand", "core.Random est le seul générateur autorisé, sans quoi un rejeu diverge de son journal"},
 		{"time", "l'horloge n'entre pas dans le noyau : une décision qui en dépend ne se rejoue pas"},

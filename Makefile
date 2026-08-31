@@ -1,6 +1,6 @@
 # Cibles en anglais, commentaires en français : convention des autres projets.
 
-BINAIRE   ?= filature
+BINAIRE   ?= evasion
 VERSION   ?= dev
 LDFLAGS    = -s -w -X main.version=$(VERSION)
 SORTIE    ?= .tmp
@@ -16,10 +16,10 @@ SORTIE    ?= .tmp
 .PHONY: build run test race lint vulncheck sec cover binaries clean tools
 
 build:
-	go build -trimpath -ldflags "$(LDFLAGS)" -o $(SORTIE)/$(BINAIRE) ./cmd/filature
+	go build -trimpath -ldflags "$(LDFLAGS)" -o $(SORTIE)/$(BINAIRE) ./cmd/evasion
 
 run:
-	go run ./cmd/filature
+	go run ./cmd/evasion
 
 # Aucun test ne doit ouvrir de fenêtre : les runners sont sans écran, et un test
 # qui exigerait xvfb n'a rien à faire dans la suite par défaut.
@@ -75,7 +75,7 @@ cover:
 # ne produit que ce qui se croise sans compilateur C — Windows et wasm.
 binary:
 	CGO_ENABLED=$(CGO) GOOS=$(OS) GOARCH=$(ARCH) go build -trimpath \
-	  -ldflags "$(LDFLAGS)" -o dist/$(BINAIRE)_$(OS)_$(ARCH)$(EXT) ./cmd/filature
+	  -ldflags "$(LDFLAGS)" -o dist/$(BINAIRE)_$(OS)_$(ARCH)$(EXT) ./cmd/evasion
 
 binaries:
 	$(MAKE) binary OS=windows ARCH=amd64 CGO=0 EXT=.exe

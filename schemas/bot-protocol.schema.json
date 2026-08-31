@@ -1,8 +1,8 @@
 {
   "$comment": "Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>. SPDX-License-Identifier: Apache-2.0",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/sprimault/filature/schemas/bot-protocol.schema.json",
-  "title": "Protocole de bot Filature",
+  "$id": "https://github.com/sprimault/evasion/schemas/bot-protocol.schema.json",
+  "title": "Protocole de bot Evasion",
   "description": "Messages échangés en JSON Lines sur les entrée et sortie standard d'un processus externe. Un objet par ligne. L'IA livrée avec le jeu parle ce protocole : s'il manquait quelque chose, le jeu ne pourrait pas jouer contre lui-même.",
   "oneOf": [
     {

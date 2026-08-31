@@ -9,7 +9,7 @@ par une issue publique.
 
 ## Périmètre
 
-Filature est un jeu. Deux domaines comptent vraiment :
+Evasion est un jeu. Deux domaines comptent vraiment :
 
 **L'information cachée.** Tout le jeu repose sur le fait qu'un camp ignore ce
 que sait l'autre. Un moyen de lire la position du fugitif ou sa zone scellée —
@@ -17,7 +17,7 @@ par le trafic réseau, un fichier de sauvegarde, un plugin ou un bot — est un
 vrai défaut, pas une curiosité. À signaler.
 
 **Le bac à sable des plugins.** Un module WebAssembly ne doit atteindre ni le
-disque, ni le réseau, ni l'horloge, ni l'entropie système. Une évasion est une
+disque, ni le réseau, ni l'horloge, ni l'entropie système. En sortir est une
 vulnérabilité.
 
 ## Hors périmètre

@@ -3,7 +3,7 @@
 ## Le découpage
 
 ```
-cmd/filature/     drapeaux, injection des dépendances
+cmd/evasion/     drapeaux, injection des dépendances
 internal/core/    règles pures — aucune dépendance UI, réseau ni disque
 internal/ai/      croyance bayésienne, IA embarquée, pilotage des bots
 internal/render/  projection isométrique, contrat de formes

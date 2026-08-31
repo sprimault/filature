@@ -1,8 +1,8 @@
-# Filature
+# Evasion
 
 English: [README.md](README.md)
 
-[![CI](https://github.com/sprimault/filature/actions/workflows/ci.yml/badge.svg)](https://github.com/sprimault/filature/actions/workflows/ci.yml)
+[![CI](https://github.com/sprimault/evasion/actions/workflows/ci.yml/badge.svg)](https://github.com/sprimault/evasion/actions/workflows/ci.yml)
 
 Un jeu de plateau au tour par tour, à déplacement caché. Un fugitif contre cinq
 inspecteurs, sur une ville de rues et de bâtiments.
@@ -33,7 +33,7 @@ absente est refusée au démarrage.
 
 ## Comment ce jeu est écrit
 
-*Filature* est aussi une expérience de méthode : le jeu est écrit en binôme avec
+*Evasion* est aussi une expérience de méthode : le jeu est écrit en binôme avec
 un assistant, sous des règles de dépôt explicites et versionnées avec le code.
 
 Les décisions de conception sont arbitrées et mesurées plutôt que devinées —
@@ -61,11 +61,11 @@ sortie est du texte, et une fenêtre ouverte par l'explorateur se referme avant
 qu'on ait pu lire quoi que ce soit.
 
 ```
-filature                      joue une partie, en texte
-filature version              le numéro de la version installée
-filature examples <dossier>   écrit les plugins livrés, pour servir de modèle
-filature validate <dossier>   contrôle un plugin et affiche son empreinte
-filature preview <dossier>    rend ses formes et un plateau en SVG
+evasion                      joue une partie, en texte
+evasion version              le numéro de la version installée
+evasion examples <dossier>   écrit les plugins livrés, pour servir de modèle
+evasion validate <dossier>   contrôle un plugin et affiche son empreinte
+evasion preview <dossier>    rend ses formes et un plateau en SVG
 ```
 
 `--version` est accepté comme équivalent de `version`.
@@ -108,7 +108,7 @@ comme un lancement direct. `--plugins` pointe ailleurs si besoin.
 
 ## Étendre le jeu
 
-Filature est fait pour être modifié. Quatre niveaux, du moins cher au plus
+Evasion est fait pour être modifié. Quatre niveaux, du moins cher au plus
 engageant :
 
 | Niveau | Ce que c'est | Format |
@@ -148,12 +148,13 @@ Hors catalogue, rien n'est restreint. C'est ta machine.
 
 ## D'où vient le nom
 
-Une filature, c'est l'acte de suivre quelqu'un sans être vu. Le mot nomme les
-deux camps à la fois : on file, et on est filé.
+Une évasion, c'est sortir d'où l'on vous tient : ce que cherche le fugitif, et
+ce que les cinq inspecteurs sont là pour empêcher. Le mot anglais en dit l'autre
+moitié — se dérober, n'être jamais où l'on regarde. Le jeu demande les deux.
 
 ## Licence
 
-Apache 2.0. **Le nom Filature, son identité visuelle et sa palette n'en font
+Apache 2.0. **Le nom Evasion, son identité visuelle et sa palette n'en font
 pas partie** — un fork est bienvenu sous un autre nom.
 
 Le binaire embarque des bibliothèques tierces dont les licences exigent que

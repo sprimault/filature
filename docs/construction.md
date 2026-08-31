@@ -71,14 +71,14 @@ WebAssembly — et le dit.
 
 ```
 CGO_ENABLED=$CGO GOOS=$OS GOARCH=$ARCH go build -trimpath \
-  -ldflags "-s -w -X main.version=$VERSION" -o dist/filature_${OS}_${ARCH}
+  -ldflags "-s -w -X main.version=$VERSION" -o dist/evasion_${OS}_${ARCH}
 ```
 
 `-trimpath` toujours : les chemins absolus de la machine de construction n'ont
 rien à faire dans un artefact public.
 
 Sous Windows, `-H windowsgui` supprime la console au lancement — mais alors
-`filature version` n'écrit nulle part, la sortie standard n'existant pas. Le
+`evasion version` n'écrit nulle part, la sortie standard n'existant pas. Le
 contrôle de version de la chaîne de publication en dépend : soit on renonce au
 drapeau, soit on attache une console à la demande.
 
@@ -117,12 +117,12 @@ contenu livré — règles, formes, palette, français et anglais — est embarq
 l'exécutable par `//go:embed` : un binaire déplacé continue de fonctionner, et
 personne ne casse ses règles en éditant un fichier qu'il n'a pas écrit.
 
-Ce contenu reste accessible à qui veut s'en inspirer : `filature examples
+Ce contenu reste accessible à qui veut s'en inspirer : `evasion examples
 <dossier>` l'écrit sur le disque, sans jamais écraser un fichier existant. C'est
 par là que passe un traducteur qui recopie l'anglais pour en faire sa langue.
 
 Le nom de l'archive porte version, système et architecture ; le binaire qu'elle
-contient s'appelle `filature` tout court — une fois extrait, on sait sur quelle
+contient s'appelle `evasion` tout court — une fois extrait, on sait sur quelle
 machine on est.
 
 Trois opérations ne peuvent pas se faire cible par cible et vont dans une étape

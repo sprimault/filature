@@ -1,4 +1,4 @@
-module github.com/sprimault/filature
+module github.com/sprimault/evasion
 
 go 1.27
 

@@ -14,7 +14,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // Les caractères du plateau, dans l'ordre où ils se lisent et non dans celui de
