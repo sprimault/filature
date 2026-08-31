@@ -1,6 +1,6 @@
 # Format d'un plugin
 
-Comment se compose un plugin Filature, fichier par fichier et champ par champ.
+Comment se compose un plugin Evasion, fichier par fichier et champ par champ.
 
 Les trois contrats qu'il peut toucher ont leur propre document, et font foi sur
 leur domaine : [`contrat-formes.md`](contrat-formes.md) pour la géométrie,
@@ -17,7 +17,7 @@ Un plugin est un dossier posé dans `plugins/`. Rien à compiler, rien à
 enregistrer.
 
 ```
-filature                l'exécutable, qui se suffit à lui-même
+evasion                l'exécutable, qui se suffit à lui-même
 plugins/
   mes-vehicules/
     manifest.toml      obligatoire
@@ -30,7 +30,7 @@ plugins/
 français et anglais sont embarqués dans l'exécutable, qui fonctionne donc sans
 aucun fichier à côté.
 
-Pour le lire ou le recopier, `filature examples <dossier>` l'écrit sur le
+Pour le lire ou le recopier, `evasion examples <dossier>` l'écrit sur le
 disque. C'est le chemin d'un traducteur qui part de l'anglais, ou de quiconque
 veut voir comment une capacité est déclarée avant d'écrire la sienne. La
 commande n'écrase jamais un fichier existant.
@@ -187,7 +187,7 @@ fichiers.
 La géométrie, les gabarits, les quatre primitives de dessin et les noms de
 formes attendus sont dans [`contrat-formes.md`](contrat-formes.md).
 
-`filature preview <dossier>` en sort un aperçu SVG sans lancer le jeu : les
+`evasion preview <dossier>` en sort un aperçu SVG sans lancer le jeu : les
 formes sur chacun des sols et un plateau en situation. Voir §8.
 
 ---
@@ -198,17 +198,17 @@ Les libellés de l'interface ne sont jamais dans le code : ils viennent d'un
 dictionnaire, et un plugin de langue en fournit un.
 
 ```
-filature-de/
+evasion-de/
   manifest.toml
   language.toml
 ```
 
 ```toml
 # manifest.toml
-name = "filature-de"
+name = "evasion-de"
 version = "1.0.0"
 license = "CC0-1.0"
-description = "Filature en allemand"
+description = "Evasion en allemand"
 
 [language]
 code = "de"
@@ -237,9 +237,9 @@ Dans le dossier des plugins, qui est `plugins/` à côté de l'exécutable, ou
 celui que désigne `--plugins` :
 
 ```
-filature.exe
+evasion.exe
 plugins/
-  filature-de/   le vôtre, ici
+  evasion-de/   le vôtre, ici
 ```
 
 Rien à enregistrer, rien à recompiler : le dossier est lu au démarrage, et la
@@ -248,7 +248,7 @@ pas est un plugin dont le manifeste a été refusé — le journal dit lequel et
 pourquoi.
 
 Le français et l'anglais ne sont pas là : ils sont dans l'exécutable. Pour
-partir de l'anglais, `filature examples <dossier>` l'en ressort.
+partir de l'anglais, `evasion examples <dossier>` l'en ressort.
 
 ### Ce qui n'a pas de version
 
@@ -319,7 +319,7 @@ point un plugin veut la liste, pas un aller-retour par erreur.
 ### Vérifier avant d'installer
 
 ```
-$ filature validate mon-plugin/
+$ evasion validate mon-plugin/
 mon-plugin/manifest.toml:23: ability.lookout.effect[0].target
     « pion » n'est pas une cible connue
     attendu : current_piece, all_pieces, other_piece, fugitive, cell, zone
@@ -358,7 +358,7 @@ Un plugin d'apparence peut être valide et laid, ou valide et illisible. La
 validation ne dit rien de ça.
 
 ```
-$ filature preview mes-vehicules/
+$ evasion preview mes-vehicules/
 mes-vehicules-formes.svg
 mes-vehicules-plateau.svg
 ```

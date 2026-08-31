@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // partieRegardee monte une partie que deux cerveaux disputent sans personne.

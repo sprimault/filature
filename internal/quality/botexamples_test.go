@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // TestBotExamplesFollowTheTypes rapproche les exemples JSON du protocole de bot

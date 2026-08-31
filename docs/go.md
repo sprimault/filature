@@ -79,7 +79,7 @@ refus ; c'est elle que lit celui dont le test échoue, et c'est elle qui fait fo
 
 ## 4. La configuration entre par `cmd/`
 
-Les drapeaux sont lus et validés dans `cmd/filature/`. Aucun `flag` ni
+Les drapeaux sont lus et validés dans `cmd/evasion/`. Aucun `flag` ni
 `os.Getenv` dans `internal/` : les dépendances sont injectées.
 
 Le corollaire est une règle de conception plus qu'une règle de style. Un choix
@@ -90,7 +90,7 @@ de commande qui le détient.
 
 ## 5. Structure
 
-- Une struct de dépendances par paquet, construite dans `cmd/filature/main.go`.
+- Une struct de dépendances par paquet, construite dans `cmd/evasion/main.go`.
 - Constructeurs `New…` rendant `(*T, error)` si l'initialisation peut échouer.
 - Interfaces définies côté consommateur, pas côté implémentation.
 - Une interface de plus de trois méthodes signale en général deux

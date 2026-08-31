@@ -6,7 +6,7 @@ package ai
 import (
 	"errors"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // Poids pondère les critères d'évaluation. Les niveaux sont des jeux de poids

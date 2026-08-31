@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // testView monte une vue de cinq cases de côté, dégagée sauf un bâtiment.

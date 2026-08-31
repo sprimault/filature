@@ -12,9 +12,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/sprimault/filature/internal/ai"
-	"github.com/sprimault/filature/internal/core"
-	"github.com/sprimault/filature/internal/render"
+	"github.com/sprimault/evasion/internal/ai"
+	"github.com/sprimault/evasion/internal/core"
+	"github.com/sprimault/evasion/internal/render"
 )
 
 // Les trois contrats publics que ce fichier rapproche du code.

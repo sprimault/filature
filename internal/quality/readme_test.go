@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // TestReadmePresetsAreAccepted vérifie que les préréglages cités par les README

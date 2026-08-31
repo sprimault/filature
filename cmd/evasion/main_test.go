@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // ailleurs est un dossier de plugins actifs qui n'entre en conflit avec aucune

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // TestEveryPrimitiveExercised échoue sur une primitive d'effets que la suite

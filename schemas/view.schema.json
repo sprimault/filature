@@ -1,8 +1,8 @@
 {
   "$comment": "Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>. SPDX-License-Identifier: Apache-2.0",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/sprimault/filature/schemas/view.schema.json",
-  "title": "Vue Filature",
+  "$id": "https://github.com/sprimault/evasion/schemas/view.schema.json",
+  "title": "Vue Evasion",
   "description": "Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis core.View : ne pas modifier a la main.",
   "$ref": "#/$defs/View",
   "$defs": {

@@ -28,6 +28,22 @@ de version sont ce que lit un auteur de plugin étranger avant de savoir s'il
 doit reprendre son travail. Ce préambule reste en français : il n'est jamais
 publié, et explique les conventions du dépôt à qui y contribue.
 
+## [Non publié]
+
+Le jeu s'appelle désormais Evasion. Le dépôt, le module Go, le binaire et ses
+sous-commandes changent de nom, et l'`$id` des schémas de `schemas/` suit.
+Aucun numéro de contrat ne bouge : un plugin ou un bot écrit contre la version
+précédente reste valide, l'`$id` d'un schéma étant un identifiant et non une
+adresse à télécharger. L'ancien nom de dépôt redirige.
+
+***
+
+The game is now called Evasion. The repository, the Go module, the binary and
+its subcommands are renamed, and the `$id` of the schemas under `schemas/`
+follows. No contract number changes: a plugin or bot written against the
+previous release stays valid, since a schema's `$id` is an identifier rather
+than a download address. The old repository name redirects.
+
 ## [0.6.3] — 2026-08-29 — La relecture du diff
 
 Le contrôle qui refuse une affirmation de nombre non tenue dans les notes

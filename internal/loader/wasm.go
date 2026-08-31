@@ -7,7 +7,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // Trois choses ne se décrivent pas en données : un générateur de plateau, une

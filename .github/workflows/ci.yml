@@ -123,7 +123,7 @@ jobs:
           CGO_ENABLED: ${{ matrix.cgo }}
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
-        run: go build -trimpath ./cmd/filature
+        run: go build -trimpath ./cmd/evasion
 
   # Le déterminisme se vérifie en exécutant, pas en compilant. Les plateaux de
   # référence de internal/core/testdata et la suite figée de Random comparent

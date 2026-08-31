@@ -3,7 +3,7 @@
 
 package server
 
-import "github.com/sprimault/filature/internal/core"
+import "github.com/sprimault/evasion/internal/core"
 
 // Enveloppe est le message échangé en WebSocket, dans les deux sens.
 //

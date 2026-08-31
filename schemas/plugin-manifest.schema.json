@@ -1,8 +1,8 @@
 {
   "$comment": "Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>. SPDX-License-Identifier: Apache-2.0",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/sprimault/filature/schemas/plugin-manifest.schema.json",
-  "title": "Manifeste de plugin Filature",
+  "$id": "https://github.com/sprimault/evasion/schemas/plugin-manifest.schema.json",
+  "title": "Manifeste de plugin Evasion",
   "description": "Contrat public. Versionné indépendamment du jeu : un plugin écrit contre la version 1 doit continuer à charger.",
   "type": "object",
   "required": [

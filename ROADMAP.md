@@ -74,7 +74,7 @@ l'évaluation du fugitif sur les mêmes positions.
 
 ## 5 — Boucle de jeu
 
-`cmd/filature` : drapeaux, assemblage des dépendances, boucle de tour.
+`cmd/evasion` : drapeaux, assemblage des dépendances, boucle de tour.
 
 Jouable, sans rendu : sortie texte, deux joueurs au clavier. C'est le premier
 moment où les règles se valident au jeu plutôt qu'en test, et donc le moment où
@@ -86,7 +86,7 @@ moment où les règles se valident au jeu plutôt qu'en test, et donc le moment 
 Toujours pas de pixel à l'écran — le contrat se teste sur des fichiers.
 
 La validation s'applique **au chargement**, plugin local compris, et pas
-seulement à `filature validate` : une forme qui déborde masque les cases
+seulement à `evasion validate` : une forme qui déborde masque les cases
 voisines, ce qui est un avantage de jeu déguisé en habillage.
 
 Le contenu livré ne revendique pas ses formes, sans quoi le premier plugin à
@@ -142,7 +142,7 @@ Deux moyens de jeu, complets l'un comme l'autre :
 Ensemble parce qu'une sauvegarde porte le manifeste des plugins actifs : une
 partie ne se recharge pas sans eux.
 
-Avec `filature validate <chemin>`, qui charge un plugin par **le même code que
+Avec `evasion validate <chemin>`, qui charge un plugin par **le même code que
 le jeu** et liste ses manquements en une fois. Deux validateurs finiraient par
 diverger, et c'est alors la partie qui tranche — au pire moment.
 

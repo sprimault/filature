@@ -7,7 +7,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // viewWithMoves monte une vue qui n'offre que les coups donnés.

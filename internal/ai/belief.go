@@ -4,7 +4,7 @@
 // Package ai porte l'adversaire embarqué et le pilotage des bots externes.
 package ai
 
-import "github.com/sprimault/filature/internal/core"
+import "github.com/sprimault/evasion/internal/core"
 
 // Croyance est une distribution de probabilité de présence du fugitif sur les
 // cases de rue.

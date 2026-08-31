@@ -10,8 +10,8 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/sprimault/filature/internal/core"
-	"github.com/sprimault/filature/plugins"
+	"github.com/sprimault/evasion/internal/core"
+	"github.com/sprimault/evasion/plugins"
 )
 
 // source monte un système de fichiers en mémoire depuis des couples chemin /
@@ -432,7 +432,7 @@ func TestFingerprintCountsNames(t *testing.T) {
 }
 
 // TestPublicFingerprintReadsDisk vérifie la commodité offerte à
-// « filature valide ».
+// « evasion valide ».
 func TestPublicFingerprintReadsDisk(t *testing.T) {
 	racine := t.TempDir()
 	dossier := filepath.Join(racine, "essai")

@@ -1,8 +1,8 @@
 {
   "$comment": "Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>. SPDX-License-Identifier: Apache-2.0",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/sprimault/filature/schemas/shapes.schema.json",
-  "title": "Contrat de formes Filature",
+  "$id": "https://github.com/sprimault/evasion/schemas/shapes.schema.json",
+  "title": "Contrat de formes Evasion",
   "description": "Vocabulaire géométrique des plugins d'apparence. Contrat public, versionné indépendamment du jeu. Aucune image : une forme est du texte, ce qui la rend relisible en diff et sans question de provenance.",
   "type": "object",
   "required": [

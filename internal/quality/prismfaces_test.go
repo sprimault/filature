@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/render"
+	"github.com/sprimault/evasion/internal/render"
 )
 
 // TestPrismFacesMatchTheContract vérifie que les coefficients d'éclairage

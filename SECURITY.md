@@ -9,7 +9,7 @@ public issue for a security flaw.
 
 ## Scope
 
-Filature is a game. Two areas actually matter:
+Evasion is a game. Two areas actually matter:
 
 **Hidden information.** The whole game rests on one camp not knowing what the
 other knows. A way to read the fugitive's position or sealed zone — through the

@@ -6,8 +6,8 @@ package quality
 import (
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
-	"github.com/sprimault/filature/internal/text"
+	"github.com/sprimault/evasion/internal/core"
+	"github.com/sprimault/evasion/internal/text"
 )
 
 // TestEveryLegalMoveReadsApart vérifie que deux coups légaux distincts ne se

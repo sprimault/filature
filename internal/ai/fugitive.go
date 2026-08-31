@@ -6,7 +6,7 @@ package ai
 import (
 	"errors"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // Fugitive est le miroir de l'IA des inspecteurs : maximiser la masse de

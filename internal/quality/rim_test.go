@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/render"
+	"github.com/sprimault/evasion/internal/render"
 )
 
 // fondsSousUnPion énumère tout ce sur quoi un pion peut se dessiner, sous les

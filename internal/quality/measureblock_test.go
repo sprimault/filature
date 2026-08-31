@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // TestMeasurementBlockNamesThePresets vérifie que le bloc de mesures des règles

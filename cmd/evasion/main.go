@@ -1,7 +1,7 @@
 // Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>
 // SPDX-License-Identifier: Apache-2.0
 
-// Commande filature : le jeu, et son mode serveur.
+// Commande evasion : le jeu, et son mode serveur.
 //
 // Toute la configuration vient des drapeaux, lus et validés ici. Aucun flag ni
 // os.Getenv dans internal/ — les dépendances sont injectées.
@@ -18,11 +18,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sprimault/filature/internal/core"
-	"github.com/sprimault/filature/internal/loader"
-	"github.com/sprimault/filature/internal/preview"
-	"github.com/sprimault/filature/internal/session"
-	"github.com/sprimault/filature/plugins"
+	"github.com/sprimault/evasion/internal/core"
+	"github.com/sprimault/evasion/internal/loader"
+	"github.com/sprimault/evasion/internal/preview"
+	"github.com/sprimault/evasion/internal/session"
+	"github.com/sprimault/evasion/plugins"
 )
 
 // version est injectée à la compilation par -ldflags.
@@ -43,7 +43,7 @@ func command(sortie io.Writer, nom, argument, second, dossierPlugins string) (tr
 		return false, nil
 
 	case "version":
-		_, err = fmt.Fprintln(sortie, "filature", version)
+		_, err = fmt.Fprintln(sortie, "evasion", version)
 		return true, err
 
 	case "examples":
@@ -86,7 +86,7 @@ func main() {
 
 	traitee, err := command(os.Stdout, nom, flag.Arg(1), flag.Arg(2), *dossierPlugins)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "filature:", err)
+		fmt.Fprintln(os.Stderr, "evasion:", err)
 		os.Exit(1)
 	}
 	if traitee {
@@ -95,12 +95,12 @@ func main() {
 
 	o, err := options(*cote, *preset, *graine, *dossierPlugins, *pause)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "filature:", err)
+		fmt.Fprintln(os.Stderr, "evasion:", err)
 		os.Exit(1)
 	}
 
 	if err := run(o, *heberger, *rejoindre, *partie); err != nil {
-		fmt.Fprintln(os.Stderr, "filature:", err)
+		fmt.Fprintln(os.Stderr, "evasion:", err)
 		os.Exit(1)
 	}
 }
@@ -151,7 +151,7 @@ func pluginsParDefaut() string {
 // « 1.2.0 » qui ne sont pas le même fichier.
 func validate(sortie io.Writer, dossier string) error {
 	if dossier == "" {
-		return errors.New("usage: filature validate <dossier>")
+		return errors.New("usage: evasion validate <dossier>")
 	}
 	if err := loader.Validate(dossier); err != nil {
 		return err
@@ -266,7 +266,7 @@ func camp(choix string) (core.Side, error) {
 // la même clé sont un conflit. Suivre l'invitation cassait le chargement.
 func extract(dossier, actifs string) error {
 	if dossier == "" {
-		return errors.New("usage: filature examples <dossier>")
+		return errors.New("usage: evasion examples <dossier>")
 	}
 	if sameFolder(dossier, actifs) {
 		return fmt.Errorf("%s est le dossier des plugins actifs : le contenu livré y serait déclaré deux fois", dossier)
@@ -309,7 +309,7 @@ func extract(dossier, actifs string) error {
 // regarder l'autre.
 func writePreviews(sortie io.Writer, dossier, destination string) error {
 	if dossier == "" {
-		return errors.New("usage: filature preview <dossier> [destination]")
+		return errors.New("usage: evasion preview <dossier> [destination]")
 	}
 	if destination == "" {
 		destination = "."

@@ -12,7 +12,7 @@
 name = "english"
 version = "0.1.0"
 license = "Apache-2.0"
-description = "Filature in English"
+description = "Evasion in English"
 
 [language]
 code = "en"

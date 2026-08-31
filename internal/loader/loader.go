@@ -26,9 +26,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/sprimault/filature/internal/core"
-	"github.com/sprimault/filature/internal/render"
-	"github.com/sprimault/filature/plugins"
+	"github.com/sprimault/evasion/internal/core"
+	"github.com/sprimault/evasion/internal/render"
+	"github.com/sprimault/evasion/plugins"
 )
 
 // Load construit le registre depuis le contenu livré puis le dossier de

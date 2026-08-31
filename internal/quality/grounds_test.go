@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/BurntSushi/toml"
-	"github.com/sprimault/filature/internal/render"
+	"github.com/sprimault/evasion/internal/render"
 )
 
 // luminance rend la clarté perçue d'une couleur, sur 255.

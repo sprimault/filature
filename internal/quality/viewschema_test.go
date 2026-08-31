@@ -11,8 +11,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
-	"github.com/sprimault/filature/internal/schema"
+	"github.com/sprimault/evasion/internal/core"
+	"github.com/sprimault/evasion/internal/schema"
 )
 
 // majSchemas réécrit les schémas générés au lieu de les compare.
@@ -38,8 +38,8 @@ var cheminSchemaVue = filepath.Join(racine, "schemas", "view.schema.json")
 func TestViewSchemaFollowsStruct(t *testing.T) {
 	attendu, err := schema.Generate(
 		reflect.TypeOf(core.View{}),
-		"https://github.com/sprimault/filature/schemas/view.schema.json",
-		"Vue Filature",
+		"https://github.com/sprimault/evasion/schemas/view.schema.json",
+		"Vue Evasion",
 		"Ce qu'un camp a le droit de savoir. Le jeu n'expose rien d'autre, ni à l'interface, ni au reseau, ni a un bot. Genere depuis core.View : ne pas modifier a la main.",
 		"Copyright 2026 Stéphane Primault <sprimault@users.noreply.github.com>. SPDX-License-Identifier: Apache-2.0",
 	)

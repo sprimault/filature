@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
-	"github.com/sprimault/filature/internal/render"
+	"github.com/sprimault/evasion/internal/core"
+	"github.com/sprimault/evasion/internal/render"
 )
 
 // TestMapPanelHoldsItsPixelsPerCell vérifie que les bornes du panneau de carte

@@ -6,7 +6,7 @@ package ai
 import (
 	"errors"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // ErrNoLegalMove dit qu'on a demandé un coup dans une position qui n'en offre

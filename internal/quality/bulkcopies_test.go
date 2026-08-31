@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sprimault/filature/internal/core"
+	"github.com/sprimault/evasion/internal/core"
 )
 
 // recopiesEnBloc énumère les types que ViewFor recopie entiers, avec les champs
